@@ -1,0 +1,19 @@
+name: Temporary keyboard listener audit
+on:
+  push:
+    branches: [feat/app-mode-editor-keyboard]
+    paths:
+      - '.github/workflows/audit-keyboard.yml'
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Locate keyboard event handlers
+        shell: bash
+        run: |
+          echo 'KEYBOARD_AUDIT_BEGIN'
+          grep -RnE "keydown|keyup|keypress|onKeyDown|onKeyUp|onKeyPress|KeyboardEvent|ArrowUp|ArrowDown|ArrowLeft|ArrowRight|KeyA|KeyD|KeyW|KeyS" src || true
+          echo 'KEYBOARD_AUDIT_END'
