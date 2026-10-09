@@ -9,6 +9,8 @@ import { mainSelectors } from 'store/main';
 
 import { useSelector } from 'store';
 
+import { useAppMode } from 'components/App/AppModeContext';
+
 import { useGoToPage } from 'hooks/control/useGoToPage';
 
 import { Item } from 'components/Toolbar/components/Item';
@@ -20,6 +22,7 @@ import { Modal } from './components';
 import * as styles from './Nav.module.scss';
 
 export const Nav = () => {
+  const appMode = useAppMode();
   const { goToPage, goPrevPage, goNextPage } = useGoToPage();
 
   const id = useSelector(mainSelectors.id);
@@ -33,26 +36,12 @@ export const Nav = () => {
   const [isModalActive, setIsModalActive] = useState(false);
 
   useEffect(() => {
+    if (appMode !== 'reader' || goToWithInputIsHide) {
+      return;
+    }
+
     inputRef.current?.focus();
-  });
-
-  useEffect(() => {
-    const keypressHandler = (e: KeyboardEvent) => {
-      const { key } = e;
-
-      if (key !== 'Enter' || goToWithInputIsHide) {
-        return;
-      }
-
-      go();
-    };
-
-    document.addEventListener('keypress', keypressHandler);
-
-    return () => {
-      document.removeEventListener('keypress', keypressHandler);
-    };
-  }, [goToWithInputIsHide, inputValue]);
+  }, [appMode, goToWithInputIsHide]);
 
   const modalConfirmHandler = () => {
     modalsWereShowed.set(id, Flags.swipes, true);
@@ -104,6 +93,12 @@ export const Nav = () => {
     setInputValue(e.target.value);
   };
 
+  const inputKeyDownHandler = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (appMode === 'reader' && event.key === 'Enter') {
+      go();
+    }
+  };
+
   const goToWithArrowsClassNames = classNames({
     [styles.GoToWithArrows]: true,
     [styles.isHide]: !goToWithInputIsHide,
@@ -147,6 +142,7 @@ export const Nav = () => {
           <input
             ref={inputRef}
             onChange={inputChangeHandler}
+            onKeyDown={inputKeyDownHandler}
             onBlur={inputBlurHandler}
             className={styles.Input}
             type="number"

@@ -8,6 +8,8 @@ import type { Config, RangeEffects, TableOfContents } from '@types';
 
 import { useDispatch, useSelector } from 'store';
 
+import { useAppMode } from 'components/App/AppModeContext';
+
 import { mainActions, mainSelectors } from 'store/main';
 import { audioEffectsSelectors } from 'store/effects/audio/audio';
 import { audioBgEffectsSelectors } from 'store/effects/audio/audioBg';
@@ -41,6 +43,7 @@ export type AppWrapperProps = {
 
 export const AppWrapper = ({ children, config, tableOfContents, rangeEffects }: PropsWithChildren<AppWrapperProps>) => {
   const dispatch = useDispatch();
+  const appMode = useAppMode();
 
   const { goPrevPage, goNextPage } = useGoToPage();
 
@@ -100,21 +103,23 @@ export const AppWrapper = ({ children, config, tableOfContents, rangeEffects }: 
   useDeleteAllVideosWithoutDataIdOnThePage();
 
   useEffect(() => {
-    // фокус для скролла
-    const narrativeElement = document.querySelector('#narrative') as HTMLElement;
-
-    if (!narrativeElement) {
+    if (appMode !== 'reader') {
       return;
     }
 
+    // Фокус для прокрутки в режиме чтения. Не переносим его при обновлении навигационных колбэков.
+    const narrativeElement = document.querySelector<HTMLElement>('#narrative');
+
     narrativeElement?.focus({ preventScroll: true });
+  }, [appMode]);
 
-    const removeKeyboardControl = addKeyboardControl(goPrevPage, goNextPage);
+  useEffect(() => {
+    if (appMode !== 'reader') {
+      return;
+    }
 
-    return () => {
-      removeKeyboardControl();
-    };
-  }, [goPrevPage, goNextPage]);
+    return addKeyboardControl(goPrevPage, goNextPage);
+  }, [appMode, goPrevPage, goNextPage]);
 
   useEffect(() => {
     // addTouchSupportForCssHover(); // вместо этого просто "удаляю" :hover везде, возможно так и оставлю

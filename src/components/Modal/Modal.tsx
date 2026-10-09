@@ -1,9 +1,11 @@
-import { PropsWithChildren, useEffect, useRef, useState } from 'react';
+import { PropsWithChildren, useCallback, useEffect, useRef, useState } from 'react';
 
 import Hammer from 'hammerjs';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCompress, faCrop, faExpand, faTimes } from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames';
+
+import { useAppMode } from 'components/App/AppModeContext';
 
 import * as styles from './Modal.module.scss';
 
@@ -40,6 +42,7 @@ export const Modal = ({
   canCrop = false,
   cropDefault = true,
 }: PropsWithChildren<ModalProps>) => {
+  const appMode = useAppMode();
   // здесь реф-версии нужны для хаммера, обычные для того чтобы ре-рендер срабатывал
   const isFullScreenRef = useRef(false);
   const isCropRef = useRef(true);
@@ -55,11 +58,15 @@ export const Modal = ({
   const iconCompressRef = useRef<HTMLDivElement>(null);
   const iconCropRef = useRef<HTMLDivElement>(null);
 
-  const escPressHandler = (e: KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      close();
+  const close = useCallback(() => {
+    if (!canClose) {
+      return;
     }
-  };
+
+    window.history.pushState(null, '', window.location.href);
+
+    onClose?.();
+  }, [canClose, onClose]);
 
   useEffect(() => {
     const listener = () => {
@@ -71,17 +78,25 @@ export const Modal = ({
     return () => {
       window.removeEventListener('popstate', listener);
     };
-  }, []);
+  }, [close]);
 
   useEffect(() => {
-    if (!isOpen) {
-      document.removeEventListener('keydown', escPressHandler);
-
+    if (!isOpen || appMode !== 'reader') {
       return;
     }
 
+    const escPressHandler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        close();
+      }
+    };
+
     document.addEventListener('keydown', escPressHandler);
-  }, [isOpen]);
+
+    return () => {
+      document.removeEventListener('keydown', escPressHandler);
+    };
+  }, [appMode, isOpen, close]);
 
   useEffect(() => {
     if (!wrapperRef.current) {
@@ -140,18 +155,6 @@ export const Modal = ({
       hammertime.destroy();
     };
   }, []);
-
-  const close = () => {
-    if (!canClose) {
-      return;
-    }
-
-    window.history.pushState(null, '', window.location.href);
-
-    if (onClose) {
-      onClose();
-    }
-  };
 
   const closeIconClickHandler = () => close();
   const overflowClickHandler = () => close();

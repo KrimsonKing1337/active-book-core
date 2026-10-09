@@ -6,6 +6,8 @@ import type { ItemProps as TableOfContentsItem } from 'components/TableOfContent
 
 import { HowlWrapper } from 'utils/effects/audio/HowlWrapper';
 
+export type AppMode = 'reader' | 'editor';
+
 export type Timer = ReturnType<typeof setTimeout> | null;
 export type Interval = ReturnType<typeof setInterval> | null;
 
