@@ -1,0 +1,7 @@
+@use "styles/__variables" as vars;
+
+.Label {
+  font-size: vars.$fs-14;
+  font-weight: 100;
+  text-transform: uppercase;
+}

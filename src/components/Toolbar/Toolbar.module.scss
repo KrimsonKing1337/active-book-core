@@ -1,0 +1,33 @@
+@use "styles/__variables" as vars;
+
+.Wrapper {
+  width: 100%;
+  padding: 0 clamp(12px, 1.5vw, 24px); // 0 20px;
+}
+
+.Toolbar {
+  z-index: 10;
+
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  max-width: vars.$appWidth;
+  height: clamp(44px, 48px, 52px); // 48px;
+  margin-top: clamp(12px, 1.5vw, 24px); // 20px;
+
+  color: var(--secondary);
+  font-size: vars.$fs-16;
+
+  background: transparent;
+}
+
+.FontSizeControlWrapper {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-start;
+  margin-left: auto;
+}

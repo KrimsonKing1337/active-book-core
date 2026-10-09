@@ -1,0 +1,11 @@
+.Volume {
+  margin-top: clamp(20px, 2.8vh, 40px); // 31px;
+}
+
+.Item {
+  margin-top: clamp(12px, 1.6vh, 20px); // 17px;
+
+  &:nth-child(1) {
+    margin-top: 0;
+  }
+}

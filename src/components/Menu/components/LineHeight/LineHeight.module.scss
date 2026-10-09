@@ -1,0 +1,40 @@
+@use "styles/__variables" as vars;
+@use "styles/__mixins" as mixins;
+
+.LineHeight {
+  margin-top: clamp(12px, 1.5vw, 24px); // 20px;
+  padding: clamp(12px, 1.5vw, 24px) 0; // 20px 0;
+
+  border-bottom: 1px #eaeaea solid;
+}
+
+.ItemsWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-top: 11px;
+}
+
+.Item {
+  margin-left: 8px;
+
+  &:nth-child(1) {
+    margin-left: 0;
+  }
+
+  &.isMinus,
+  &.isPlus {
+    font-size: vars.$fs-20;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    @include mixins.hover-default;
+  }
+
+  &.isValue {
+    color: var(--main);
+    font-size: vars.$fs-14;
+    font-weight: 100;
+  }
+}

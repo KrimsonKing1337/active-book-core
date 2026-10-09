@@ -1,0 +1,18 @@
+@use "styles/__variables" as vars;
+@use "styles/__mixins" as mixins;
+
+.Link {
+  display: inline;
+
+  color: #09f;
+
+  opacity: 0.85;
+
+  transition: text-shadow vars.$transitionDefault;
+
+  &:hover {
+    cursor: pointer;
+
+    @include mixins.text-shadow-default;
+  }
+}

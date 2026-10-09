@@ -1,0 +1,19 @@
+@use "styles/__mixins" as mixins;
+@use "styles/__variables" as vars;
+
+.AuthorComment {
+  display: inline;
+
+  color: #fd0;
+  font-weight: bold;
+
+  opacity: 0.85;
+
+  transition: text-shadow vars.$transitionDefault;
+
+  &:hover {
+    cursor: pointer;
+
+    @include mixins.text-shadow-default;
+  }
+}

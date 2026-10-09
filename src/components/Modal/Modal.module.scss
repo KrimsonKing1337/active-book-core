@@ -1,0 +1,230 @@
+@use "styles/__mixins" as mixins;
+@use "styles/__variables" as vars;
+
+.Overflow {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 10;
+
+  display: none;
+  width: 100%;
+  height: 100vh;
+  margin: auto;
+
+  background: var(--overflow);
+
+  &.isOpen {
+    display: block;
+  }
+}
+
+.Modal {
+  $transition: width #{vars.$transitionDefault}, height #{vars.$transitionDefault};
+
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 11;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  width: vars.$modalWidth;
+  max-width: vars.$appWidth;
+  height: vars.$modalHeight;
+  margin: auto;
+  overflow: auto;
+
+  &.isFullScreen {
+    width: 100%;
+    height: 95vh;
+  }
+
+  &.isMediaMode {
+    align-items: center;
+    max-width: none;
+
+    &.isFullScreen {
+      width: 100%;
+      height: 100vh;
+    }
+  }
+
+  @include mixins.scrollbar($transition);
+}
+
+.Wrapper {
+  position: relative;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+
+  width: 100%;
+}
+
+.Toolbar {
+  display: block;
+}
+
+.IconClose {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 1;
+
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin: auto;
+
+  transform: translateY(25%) translateX(75%);
+
+  filter: drop-shadow(1px 1px 1px #111);
+
+  &.isMediaMode {
+    position: absolute;
+    top: 5px;
+    right: 8px;
+    left: auto !important;
+
+    transform: none;
+  }
+
+  &.canClose {
+    display: flex;
+  }
+
+  @include mixins.modal-content-icon;
+}
+
+.IconExpand,
+.IconCompress {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: clamp(32px, 2.8vw, 44px); // 40px;
+  height: clamp(32px, 2.8vw, 44px); // 40px;
+
+  margin: auto;
+
+  transform: translateY(-25%) translateX(75%);
+
+  filter: drop-shadow(1px 1px 1px #111);
+
+  &.isHidden {
+    display: none !important;
+  }
+
+  &.isMediaMode {
+    position: absolute;
+    right: 8px;
+    bottom: 5px;
+    left: auto !important;
+
+    transform: none;
+  }
+
+  &.isFullScreen {
+    display: none;
+  }
+
+  @include mixins.modal-content-icon;
+}
+
+.IconCompress {
+  display: none;
+
+  &.isFullScreen {
+    display: flex;
+  }
+}
+
+.IconCrop {
+  position: absolute;
+  bottom: 5px;
+  left: 8px !important;
+  z-index: 1;
+
+  display: none;
+  align-items: center;
+  justify-content: center;
+
+  width: clamp(32px, 2.8vw, 44px); // 40px;
+  height: clamp(32px, 2.8vw, 44px); // 40px;
+
+  filter: drop-shadow(1px 1px 1px #111);
+
+  &.isHidden {
+    display: none !important;
+  }
+
+  &.isMediaMode {
+    &.isFullScreen {
+      display: flex;
+    }
+  }
+
+  @include mixins.modal-content-icon;
+}
+
+.Content {
+  height: vars.$modalHeight;
+
+  &.isFullScreen {
+    height: 95vh;
+  }
+
+  &.isMediaMode {
+    > img,
+    > video {
+      width: inherit;
+      height: inherit;
+      object-fit: contain;
+    }
+
+    &.isFullScreen {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100vh;
+    }
+  }
+
+  &.isCrop {
+    > img,
+    > video {
+      object-fit: cover;
+    }
+  }
+}
+
+.Confirm {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+
+  button {
+    margin-left: clamp(10px, 0.8vw, 18px); // 15px;
+
+    &:nth-child(1) {
+      margin-left: 0;
+    }
+  }
+}

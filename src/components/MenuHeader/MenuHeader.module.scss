@@ -1,0 +1,6 @@
+@use "styles/__variables" as vars;
+
+.Header {
+  font-size: vars.$fs-42;
+  font-weight: bold;
+}

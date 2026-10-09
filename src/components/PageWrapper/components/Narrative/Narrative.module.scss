@@ -1,0 +1,24 @@
+@use "styles/__mixins" as mixins;
+
+.Narrative {
+  position: relative;
+
+  width: 100%;
+  height: calc(100% - clamp(48px, 6vh, 80px)); // calc(100% - 68px);
+  padding: clamp(12px, 1.5vw, 24px); // 20px;
+  overflow: auto;
+
+  color: var(--secondary);
+  font-size: 100%;
+  text-shadow: 1px 1px 1px var(--bg);
+  hyphens: auto; // чтобы перенос строк работал - нужно в тэге html обязательно указывать правильный lang
+
+  /*
+  * иначе событие swipe у Hammer.Js не срабатывает,
+  * см.: https://stackoverflow.Com/questions/60198150/hammerjs-swipe-not-working-on-elements-with-overflow-css-property
+  */
+  touch-action: pan-y !important;
+
+  @include mixins.scrollbar;
+}
+

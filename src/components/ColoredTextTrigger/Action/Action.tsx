@@ -1,0 +1,36 @@
+import type { PropsWithChildren } from 'react';
+
+import classNames from 'classnames';
+
+import * as styles from './Action.module.scss';
+
+export type ActionProps = React.HTMLAttributes<HTMLSpanElement> & {
+  className?: string;
+  fullWidth?: boolean;
+  withSpaces?: boolean;
+  onClick?: () => void;
+};
+
+export const Action = ({
+  children,
+  className = '',
+  fullWidth = false,
+  withSpaces = true,
+  onClick = () => {
+  },
+  ...etc
+}: PropsWithChildren<ActionProps>) => {
+  const actionClassNames = classNames({
+    [styles.Action]: true,
+    [styles.isFullWidth]: fullWidth,
+    [className]: !!className,
+  });
+
+  return (
+    <span className={actionClassNames} onClick={onClick} {...etc}>
+      { withSpaces && ' ' }
+      {children}
+      { withSpaces && ' ' }
+    </span>
+  );
+};

@@ -1,0 +1,41 @@
+@use "styles/__mixins" as mixins;
+
+.Item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-top: 24px;
+
+  font-size: 24px;
+
+  &:nth-child(1) {
+    margin-top: 0;
+  }
+
+  @include mixins.hover-default;
+}
+
+.Title {
+  flex-shrink: 0;
+}
+
+.Subtitle {
+  margin-left: 9px;
+  overflow: hidden;
+
+  font-size: 18px;
+  // font-style: italic;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.PageNumber {
+  flex-shrink: 0;
+  margin-left: 15px;
+}
+
+.DeleteIcon {
+  flex-shrink: 0;
+  margin-left: auto;
+}

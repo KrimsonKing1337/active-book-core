@@ -1,0 +1,37 @@
+@use "styles/__variables" as vars;
+@use "styles/__mixins" as mixins;
+
+.Item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-top: clamp(16px, 2.2vh, 28px); // 24px;
+
+  font-size: vars.$fs-24;
+
+  &:nth-child(1) {
+    margin-top: 0;
+  }
+
+  @include mixins.hover-default;
+}
+
+.Title {
+  flex-shrink: 0;
+}
+
+.Subtitle {
+  margin-left: 9px;
+  overflow: hidden;
+
+  font-size: clamp(16px, 1.2vw, 20px); // 18px;
+  // font-style: italic;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.PageNumber {
+  flex-shrink: 0;
+  margin-left: auto;
+}

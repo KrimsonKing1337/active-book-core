@@ -1,0 +1,46 @@
+import classNames from 'classnames';
+
+import { useDispatch } from 'store';
+import { mainActions } from 'store/main';
+
+import * as styles from './Footer.module.scss';
+
+function getClassNames(className: string) {
+  return classNames([
+    styles.Button,
+    className,
+  ]);
+}
+
+export const Footer = () => {
+  const dispatch = useDispatch();
+
+  const tableOfContentsButtonClickHandler = () => {
+    dispatch(mainActions.setMenuActiveState('tableOfContents'));
+  };
+
+  /*const achievementsProgressClickHandler = () => {
+    dispatch(mainActions.setMenuActiveState('achievementsProgress'));
+  };*/
+
+  const closeButtonClickHandler = () => {
+    dispatch(mainActions.setMenuActiveState(null));
+  };
+
+  return (
+    <div className={styles.Footer}>
+      <button className={getClassNames(styles.isTableOfContents)} onClick={tableOfContentsButtonClickHandler}>
+        Оглавление
+      </button>
+
+      {/* временно скрываю всё, что связано с ачивками */}
+      {/*<button className={getClassNames(styles.isAchievementsProgress)} onClick={achievementsProgressClickHandler}>
+        Прогресс достижений
+      </button>*/}
+
+      <button className={getClassNames(styles.isClose)} onClick={closeButtonClickHandler}>
+        Закрыть
+      </button>
+    </div>
+  );
+};

@@ -1,0 +1,59 @@
+@use "styles/__variables" as vars;
+@use "styles/__mixins" as mixins;
+
+.Toggle {
+  margin-top: clamp(12px, 1.5vw, 24px); // 20px;
+  padding: clamp(12px, 1.5vw, 24px) 0; // 20px 0;
+
+  border-bottom: 1px #eaeaea solid;
+
+  &.isWithoutBorder {
+    border-bottom: none;
+  }
+}
+
+.ItemsWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: clamp(20px, 4vh, 40px); // 31px;
+  margin-top: 11px;
+
+  border: 1px var(--main) solid;
+  border-radius: clamp(0px, 2vw, 16px); // 16px;
+}
+
+.Item {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 50%;
+  height: inherit;
+
+  color: var(--secondary);
+  font-size: vars.$fs-14;
+  font-weight: 100;
+  text-transform: capitalize;
+
+  background: transparent;
+  cursor: pointer;
+
+  &:nth-child(1) {
+    border-top-left-radius: clamp(0px, 2vw, 16px); // 16px;
+    border-bottom-left-radius: clamp(0px, 2vw, 16px); // 16px;
+  }
+
+  &:nth-child(2) {
+    border-top-right-radius: clamp(0px, 2vw, 16px); // 16px;
+    border-bottom-right-radius: clamp(0px, 2vw, 16px); // 16px;
+  }
+
+  &.isActive {
+    color: #fff;
+
+    background-color: var(--main);
+  }
+
+  @include mixins.hover-default;
+}
