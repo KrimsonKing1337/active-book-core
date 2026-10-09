@@ -4,6 +4,8 @@ import classNames from 'classnames';
 
 
 import { useDispatch } from 'store';
+
+import { useAppMode } from 'components/App/AppModeContext';
 import { mainActions } from 'store/main';
 
 import { getNarrativeElement } from 'components/PageWrapper/components/Narrative/utils';
@@ -16,6 +18,7 @@ export type OverflowProps = React.HTMLAttributes<HTMLDivElement> & PropsWithChil
 };
 
 export const Overflow = ({ children, isOpen, className = '', ...etc }: OverflowProps) => {
+  const appMode = useAppMode();
   const dispatch = useDispatch();
 
   const overflowRef = useRef<HTMLDivElement>(null);
@@ -30,16 +33,20 @@ export const Overflow = ({ children, isOpen, className = '', ...etc }: OverflowP
       }
     };
 
-    if (isOpen) {
+    if (isOpen && appMode === 'reader') {
       document.addEventListener('keydown', keypressEscHandler);
     }
 
     return () => {
       document.removeEventListener('keydown', keypressEscHandler);
     };
-  }, [isOpen]);
+  }, [appMode, isOpen, dispatch]);
 
   useEffect(() => {
+    if (appMode !== 'reader') {
+      return;
+    }
+
     if (isOpen) {
       // переводим фокус на прокручиваемый элемент для возможности прокрутки с помощью стрелок вверх и вниз
       overflowRef.current?.focus();
@@ -49,7 +56,7 @@ export const Overflow = ({ children, isOpen, className = '', ...etc }: OverflowP
 
       narrativeElement?.focus();
     }
-  }, [isOpen]);
+  }, [appMode, isOpen]);
 
   const overflowClassNames = classNames({
     [styles.Overflow]: true,

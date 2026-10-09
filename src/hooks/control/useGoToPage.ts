@@ -1,3 +1,5 @@
+import { useCallback } from 'react';
+
 import { useNavigate, useLocation } from 'react-router-dom';
 
 import { useDispatch, useSelector } from 'store';
@@ -10,10 +12,10 @@ export function useGoToPage() {
   const currentPage = useSelector(mainSelectors.page);
   const pages = useSelector(mainSelectors.pages);
 
-  const location = useLocation();
+  const { pathname } = useLocation();
   const navigate = useNavigate();
 
-  const goToPage = (page: number) => {
+  const goToPage = useCallback((page: number) => {
     if (page === 0) {
       dispatch(mainActions.setPage(0));
       navigate('/');
@@ -23,11 +25,9 @@ export function useGoToPage() {
 
     dispatch(mainActions.setPage(page));
     navigate(`/page-${page}`);
-  };
+  }, [dispatch, navigate]);
 
-  const goNextPage = () => {
-    const { pathname } = location;
-
+  const goNextPage = useCallback(() => {
     if (pathname === '/') {
       goToPage(1);
 
@@ -41,17 +41,15 @@ export function useGoToPage() {
     }
 
     goToPage(nextIndex);
-  };
+  }, [currentPage, pages, pathname, goToPage]);
 
-  const goPrevPage = () => {
-    const { pathname } = location;
-
+  const goPrevPage = useCallback(() => {
     if (pathname === '/') {
       return;
     }
 
     goToPage(currentPage - 1);
-  };
+  }, [currentPage, pathname, goToPage]);
 
   return {
     goToPage,

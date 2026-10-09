@@ -11,9 +11,12 @@ import { mainSelectors } from 'store/main';
 
 import { useGoToPage } from 'hooks/control/useGoToPage';
 
+import { useAppMode } from 'components/App/AppModeContext';
+
 import * as styles from './Narrative.module.scss';
 
 export const Narrative = ({ children }: PropsWithChildren) => {
+  const appMode = useAppMode();
   const { goNextPage, goPrevPage } = useGoToPage();
 
   const currentPage = useSelector(mainSelectors.page);
@@ -42,12 +45,16 @@ export const Narrative = ({ children }: PropsWithChildren) => {
   }, [currentPage]);
 
   useEffect(() => {
-    // переводим фокус на прокручиваемый элемент для возможности прокрутки с помощью стрелок вверх и вниз
+    if (appMode !== 'reader') {
+      return;
+    }
+
+    // Переводим фокус для прокрутки только в режиме чтения.
     ref.current?.focus();
-  }, []);
+  }, [appMode]);
 
   useEffect(() => {
-    if (!ref.current || currentPageRef.current === 0) {
+    if (appMode !== 'reader' || !ref.current || currentPageRef.current === 0) {
       return;
     }
 
@@ -74,7 +81,7 @@ export const Narrative = ({ children }: PropsWithChildren) => {
       hammertime.off('swipe');
       hammertime.destroy();
     };
-  }, []);
+  }, [appMode, goNextPage, goPrevPage]);
 
   return (
     <div
