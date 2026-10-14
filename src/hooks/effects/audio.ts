@@ -104,7 +104,7 @@ export function useAudio({
       // Незаконченная загрузка не должна навсегда удерживать isAudiosLoading.
       markReady();
 
-      dispatch(audioEffectsActions.deleteAudioInstance({ id, instance }));
+      dispatch(audioEffectsActions.removeAudioInstance({ id, instance }));
     };
   }, [currentPage, isAudioUnlocked, id, page, src, formatKey, lifecycle]);
 

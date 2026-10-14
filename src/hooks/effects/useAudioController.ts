@@ -34,7 +34,7 @@ export function useAudioController(id: string) {
       return;
     }
 
-    dispatch(audioEffectsActions.deleteAudioInstance({ id, instance }));
+    dispatch(audioEffectsActions.removeAudioInstance({ id, instance }));
   }, [id, getAudio, dispatch]);
 
   return {

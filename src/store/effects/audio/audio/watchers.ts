@@ -10,13 +10,17 @@ import { selectors } from './selectors';
 
 import type { DeleteAudioInstancePayload } from './@types';
 
+type RemoveAudioInstancePayload = {
+  id: string;
+  instance: NonNullable<HowlInst>;
+};
+
+// Обратная совместимость: старые вызовы удаления по ID переводятся в точное удаление экземпляра.
 export function* watchDeleteAudioInstance(action: PayloadAction<DeleteAudioInstancePayload>) {
   const { payload } = action;
 
   const id = typeof payload === 'string' ? payload : payload.id;
   const audioInstances: HowlInstances = yield select(selectors.audioInstances);
-
-  // Точное совпадение защищает от удаления нового экземпляра с тем же ID.
   const instance: HowlInst = typeof payload === 'string' ? audioInstances[id] : payload.instance;
 
   if (!instance) {
@@ -24,6 +28,16 @@ export function* watchDeleteAudioInstance(action: PayloadAction<DeleteAudioInsta
   }
 
   yield put(actions.removeAudioInstance({ id, instance }));
+}
+
+export function* watchRemoveAudioInstance(action: PayloadAction<RemoveAudioInstancePayload>) {
+  const { id, instance } = action.payload;
+  const audioInstances: HowlInstances = yield select(selectors.audioInstances);
+
+  // Если тот же экземпляр снова зарегистрировали, выгружать его нельзя.
+  if (audioInstances[id] === instance) {
+    return;
+  }
 
   Object.values(instance.timers).forEach((timer) => {
     if (timer) {
@@ -38,4 +52,5 @@ export function* watchDeleteAudioInstance(action: PayloadAction<DeleteAudioInsta
 
 export function* watchActions() {
   yield takeEvery(actions.deleteAudioInstance, watchDeleteAudioInstance);
+  yield takeEvery(actions.removeAudioInstance, watchRemoveAudioInstance);
 }
