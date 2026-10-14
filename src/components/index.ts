@@ -29,4 +29,4 @@ export * from './DotLottieReact';
 export * from './WelcomeTour';
 export * from './Typography';
 export * from './Slider';
-
+export * from './ProxyHooks';
