@@ -1,4 +1,9 @@
-import type { HowlInstances } from '@types';
+import type { HowlInst, HowlInstances } from '@types';
+
+export type DeleteAudioInstancePayload = string | {
+  id: string;
+  instance: NonNullable<HowlInst>;
+};
 
 export interface State {
   audioInstances: HowlInstances;

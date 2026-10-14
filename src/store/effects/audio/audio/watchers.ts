@@ -1,5 +1,5 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
-import { put, select, takeLatest } from 'redux-saga/effects';
+import { put, select, takeEvery } from 'redux-saga/effects';
 
 import type { HowlInst, HowlInstances } from '@types';
 
@@ -8,59 +8,34 @@ import { unloadAudio } from 'utils/effects/audio/unloadAudio';
 import { actions } from './slice';
 import { selectors } from './selectors';
 
-export function* watchSetAudioInstance(action: PayloadAction<HowlInst>) {
+import type { DeleteAudioInstancePayload } from './@types';
+
+export function* watchDeleteAudioInstance(action: PayloadAction<DeleteAudioInstancePayload>) {
   const { payload } = action;
 
-  if (!payload) {
+  const id = typeof payload === 'string' ? payload : payload.id;
+  const audioInstances: HowlInstances = yield select(selectors.audioInstances);
+
+  // Точное совпадение защищает от удаления нового экземпляра с тем же ID.
+  const instance: HowlInst = typeof payload === 'string' ? audioInstances[id] : payload.instance;
+
+  if (!instance) {
     return;
   }
 
-  const { id } = payload;
+  yield put(actions.removeAudioInstance({ id, instance }));
 
-  const howlInstances: HowlInstances = yield select(selectors.audioInstances);
-
-  const newValue = {
-    ...howlInstances,
-    [id]: payload,
-  };
-
-  yield put(actions.setAudioInstances(newValue));
-}
-
-export function* watchDeleteAudioInstance(action: PayloadAction<string>) {
-  const { payload } = action;
-
-  const howlInstances: HowlInstances = yield select(selectors.audioInstances);
-
-  const howlInstance = howlInstances[payload];
-
-  if (!howlInstance) {
-    return;
-  }
-
-  yield put(actions.setIsDeleting(true));
-
-  Object.values(howlInstance.timers).forEach((timerCur) => {
-    if (timerCur) {
-      clearTimeout(timerCur);
+  Object.values(instance.timers).forEach((timer) => {
+    if (timer) {
+      clearTimeout(timer);
     }
   });
 
-  if (!howlInstance.isUnloading) {
-    unloadAudio(howlInstance);
+  if (!instance.isUnloading) {
+    void unloadAudio(instance);
   }
-
-  const newValue = {
-    ...howlInstances,
-  };
-
-  delete newValue[payload];
-
-  yield put(actions.setAudioInstances(newValue));
-  yield put(actions.setIsDeleting(false));
 }
 
 export function* watchActions() {
-  yield takeLatest(actions.setAudioInstance, watchSetAudioInstance);
-  yield takeLatest(actions.deleteAudioInstance, watchDeleteAudioInstance);
+  yield takeEvery(actions.deleteAudioInstance, watchDeleteAudioInstance);
 }
