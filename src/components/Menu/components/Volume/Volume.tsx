@@ -90,6 +90,7 @@ export const Volume = () => {
             <Label label={label} />
 
             <Slider
+              className={styles.Slider}
               value={value}
               onChange={onChange}
               onAfterChange={afterChangeHandler}

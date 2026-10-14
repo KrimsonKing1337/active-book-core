@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import type { IRenderThumbParams, IRenderTrackParams } from 'react-range/lib/types';
 import { Range, getTrackBackground } from 'react-range';
 
+import classNames from 'classnames';
+
 const STEP = 1;
 const MIN = 0;
 const MAX = 100;
@@ -10,12 +12,18 @@ const MAX = 100;
 import * as styles from './Slider.module.scss';
 
 type SliderProps = {
+  className?: string;
   value: number;
   onChange?: (value: number) => void;
   onAfterChange?: (value: number) => void;
 };
 
-export const Slider = ({ value, onChange, onAfterChange }: SliderProps) => {
+export const Slider = ({
+  className = '',
+  value,
+  onChange,
+  onAfterChange,
+}: SliderProps) => {
   const [values, setValues] = useState([value]);
 
   useEffect(() => {
@@ -37,6 +45,11 @@ export const Slider = ({ value, onChange, onAfterChange }: SliderProps) => {
   };
 
   const Track = ({ props, children }: IRenderTrackParams) => {
+    const trackWrapperClassNames = classNames({
+      [styles.TrackWrapper]: true,
+      [className]: !!className,
+    });
+
     const trackStyleBackground = getTrackBackground({
       values,
       colors: ['var(--main)', '#ccc'],
@@ -51,7 +64,7 @@ export const Slider = ({ value, onChange, onAfterChange }: SliderProps) => {
     return (
       <div
         style={props.style}
-        className={styles.TrackWrapper}
+        className={trackWrapperClassNames}
         onMouseDown={props.onMouseDown}
         onTouchStart={props.onTouchStart}
       >
