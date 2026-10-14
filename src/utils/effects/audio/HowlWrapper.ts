@@ -8,6 +8,7 @@ export type HowlWrapperOptions = {
   id: string;
   page?: number;
   src: HowlOptions['src'];
+  format?: HowlOptions['format'];
   loop?: HowlOptions['loop'];
   type?: AudioType;
   isRange?: boolean;
@@ -26,6 +27,7 @@ export type HowlWrapperOptions = {
 
 type HowlerOptions = {
   src: HowlOptions['src'];
+  format?: HowlOptions['format'];
   loop?: HowlOptions['loop'];
   volume?: HowlOptions['volume'];
 };
@@ -60,6 +62,7 @@ export class HowlWrapper {
     id,
     page,
     src,
+    format,
     loop,
     type = 'sfx',
     isRange = false,
@@ -85,6 +88,7 @@ export class HowlWrapper {
 
     const options: HowlerOptions = {
       src,
+      format,
       loop,
     };
 

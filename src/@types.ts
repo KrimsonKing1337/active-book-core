@@ -21,6 +21,7 @@ export type AudioEffectOptions = {
   page: number;
   inRange?: boolean;
   src: string;
+  format?: string[];
   fadeOutWhenUnload?: boolean;
   type?: AudioType;
   loop?: boolean;
