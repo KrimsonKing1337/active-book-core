@@ -47,36 +47,56 @@ export const Volume = () => {
     dispatch(volumeActions.setVideos(value));
   };
 
-  /*
-  * пытался то, что ниже переделать в массив и map(),
-  * но получаю ошибку: Can't perform a React state update on an unmounted component
-  */
+  const volumeControls = [
+    {
+      id: 'global',
+      label: 'Общая громкость',
+      value: globalVolume,
+      onChange: globalChangeHandler,
+    },
+    {
+      id: 'music',
+      label: 'Громкость музыки',
+      value: musicVolume,
+      onChange: musicChangeHandler,
+    },
+    {
+      id: 'sfx',
+      label: 'SFX',
+      value: sfxVolume,
+      onChange: sfxChangeHandler,
+    },
+    {
+      id: 'bg',
+      label: 'Фоновые звуки',
+      value: bgVolume,
+      onChange: bgChangeHandler,
+    },
+    {
+      id: 'videos',
+      label: 'Громкость видео',
+      value: videosVolume,
+      onChange: videosChangeHandler,
+    },
+  ];
+
   return (
     <div className={styles.Volume}>
-      <div className={styles.Item}>
-        <Label label="Общая громкость" />
-        <Slider value={globalVolume} onChange={globalChangeHandler} onAfterChange={afterChangeHandler} />
-      </div>
+      {volumeControls.map((controlCur) => {
+        const { id, label, value, onChange } = controlCur;
 
-      <div className={styles.Item}>
-        <Label label="Громкость музыки" />
-        <Slider value={musicVolume} onChange={musicChangeHandler} onAfterChange={afterChangeHandler} />
-      </div>
+        return (
+          <div key={id} className={styles.Item}>
+            <Label label={label} />
 
-      <div className={styles.Item}>
-        <Label label="SFX" />
-        <Slider value={sfxVolume} onChange={sfxChangeHandler} onAfterChange={afterChangeHandler} />
-      </div>
-
-      <div className={styles.Item}>
-        <Label label="Фоновые звуки" />
-        <Slider value={bgVolume} onChange={bgChangeHandler} onAfterChange={afterChangeHandler} />
-      </div>
-
-      <div className={styles.Item}>
-        <Label label="Громкость видео" />
-        <Slider value={videosVolume} onChange={videosChangeHandler} onAfterChange={afterChangeHandler} />
-      </div>
+            <Slider
+              value={value}
+              onChange={onChange}
+              onAfterChange={afterChangeHandler}
+            />
+          </div>
+        );
+      })}
     </div>
   );
 };
