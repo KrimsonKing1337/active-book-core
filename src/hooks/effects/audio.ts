@@ -50,6 +50,17 @@ export function useAudio({
       return;
     }
 
+    let isReady = false;
+
+    const markReady = () => {
+      if (isReady) {
+        return;
+      }
+
+      isReady = true;
+      dispatch(effectsActions.setAudioReady());
+    };
+
     const options: HowlWrapperOptions = {
       id,
       page,
@@ -66,23 +77,16 @@ export function useAudio({
       onPlay,
       onPause,
       onStop,
-      onUnload,
+      onUnload: () => {
+        // В manual звук могут удалить до завершения загрузки.
+        markReady();
+        onUnload();
+      },
     };
 
     const instance = new HowlWrapper(options);
 
     dispatch(effectsActions.setAudiosAmountInc());
-
-    let isReady = false;
-
-    const markReady = () => {
-      if (isReady) {
-        return;
-      }
-
-      isReady = true;
-      dispatch(effectsActions.setAudioReady());
-    };
 
     if (instance.howlInst.state() === 'loaded') {
       markReady();
