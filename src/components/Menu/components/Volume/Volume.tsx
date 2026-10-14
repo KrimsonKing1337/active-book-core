@@ -4,10 +4,9 @@ import { volumeActions, volumeSelectors } from 'store/volume';
 import { mainSelectors } from 'store/main';
 
 import { Label } from 'components/Label';
+import { Slider } from 'components/Slider';
 
 import { set as localStorageSet } from 'utils/localStorage/localStorage';
-
-import { Slider } from './components/Slider';
 
 import * as styles from './Volume.module.scss';
 

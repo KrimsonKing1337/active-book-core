@@ -28,3 +28,5 @@ export * from './Segment';
 export * from './DotLottieReact';
 export * from './WelcomeTour';
 export * from './Typography';
+export * from './Slider';
+

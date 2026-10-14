@@ -37,23 +37,27 @@ export const Slider = ({ value, onChange, onAfterChange }: SliderProps) => {
   };
 
   const Track = ({ props, children }: IRenderTrackParams) => {
+    const trackStyleBackground = getTrackBackground({
+      values,
+      colors: ['var(--main)', '#ccc'],
+      min: MIN,
+      max: MAX,
+    });
+
+    const trackStyle = {
+      background: trackStyleBackground,
+    };
+
     return (
       <div
-        onMouseDown={props.onMouseDown}
-        onTouchStart={props.onTouchStart}
         style={props.style}
         className={styles.TrackWrapper}
+        onMouseDown={props.onMouseDown}
+        onTouchStart={props.onTouchStart}
       >
         <div
           ref={props.ref}
-          style={{
-            background: getTrackBackground({
-              values,
-              colors: ['var(--main)', '#ccc'],
-              min: MIN,
-              max: MAX,
-            }),
-          }}
+          style={trackStyle}
           className={styles.Track}
         >
           {children}
@@ -63,12 +67,14 @@ export const Slider = ({ value, onChange, onAfterChange }: SliderProps) => {
   };
 
   const Thumb = ({ props }: IRenderThumbParams) => {
+    const { key, style, ...rest } = props;
+
     return (
       <div
-        {...props}
-        key={props.key}
-        style={props.style}
+        key={key}
+        style={style}
         className={styles.Thumb}
+        {...rest}
       />
     );
   };
@@ -79,10 +85,10 @@ export const Slider = ({ value, onChange, onAfterChange }: SliderProps) => {
       step={STEP}
       min={MIN}
       max={MAX}
-      onChange={changeHandler}
-      onFinalChange={afterChangeHandler}
       renderTrack={Track}
       renderThumb={Thumb}
+      onChange={changeHandler}
+      onFinalChange={afterChangeHandler}
     />
   );
 };
