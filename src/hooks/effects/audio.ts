@@ -43,7 +43,7 @@ export function useAudio({
       return;
     }
 
-    // В manual экземпляр принадлежит приложению: React лишь обеспечивает его создание.
+    // В manual экземпляр принадлежит приложению: React лишь обеспечивает его создание
     const existing = store.getState().audioEffects.audioInstances[id];
 
     if (lifecycle === 'manual' && existing && !existing.isUnloading) {
@@ -58,6 +58,7 @@ export function useAudio({
       }
 
       isReady = true;
+
       dispatch(effectsActions.setAudioReady());
     };
 
@@ -78,7 +79,7 @@ export function useAudio({
       onPause,
       onStop,
       onUnload: () => {
-        // В manual звук могут удалить до завершения загрузки.
+        // В manual звук могут удалить до завершения загрузки
         markReady();
         onUnload();
       },
@@ -105,12 +106,23 @@ export function useAudio({
       instance.howlInst.off('load', markReady);
       instance.howlInst.off('loaderror', markReady);
 
-      // Незаконченная загрузка не должна навсегда удерживать isAudiosLoading.
+      // Незаконченная загрузка не должна навсегда удерживать isAudiosLoading
       markReady();
 
-      dispatch(audioEffectsActions.removeAudioInstance({ id, instance }));
+      dispatch(audioEffectsActions.removeAudioInstance({
+        id,
+        instance,
+      }));
     };
-  }, [currentPage, isAudioUnlocked, id, page, src, formatKey, lifecycle]);
+  }, [
+    currentPage,
+    isAudioUnlocked,
+    id,
+    page,
+    src,
+    formatKey,
+    lifecycle,
+  ]);
 
   return audioInstances[id];
 }

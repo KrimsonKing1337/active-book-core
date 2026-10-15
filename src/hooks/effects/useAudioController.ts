@@ -4,9 +4,10 @@ import { store, useDispatch, useSelector } from 'store';
 
 import { audioEffectsActions, audioEffectsSelectors } from 'store/effects/audio/audio';
 
-// Управление по ID работает и после размонтирования компонента Audio (lifecycle="manual").
-export function useAudioController(id: string) {
+// Управление по ID работает и после размонтирования компонента Audio (lifecycle="manual")
+export const useAudioController = (id: string) => {
   const dispatch = useDispatch();
+
   const audioInstances = useSelector(audioEffectsSelectors.audioInstances);
 
   const audio = audioInstances[id] ?? null;
@@ -44,4 +45,4 @@ export function useAudioController(id: string) {
     stop,
     remove,
   };
-}
+};
