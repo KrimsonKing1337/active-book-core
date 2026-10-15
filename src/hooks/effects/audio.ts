@@ -1,8 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 
 import type { AudioEffectOptions } from '@types';
 
-import { useSelector, useDispatch } from 'store';
+import { store, useSelector, useDispatch } from 'store';
 
 import { mainSelectors } from 'store/main';
 import { audioEffectsActions, audioEffectsSelectors } from 'store/effects/audio/audio';
@@ -16,6 +16,7 @@ export function useAudio({
   page,
   src,
   format,
+  lifecycle = 'auto',
   type = 'sfx',
   loop = false,
   playOnLoad = false,
@@ -35,34 +36,33 @@ export function useAudio({
   const isAudioUnlocked = useSelector(mainSelectors.isAudioUnlocked);
   const audioInstances = useSelector(audioEffectsSelectors.audioInstances);
 
-  const refId = useRef('');
-  const currentPageRef = useRef(0);
+  const formatKey = format?.join(',');
 
   useEffect(() => {
-    currentPageRef.current = currentPage;
-  }, [currentPage]);
-
-  useEffect(() => {
-    /*
-      Если есть или id у этого экземпляра уже есть - значит эффект не нужно инициализировать заново.
-      Или если страница эффекта не соответствует текущей странице
-
-      todo: Здесь была ещё завязка на isDeleting. Но я не смог вспомнить зачем это было нужно
-    */
-
-    if (currentPage !== page) {
+    if (currentPage !== page || !isAudioUnlocked || !id || !src) {
       return;
     }
 
-    if (refId.current) {
+    // В manual экземпляр принадлежит приложению: React лишь обеспечивает его создание
+    const existing = store.getState().audioEffects.audioInstances[id];
+
+    if (lifecycle === 'manual' && existing && !existing.isUnloading) {
       return;
     }
 
-    if (!isAudioUnlocked) {
-      return;
-    }
+    let isReady = false;
 
-    const opt: HowlWrapperOptions = {
+    const markReady = () => {
+      if (isReady) {
+        return;
+      }
+
+      isReady = true;
+
+      dispatch(effectsActions.setAudioReady());
+    };
+
+    const options: HowlWrapperOptions = {
       id,
       page,
       src: [src],
@@ -78,44 +78,51 @@ export function useAudio({
       onPlay,
       onPause,
       onStop,
-      onUnload,
+      onUnload: () => {
+        // В manual звук могут удалить до завершения загрузки
+        markReady();
+        onUnload();
+      },
     };
 
-    const howlWrapperInst = new HowlWrapper(opt);
+    const instance = new HowlWrapper(options);
 
     dispatch(effectsActions.setAudiosAmountInc());
 
-    // иногда событие loaded происходит уже после смены страницы.
-    // чтобы поймать актуальный номер страницы - я использую ref
-    const loadedHandler = () => {
-      if (currentPageRef.current !== howlWrapperInst.page) {
-        return;
-      }
-
-      dispatch(effectsActions.setAudioReady());
-    };
-
-    if (howlWrapperInst.howlInst.state() === 'loaded') {
-      loadedHandler();
+    if (instance.howlInst.state() === 'loaded') {
+      markReady();
     } else {
-      const handler = () => {
-        loadedHandler();
-      };
-
-      howlWrapperInst.howlInst.once('load', handler);
-      howlWrapperInst.howlInst.once('loaderror', handler);
+      instance.howlInst.once('load', markReady);
+      instance.howlInst.once('loaderror', markReady);
     }
 
-    refId.current = id;
+    dispatch(audioEffectsActions.setAudioInstance(instance));
 
-    dispatch(audioEffectsActions.setAudioInstance(howlWrapperInst));
-  }, [currentPage, isAudioUnlocked]);
+    if (lifecycle === 'manual') {
+      return;
+    }
 
-  useEffect(() => {
     return () => {
-      dispatch(audioEffectsActions.deleteAudioInstance(refId.current));
-    };
-  }, []);
+      instance.howlInst.off('load', markReady);
+      instance.howlInst.off('loaderror', markReady);
 
-  return audioInstances[refId.current];
+      // Незаконченная загрузка не должна навсегда удерживать isAudiosLoading
+      markReady();
+
+      dispatch(audioEffectsActions.removeAudioInstance({
+        id,
+        instance,
+      }));
+    };
+  }, [
+    currentPage,
+    isAudioUnlocked,
+    id,
+    page,
+    src,
+    formatKey,
+    lifecycle,
+  ]);
+
+  return audioInstances[id];
 }

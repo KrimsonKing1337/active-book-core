@@ -15,8 +15,10 @@ export type HowlInst = HowlWrapper | null;
 export type HowlInstances = Record<string, HowlInst>;
 
 export type AudioType = 'bg' | 'music' | 'sfx';
+export type AudioLifecycle = 'auto' | 'manual';
 
 export type AudioEffectOptions = {
+  lifecycle?: AudioLifecycle;
   id: string;
   page: number;
   inRange?: boolean;
