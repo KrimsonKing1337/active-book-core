@@ -5,7 +5,7 @@ import { sleep } from 'utils/sleep';
 
 let letItBe = false;
 
-async function play(flashlightOn: (n: number) => void) {
+const play = async (flashlightOn: (n: number) => void) => {
   const flash = async (sleepAfter: number) => {
     if (!letItBe) return;
 
@@ -25,9 +25,9 @@ async function play(flashlightOn: (n: number) => void) {
   await flash(8253);
   await flash(4775);
   await flash(7897);
-}
+};
 
-export function useRain() {
+export const useRain = () => {
   const { flashlightOn, flashlightOff } = useFlashlight(true);
 
   useEffect(() => {
@@ -49,4 +49,4 @@ export function useRain() {
       letItBe = false;
     };
   }, []);
-}
+};

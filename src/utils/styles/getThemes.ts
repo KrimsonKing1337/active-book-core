@@ -1,6 +1,6 @@
 import { ThemeOptions } from '@types';
 
-export function getThemes(customThemes?: Record<string, ThemeOptions>) {
+export const getThemes = (customThemes?: Record<string, ThemeOptions>) => {
   const defaultThemes: Record<string, ThemeOptions> = {
     dark: {
       main: '#a3a3a3',
@@ -40,4 +40,4 @@ export function getThemes(customThemes?: Record<string, ThemeOptions>) {
     ...customThemes,
     ...defaultThemes,
   };
-}
+};

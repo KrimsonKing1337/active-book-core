@@ -1,5 +1,5 @@
 // font-size || line-height
-export function getNewValueForNarrativeTextStyle(currentValue: number, isMoreAction: boolean) {
+export const getNewValueForNarrativeTextStyle = (currentValue: number, isMoreAction: boolean) => {
   const step = 25;
   const limit = isMoreAction ? 150 : 75;
 
@@ -20,4 +20,4 @@ export function getNewValueForNarrativeTextStyle(currentValue: number, isMoreAct
   }
 
   return newValue;
-}
+};

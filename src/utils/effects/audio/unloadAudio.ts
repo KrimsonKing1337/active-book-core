@@ -3,7 +3,7 @@ import { HowlWrapper } from './HowlWrapper';
 /*
   если аудио слишком короткое (до 1.2 секунды) - сначала ждём пока оно доиграет, затем производим unload
 */
-export async function unloadAudio(audioInstance: HowlWrapper) {
+export const unloadAudio = async (audioInstance: HowlWrapper) => {
   const dur = parseFloat(audioInstance.howlInst.duration().toFixed(1));
 
   if (dur < 1.2) {
@@ -11,4 +11,4 @@ export async function unloadAudio(audioInstance: HowlWrapper) {
   }
 
   await audioInstance.unload();
-}
+};

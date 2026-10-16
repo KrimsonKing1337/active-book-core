@@ -16,7 +16,7 @@ import { effectsActions } from 'store/effects/common';
 import { HowlWrapper } from 'utils/effects/audio/HowlWrapper';
 import { getEffectsInRange } from 'utils/effects/rangeEffects';
 
-export function useAudioInRange(effects: RangeEffects) {
+export const useAudioInRange = (effects: RangeEffects) => {
   const dispatch = useDispatch();
 
   const page = useSelector(mainSelectors.page);
@@ -109,4 +109,4 @@ export function useAudioInRange(effects: RangeEffects) {
       dispatch(audioBgEffectsActions.setAudioInstance(howlWrapperInst));
     });
   }, [page, audioInstances]);
-}
+};

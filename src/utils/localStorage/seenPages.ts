@@ -2,11 +2,11 @@ import { get as localStorageGet, set as localStorageSet } from 'utils/localStora
 
 const key = 'seenPages';
 
-function get(id: string) {
+const get = (id: string) => {
   return localStorageGet(id, key);
-}
+};
 
-function set(id: string, value: number) {
+const set = (id: string, value: number) => {
   const seenPages = get(id);
 
   const newSeenPages = {
@@ -15,7 +15,7 @@ function set(id: string, value: number) {
   };
 
   localStorageSet(id, { [key]: newSeenPages });
-}
+};
 
 export const seenPages = {
   set,

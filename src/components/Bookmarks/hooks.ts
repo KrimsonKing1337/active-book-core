@@ -7,7 +7,7 @@ import { mainSelectors } from 'store/main';
 
 import { get as localStorageGet } from 'utils/localStorage/localStorage';
 
-export function useBookmarks() {
+export const useBookmarks = () => {
   const dispatch = useDispatch();
 
   const id = useSelector(mainSelectors.id);
@@ -30,4 +30,4 @@ export function useBookmarks() {
   }, []);
 
   return { bookmarks, setBookmarks };
-}
+};

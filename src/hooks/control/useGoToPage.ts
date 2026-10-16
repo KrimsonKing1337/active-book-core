@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'store';
 
 import { mainActions, mainSelectors } from 'store/main';
 
-export function useGoToPage() {
+export const useGoToPage = () => {
   const dispatch = useDispatch();
 
   const currentPage = useSelector(mainSelectors.page);
@@ -56,4 +56,4 @@ export function useGoToPage() {
     goNextPage,
     goPrevPage,
   };
-}
+};

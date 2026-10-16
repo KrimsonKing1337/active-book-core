@@ -1,7 +1,7 @@
-export function on(n: number) {
+export const on = (n: number) => {
   navigator.vibrate(n);
-}
+};
 
-export function off() {
+export const off = () => {
   navigator.vibrate(0);
-}
+};

@@ -1,3 +1,3 @@
-export function getIsMobile() {
+export const getIsMobile = () => {
   return !!(window as any).cordova;
-}
+};

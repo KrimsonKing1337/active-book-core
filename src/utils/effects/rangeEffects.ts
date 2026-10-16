@@ -1,12 +1,12 @@
 import type { RangeEffects, Range, RangeEffect } from '@types';
 
-export function isPageInRange(pageNumberCurrent: number, range: Range[]) {
+export const isPageInRange = (pageNumberCurrent: number, range: Range[]) => {
   return range.some((rangeCur) => {
     return pageNumberCurrent >= rangeCur.from && pageNumberCurrent <= rangeCur.to;
   });
-}
+};
 
-export function getEffectsInRange(effects: RangeEffects, pageNumberCurrent: number, type: string) {
+export const getEffectsInRange = (effects: RangeEffects, pageNumberCurrent: number, type: string) => {
   const arr = effects as RangeEffect[];
 
   const result: RangeEffect[] = [];
@@ -29,4 +29,4 @@ export function getEffectsInRange(effects: RangeEffects, pageNumberCurrent: numb
   }
 
   return result;
-}
+};

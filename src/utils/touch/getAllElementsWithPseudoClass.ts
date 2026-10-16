@@ -2,7 +2,7 @@ import { getAllCssRulesForElementsWithPseudoClass } from './getAllCssRulesForEle
 
 let cachedAllElements: HTMLElement[] = [];
 
-export function getAllElementsWithPseudoClass(pseudo: string, cache = true): HTMLElement[] {
+export const getAllElementsWithPseudoClass = (pseudo: string, cache = true): HTMLElement[] => {
   if (cachedAllElements.length && cache) {
     return cachedAllElements;
   }
@@ -20,4 +20,4 @@ export function getAllElementsWithPseudoClass(pseudo: string, cache = true): HTM
   cachedAllElements = Array.from(elements) as HTMLElement[];
 
   return cachedAllElements;
-}
+};

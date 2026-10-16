@@ -5,7 +5,7 @@ import { sideShadowEffectSelectors } from 'store/effects/side/shadow';
 
 import { setCssVariable } from 'utils/styles/setCssVariable';
 
-export function useColorPolice(sideShadowRef: RefObject<HTMLDivElement | null>) {
+export const useColorPolice = (sideShadowRef: RefObject<HTMLDivElement | null>) => {
   const color = useSelector(sideShadowEffectSelectors.color);
 
   useEffect(() => {
@@ -27,9 +27,9 @@ export function useColorPolice(sideShadowRef: RefObject<HTMLDivElement | null>) 
       sideShadowElement?.removeEventListener('animationiteration', changeTextShadowColor);
     };
   }, [color]);
-}
+};
 
-export function useColorCarameldansen(sideShadowRef: RefObject<HTMLDivElement | null>) {
+export const useColorCarameldansen = (sideShadowRef: RefObject<HTMLDivElement | null>) => {
   const color = useSelector(sideShadowEffectSelectors.color);
 
   const colors = [
@@ -71,9 +71,9 @@ export function useColorCarameldansen(sideShadowRef: RefObject<HTMLDivElement | 
       sideShadowElement?.removeEventListener('animationiteration', changeTextShadowColor);
     };
   }, [color]);
-}
+};
 
-export function useResetNameOfTextShadowAnimationCss() {
+export const useResetNameOfTextShadowAnimationCss = () => {
   useEffect(() => {
     /**
      * css-modules косячно отрабатывает названия анимаций, определённых через @kayframes.
@@ -84,4 +84,4 @@ export function useResetNameOfTextShadowAnimationCss() {
      */
     setCssVariable('--text-shadow-animation', 'blink');
   }, []);
-}
+};

@@ -11,7 +11,7 @@ import { effectsActions } from 'store/effects/common';
 
 import { HowlWrapper, type HowlWrapperOptions } from 'utils/effects/audio/HowlWrapper';
 
-export function useAudio({
+export const useAudio = ({
   id,
   page,
   src,
@@ -29,7 +29,7 @@ export function useAudio({
   onPause = () => {},
   onStop = () => {},
   onUnload = () => {},
-}: AudioEffectOptions) {
+}: AudioEffectOptions) => {
   const dispatch = useDispatch();
 
   const currentPage = useSelector(mainSelectors.page);
@@ -130,4 +130,4 @@ export function useAudio({
   ]);
 
   return audioInstances[id];
-}
+};

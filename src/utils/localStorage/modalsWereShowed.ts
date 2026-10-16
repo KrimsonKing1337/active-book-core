@@ -8,7 +8,7 @@ export enum Flags {
   inverseColor = 'inverseColor', // todo: сделать это непосредственно в книге
 }
 
-function get(id: string, name: Flags) {
+const get = (id: string, name: Flags) => {
   const modals = localStorageGet(id, key);
 
   if (!modals) {
@@ -16,9 +16,9 @@ function get(id: string, name: Flags) {
   }
 
   return modals[name];
-}
+};
 
-function set(id: string, name: Flags, value: boolean) {
+const set = (id: string, name: Flags, value: boolean) => {
   const values = localStorageGet(id, key);
 
   let newValues = {
@@ -34,7 +34,7 @@ function set(id: string, name: Flags, value: boolean) {
   newValues[name] = value;
 
   localStorageSet(id, { [key]: newValues });
-}
+};
 
 export const modalsWereShowed = {
   set,
