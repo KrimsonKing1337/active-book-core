@@ -38,6 +38,14 @@ export type AudioEffectOptions = {
   onStop?: () => void;
 };
 
+export type VibrationEffectOptions = {
+  id: string;
+  page: number;
+  duration: number;
+  delay?: number;
+  playOnLoad?: boolean;
+};
+
 export type Range = {
   from: number;
   to: number;
