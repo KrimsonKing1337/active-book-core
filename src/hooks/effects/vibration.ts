@@ -41,16 +41,22 @@ export function useVibration(options?: VibrationEffectOptions) {
     vibrationOff();
   }, [isVibrationAvailable]);
 
-  // Keep the existing imperative useVibration() behaviour: stop a running vibration on unmount.
+  // Keep the existing imperative useVibration() behavior: stop a running vibration on unmount
   useEffect(() => {
     return () => {
       off();
     };
   }, [off]);
 
-  // Declarative behaviour is available through both useVibration(options) and <Vibration />.
+  // Declarative behavior is available through both useVibration(options) and <Vibration />
   useEffect(() => {
-    if (!id || currentPage !== page || !playOnLoad || !isVibrationAvailable || !vibrationEnabled) {
+    const isSamePage = currentPage === page;
+    const canVibrate = isVibrationAvailable && vibrationEnabled;
+
+    if (!id
+      || !isSamePage
+      || !playOnLoad
+      || !canVibrate) {
       return;
     }
 
@@ -72,6 +78,7 @@ export function useVibration(options?: VibrationEffectOptions) {
 
     return () => {
       window.clearTimeout(timer);
+
       off();
     };
   }, [
@@ -87,5 +94,8 @@ export function useVibration(options?: VibrationEffectOptions) {
     off,
   ]);
 
-  return { vibrationOff: off, vibrationOn: on };
+  return {
+    vibrationOff: off,
+    vibrationOn: on,
+  };
 }
