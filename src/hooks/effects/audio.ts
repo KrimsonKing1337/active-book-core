@@ -39,7 +39,12 @@ export function useAudio({
   const formatKey = format?.join(',');
 
   useEffect(() => {
-    if (currentPage !== page || !isAudioUnlocked || !id || !src) {
+    const isSamePage = currentPage === page;
+
+    if (!isSamePage
+      || !isAudioUnlocked
+      || !id
+      || !src) {
       return;
     }
 
