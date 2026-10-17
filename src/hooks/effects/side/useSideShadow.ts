@@ -14,6 +14,9 @@ export const useSideShadow = ({ isActiveDefault = true, color, speed = initialSt
   const dispatch = useDispatch();
 
   const on = () => {
+    // The shadow is shared; apply this instance's settings when it starts.
+    dispatch(sideShadowActions.setColor(color));
+    dispatch(sideShadowActions.setSpeed(speed));
     dispatch(sideShadowActions.setActiveState(true));
   };
 

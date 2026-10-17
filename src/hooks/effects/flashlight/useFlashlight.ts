@@ -39,6 +39,7 @@ export const useFlashlight = (options: Partial<FlashlightEffectOptions> = {}) =>
   sideShadowHandlersRef.current = { sideShadowOn, sideShadowOff };
 
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const resolvePulseRef = useRef<(() => void) | null>(null);
   const runRef = useRef(0);
 
   const off = useCallback(() => {
@@ -48,6 +49,10 @@ export const useFlashlight = (options: Partial<FlashlightEffectOptions> = {}) =>
       clearTimeout(timerRef.current);
       timerRef.current = null;
     }
+
+    // An imperative caller may await the pulse (e.g. useRain).
+    resolvePulseRef.current?.();
+    resolvePulseRef.current = null;
 
     if (withSideShadow) {
       sideShadowHandlersRef.current.sideShadowOff();
@@ -89,7 +94,10 @@ export const useFlashlight = (options: Partial<FlashlightEffectOptions> = {}) =>
     }
 
     if (pulseDuration && pulseDuration > 0) {
-      timerRef.current = setTimeout(off, pulseDuration);
+      await new Promise<void>((resolve) => {
+        resolvePulseRef.current = resolve;
+        timerRef.current = setTimeout(off, pulseDuration);
+      });
     }
   }, [flashlightEnabled, withSideShadow, off]);
 
