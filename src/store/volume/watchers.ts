@@ -14,6 +14,25 @@ import { selectors } from './selectors';
 
 import { setVideosVolume } from './utils';
 
+const setAudioVolumeByType = (type: AudioType, volume: number) => {
+  const setVolume = (audioInstances: HowlInstances) => {
+    Object.values(audioInstances).forEach((audioInstanceCur) => {
+      if (!audioInstanceCur) {
+        return;
+      }
+
+      if (audioInstanceCur.type === type) {
+        audioInstanceCur.volume(volume / 100);
+      }
+    });
+  };
+
+  const { audioInstances, audioBgInstances } = getAudioInstances();
+
+  setVolume(audioInstances);
+  setVolume(audioBgInstances);
+};
+
 export function* watchSetAll(action: PayloadAction<State>) {
   const { payload } = action;
   const { global, bg, music, sfx, videos } = payload;
@@ -42,25 +61,6 @@ export function* watchSetGlobal(action: PayloadAction<State['global']>) {
     setVideosVolume(videos * (payload / 100));
   });
 }
-
-const setAudioVolumeByType = (type: AudioType, volume: number) => {
-  const setVolume = (audioInstances: HowlInstances) => {
-    Object.values(audioInstances).forEach((audioInstanceCur) => {
-      if (!audioInstanceCur) {
-        return;
-      }
-
-      if (audioInstanceCur.type === type) {
-        audioInstanceCur.volume(volume / 100);
-      }
-    });
-  };
-
-  const { audioInstances, audioBgInstances } = getAudioInstances();
-
-  setVolume(audioInstances);
-  setVolume(audioBgInstances);
-};
 
 export function* watchSetBg(action: PayloadAction<State['bg']>) {
   const { payload } = action;

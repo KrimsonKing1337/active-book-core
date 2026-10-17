@@ -18,6 +18,16 @@ export const useFlashlight = (withSideShadow = false, speed = 150) => {
     speed,
   });
 
+  const off = () => {
+    console.log('___ flashlight off');
+
+    if (withSideShadow) {
+      sideShadowOff();
+    }
+
+    flashlightInst.off();
+  };
+
   const on = async (duration?: number) => {
     if (document.hidden) {
       return;
@@ -42,15 +52,8 @@ export const useFlashlight = (withSideShadow = false, speed = 150) => {
     }
   };
 
-  const off = () => {
-    console.log('___ flashlight off');
-
-    if (withSideShadow) {
-      sideShadowOff();
-    }
-
-    flashlightInst.off();
+  return {
+    flashlightOff: off,
+    flashlightOn: on,
   };
-
-  return { flashlightOff: off, flashlightOn: on };
 };

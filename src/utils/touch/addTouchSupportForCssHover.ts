@@ -2,33 +2,31 @@ import { getAllElementsWithPseudoClass } from './getAllElementsWithPseudoClass';
 import { replaceCssPseudoClassWith } from './replaceCssPseudoClassWith';
 import { selectorInsteadOfHover } from './utils';
 
-const touchStartHandler = () => {
+const setTouchMode = (isTouch: boolean) => {
   const { classList } = document.body;
 
-  if (classList.contains('is-touch')) {
+  if (classList.contains('is-touch') === isTouch) {
     return;
   }
 
-  replaceCssPseudoClassWith(':hover', `.${selectorInsteadOfHover}`);
+  const from = isTouch ? ':hover' : `.${selectorInsteadOfHover}`;
+  const to = isTouch ? `.${selectorInsteadOfHover}` : ':hover';
 
-  classList.add('is-touch');
+  replaceCssPseudoClassWith(from, to);
+
+  classList.toggle('is-touch', isTouch);
 };
 
-// todo: не нашёл, у какого event-а есть свойство sourceCapabilities
-const mouseOverHandler = (e: any) => {
-  if (e?.sourceCapabilities?.firesTouchEvents) {
-    return;
+const pointerDownHandler = (event: PointerEvent) => {
+  if (event.pointerType === 'touch') {
+    setTouchMode(true);
   }
+};
 
-  const { classList } = document.body;
-
-  if (!classList.contains('is-touch')) {
-    return;
+const pointerOverHandler = (event: PointerEvent) => {
+  if (event.pointerType === 'mouse') {
+    setTouchMode(false);
   }
-
-  replaceCssPseudoClassWith(`.${selectorInsteadOfHover}`, ':hover');
-
-  classList.remove('is-touch');
 };
 
 export const addTouchSupportForCssHover = () => {
@@ -48,6 +46,6 @@ export const addTouchSupportForCssHover = () => {
     elementCur.addEventListener('touchcancel', removeClassListHover);
   });
 
-  document.addEventListener('touchstart', touchStartHandler);
-  document.addEventListener('mouseover', mouseOverHandler);
+  document.addEventListener('pointerdown', pointerDownHandler);
+  document.addEventListener('pointerover', pointerOverHandler);
 };
