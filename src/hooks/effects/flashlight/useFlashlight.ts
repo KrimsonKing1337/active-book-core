@@ -10,30 +10,27 @@ import { useSideShadow } from 'hooks/effects/side/useSideShadow';
 
 import { flashlightInst } from 'utils/effects/flashlight';
 
-// The boolean overload is kept for the existing imperative useFlashlight(withSideShadow, speed) API.
-export const useFlashlight = (optionsOrSideShadow: FlashlightEffectOptions | boolean = false, speed = 150) => {
+export const useFlashlight = (options: Partial<FlashlightEffectOptions> = {}) => {
   const currentPage = useSelector(mainSelectors.page);
   const flashlightEnabled = useSelector(configSelectors.flashlight);
   const theme = useSelector(configSelectors.theme);
 
-  const options = typeof optionsOrSideShadow === 'boolean' ? undefined : optionsOrSideShadow;
-  const sideShadow = typeof optionsOrSideShadow === 'boolean'
-    ? optionsOrSideShadow
-    : options?.sideShadow ?? false;
-  const shadowSpeed = options ? 150 : speed;
-
-  const id = options?.id;
-  const page = options?.page;
-  const duration = options?.duration ?? 0;
-  const delay = options?.delay ?? 0;
-  const playOnLoad = options?.playOnLoad ?? false;
+  const {
+    id,
+    page,
+    duration = 0,
+    delay = 0,
+    playOnLoad = false,
+    withSideShadow = false,
+    speed = 150,
+  } = options;
 
   const color = theme === 'dark' ? '#fff' : '#9addf4';
 
   const { sideShadowOn, sideShadowOff } = useSideShadow({
     color,
     isActiveDefault: false,
-    speed: shadowSpeed,
+    speed,
   });
 
   // useSideShadow currently returns new function instances on every render.
@@ -52,18 +49,18 @@ export const useFlashlight = (optionsOrSideShadow: FlashlightEffectOptions | boo
       timerRef.current = null;
     }
 
-    if (sideShadow) {
+    if (withSideShadow) {
       sideShadowHandlersRef.current.sideShadowOff();
     }
 
     flashlightInst.off();
-  }, [sideShadow]);
+  }, [withSideShadow]);
 
   const on = useCallback(async (pulseDuration?: number) => {
     // Invalidate pending camera initialization and any previous auto-off timer.
     off();
 
-    if (document.hidden || (!flashlightEnabled && !sideShadow)) {
+    if (document.hidden || (!flashlightEnabled && !withSideShadow)) {
       return;
     }
 
@@ -83,7 +80,7 @@ export const useFlashlight = (optionsOrSideShadow: FlashlightEffectOptions | boo
       return;
     }
 
-    if (sideShadow) {
+    if (withSideShadow) {
       sideShadowHandlersRef.current.sideShadowOn();
     }
 
@@ -94,7 +91,7 @@ export const useFlashlight = (optionsOrSideShadow: FlashlightEffectOptions | boo
     if (pulseDuration && pulseDuration > 0) {
       timerRef.current = setTimeout(off, pulseDuration);
     }
-  }, [flashlightEnabled, sideShadow, off]);
+  }, [flashlightEnabled, withSideShadow, off]);
 
   // Preserve the original imperative hook's behavior on unmount.
   useEffect(() => {
@@ -109,7 +106,7 @@ export const useFlashlight = (optionsOrSideShadow: FlashlightEffectOptions | boo
     }
 
     // A visual sideShadow imitation is allowed even without a physical torch.
-    if (!flashlightEnabled && !sideShadow) {
+    if (!flashlightEnabled && !withSideShadow) {
       return;
     }
 
@@ -129,7 +126,7 @@ export const useFlashlight = (optionsOrSideShadow: FlashlightEffectOptions | boo
     duration,
     delay,
     playOnLoad,
-    sideShadow,
+    withSideShadow,
     on,
     off,
   ]);

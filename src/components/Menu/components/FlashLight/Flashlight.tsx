@@ -16,7 +16,7 @@ import * as styles from './Flashlight.module.scss';
 export const Flashlight = () => {
   const dispatch = useDispatch();
 
-  const { flashlightOn } = useFlashlight();
+  const { flashlightOn } = useFlashlight({});
 
   const isFlashlightAvailable = useSelector(mainSelectors.isFlashlightAvailable);
   const flashlightProblems = useSelector(mainSelectors.flashlightProblems);
