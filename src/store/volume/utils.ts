@@ -1,4 +1,4 @@
-export function setVideosVolume(volume: number) {
+export const setVideosVolume = (volume: number) => {
   const videos = document.querySelectorAll('video');
 
   videos.forEach(videoCur => {
@@ -7,4 +7,4 @@ export function setVideosVolume(volume: number) {
 
     videoCur.volume = (volume / 100) * (relativeVolume / 100);
   });
-}
+};

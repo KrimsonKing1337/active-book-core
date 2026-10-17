@@ -1,7 +1,7 @@
 import { Howler } from 'howler';
 import type { HowlExtended } from '@types';
 
-export function waitForMediaLoad() {
+export const waitForMediaLoad = () => {
   const images = Array.from(document.querySelectorAll('img'));
   const videos = Array.from(document.querySelectorAll('video'));
 
@@ -30,9 +30,9 @@ export function waitForMediaLoad() {
   });
 
   return Promise.all(promises);
-}
+};
 
-export function waitForHowlerLoad() {
+export const waitForHowlerLoad = () => {
   const promises: Promise<void>[] = [];
 
   const Howl = Howler as unknown as HowlExtended;
@@ -56,4 +56,4 @@ export function waitForHowlerLoad() {
   });
 
   return Promise.all(promises);
-}
+};

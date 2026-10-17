@@ -1,6 +1,6 @@
 import { store } from 'store';
 
-export function getAudioInstances() {
+export const getAudioInstances = () => {
   const storeState = store.getState();
 
   const { audioEffects, audioBgEffects } = storeState;
@@ -9,4 +9,4 @@ export function getAudioInstances() {
     audioInstances: audioEffects.audioInstances,
     audioBgInstances: audioBgEffects.audioInstances,
   };
-}
+};

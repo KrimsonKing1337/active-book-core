@@ -8,7 +8,7 @@ import { mainSelectors } from 'store/main';
 
 import { getEffectsInRange } from 'utils/effects/rangeEffects';
 
-export function useDotsInRange(effects: RangeEffects) {
+export const useDotsInRange = (effects: RangeEffects) => {
   const dispatch = useDispatch();
 
   const page = useSelector(mainSelectors.page);
@@ -24,4 +24,4 @@ export function useDotsInRange(effects: RangeEffects) {
 
     dispatch(effectsActions.setDotsActiveState(true));
   }, [page]);
-}
+};

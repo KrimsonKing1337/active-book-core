@@ -1,6 +1,6 @@
 import { replaceCssPseudoClassWith } from './replaceCssPseudoClassWith';
 
-export function removeCssHover() {
+export const removeCssHover = () => {
   if ('ontouchstart' in document.documentElement) {
     setTimeout(() => {
       /*
@@ -12,4 +12,4 @@ export function removeCssHover() {
       replaceCssPseudoClassWith(':hover', 'disable-hover');
     }, 0);
   }
-}
+};

@@ -5,12 +5,12 @@ import { mainActions } from 'store/main';
 
 import * as styles from './Footer.module.scss';
 
-function getClassNames(className: string) {
+const getClassNames = (className: string) => {
   return classNames([
     styles.Button,
     className,
   ]);
-}
+};
 
 export const Footer = () => {
   const dispatch = useDispatch();

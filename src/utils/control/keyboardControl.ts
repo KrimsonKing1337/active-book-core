@@ -2,7 +2,7 @@ import { scrollDown, scrollUp } from 'utils/control/scroll';
 
 type Fn = () => void;
 
-export function addKeyboardControl(goPrevPage: Fn, goNextPage: Fn) {
+export const addKeyboardControl = (goPrevPage: Fn, goNextPage: Fn) => {
   const narrativeElement = document.querySelector('#narrative');
 
   const listener = (e: KeyboardEvent) => {
@@ -57,4 +57,4 @@ export function addKeyboardControl(goPrevPage: Fn, goNextPage: Fn) {
   return () => {
     document.removeEventListener('keydown', listener);
   };
-}
+};

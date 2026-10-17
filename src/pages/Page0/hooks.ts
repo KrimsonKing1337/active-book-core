@@ -7,7 +7,7 @@ import { mainSelectors } from 'store/main';
 import { Flags as ModalsFlags } from 'utils/localStorage/modalsWereShowed';
 import { modalsWereShowed } from 'utils/localStorage/modalsWereShowed';
 
-export function useModal() {
+export const useModal = () => {
   const id = useSelector(mainSelectors.id);
 
   const [modalIsActive, setModalIsActive] = useState(false);
@@ -23,4 +23,4 @@ export function useModal() {
     modalOnClose,
     setModalIsActive,
   };
-}
+};

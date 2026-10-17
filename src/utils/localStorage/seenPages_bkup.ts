@@ -4,15 +4,15 @@ import { cryptr } from 'utils/cryptr';
 
 const key = 'seenPages';
 
-function get(id: string) {
+const get = (id: string) => {
   const seenPagesEncrypt = localStorageGet(id, key);
   const seenPagesEncryptAsJson = JSON.stringify(seenPagesEncrypt);
   const seenPagesDecryptAsJson = cryptr.decrypt(seenPagesEncryptAsJson);
 
   return JSON.parse(seenPagesDecryptAsJson);
-}
+};
 
-function set(id: string, value: number) {
+const set = (id: string, value: number) => {
   const seenPagesDecrypt = get(id);
 
   const newSeenPages = {
@@ -24,7 +24,7 @@ function set(id: string, value: number) {
   const newSeenPagesEncrypt = cryptr.encrypt(newSeenPagesAsJson);
 
   localStorageSet(id, { [key]: newSeenPagesEncrypt });
-}
+};
 
 export const seenPages = {
   set,

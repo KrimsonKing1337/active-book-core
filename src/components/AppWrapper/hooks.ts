@@ -15,7 +15,7 @@ import { initialState as configInitialState } from 'store/config/slice';
 import { initialState as volumeInitialState } from 'store/volume/slice';
 import { volumeActions } from 'store/volume';
 
-import { useVibration } from 'hooks/effects/vibration';
+import { useVibration } from 'hooks/effects/useVibration';
 
 import { setMuteToAllVideos } from 'components/AppWrapper/utils';
 
@@ -24,7 +24,7 @@ import { seenPages } from 'utils/localStorage/seenPages';
 import { getThemes } from 'utils/styles/getThemes';
 import { set as localStorageSet, get as localStorageGet } from 'utils/localStorage/localStorage';
 
-export function useVisibilityChangeHandler() {
+export const useVisibilityChangeHandler = () => {
   const { vibrationOff } = useVibration();
 
   useEffect(() => {
@@ -50,9 +50,9 @@ export function useVisibilityChangeHandler() {
       document.removeEventListener('visibilitychange', handler);
     };
   }, []);
-}
+};
 
-export function useDeleteAllVideosWithoutDataIdOnThePage() {
+export const useDeleteAllVideosWithoutDataIdOnThePage = () => {
   const dispatch = useDispatch();
 
   const videosCurrentTimeRef = useRef<typeof videosCurrentTime>(null);
@@ -80,9 +80,9 @@ export function useDeleteAllVideosWithoutDataIdOnThePage() {
 
     dispatch(effectsActions.setVideosCurrentTime(videosCurrentTimeNewValue));
   }, [page]);
-}
+};
 
-export function useAllPagesSeen() {
+export const useAllPagesSeen = () => {
   const dispatch = useDispatch();
 
   const id = useSelector(mainSelectors.id);
@@ -130,9 +130,9 @@ export function useAllPagesSeen() {
       dispatch(configActions.setAuthorComments(true));
     }
   }, [page, pages, allPagesSeen]);
-}
+};
 
-export function useBeforeUnloadHandler() {
+export const useBeforeUnloadHandler = () => {
   const id = useSelector(mainSelectors.id);
   const page = useSelector(mainSelectors.page);
 
@@ -149,9 +149,9 @@ export function useBeforeUnloadHandler() {
       window.removeEventListener('beforeunload', listener);
     };
   }, [page]);
-}
+};
 
-export function useSetUpConfig(passedConfig: Config) {
+export const useSetUpConfig = (passedConfig: Config) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -198,4 +198,4 @@ export function useSetUpConfig(passedConfig: Config) {
       document.querySelector('body')?.setAttribute('style', bodyStyleForSet);
     }
   }, []);
-}
+};

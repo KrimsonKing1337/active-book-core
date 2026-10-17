@@ -14,7 +14,7 @@ export type LocationStyles = {
   left: string;
 };
 
-export function getPlaceInLineByLocationStyles(styles: LocationStyles) {
+export const getPlaceInLineByLocationStyles = (styles: LocationStyles) => {
   const { top, right, bottom, left } = styles;
 
   if (top === '0px' && left === '0px') {
@@ -34,9 +34,9 @@ export function getPlaceInLineByLocationStyles(styles: LocationStyles) {
   }
 
   return 0;
-}
+};
 
-export function createDotsAsArray() {
+export const createDotsAsArray = () => {
   const arr = [];
 
   for (let i = 0; i < 4; i++) {
@@ -44,4 +44,4 @@ export function createDotsAsArray() {
   }
 
   return arr;
-}
+};

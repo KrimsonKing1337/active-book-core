@@ -1,1 +1,1 @@
-export { useFlashlight } from './flashlight';
+export { useFlashlight } from './useFlashlight';

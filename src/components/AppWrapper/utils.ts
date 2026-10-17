@@ -2,7 +2,7 @@ import type { HowlInstances } from '@types';
 
 import { store } from 'store';
 
-export function setMuteToAllVideos(muted: boolean) {
+export const setMuteToAllVideos = (muted: boolean) => {
   const videos = document.querySelectorAll('video');
 
   const { videos: videosVolume, global: globalVolume } = store.getState().volume;
@@ -14,9 +14,9 @@ export function setMuteToAllVideos(muted: boolean) {
 
     videoCur.volume = volume * (relativeVolume / 100) * (globalVolume / 100);
   });
-}
+};
 
-export function startToPlayAllAudiosWithPlayOnLoad(audioInstances: HowlInstances, page: number) {
+export const startToPlayAllAudiosWithPlayOnLoad = (audioInstances: HowlInstances, page: number) => {
   Object.values(audioInstances).forEach((audio) => {
     if (!audio) return;
     if (audio.page !== page && !audio.isRange) return;
@@ -26,9 +26,9 @@ export function startToPlayAllAudiosWithPlayOnLoad(audioInstances: HowlInstances
 
     audio.play();
   });
-}
+};
 
-export function startToPlayAllVideosWithPlayOnLoad() {
+export const startToPlayAllVideosWithPlayOnLoad = () => {
   const videos = Array.from(document.querySelectorAll('video'));
 
   videos.forEach((videoCur) => {
@@ -38,4 +38,4 @@ export function startToPlayAllVideosWithPlayOnLoad() {
       videoCur.play();
     }
   });
-}
+};

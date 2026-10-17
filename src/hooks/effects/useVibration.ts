@@ -8,7 +8,7 @@ import { mainSelectors } from 'store/main';
 
 import { off as vibrationOff, on as vibrationOn } from 'utils/effects/vibration';
 
-export function useVibration(options?: VibrationEffectOptions) {
+export const useVibration = (options?: VibrationEffectOptions) => {
   const currentPage = useSelector(mainSelectors.page);
   const isVibrationAvailable = useSelector(mainSelectors.isVibrationAvailable);
   const vibrationEnabled = useSelector(configSelectors.vibration);
@@ -98,4 +98,4 @@ export function useVibration(options?: VibrationEffectOptions) {
     vibrationOff: off,
     vibrationOn: on,
   };
-}
+};

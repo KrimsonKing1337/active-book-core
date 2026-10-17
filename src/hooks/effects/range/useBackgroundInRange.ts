@@ -11,7 +11,7 @@ import type { BackgroundEffect } from 'hooks/effects/background/@types';
 
 import { getEffectsInRange } from 'utils/effects/rangeEffects';
 
-export function useBackgroundInRange(effects: RangeEffects) {
+export const useBackgroundInRange = (effects: RangeEffects) => {
   const dispatch = useDispatch();
 
   const page = useSelector(mainSelectors.page);
@@ -63,4 +63,4 @@ export function useBackgroundInRange(effects: RangeEffects) {
       dispatch(backgroundEffectsActions.setEffect(backgroundEffectOnPageCurOptions));
     });
   }, [page]);
-}
+};

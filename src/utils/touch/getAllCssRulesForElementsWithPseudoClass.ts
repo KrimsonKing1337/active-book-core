@@ -1,6 +1,6 @@
 let cachedAllCssRules: CSSStyleRule[] = [];
 
-export function getAllCssRulesForElementsWithPseudoClass(pseudo: string, cache = true): CSSStyleRule[] {
+export const getAllCssRulesForElementsWithPseudoClass = (pseudo: string, cache = true): CSSStyleRule[] => {
   if (cachedAllCssRules.length && cache) {
     return cachedAllCssRules;
   }
@@ -23,4 +23,4 @@ export function getAllCssRulesForElementsWithPseudoClass(pseudo: string, cache =
   cachedAllCssRules = Array.from(result) as CSSStyleRule[];
 
   return cachedAllCssRules;
-}
+};

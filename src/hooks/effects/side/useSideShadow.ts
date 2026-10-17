@@ -10,7 +10,7 @@ export type useSideShadowProps = {
   speed?: number;
 };
 
-export function useSideShadow({ isActiveDefault = true, color, speed = initialState.speed }: useSideShadowProps) {
+export const useSideShadow = ({ isActiveDefault = true, color, speed = initialState.speed }: useSideShadowProps) => {
   const dispatch = useDispatch();
 
   const on = () => {
@@ -32,4 +32,4 @@ export function useSideShadow({ isActiveDefault = true, color, speed = initialSt
   }, []);
 
   return { sideShadowOn: on, sideShadowOff: off };
-}
+};

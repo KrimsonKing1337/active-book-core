@@ -1,6 +1,6 @@
 import { get as _get } from 'lodash-es';
 
-export function get(id: string, path: string) {
+export const get = (id: string, path: string) => {
   const dataByIdJson = localStorage.getItem(id) || '{}';
   const dataById = JSON.parse(dataByIdJson);
 
@@ -9,9 +9,9 @@ export function get(id: string, path: string) {
   }
 
   return _get(dataById, path);
-}
+};
 
-export function set(id: string, value: Record<string, unknown>) {
+export const set = (id: string, value: Record<string, unknown>) => {
   const dataById = get(id, '');
 
   const newDataById = {
@@ -20,4 +20,4 @@ export function set(id: string, value: Record<string, unknown>) {
   };
 
   localStorage.setItem(id, JSON.stringify(newDataById));
-}
+};

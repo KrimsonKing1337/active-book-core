@@ -10,12 +10,12 @@ import { getNewValueForNarrativeTextStyle } from 'utils/styles/getNewValueForNar
 
 import * as styles from './LineHeight.module.scss';
 
-function getClassNames(className: string) {
+const getClassNames = (className: string) => {
   return classNames([
     styles.Item,
     className,
   ]);
-}
+};
 
 export const LineHeight = () => {
   const dispatch = useDispatch();

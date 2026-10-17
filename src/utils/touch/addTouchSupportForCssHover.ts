@@ -2,7 +2,7 @@ import { getAllElementsWithPseudoClass } from './getAllElementsWithPseudoClass';
 import { replaceCssPseudoClassWith } from './replaceCssPseudoClassWith';
 import { selectorInsteadOfHover } from './utils';
 
-function touchStartHandler() {
+const touchStartHandler = () => {
   const { classList } = document.body;
 
   if (classList.contains('is-touch')) {
@@ -12,10 +12,10 @@ function touchStartHandler() {
   replaceCssPseudoClassWith(':hover', `.${selectorInsteadOfHover}`);
 
   classList.add('is-touch');
-}
+};
 
 // todo: не нашёл, у какого event-а есть свойство sourceCapabilities
-function mouseOverHandler(e: any) {
+const mouseOverHandler = (e: any) => {
   if (e?.sourceCapabilities?.firesTouchEvents) {
     return;
   }
@@ -29,9 +29,9 @@ function mouseOverHandler(e: any) {
   replaceCssPseudoClassWith(`.${selectorInsteadOfHover}`, ':hover');
 
   classList.remove('is-touch');
-}
+};
 
-export function addTouchSupportForCssHover() {
+export const addTouchSupportForCssHover = () => {
   const elementsWithHover = getAllElementsWithPseudoClass(':hover');
 
   elementsWithHover.forEach((elementCur) => {
@@ -50,4 +50,4 @@ export function addTouchSupportForCssHover() {
 
   document.addEventListener('touchstart', touchStartHandler);
   document.addEventListener('mouseover', mouseOverHandler);
-}
+};

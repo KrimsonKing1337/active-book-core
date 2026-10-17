@@ -10,7 +10,7 @@ export type useSideTextProps = {
   speed?: number;
 };
 
-export function useSideText({ isActiveDefault = true, template, speed = initialState.speed }: useSideTextProps) {
+export const useSideText = ({ isActiveDefault = true, template, speed = initialState.speed }: useSideTextProps) => {
   const dispatch = useDispatch();
 
   const on = () => {
@@ -32,4 +32,4 @@ export function useSideText({ isActiveDefault = true, template, speed = initialS
   }, []);
 
   return { sideTextOn: on, sideTextOff: off };
-}
+};

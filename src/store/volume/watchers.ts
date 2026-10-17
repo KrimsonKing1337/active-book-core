@@ -43,7 +43,7 @@ export function* watchSetGlobal(action: PayloadAction<State['global']>) {
   });
 }
 
-function setAudioVolumeByType(type: AudioType, volume: number) {
+const setAudioVolumeByType = (type: AudioType, volume: number) => {
   const setVolume = (audioInstances: HowlInstances) => {
     Object.values(audioInstances).forEach((audioInstanceCur) => {
       if (!audioInstanceCur) {
@@ -60,7 +60,7 @@ function setAudioVolumeByType(type: AudioType, volume: number) {
 
   setVolume(audioInstances);
   setVolume(audioBgInstances);
-}
+};
 
 export function* watchSetBg(action: PayloadAction<State['bg']>) {
   const { payload } = action;

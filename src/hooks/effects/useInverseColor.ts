@@ -1,7 +1,7 @@
 import { useDispatch } from 'store';
 import { effectsActions } from 'store/effects/common';
 
-export function useInverseColor() {
+export const useInverseColor = () => {
   const dispatch = useDispatch();
 
   const on = () => dispatch(effectsActions.setInverseColorActiveState(true));
@@ -11,4 +11,4 @@ export function useInverseColor() {
     inverseColorOn: on,
     inverseColorOff: off,
   };
-}
+};

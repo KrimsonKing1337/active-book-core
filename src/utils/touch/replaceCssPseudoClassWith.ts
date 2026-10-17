@@ -1,6 +1,6 @@
 import { getAllCssRulesForElementsWithPseudoClass } from './getAllCssRulesForElementsWithPseudoClass';
 
-export function replaceCssPseudoClassWith(pseudo: string, replaceValue: string): void {
+export const replaceCssPseudoClassWith = (pseudo: string, replaceValue: string): void => {
   const cssRules = getAllCssRulesForElementsWithPseudoClass(pseudo);
 
   cssRules.forEach((rulesCur) => {
@@ -8,4 +8,4 @@ export function replaceCssPseudoClassWith(pseudo: string, replaceValue: string):
 
     rulesCur.selectorText = selectorText.replace(pseudo, replaceValue);
   });
-}
+};

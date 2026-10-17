@@ -1,4 +1,4 @@
 // todo: хранить в сторе, брать оттуда
-export function getNarrativeElement() {
+export const getNarrativeElement = () => {
   return (document.querySelector('[class^="Narrative"]') as HTMLElement);
-}
+};
