@@ -46,6 +46,16 @@ export type VibrationEffectOptions = {
   playOnLoad?: boolean;
 };
 
+export type FlashlightEffectOptions = {
+  id: string;
+  page: number;
+  duration: number;
+  delay?: number;
+  playOnLoad?: boolean;
+  withSideShadow?: boolean;
+  speed?: number;
+};
+
 export type Range = {
   from: number;
   to: number;
