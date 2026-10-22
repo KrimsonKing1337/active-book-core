@@ -40,8 +40,8 @@ export const BackgroundEffects = memo(() => {
     return Object.values(effects).flatMap((effectCur) => {
       const images = effectCur.images ?? [];
 
-      return images.map((imageCur, index) => {
-        return JSON.stringify([effectCur.id, imageCur.id ?? index, imageCur.src]);
+      return images.map((imageCur) => {
+        return JSON.stringify([effectCur.id, imageCur.id, imageCur.src]);
       });
     });
   }, [effects]);
