@@ -11,7 +11,7 @@ export type VideosProps = {
 };
 
 export const Videos = ({ backgroundId, videos, onReady }: VideosProps) => {
-  return videos.map((video) => {
+  return videos.map((videoCur) => {
     const {
       id,
       src,
@@ -20,7 +20,7 @@ export const Videos = ({ backgroundId, videos, onReady }: VideosProps) => {
       loop = true,
       muted = true,
       relativeVolume = 100,
-    } = video;
+    } = videoCur;
 
     const mediaKey = JSON.stringify([backgroundId, id, src]);
 

@@ -1,4 +1,13 @@
-import { type PropsWithChildren, Fragment, memo, useCallback, useEffect, useMemo, useRef } from 'react';
+import {
+  type PropsWithChildren,
+
+  Fragment,
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'react';
 
 import { useDispatch, useSelector } from 'store';
 
@@ -21,20 +30,29 @@ const Child = memo(({ children }: PropsWithChildren) => {
 
 export const BackgroundEffects = memo(() => {
   const dispatch = useDispatch();
+
   const effects = useSelector(backgroundEffectsSelectors.effects);
 
   const loadedImagesRef = useRef(new Set<string>());
   const loadedVideosRef = useRef(new Set<string>());
 
   const imageKeys = useMemo(() => {
-    return Object.values(effects).flatMap((effect) => {
-      return (effect.images ?? []).map((image, index) => JSON.stringify([effect.id, index, image.src]));
+    return Object.values(effects).flatMap((effectCur) => {
+      const images = effectCur.images ?? [];
+
+      return images.map((imageCur, index) => {
+        return JSON.stringify([effectCur.id, index, imageCur.src]);
+      });
     });
   }, [effects]);
 
   const videoKeys = useMemo(() => {
-    return Object.values(effects).flatMap((effect) => {
-      return (effect.videos ?? []).map((video) => JSON.stringify([effect.id, video.id, video.src]));
+    return Object.values(effects).flatMap((effectCur) => {
+      const videos = effectCur.videos ?? [];
+
+      return videos.map((videoCur) => {
+        return JSON.stringify([effectCur.id, videoCur.id, videoCur.src]);
+      });
     });
   }, [effects]);
 
@@ -62,6 +80,7 @@ export const BackgroundEffects = memo(() => {
 
   const markReady = useCallback((kind: MediaKind, key: string) => {
     const isImage = kind === 'image';
+
     const validKeys = isImage ? imageKeys : videoKeys;
     const loaded = isImage ? loadedImagesRef.current : loadedVideosRef.current;
 
@@ -79,7 +98,7 @@ export const BackgroundEffects = memo(() => {
   }, [imageKeys, videoKeys, dispatch]);
 
   const backgroundWrappers = useMemo(() => {
-    return Object.values(effects).map((effect) => {
+    return Object.values(effects).map((effectCur) => {
       const {
         id,
         videos = [],
@@ -87,9 +106,13 @@ export const BackgroundEffects = memo(() => {
         Component = null,
         shadow = {},
         style = {},
-      } = effect;
+      } = effectCur;
 
-      const isVisible = !!videos.length || !!images.length || !!Component || !!shadow.show;
+      const isVisible =
+        !!videos.length
+        || !!images.length
+        || !!Component
+        || !!shadow.show;
 
       if (!isVisible) {
         return null;

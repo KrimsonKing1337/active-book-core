@@ -130,6 +130,7 @@ export default defineConfig([globIgnores, {
     'react/jsx-first-prop-new-line': [2, 'multiline'],
     'react/jsx-curly-brace-presence': ['error', 'never'],
     'react/self-closing-comp': 'error',
+
     '@typescript-eslint/no-empty-function': 'off',
     '@typescript-eslint/indent': 'off',
     '@typescript-eslint/camelcase': 0,

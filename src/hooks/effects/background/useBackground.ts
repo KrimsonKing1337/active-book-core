@@ -9,6 +9,7 @@ import { effectsAreEqual } from './utils';
 
 export const useBackground = (effect: BackgroundEffect) => {
   const dispatch = useDispatch();
+
   const registeredEffectRef = useRef<BackgroundEffect | null>(null);
 
   const destroy = useCallback(() => {
@@ -19,6 +20,7 @@ export const useBackground = (effect: BackgroundEffect) => {
     }
 
     registeredEffectRef.current = null;
+
     dispatch(backgroundEffectsActions.deleteEffect(registeredEffect.id));
   }, [dispatch]);
 
@@ -33,6 +35,7 @@ export const useBackground = (effect: BackgroundEffect) => {
 
     if (!isSameEffect) {
       registeredEffectRef.current = effect;
+
       dispatch(backgroundEffectsActions.setEffect(effect));
     }
   }, [effect, dispatch]);
