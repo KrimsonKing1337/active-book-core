@@ -32,7 +32,7 @@ export const BackgroundEffects = memo(() => {
         style = {},
       } = effectCur;
 
-      const oneOfBgIsActive = !!videos.length || !!images.length || !!Component;
+      const oneOfBgIsActive = !!videos.length || !!images.length || !!Component || !!shadow.show;
 
       return oneOfBgIsActive && (
         <Child key={id}>
