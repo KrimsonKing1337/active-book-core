@@ -108,11 +108,14 @@ export const BackgroundEffects = memo(() => {
         style = {},
       } = effectCur;
 
+      const hasBackgroundStyle = Object.keys(style).length > 0;
+
       const isVisible =
         !!videos.length
         || !!images.length
         || !!Component
-        || !!shadow.show;
+        || !!shadow.show
+        || hasBackgroundStyle;
 
       if (!isVisible) {
         return null;
