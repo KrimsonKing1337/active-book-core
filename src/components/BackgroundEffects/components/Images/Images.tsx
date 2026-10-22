@@ -20,11 +20,11 @@ export const Images = ({ images }: ImagesProps) => {
 
   const page = useSelector(mainSelectors.page);
 
-  if (images.length === 0) {
-    return null;
-  }
-
   useEffect(() => {
+    if (images.length === 0) {
+      return;
+    }
+
     dispatch(effectsActions.setImagesAmount(images.length));
 
     return () => {
@@ -32,6 +32,10 @@ export const Images = ({ images }: ImagesProps) => {
       dispatch(effectsActions.setImagesReadyAmount(0));
     };
   }, [page, images.length]);
+
+  if (images.length === 0) {
+    return null;
+  }
 
   const loadHandler = () => {
     dispatch(effectsActions.setImageReady());

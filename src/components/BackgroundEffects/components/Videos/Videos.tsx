@@ -20,11 +20,11 @@ export const Videos = ({ videos }: VideosProps) => {
 
   const page = useSelector(mainSelectors.page);
 
-  if (videos.length === 0) {
-    return null;
-  }
-
   useEffect(() => {
+    if (videos.length === 0) {
+      return;
+    }
+
     dispatch(effectsActions.setVideosAmount(videos.length));
 
     return () => {
@@ -32,6 +32,10 @@ export const Videos = ({ videos }: VideosProps) => {
       dispatch(effectsActions.setVideosReadyAmount(0));
     };
   }, [page, videos.length]);
+
+  if (videos.length === 0) {
+    return null;
+  }
 
   const canPlayHandler = () => {
     dispatch(effectsActions.setVideoReady());

@@ -111,6 +111,9 @@ export default defineConfig([globIgnores, {
     'no-native-reassign': 0,
     'jsx-a11y/anchor-is-valid': 0,
 
+    'react-hooks/rules-of-hooks': 'error',
+    'react-hooks/exhaustive-deps': 'warn',
+
     'react/jsx-max-props-per-line': [2, {
       maximum: {
         single: 3,
