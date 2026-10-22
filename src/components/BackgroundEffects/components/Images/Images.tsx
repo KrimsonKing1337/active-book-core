@@ -12,9 +12,9 @@ export type ImagesProps = {
 
 export const Images = ({ backgroundId, images, onReady }: ImagesProps) => {
   return images.map((imageCur, index) => {
-    const { src, style } = imageCur;
+    const { id, src, style } = imageCur;
 
-    const mediaKey = JSON.stringify([backgroundId, index, src]);
+    const mediaKey = JSON.stringify([backgroundId, id ?? index, src]);
 
     const handleReady = () => {
       onReady('image', mediaKey);
@@ -22,7 +22,7 @@ export const Images = ({ backgroundId, images, onReady }: ImagesProps) => {
 
     return (
       <Img
-        key={mediaKey}
+        key={id ?? mediaKey}
         style={style}
         className={styles.Img}
         src={src}

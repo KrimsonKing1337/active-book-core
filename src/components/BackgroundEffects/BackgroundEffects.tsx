@@ -41,7 +41,7 @@ export const BackgroundEffects = memo(() => {
       const images = effectCur.images ?? [];
 
       return images.map((imageCur, index) => {
-        return JSON.stringify([effectCur.id, index, imageCur.src]);
+        return JSON.stringify([effectCur.id, imageCur.id ?? index, imageCur.src]);
       });
     });
   }, [effects]);
