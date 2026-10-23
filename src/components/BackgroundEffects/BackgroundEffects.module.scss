@@ -6,33 +6,6 @@
   // height: auto;
   height: 100%;
 
-  animation: var(--background-animation) var(--background-animation-speed) ease infinite;
-
-  will-change: opacity;
-
-  @keyframes blink {
-    0% {
-      opacity: 0;
-    }
-
-    50% {
-      opacity: 1;
-    }
-
-    100% {
-      opacity: 0;
-    }
-  }
-
-  @keyframes static {
-    0% {
-      opacity: 1;
-    }
-
-    100% {
-      opacity: 1;
-    }
-  }
 }
 
 .BackgroundObjectsShadow {

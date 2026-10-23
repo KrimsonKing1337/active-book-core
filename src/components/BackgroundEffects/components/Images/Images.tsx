@@ -1,55 +1,33 @@
-import { useEffect } from 'react';
-
-import { useDispatch, useSelector } from 'store';
-
-import { mainSelectors } from 'store/main';
-import { effectsActions } from 'store/effects/common';
-
-import { UseBackgroundEffectImageOptions } from 'hooks/effects/background/@types';
+import type { BackgroundEffectMediaOptions } from 'hooks/effects/background/@types';
 
 import { Img } from 'components/Img';
 
 import * as styles from './Images.module.scss';
 
 export type ImagesProps = {
-  images: UseBackgroundEffectImageOptions[];
+  backgroundId: string;
+  images: BackgroundEffectMediaOptions[];
+  onReady: (kind: 'image' | 'video', key: string) => void;
 };
 
-export const Images = ({ images }: ImagesProps) => {
-  const dispatch = useDispatch();
+export const Images = ({ backgroundId, images, onReady }: ImagesProps) => {
+  return images.map((imageCur) => {
+    const { id, src, style } = imageCur;
 
-  const page = useSelector(mainSelectors.page);
+    const mediaKey = JSON.stringify([backgroundId, id, src]);
 
-  if (images.length === 0) {
-    return null;
-  }
-
-  useEffect(() => {
-    dispatch(effectsActions.setImagesAmount(images.length));
-
-    return () => {
-      dispatch(effectsActions.setImagesAmount(0));
-      dispatch(effectsActions.setImagesReadyAmount(0));
+    const handleReady = () => {
+      onReady('image', mediaKey);
     };
-  }, [page, images.length]);
-
-  const loadHandler = () => {
-    dispatch(effectsActions.setImageReady());
-  };
-
-  return images.map((imageCur, index) => {
-    const { src, style } = imageCur;
-
-    const uuid = `${index}___${src}`;
 
     return (
       <Img
-        key={uuid}
+        key={id}
         style={style}
         className={styles.Img}
         src={src}
-        onLoad={loadHandler}
-        onError={loadHandler}
+        onLoad={handleReady}
+        onError={handleReady}
       />
     );
   });

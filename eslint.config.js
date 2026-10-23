@@ -111,6 +111,9 @@ export default defineConfig([globIgnores, {
     'no-native-reassign': 0,
     'jsx-a11y/anchor-is-valid': 0,
 
+    'react-hooks/rules-of-hooks': 'error',
+    'react-hooks/exhaustive-deps': 'warn',
+
     'react/jsx-max-props-per-line': [2, {
       maximum: {
         single: 3,
@@ -127,6 +130,7 @@ export default defineConfig([globIgnores, {
     'react/jsx-first-prop-new-line': [2, 'multiline'],
     'react/jsx-curly-brace-presence': ['error', 'never'],
     'react/self-closing-comp': 'error',
+
     '@typescript-eslint/no-empty-function': 'off',
     '@typescript-eslint/indent': 'off',
     '@typescript-eslint/camelcase': 0,

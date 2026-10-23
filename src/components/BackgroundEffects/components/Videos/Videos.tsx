@@ -1,10 +1,3 @@
-import { useEffect } from 'react';
-
-import { useDispatch, useSelector } from 'store';
-
-import { mainSelectors } from 'store/main';
-import { effectsActions } from 'store/effects/common';
-
 import type { BackgroundEffectVideoOptions } from 'hooks/effects/background/@types';
 
 import { Video } from 'components/Video';
@@ -12,31 +5,12 @@ import { Video } from 'components/Video';
 import * as styles from './Videos.module.scss';
 
 export type VideosProps = {
+  backgroundId: string;
   videos: BackgroundEffectVideoOptions[];
+  onReady: (kind: 'image' | 'video', key: string) => void;
 };
 
-export const Videos = ({ videos }: VideosProps) => {
-  const dispatch = useDispatch();
-
-  const page = useSelector(mainSelectors.page);
-
-  if (videos.length === 0) {
-    return null;
-  }
-
-  useEffect(() => {
-    dispatch(effectsActions.setVideosAmount(videos.length));
-
-    return () => {
-      dispatch(effectsActions.setVideosAmount(0));
-      dispatch(effectsActions.setVideosReadyAmount(0));
-    };
-  }, [page, videos.length]);
-
-  const canPlayHandler = () => {
-    dispatch(effectsActions.setVideoReady());
-  };
-
+export const Videos = ({ backgroundId, videos, onReady }: VideosProps) => {
   return videos.map((videoCur) => {
     const {
       id,
@@ -47,6 +21,12 @@ export const Videos = ({ videos }: VideosProps) => {
       muted = true,
       relativeVolume = 100,
     } = videoCur;
+
+    const mediaKey = JSON.stringify([backgroundId, id, src]);
+
+    const handleReady = () => {
+      onReady('video', mediaKey);
+    };
 
     return (
       <Video
@@ -59,8 +39,8 @@ export const Videos = ({ videos }: VideosProps) => {
         loop={loop}
         muted={muted}
         relativeVolume={relativeVolume}
-        onCanPlay={canPlayHandler}
-        onError={canPlayHandler}
+        onCanPlay={handleReady}
+        onError={handleReady}
       />
     );
   });

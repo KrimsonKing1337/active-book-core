@@ -1,39 +1,48 @@
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 import { useDispatch } from 'store';
 import { backgroundEffectsActions } from 'store/effects/background';
 
 import type { BackgroundEffect } from './@types';
 
+import { effectsAreEqual } from './utils';
+
 export const useBackground = (effect: BackgroundEffect) => {
   const dispatch = useDispatch();
 
-  const refEffect = useRef<BackgroundEffect | null>(null);
+  const registeredEffectRef = useRef<BackgroundEffect | null>(null);
+
+  const destroy = useCallback(() => {
+    const registeredEffect = registeredEffectRef.current;
+
+    if (!registeredEffect) {
+      return;
+    }
+
+    registeredEffectRef.current = null;
+
+    dispatch(backgroundEffectsActions.deleteEffect(registeredEffect.id));
+  }, [dispatch]);
 
   useEffect(() => {
-    // если эффект уже есть, и он точно такой же, как тот, что приходит - значит эффект не нужно инициализировать заново
-    if (refEffect.current?.id === effect.id) {
-      return;
+    const registeredEffect = registeredEffectRef.current;
+
+    if (registeredEffect?.id !== effect.id && registeredEffect) {
+      dispatch(backgroundEffectsActions.deleteEffect(registeredEffect.id));
     }
 
-    refEffect.current = effect;
+    const isSameEffect = registeredEffect?.id === effect.id && effectsAreEqual(registeredEffect, effect);
 
-    dispatch(backgroundEffectsActions.setEffect(effect));
-  }, [effect]);
+    if (!isSameEffect) {
+      registeredEffectRef.current = effect;
 
-  const destroy = () => {
-    if (!refEffect.current) {
-      return;
+      dispatch(backgroundEffectsActions.setEffect(effect));
     }
-
-    dispatch(backgroundEffectsActions.deleteEffect(refEffect.current.id));
-
-    refEffect.current = null;
-  };
+  }, [effect, dispatch]);
 
   useEffect(() => {
     return destroy;
-  }, []);
+  }, [destroy]);
 
   return destroy;
 };

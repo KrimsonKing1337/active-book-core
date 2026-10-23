@@ -10,4 +10,6 @@ try {
   execSync('npm run packaging', { stdio: 'inherit' });
 } catch (e) {
   console.error(e);
+
+  process.exitCode = 1;
 }

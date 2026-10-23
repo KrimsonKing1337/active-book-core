@@ -1,3 +1,5 @@
+import { isValidElement } from 'react';
+
 import { isEqual } from 'lodash-es';
 
 import type { BackgroundEffect, BackgroundEffectMediaPosition } from './@types';
@@ -75,11 +77,17 @@ export const getPositionByPreset = (value: BackgroundEffectMediaPosition): React
   только если он появился или исчез - только тогда делаем ререндер
 */
 export const effectsAreEqual = (effect1: BackgroundEffect, effect2: BackgroundEffect) => {
-  if (effect1.Component && !effect2.Component) {
-    return false;
-  }
+  const firstComponent = effect1.Component;
+  const secondComponent = effect2.Component;
 
-  if (!effect1.Component && effect2.Component) {
+  if (isValidElement(firstComponent) && isValidElement(secondComponent)) {
+    const hasSameComponentType = firstComponent.type === secondComponent.type;
+    const hasSameComponentProps = isEqual(firstComponent.props, secondComponent.props);
+
+    if (!hasSameComponentType || !hasSameComponentProps) {
+      return false;
+    }
+  } else if (firstComponent !== secondComponent) {
     return false;
   }
 

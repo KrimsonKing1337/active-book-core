@@ -5,7 +5,7 @@
     "strict": true,
     "esModuleInterop": true,
     "pretty": false,
-    "target": "es5",
+    "target": "es2020",
     "module": "es2020",
     "moduleResolution": "node",
     "outDir": "lib",
