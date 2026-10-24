@@ -1,0 +1,44 @@
+.AnimatedSideShadow {
+  width: 100%;
+  height: calc(100% + 60px);
+  margin-top: -30px;
+
+  color: red;
+  box-shadow: inset 0 0 clamp(26px, 30px, 34px) currentColor;
+  pointer-events: none;
+}
+
+.Pulse {
+  animation-name: pulse;
+  animation-timing-function: ease-in-out;
+}
+
+.Police {
+  animation-name: police;
+  animation-timing-function: steps(1, end);
+}
+
+.Caramel {
+  animation-name: caramel;
+  animation-timing-function: steps(1, end);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+@keyframes police {
+  0%, 49.99% { color: red; }
+  50%, 100% { color: blue; }
+}
+
+@keyframes caramel {
+  0% { color: #ff0000; }
+  14.28% { color: #ff7f00; }
+  28.57% { color: #ffff00; }
+  42.85% { color: #00ff00; }
+  57.14% { color: #0000ff; }
+  71.42% { color: #4b0082; }
+  85.71%, 100% { color: #9400d3; }
+}
