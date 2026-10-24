@@ -24,6 +24,7 @@ export const SideText = ({ children, animation, style }: SideTextProps) => {
     animationIterationCount: animation?.iterations,
     animationPlayState: animation?.playState === 'paused' ? 'paused' : 'running',
     animationName: animation?.preset === 'none' || animation?.playState === 'stopped' ? 'none' : undefined,
+    transform: animation?.preset === 'none' || animation?.playState === 'stopped' ? 'none' : undefined,
   };
 
   return (
