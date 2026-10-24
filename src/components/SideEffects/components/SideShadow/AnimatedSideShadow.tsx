@@ -13,6 +13,7 @@ const presets = {
   pulse: styles.Pulse,
   police: styles.Police,
   caramel: styles.Caramel,
+  scroll: '',
 };
 
 export const AnimatedSideShadow = ({ options }: AnimatedSideShadowProps) => {
@@ -23,7 +24,8 @@ export const AnimatedSideShadow = ({ options }: AnimatedSideShadowProps) => {
     animationDuration: `${animation?.duration ?? 1000}ms`,
     animationDelay: `${animation?.delay ?? 0}ms`,
     animationIterationCount: animation?.iterations ?? 'infinite',
-    animationPlayState: animation?.playState ?? 'running',
+    animationPlayState: animation?.playState === 'paused' ? 'paused' : 'running',
+    animationName: animation?.playState === 'stopped' ? 'none' : undefined,
   };
 
   const className = [styles.AnimatedSideShadow, presets[preset]].filter(Boolean).join(' ');

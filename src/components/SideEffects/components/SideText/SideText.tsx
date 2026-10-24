@@ -22,8 +22,8 @@ export const SideText = ({ children, animation, style }: SideTextProps) => {
     animationDuration: animation ? `${animation.duration ?? 60000}ms` : undefined,
     animationDelay: animation ? `${animation.delay ?? 0}ms` : undefined,
     animationIterationCount: animation?.iterations,
-    animationPlayState: animation?.playState,
-    animationName: animation?.preset === 'none' ? 'none' : undefined,
+    animationPlayState: animation?.playState === 'paused' ? 'paused' : 'running',
+    animationName: animation?.preset === 'none' || animation?.playState === 'stopped' ? 'none' : undefined,
   };
 
   return (

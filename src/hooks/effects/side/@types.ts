@@ -11,14 +11,14 @@ export type SidePosition =
   | 'bottom'
   | 'bottom-right';
 
-export type SideAnimationPreset = 'none' | 'pulse' | 'police' | 'caramel';
+export type SideAnimationPreset = 'none' | 'pulse' | 'police' | 'caramel' | 'scroll';
 
 export type SideAnimation = {
   preset?: SideAnimationPreset;
   duration?: number;
   delay?: number;
   iterations?: number | 'infinite';
-  playState?: 'running' | 'paused';
+  playState?: 'running' | 'paused' | 'stopped';
 };
 
 export type SideElementLayout = {
