@@ -8,7 +8,7 @@ import * as styles from './SideEffects.module.scss';
 export const SideEffects = () => {
   const sideShadowIsActive = useSelector(sideShadowEffectSelectors.isActive);
   const sideTextIsActive = useSelector(sideTextEffectSelectors.isActive);
-  const sideShadowTemplate = useSelector(sideTextEffectSelectors.template);
+  const sideTextTemplate = useSelector(sideTextEffectSelectors.template);
 
   return (
     <div id="side-effects" className={styles.SideEffects}>
@@ -18,7 +18,7 @@ export const SideEffects = () => {
 
       {sideTextIsActive && (
         <>
-          {sideShadowTemplate}
+          {sideTextTemplate}
         </>
       )}
     </div>
