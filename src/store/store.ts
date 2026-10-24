@@ -19,6 +19,7 @@ import { backgroundEffectsReducer, watchBackgroundEffectsActions } from './effec
 import { fontEffectsReducer } from './effects/font';
 import { audioEffectsReducer, watchAudioEffectsActions } from './effects/audio/audio';
 import { audioBgEffectsReducer, watchAudioBgEffectsActions } from './effects/audio/audioBg';
+import { sideEffectsReducer } from './effects/side/effects';
 import { sideShadowReducer, watchSideShadowActions } from './effects/side/shadow';
 import { sideTextReducer, watchSideTextActions } from './effects/side/text';
 import { bookmarksReducer, watchBookmarksActions } from './bookmarks';
@@ -35,6 +36,7 @@ const reducer = {
   effects: effectsReducer,
   audioEffects: audioEffectsReducer,
   audioBgEffects: audioBgEffectsReducer,
+  sideEffects: sideEffectsReducer,
   sideShadowEffect: sideShadowReducer,
   sideTextEffect: sideTextReducer,
   backgroundEffects: backgroundEffectsReducer,

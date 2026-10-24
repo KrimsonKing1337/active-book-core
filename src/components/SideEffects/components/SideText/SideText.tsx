@@ -1,27 +1,44 @@
-import React, { PropsWithChildren } from 'react';
+import type { CSSProperties, PropsWithChildren } from 'react';
+
+import { Children } from 'react';
+
+import type { SideAnimation } from 'hooks/effects/side/@types';
 
 import * as styles from './SideText.module.scss';
 
-export const SideText = ({ children }: PropsWithChildren<unknown>) => {
-  const childrenAsArray = React.Children.toArray(children);
+type SideTextProps = PropsWithChildren<{
+  animation?: SideAnimation;
+  style?: CSSProperties;
+}>;
+
+export const SideText = ({ children, animation, style }: SideTextProps) => {
+  const childrenAsArray = Children.toArray(children);
 
   if (childrenAsArray.length !== 2) {
-    throw new Error('There are must be two children in props!');
+    throw new Error('There must be two children in SideText');
   }
+
+  const animationStyle: CSSProperties = {
+    animationDuration: animation ? `${animation.duration ?? 60000}ms` : undefined,
+    animationDelay: animation ? `${animation.delay ?? 0}ms` : undefined,
+    animationIterationCount: animation?.iterations,
+    animationPlayState: animation?.playState,
+    animationName: animation?.preset === 'none' ? 'none' : undefined,
+  };
 
   return (
     <div className={styles.SideTextScrollWrapper}>
       <div className={styles.SideTextScrollLeftWrapper}>
-        <div className={styles.SideTextScrollLeft}>
-          <div className={styles.SideTextScrollContent}>
+        <div className={styles.SideTextScrollLeft} style={animationStyle}>
+          <div className={styles.SideTextScrollContent} style={style}>
             {childrenAsArray[0]}
           </div>
         </div>
       </div>
 
       <div className={styles.SideTextScrollRightWrapper}>
-        <div className={styles.SideTextScrollRight}>
-          <div className={styles.SideTextScrollContent}>
+        <div className={styles.SideTextScrollRight} style={animationStyle}>
+          <div className={styles.SideTextScrollContent} style={style}>
             {childrenAsArray[1]}
           </div>
         </div>
