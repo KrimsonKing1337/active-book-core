@@ -14,9 +14,16 @@ export const SideEffects = () => {
   return (
     <div id="side-effects" className={styles.SideEffects}>
       {Object.values(effects).map((effectCur) => {
+        const {
+          id,
+          shadows,
+          texts,
+          Component,
+        } = effectCur;
+
         return (
-          <div key={effectCur.id}>
-            {effectCur.shadows?.map((shadowCur) => {
+          <div key={id}>
+            {shadows?.map((shadowCur) => {
               const preset = shadowCur.animation?.preset;
 
               let ShadowComponent = SideShadow;
@@ -34,18 +41,31 @@ export const SideEffects = () => {
               );
             })}
 
-            {effectCur.texts?.map((textCur) => {
+            {texts?.map((textCur) => {
+              const {
+                id,
+                animation,
+                style,
+                leftText,
+                rightText,
+              } = textCur;
+
               return (
-                <SideElement key={textCur.id} {...textCur}>
-                  <SideText animation={textCur.animation} style={textCur.style}>
-                    <span>{textCur.leftText}</span>
-                    <span>{textCur.rightText}</span>
+                <SideElement key={id} {...textCur}>
+                  <SideText animation={animation} style={style}>
+                    <span>
+                      {leftText}
+                    </span>
+
+                    <span>
+                      {rightText}
+                    </span>
                   </SideText>
                 </SideElement>
               );
             })}
 
-            {effectCur.Component}
+            {Component}
           </div>
         );
       })}

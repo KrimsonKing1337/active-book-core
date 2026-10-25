@@ -24,11 +24,13 @@ export const useSideEffect = (effect: SideEffect | null) => {
       return;
     }
 
-    const optionsKey = JSON.stringify({
+    const options = {
       id: effect.id,
       shadows: effect.shadows,
       texts: effect.texts,
-    });
+    };
+
+    const optionsKey = JSON.stringify(options);
 
     if (registered && registered.id !== effect.id) {
       dispatch(sideEffectsActions.deleteEffect(registered.id));

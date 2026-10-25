@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useId, useRef } from 'react';
 
 import type { FlashlightEffectOptions } from '@types';
+import type { SideAnimation, SideEffect, SideShadowItem } from 'hooks/effects/side/@types';
 
 import { useSelector } from 'store';
 import { configSelectors } from 'store/config';
@@ -32,15 +33,28 @@ export const useFlashlight = (options: Partial<FlashlightEffectOptions> = {}) =>
   const shadowEffectId = `flashlight-side-${generatedId}`;
   const shadowId = 'glow';
 
-  const shadowEffect = withSideShadow ? {
-    id: shadowEffectId,
-    shadows: [{
-      id: shadowId,
-      style: { color },
-      hidden: true,
-      animation: { preset: 'pulse' as const, duration: speed },
-    }],
-  } : null;
+  const shadowStyle = {
+    color,
+  };
+
+  const shadowAnimation: SideAnimation = {
+    preset: 'pulse',
+    duration: speed,
+  };
+
+  const shadow: SideShadowItem = {
+    id: shadowId,
+    style: shadowStyle,
+    hidden: true,
+    animation: shadowAnimation,
+  };
+
+  const shadowEffect: SideEffect | null = withSideShadow
+    ? {
+      id: shadowEffectId,
+      shadows: [shadow],
+    }
+    : null;
 
   useSideEffect(shadowEffect);
 

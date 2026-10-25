@@ -14,7 +14,13 @@ export const useSideEffects = () => {
     shadowId: string,
     changes: Partial<SideShadowItem>,
   ) => {
-    dispatch(sideEffectsActions.updateShadow({ effectId, shadowId, changes }));
+    const update = {
+      effectId,
+      shadowId,
+      changes,
+    };
+
+    dispatch(sideEffectsActions.updateShadow(update));
   }, [dispatch]);
 
   const updateText = useCallback((
@@ -22,8 +28,18 @@ export const useSideEffects = () => {
     textId: string,
     changes: Partial<SideTextItem>,
   ) => {
-    dispatch(sideEffectsActions.updateText({ effectId, textId, changes }));
+    const update = {
+      effectId,
+      textId,
+      changes,
+    };
+
+    dispatch(sideEffectsActions.updateText(update));
   }, [dispatch]);
 
-  return { effects, updateShadow, updateText };
+  return {
+    effects,
+    updateShadow,
+    updateText,
+  };
 };

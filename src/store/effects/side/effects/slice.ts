@@ -1,6 +1,9 @@
-import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
 
 import type { SideEffect, SideShadowItem, SideTextItem } from 'hooks/effects/side/@types';
+import type { SideEffects, State } from './@types';
+
+import { createSlice } from '@reduxjs/toolkit';
 
 export type UpdateSideShadow = {
   effectId: string;
@@ -13,8 +16,6 @@ export type UpdateSideText = {
   textId: string;
   changes: Partial<SideTextItem>;
 };
-
-import type { SideEffects, State } from './@types';
 
 export const initialState: State = {
   effects: {},
@@ -32,16 +33,29 @@ const slice = createSlice({
     },
     updateShadow(state, action: PayloadAction<UpdateSideShadow>) {
       const { effectId, shadowId, changes } = action.payload;
-      const shadow = state.effects[effectId]?.shadows?.find((item) => item.id === shadowId);
+      const shadow = state.effects[effectId]?.shadows?.find((cur) => cur.id === shadowId);
 
       if (!shadow) {
         return;
       }
 
-      const style = changes.style ? { ...shadow.style, ...changes.style } : shadow.style;
-      const animation = changes.animation ? { ...shadow.animation, ...changes.animation } : shadow.animation;
+      const style = changes.style
+        ? { ...shadow.style, ...changes.style }
+        : shadow.style;
 
-      Object.assign(shadow, changes, { style, animation });
+      const animation = changes.animation
+        ? { ...shadow.animation, ...changes.animation }
+        : shadow.animation;
+
+      Object.assign(shadow, changes);
+
+      if (changes.style) {
+        shadow.style = style;
+      }
+
+      if (changes.animation) {
+        shadow.animation = animation;
+      }
     },
     updateText(state, action: PayloadAction<UpdateSideText>) {
       const { effectId, textId, changes } = action.payload;
@@ -51,10 +65,23 @@ const slice = createSlice({
         return;
       }
 
-      const style = changes.style ? { ...item.style, ...changes.style } : item.style;
-      const animation = changes.animation ? { ...item.animation, ...changes.animation } : item.animation;
+      const style = changes.style
+        ? { ...item.style, ...changes.style }
+        : item.style;
 
-      Object.assign(item, changes, { style, animation });
+      const animation = changes.animation
+        ? { ...item.animation, ...changes.animation }
+        : item.animation;
+
+      Object.assign(item, changes);
+
+      if (changes.style) {
+        item.style = style;
+      }
+
+      if (changes.animation) {
+        item.animation = animation;
+      }
     },
     setEffects(state, action: PayloadAction<SideEffects>) {
       state.effects = action.payload;

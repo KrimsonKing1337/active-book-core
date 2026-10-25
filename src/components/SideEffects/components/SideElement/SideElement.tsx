@@ -30,7 +30,12 @@ export const SideElement = ({
     return null;
   }
 
-  const [left, top, shiftX, shiftY] = positionCoordinates[position];
+  const [
+    left,
+    top,
+    shiftX,
+    shiftY,
+  ] = positionCoordinates[position];
 
   const positionStyle: CSSProperties = {
     left,
