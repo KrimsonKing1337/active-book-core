@@ -37,6 +37,8 @@ export const useSideEffect = (effect: SideEffect) => {
       const registered = registeredEffectRef.current;
 
       if (registered) {
+        registeredEffectRef.current = null;
+        registeredOptionsKeyRef.current = '';
         dispatch(sideEffectsActions.deleteEffect(registered.id));
       }
     };

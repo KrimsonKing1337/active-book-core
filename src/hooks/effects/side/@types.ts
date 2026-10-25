@@ -32,6 +32,7 @@ export type SideElementLayout = {
 
 export type SideShadowItem = SideElementLayout & {
   id: string;
+  thickness?: number;
   animation?: SideAnimation;
 };
 

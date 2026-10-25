@@ -1,5 +1,7 @@
 import type { CSSProperties } from 'react';
 
+import { useEffect, useState } from 'react';
+
 import type { SideShadowItem } from 'hooks/effects/side/@types';
 
 import * as styles from './AnimatedSideShadow.module.scss';
@@ -8,44 +10,66 @@ export type AnimatedSideShadowProps = {
   options: SideShadowItem;
 };
 
-const presets = {
-  none: '',
-  pulse: styles.Pulse,
-  police: styles.Police,
-  caramel: styles.Caramel,
-  scroll: '',
-};
+const POLICE_COLORS = ['red', 'blue'];
+const CARAMEL_COLORS = [
+  '#ff0000',
+  '#ff7f00',
+  '#ffff00',
+  '#00ff00',
+  '#0000ff',
+  '#4b0082',
+  '#9400d3',
+];
 
 export const AnimatedSideShadow = ({ options }: AnimatedSideShadowProps) => {
-  const { animation, style } = options;
+  const { animation, style, thickness = 30 } = options;
   const preset = animation?.preset ?? 'pulse';
-  const duration = animation?.duration ?? 1000;
-  const delay = animation?.delay ?? 0;
-  const iterations = animation?.iterations ?? 'infinite';
 
-  const colorsPerCycle = preset === 'police' ? 2 : preset === 'caramel' ? 7 : 1;
-  const hasColorAnimation = colorsPerCycle > 1;
-  const colorDuration = duration * colorsPerCycle;
+  const [colorIndex, setColorIndex] = useState(0);
 
-  const colorIterations = iterations === 'infinite' ? 'infinite' : iterations / colorsPerCycle;
+  useEffect(() => {
+    setColorIndex(0);
+  }, [preset]);
 
-  const animationDuration = hasColorAnimation ? `${duration}ms, ${colorDuration}ms` : `${duration}ms`;
-  const animationDelay = hasColorAnimation ? `${delay}ms, ${delay}ms` : `${delay}ms`;
-  const animationIterations = hasColorAnimation ? `${iterations}, ${colorIterations}` : iterations;
+  const handleAnimationIteration = () => {
+    if (preset === 'police' || preset === 'caramel') {
+      setColorIndex((current) => current + 1);
+    }
+  };
+
+  let palette: string[] = [];
+
+  if (preset === 'police') {
+    palette = POLICE_COLORS;
+  } else if (preset === 'caramel') {
+    palette = CARAMEL_COLORS;
+  }
+
+  const color = palette.length > 0 ? palette[colorIndex % palette.length] : style?.color;
+  const isAnimated = preset !== 'none' && animation?.playState !== 'stopped';
 
   const animationStyle: CSSProperties = {
     ...style,
-    animationDuration,
-    animationDelay,
-    animationIterationCount: animationIterations,
+    color,
+    height: `calc(100% + ${thickness * 2}px)`,
+    marginTop: -thickness,
+    boxShadow: `inset 0 0 ${thickness}px currentColor`,
+    animationDuration: `${animation?.duration ?? 1000}ms`,
+    animationDelay: `${animation?.delay ?? 0}ms`,
+    animationIterationCount: animation?.iterations ?? 'infinite',
     animationPlayState: animation?.playState === 'paused' ? 'paused' : 'running',
     animationFillMode: 'forwards',
-    animationName: animation?.playState === 'stopped' ? 'none' : undefined,
   };
 
-  const className = [styles.AnimatedSideShadow, presets[preset]].filter(Boolean).join(' ');
+  const className = isAnimated
+    ? `${styles.AnimatedSideShadow} ${styles.Pulse}`
+    : styles.AnimatedSideShadow;
 
   return (
-    <div className={className} style={animationStyle} />
+    <div
+      className={className}
+      style={animationStyle}
+      onAnimationIteration={handleAnimationIteration}
+    />
   );
 };
