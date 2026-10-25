@@ -24,6 +24,7 @@ export const SideElement = ({
   offsetX = '0px',
   offsetY = '0px',
   scale = 1,
+  style: elementStyle,
   hidden = false,
 }: SideElementProps) => {
   if (hidden) {
@@ -32,15 +33,15 @@ export const SideElement = ({
 
   const [left, top, shiftX, shiftY] = positionCoordinates[position];
 
-  const style: CSSProperties = {
+  const positionStyle: CSSProperties = {
     left,
     top,
-    zIndex: style?.zIndex,
+    zIndex: elementStyle?.zIndex,
     transform: `translate(calc(${shiftX} + ${offsetX}), calc(${shiftY} + ${offsetY})) scale(${scale})`,
   };
 
   return (
-    <div className={styles.SideElement} style={style}>
+    <div className={styles.SideElement} style={positionStyle}>
       {children}
     </div>
   );
