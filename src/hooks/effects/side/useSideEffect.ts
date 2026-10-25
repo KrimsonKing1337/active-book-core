@@ -5,13 +5,25 @@ import { sideEffectsActions } from 'store/effects/side/effects';
 
 import type { SideEffect } from './@types';
 
-export const useSideEffect = (effect: SideEffect) => {
+export const useSideEffect = (effect: SideEffect | null) => {
   const dispatch = useDispatch();
   const registeredEffectRef = useRef<SideEffect | null>(null);
   const registeredOptionsKeyRef = useRef('');
 
   useEffect(() => {
     const registered = registeredEffectRef.current;
+
+    if (!effect) {
+      if (registered) {
+        dispatch(sideEffectsActions.deleteEffect(registered.id));
+      }
+
+      registeredEffectRef.current = null;
+      registeredOptionsKeyRef.current = '';
+
+      return;
+    }
+
     const optionsKey = JSON.stringify({
       id: effect.id,
       shadows: effect.shadows,

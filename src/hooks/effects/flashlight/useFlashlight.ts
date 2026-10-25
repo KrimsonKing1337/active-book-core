@@ -32,15 +32,17 @@ export const useFlashlight = (options: Partial<FlashlightEffectOptions> = {}) =>
   const shadowEffectId = `flashlight-side-${generatedId}`;
   const shadowId = 'glow';
 
-  useSideEffect({
+  const shadowEffect = withSideShadow ? {
     id: shadowEffectId,
     shadows: [{
       id: shadowId,
       style: { color },
       hidden: true,
-      animation: { preset: 'pulse', duration: speed },
+      animation: { preset: 'pulse' as const, duration: speed },
     }],
-  });
+  } : null;
+
+  useSideEffect(shadowEffect);
 
   const { updateShadow } = useSideEffects();
 
