@@ -12,13 +12,15 @@ export type SideShadowProps = {
 
 export const SideShadow = ({ options, elementRef, className }: SideShadowProps) => {
   const { animation, style, thickness = 30 } = options;
-  const isAnimated = animation?.preset !== undefined
-    && animation.preset !== 'none'
-    && animation.playState !== 'stopped';
+  const preset = animation?.preset ?? 'none';
+  const isAnimated = preset !== 'none' && animation?.playState !== 'stopped';
 
   const thicknessPx = Math.max(0, thickness);
-  const leftShadow = `inset ${thicknessPx}px 0 ${thicknessPx}px -${thicknessPx}px var(--side-shadow-color, currentColor)`;
-  const rightShadow = `inset -${thicknessPx}px 0 ${thicknessPx}px -${thicknessPx}px var(--side-shadow-color, currentColor)`;
+  const size = `${thicknessPx}px`;
+  const color = 'var(--side-shadow-color, currentColor)';
+
+  const leftShadow = `inset ${size} 0 ${size} -${size} ${color}`;
+  const rightShadow = `inset -${size} 0 ${size} -${size} ${color}`;
 
   const shadowStyle: CSSProperties = {
     ...style,
