@@ -1,37 +1,42 @@
-import { useSelector } from 'store';
-
-import { sideShadowEffectSelectors } from 'store/effects/side/shadow';
+import type { CSSProperties, RefObject } from 'react';
 
 import type { SideShadowItem } from 'hooks/effects/side/@types';
 
-import { AnimatedSideShadow } from './AnimatedSideShadow';
-import { Police, Caramelldansen } from './presets';
+import * as styles from './SideShadow.module.scss';
 
-export const SideShadow = () => {
-  const color = useSelector(sideShadowEffectSelectors.color);
-  const speed = useSelector(sideShadowEffectSelectors.speed);
+export type SideShadowProps = {
+  options: SideShadowItem;
+  elementRef?: RefObject<HTMLDivElement | null>;
+  className?: string;
+};
 
-  let preset: NonNullable<SideShadowItem['animation']>['preset'] = 'pulse';
+export const SideShadow = ({ options, elementRef, className }: SideShadowProps) => {
+  const { animation, style, thickness = 30 } = options;
+  const isAnimated = animation?.preset !== undefined
+    && animation.preset !== 'none'
+    && animation.playState !== 'stopped';
 
-  if (color === 'police') {
-    preset = 'police';
-  } else if (color === 'caramel') {
-    preset = 'caramel';
-  }
+  const thicknessPx = Math.max(0, thickness);
+  const leftShadow = `inset ${thicknessPx}px 0 ${thicknessPx}px -${thicknessPx}px var(--side-shadow-color, currentColor)`;
+  const rightShadow = `inset -${thicknessPx}px 0 ${thicknessPx}px -${thicknessPx}px var(--side-shadow-color, currentColor)`;
 
-  const options: SideShadowItem = {
-    id: 'legacy-side-shadow',
-    style: { color: preset === 'pulse' ? color : 'red' },
-    animation: { preset, duration: speed },
+  const shadowStyle: CSSProperties = {
+    ...style,
+    boxShadow: `${leftShadow}, ${rightShadow}`,
+    animationDuration: `${animation?.duration ?? 1000}ms`,
+    animationDelay: `${animation?.delay ?? 0}ms`,
+    animationIterationCount: animation?.iterations ?? 'infinite',
+    animationPlayState: animation?.playState === 'paused' ? 'paused' : 'running',
+    animationFillMode: 'forwards',
   };
 
-  if (preset === 'police') {
-    return <Police options={options} />;
-  }
+  const classNames = [
+    styles.SideShadow,
+    isAnimated ? styles.Pulse : '',
+    className,
+  ].filter(Boolean).join(' ');
 
-  if (preset === 'caramel') {
-    return <Caramelldansen options={options} />;
-  }
-
-  return <AnimatedSideShadow options={options} />;
+  return (
+    <div ref={elementRef} className={classNames} style={shadowStyle} />
+  );
 };
