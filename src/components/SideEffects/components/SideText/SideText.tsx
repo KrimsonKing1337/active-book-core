@@ -2,6 +2,9 @@ import type { CSSProperties, PropsWithChildren } from 'react';
 
 import { Children } from 'react';
 
+import { useSelector } from 'store';
+import { sideTextEffectSelectors } from 'store/effects/side/text';
+
 import type { SideAnimation } from 'hooks/effects/side/@types';
 
 import * as styles from './SideText.module.scss';
@@ -12,6 +15,7 @@ type SideTextProps = PropsWithChildren<{
 }>;
 
 export const SideText = ({ children, animation, style }: SideTextProps) => {
+  const legacyDuration = useSelector(sideTextEffectSelectors.speed);
   const childrenAsArray = Children.toArray(children);
 
   if (childrenAsArray.length !== 2) {
@@ -21,9 +25,7 @@ export const SideText = ({ children, animation, style }: SideTextProps) => {
   const isStatic = animation?.preset === 'none' || animation?.playState === 'stopped';
 
   const animationStyle: CSSProperties = {
-    animationDuration: animation?.duration === undefined
-      ? 'var(--side-scroll-text-animation-speed, 60000ms)'
-      : `${animation.duration}ms`,
+    animationDuration: `${animation?.duration ?? legacyDuration}ms`,
     animationDelay: `${animation?.delay ?? 0}ms`,
     animationIterationCount: animation?.iterations ?? 'infinite',
     animationPlayState: animation?.playState === 'paused' ? 'paused' : 'running',
