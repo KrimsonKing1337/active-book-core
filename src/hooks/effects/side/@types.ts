@@ -25,7 +25,6 @@ export type SideElementLayout = {
   position?: SidePosition;
   offsetX?: string;
   offsetY?: string;
-  scale?: number;
   style?: CSSProperties;
   hidden?: boolean;
 };

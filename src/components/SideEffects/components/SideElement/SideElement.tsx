@@ -23,7 +23,6 @@ export const SideElement = ({
   position = 'top-left',
   offsetX = '0px',
   offsetY = '0px',
-  scale = 1,
   style: elementStyle,
   hidden = false,
 }: SideElementProps) => {
@@ -37,7 +36,7 @@ export const SideElement = ({
     left,
     top,
     zIndex: elementStyle?.zIndex,
-    transform: `translate(calc(${shiftX} + ${offsetX}), calc(${shiftY} + ${offsetY})) scale(${scale})`,
+    transform: `translate(calc(${shiftX} + ${offsetX}), calc(${shiftY} + ${offsetY}))`,
   };
 
   return (
