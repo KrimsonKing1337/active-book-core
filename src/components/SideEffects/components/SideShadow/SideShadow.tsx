@@ -1,16 +1,37 @@
-import { useRef } from 'react';
+import { useSelector } from 'store';
 
-import { useColorCarameldansen, useColorPolice, useResetNameOfTextShadowAnimationCss } from './hooks';
-import * as styles from './SideShadow.module.scss';
+import { sideShadowEffectSelectors } from 'store/effects/side/shadow';
+
+import type { SideShadowItem } from 'hooks/effects/side/@types';
+
+import { AnimatedSideShadow } from './AnimatedSideShadow';
+import { Police, Caramelldansen } from './presets';
 
 export const SideShadow = () => {
-  const sideShadowRef = useRef<HTMLDivElement>(null);
+  const color = useSelector(sideShadowEffectSelectors.color);
+  const speed = useSelector(sideShadowEffectSelectors.speed);
 
-  useResetNameOfTextShadowAnimationCss();
-  useColorPolice(sideShadowRef);
-  useColorCarameldansen(sideShadowRef);
+  let preset: NonNullable<SideShadowItem['animation']>['preset'] = 'pulse';
 
-  return (
-    <div ref={sideShadowRef} className={styles.SideShadow} />
-  );
+  if (color === 'police') {
+    preset = 'police';
+  } else if (color === 'caramel') {
+    preset = 'caramel';
+  }
+
+  const options: SideShadowItem = {
+    id: 'legacy-side-shadow',
+    style: { color: preset === 'pulse' ? color : 'red' },
+    animation: { preset, duration: speed },
+  };
+
+  if (preset === 'police') {
+    return <Police options={options} />;
+  }
+
+  if (preset === 'caramel') {
+    return <Caramelldansen options={options} />;
+  }
+
+  return <AnimatedSideShadow options={options} />;
 };

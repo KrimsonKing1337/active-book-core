@@ -1,6 +1,4 @@
-import type { CSSProperties } from 'react';
-
-import { useEffect, useState } from 'react';
+import type { CSSProperties, RefObject } from 'react';
 
 import type { SideShadowItem } from 'hooks/effects/side/@types';
 
@@ -8,52 +6,19 @@ import * as styles from './AnimatedSideShadow.module.scss';
 
 export type AnimatedSideShadowProps = {
   options: SideShadowItem;
+  elementRef?: RefObject<HTMLDivElement | null>;
+  className?: string;
 };
 
-const POLICE_COLORS = ['red', 'blue'];
-const CARAMEL_COLORS = [
-  '#ff0000',
-  '#ff7f00',
-  '#ffff00',
-  '#00ff00',
-  '#0000ff',
-  '#4b0082',
-  '#9400d3',
-];
-
-export const AnimatedSideShadow = ({ options }: AnimatedSideShadowProps) => {
+export const AnimatedSideShadow = ({ options, elementRef, className }: AnimatedSideShadowProps) => {
   const { animation, style, thickness = 30 } = options;
-  const preset = animation?.preset ?? 'pulse';
-
-  const [colorIndex, setColorIndex] = useState(0);
-
-  useEffect(() => {
-    setColorIndex(0);
-  }, [preset]);
-
-  const handleAnimationIteration = () => {
-    if (preset === 'police' || preset === 'caramel') {
-      setColorIndex((current) => current + 1);
-    }
-  };
-
-  let palette: string[] = [];
-
-  if (preset === 'police') {
-    palette = POLICE_COLORS;
-  } else if (preset === 'caramel') {
-    palette = CARAMEL_COLORS;
-  }
-
-  const color = palette.length > 0 ? palette[colorIndex % palette.length] : style?.color;
-  const isAnimated = preset !== 'none' && animation?.playState !== 'stopped';
+  const isAnimated = animation?.preset !== 'none' && animation?.playState !== 'stopped';
 
   const animationStyle: CSSProperties = {
     ...style,
-    color,
     height: `calc(100% + ${thickness * 2}px)`,
     marginTop: -thickness,
-    boxShadow: `inset 0 0 ${thickness}px currentColor`,
+    boxShadow: `inset 0 0 ${thickness}px var(--side-shadow-color, currentColor)`,
     animationDuration: `${animation?.duration ?? 1000}ms`,
     animationDelay: `${animation?.delay ?? 0}ms`,
     animationIterationCount: animation?.iterations ?? 'infinite',
@@ -61,15 +26,13 @@ export const AnimatedSideShadow = ({ options }: AnimatedSideShadowProps) => {
     animationFillMode: 'forwards',
   };
 
-  const className = isAnimated
-    ? `${styles.AnimatedSideShadow} ${styles.Pulse}`
-    : styles.AnimatedSideShadow;
+  const classNames = [
+    styles.AnimatedSideShadow,
+    isAnimated ? styles.Pulse : '',
+    className,
+  ].filter(Boolean).join(' ');
 
   return (
-    <div
-      className={className}
-      style={animationStyle}
-      onAnimationIteration={handleAnimationIteration}
-    />
+    <div ref={elementRef} className={classNames} style={animationStyle} />
   );
 };

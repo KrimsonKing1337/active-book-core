@@ -5,7 +5,7 @@ import { sideShadowEffectSelectors } from 'store/effects/side/shadow';
 import { sideTextEffectSelectors } from 'store/effects/side/text';
 
 import { SideElement } from './components/SideElement';
-import { SideShadow, AnimatedSideShadow } from './components/SideShadow';
+import { SideShadow, AnimatedSideShadow, Police, Caramelldansen } from './components/SideShadow';
 import { SideText } from './components/SideText';
 
 import * as styles from './SideEffects.module.scss';
@@ -13,7 +13,7 @@ import * as styles from './SideEffects.module.scss';
 export const SideEffects = () => {
   const effects = useSelector(sideEffectsSelectors.effects);
 
-  // Kept for the existing flashlight fallback until it has a dedicated glow component.
+  // The legacy hook remains available to books and to the flashlight fallback.
   const sideShadowIsActive = useSelector(sideShadowEffectSelectors.isActive);
   const sideTextIsActive = useSelector(sideTextEffectSelectors.isActive);
   const sideTextTemplate = useSelector(sideTextEffectSelectors.template);
@@ -27,9 +27,19 @@ export const SideEffects = () => {
         return (
           <div key={effectCur.id}>
             {effectCur.shadows?.map((shadowCur) => {
+              const preset = shadowCur.animation?.preset;
+
+              let ShadowComponent = AnimatedSideShadow;
+
+              if (preset === 'police') {
+                ShadowComponent = Police;
+              } else if (preset === 'caramel') {
+                ShadowComponent = Caramelldansen;
+              }
+
               return (
                 <SideElement key={shadowCur.id} {...shadowCur}>
-                  <AnimatedSideShadow options={shadowCur} />
+                  <ShadowComponent options={shadowCur} />
                 </SideElement>
               );
             })}
