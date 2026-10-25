@@ -18,19 +18,30 @@ export const SideText = ({ children, animation, style }: SideTextProps) => {
     throw new Error('There must be two children in SideText');
   }
 
+  const isStatic = animation?.preset === 'none' || animation?.playState === 'stopped';
+
   const animationStyle: CSSProperties = {
-    animationDuration: animation ? `${animation.duration ?? 60000}ms` : undefined,
-    animationDelay: animation ? `${animation.delay ?? 0}ms` : undefined,
-    animationIterationCount: animation?.iterations,
+    animationDuration: `${animation?.duration ?? 60000}ms`,
+    animationDelay: `${animation?.delay ?? 0}ms`,
+    animationIterationCount: animation?.iterations ?? 'infinite',
     animationPlayState: animation?.playState === 'paused' ? 'paused' : 'running',
-    animationName: animation?.preset === 'none' || animation?.playState === 'stopped' ? 'none' : undefined,
-    transform: animation?.preset === 'none' || animation?.playState === 'stopped' ? 'none' : undefined,
+    animationName: isStatic ? 'none' : undefined,
   };
+
+  const leftClassName = [
+    styles.SideTextScrollLeft,
+    isStatic ? styles.Static : '',
+  ].filter(Boolean).join(' ');
+
+  const rightClassName = [
+    styles.SideTextScrollRight,
+    isStatic ? styles.Static : '',
+  ].filter(Boolean).join(' ');
 
   return (
     <div className={styles.SideTextScrollWrapper}>
       <div className={styles.SideTextScrollLeftWrapper}>
-        <div className={styles.SideTextScrollLeft} style={animationStyle}>
+        <div className={leftClassName} style={animationStyle}>
           <div className={styles.SideTextScrollContent} style={style}>
             {childrenAsArray[0]}
           </div>
@@ -38,7 +49,7 @@ export const SideText = ({ children, animation, style }: SideTextProps) => {
       </div>
 
       <div className={styles.SideTextScrollRightWrapper}>
-        <div className={styles.SideTextScrollRight} style={animationStyle}>
+        <div className={rightClassName} style={animationStyle}>
           <div className={styles.SideTextScrollContent} style={style}>
             {childrenAsArray[1]}
           </div>
