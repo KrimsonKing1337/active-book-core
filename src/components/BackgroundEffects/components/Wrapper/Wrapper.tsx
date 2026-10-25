@@ -8,14 +8,14 @@ export type WrapperProps = React.HTMLAttributes<HTMLDivElement> & PropsWithChild
   className?: string;
 };
 
-export const Wrapper = ({ children, className = '', ...etc }: WrapperProps) => {
+export const Wrapper = ({ children, id = '', className = '', ...etc }: WrapperProps) => {
   const wrapperClassNames = classNames({
     [styles.Wrapper]: true,
     [className]: !!className,
   });
 
   return (
-    <div className={wrapperClassNames} {...etc}>
+    <div id={id} className={wrapperClassNames} {...etc}>
       {children}
     </div>
   );
