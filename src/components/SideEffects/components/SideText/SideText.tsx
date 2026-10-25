@@ -21,7 +21,9 @@ export const SideText = ({ children, animation, style }: SideTextProps) => {
   const isStatic = animation?.preset === 'none' || animation?.playState === 'stopped';
 
   const animationStyle: CSSProperties = {
-    animationDuration: `${animation?.duration ?? 60000}ms`,
+    animationDuration: animation?.duration === undefined
+      ? 'var(--side-scroll-text-animation-speed, 60000ms)'
+      : `${animation.duration}ms`,
     animationDelay: `${animation?.delay ?? 0}ms`,
     animationIterationCount: animation?.iterations ?? 'infinite',
     animationPlayState: animation?.playState === 'paused' ? 'paused' : 'running',
