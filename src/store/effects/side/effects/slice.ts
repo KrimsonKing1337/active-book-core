@@ -1,6 +1,18 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
-import type { SideEffect } from 'hooks/effects/side/@types';
+import type { SideEffect, SideShadowItem, SideTextItem } from 'hooks/effects/side/@types';
+
+export type UpdateSideShadow = {
+  effectId: string;
+  shadowId: string;
+  changes: Partial<SideShadowItem>;
+};
+
+export type UpdateSideText = {
+  effectId: string;
+  textId: string;
+  changes: Partial<SideTextItem>;
+};
 
 import type { SideEffects, State } from './@types';
 
@@ -17,6 +29,32 @@ const slice = createSlice({
     },
     deleteEffect(state, action: PayloadAction<string>) {
       delete state.effects[action.payload];
+    },
+    updateShadow(state, action: PayloadAction<UpdateSideShadow>) {
+      const { effectId, shadowId, changes } = action.payload;
+      const shadow = state.effects[effectId]?.shadows?.find((item) => item.id === shadowId);
+
+      if (!shadow) {
+        return;
+      }
+
+      const style = changes.style ? { ...shadow.style, ...changes.style } : shadow.style;
+      const animation = changes.animation ? { ...shadow.animation, ...changes.animation } : shadow.animation;
+
+      Object.assign(shadow, changes, { style, animation });
+    },
+    updateText(state, action: PayloadAction<UpdateSideText>) {
+      const { effectId, textId, changes } = action.payload;
+      const item = state.effects[effectId]?.texts?.find((textCur) => textCur.id === textId);
+
+      if (!item) {
+        return;
+      }
+
+      const style = changes.style ? { ...item.style, ...changes.style } : item.style;
+      const animation = changes.animation ? { ...item.animation, ...changes.animation } : item.animation;
+
+      Object.assign(item, changes, { style, animation });
     },
     setEffects(state, action: PayloadAction<SideEffects>) {
       state.effects = action.payload;

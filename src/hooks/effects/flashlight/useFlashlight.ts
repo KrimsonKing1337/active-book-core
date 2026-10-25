@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useId, useRef } from 'react';
 
 import type { FlashlightEffectOptions } from '@types';
 
@@ -6,7 +6,8 @@ import { useSelector } from 'store';
 import { configSelectors } from 'store/config';
 import { mainSelectors } from 'store/main';
 
-import { useSideShadow } from 'hooks/effects/side/useSideShadow';
+import { useSideEffect } from 'hooks/effects/side/useSideEffect';
+import { useSideEffects } from 'hooks/effects/side/useSideEffects';
 
 import { flashlightInst } from 'utils/effects/flashlight';
 
@@ -27,16 +28,21 @@ export const useFlashlight = (options: Partial<FlashlightEffectOptions> = {}) =>
 
   const color = theme === 'dark' ? '#fff' : '#9addf4';
 
-  const { sideShadowOn, sideShadowOff } = useSideShadow({
-    color,
-    isActiveDefault: false,
-    speed,
+  const generatedId = useId();
+  const shadowEffectId = `flashlight-side-${generatedId}`;
+  const shadowId = 'glow';
+
+  useSideEffect({
+    id: shadowEffectId,
+    shadows: [{
+      id: shadowId,
+      style: { color },
+      hidden: true,
+      animation: { preset: 'pulse', duration: speed },
+    }],
   });
 
-  // useSideShadow currently returns new function instances on every render.
-  // Keep the latest handlers without restarting a timed flashlight pulse.
-  const sideShadowHandlersRef = useRef({ sideShadowOn, sideShadowOff });
-  sideShadowHandlersRef.current = { sideShadowOn, sideShadowOff };
+  const { updateShadow } = useSideEffects();
 
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const resolvePulseRef = useRef<(() => void) | null>(null);
@@ -55,11 +61,11 @@ export const useFlashlight = (options: Partial<FlashlightEffectOptions> = {}) =>
     resolvePulseRef.current = null;
 
     if (withSideShadow) {
-      sideShadowHandlersRef.current.sideShadowOff();
+      updateShadow(shadowEffectId, shadowId, { hidden: true });
     }
 
     flashlightInst.off();
-  }, [withSideShadow]);
+  }, [withSideShadow, updateShadow, shadowEffectId]);
 
   const on = useCallback(async (pulseDuration?: number) => {
     // Invalidate pending camera initialization and any previous auto-off timer.
@@ -86,7 +92,7 @@ export const useFlashlight = (options: Partial<FlashlightEffectOptions> = {}) =>
     }
 
     if (withSideShadow) {
-      sideShadowHandlersRef.current.sideShadowOn();
+      updateShadow(shadowEffectId, shadowId, { hidden: false });
     }
 
     if (flashlightEnabled) {
@@ -99,7 +105,7 @@ export const useFlashlight = (options: Partial<FlashlightEffectOptions> = {}) =>
         timerRef.current = setTimeout(off, pulseDuration);
       });
     }
-  }, [flashlightEnabled, withSideShadow, off]);
+  }, [flashlightEnabled, withSideShadow, off, updateShadow, shadowEffectId]);
 
   // Preserve the original imperative hook's behavior on unmount.
   useEffect(() => {
