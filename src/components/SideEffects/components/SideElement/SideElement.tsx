@@ -35,6 +35,7 @@ export const SideElement = ({
   const style: CSSProperties = {
     left,
     top,
+    zIndex: style?.zIndex,
     transform: `translate(calc(${shiftX} + ${offsetX}), calc(${shiftY} + ${offsetY})) scale(${scale})`,
   };
 
