@@ -4,7 +4,6 @@ import { State, VideoCurrentTime } from './@types';
 
 export const initialState: State = {
   inverseColorIsActive: false,
-  dotsIsActive: false,
 
   dotLottieAmount: 0,
   dotLottieReadyAmount: 0,
@@ -26,9 +25,6 @@ const slice = createSlice({
   reducers: {
     setInverseColorActiveState(state, action: PayloadAction<State['inverseColorIsActive']>) {
       state.inverseColorIsActive = action.payload;
-    },
-    setDotsActiveState(state, action: PayloadAction<State['dotsIsActive']>) {
-      state.dotsIsActive = action.payload;
     },
 
     setDotLottieAmount(state, action: PayloadAction<State['dotLottieAmount']>) {
