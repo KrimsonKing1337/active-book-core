@@ -112,7 +112,7 @@ export const BackgroundEffects = memo(() => {
 
           {kind === 'video' && video?.src.trim() && (
             <Video
-              id={image?.id ?? video.id}
+              id={video.id}
               src={video.src}
               className={styles.Media}
               style={video.style}

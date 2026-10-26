@@ -4,30 +4,36 @@ import { actions, initialState, reducer } from './slice';
 
 const firstEffect: SideEffect = {
   id: 'first',
-  shadows: [{
+  kind: 'shadow',
+  shadow: {
     id: 'glow',
     thickness: 30,
     style: { color: '#ff0000', zIndex: 3 },
     animation: { preset: 'none' },
-  }],
-  texts: [{
-    id: 'ticker',
-    leftText: 'left',
-    rightText: 'right',
-  }],
+  },
 };
 
 const secondEffect: SideEffect = {
   id: 'second',
-  shadows: [{
+  kind: 'shadow',
+  shadow: {
     id: 'glow',
     style: { color: '#0000ff' },
-  }],
+  },
 };
 
-test('updates one shadow by effect ID without replacing unrelated styles or other effects', () => {
-  let state = reducer(initialState, actions.setEffect(firstEffect));
+const textEffect: SideEffect = {
+  id: 'text',
+  kind: 'text',
+  text: {
+    id: 'ticker',
+    leftText: 'left',
+    rightText: 'right',
+  },
+};
 
+test('updates one side shadow without changing unrelated effects', () => {
+  let state = reducer(initialState, actions.setEffect(firstEffect));
   state = reducer(state, actions.setEffect(secondEffect));
   state = reducer(state, actions.updateShadow({
     effectId: 'first',
@@ -38,28 +44,29 @@ test('updates one shadow by effect ID without replacing unrelated styles or othe
     },
   }));
 
-  expect(state.effects.first.shadows?.[0].style).toEqual({
+  expect(state.effects.first.shadow?.style).toEqual({
     color: '#00ff00',
     zIndex: 3,
   });
 
-  expect(state.effects.first.shadows?.[0].thickness).toBe(50);
-  expect(state.effects.second.shadows?.[0].style?.color).toBe('#0000ff');
-  expect(firstEffect.shadows?.[0].style?.color).toBe('#ff0000');
+  expect(state.effects.first.shadow?.thickness).toBe(50);
+  expect(state.effects.second.shadow?.style?.color).toBe('#0000ff');
+  expect(firstEffect.shadow?.style?.color).toBe('#ff0000');
 });
 
-test('updates text without touching the shadow or the original book options', () => {
+test('updates text without touching a separate shadow or the original text', () => {
   let state = reducer(initialState, actions.setEffect(firstEffect));
+  state = reducer(state, actions.setEffect(textEffect));
 
   state = reducer(state, actions.updateText({
-    effectId: 'first',
+    effectId: 'text',
     textId: 'ticker',
     changes: { leftText: 'updated' },
   }));
 
-  expect(state.effects.first.texts?.[0].leftText).toBe('updated');
-  expect(state.effects.first.shadows?.[0].style?.color).toBe('#ff0000');
-  expect(firstEffect.texts?.[0].leftText).toBe('left');
+  expect(state.effects.text.text?.leftText).toBe('updated');
+  expect(state.effects.first.shadow?.style?.color).toBe('#ff0000');
+  expect(textEffect.text?.leftText).toBe('left');
 });
 
 test('ignores updates to unknown effects and items', () => {
