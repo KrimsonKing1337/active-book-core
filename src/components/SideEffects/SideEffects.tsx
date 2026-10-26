@@ -33,6 +33,10 @@ export const SideEffects = () => {
           ShadowComponent = Caramelldansen;
         }
 
+        const showShadow = kind === 'shadow' && shadow;
+        const showText = kind === 'text' && text;
+        const showComponent = kind === 'component' && Boolean(Component);
+
         return (
           <div
             key={id}
@@ -41,13 +45,13 @@ export const SideEffects = () => {
             style={wrapperStyle}
             className={styles.EffectWrapper}
           >
-            {kind === 'shadow' && shadow && (
+            {showShadow && (
               <SideElement {...shadow}>
                 <ShadowComponent options={shadow} />
               </SideElement>
             )}
 
-            {kind === 'text' && text && (
+            {showText && (
               <SideElement {...text}>
                 <SideText animation={text.animation} style={text.style}>
                   <span>
@@ -61,7 +65,9 @@ export const SideEffects = () => {
               </SideElement>
             )}
 
-            {kind === 'component' && Component}
+            {showComponent && (
+              Component
+            )}
           </div>
         );
       })}

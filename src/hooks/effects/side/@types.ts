@@ -11,7 +11,12 @@ export type SidePosition =
   | 'bottom'
   | 'bottom-right';
 
-export type SideAnimationPreset = 'none' | 'pulse' | 'police' | 'caramel' | 'scroll';
+export type SideAnimationPreset =
+  | 'none'
+  | 'pulse'
+  | 'police'
+  | 'caramel'
+  | 'scroll';
 
 export type SideAnimation = {
   preset?: SideAnimationPreset;

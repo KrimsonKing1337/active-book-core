@@ -3,6 +3,7 @@ import { useCallback, useEffect, useId, useRef } from 'react';
 import type { FlashlightEffectOptions } from '@types';
 
 import { useSelector } from 'store';
+
 import { configSelectors } from 'store/config';
 import { mainSelectors } from 'store/main';
 

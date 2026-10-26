@@ -22,7 +22,7 @@ export const BackgroundEffects = memo(() => {
   const loadedImagesRef = useRef(new Set<string>());
   const loadedVideosRef = useRef(new Set<string>());
 
-  const { imageKeys, videoKeys } = useMemo(() => {
+  const keys = useMemo(() => {
     const imageKeys: string[] = [];
     const videoKeys: string[] = [];
 
@@ -46,6 +46,8 @@ export const BackgroundEffects = memo(() => {
       videoKeys,
     };
   }, [effects]);
+
+  const { imageKeys, videoKeys } = keys;
 
   useEffect(() => {
     const currentImages = new Set(imageKeys);

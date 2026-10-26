@@ -27,7 +27,12 @@ export type BackgroundEffectShadowOptions = {
   show?: boolean;
 };
 
-export type BackgroundEffectKind = 'background' | 'image' | 'video' | 'shadow' | 'component';
+export type BackgroundEffectKind =
+  | 'background'
+  | 'image'
+  | 'video'
+  | 'shadow'
+  | 'component';
 
 export type BackgroundEffect = {
   id: string;
