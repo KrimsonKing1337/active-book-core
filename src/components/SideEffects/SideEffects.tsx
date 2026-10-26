@@ -31,8 +31,8 @@ export const SideEffects = () => {
             key={id}
             id={`effect-${id}`}
             data-effect-id={id}
-            className={styles.EffectWrapper}
             style={wrapperStyle}
+            className={styles.EffectWrapper}
           >
             {kind === 'shadow' && shadow && (
               <SideElement {...shadow}>
@@ -43,8 +43,13 @@ export const SideEffects = () => {
             {kind === 'text' && text && (
               <SideElement {...text}>
                 <SideText animation={text.animation} style={text.style}>
-                  <span>{text.leftText}</span>
-                  <span>{text.rightText}</span>
+                  <span>
+                    {text.leftText}
+                  </span>
+
+                  <span>
+                    {text.rightText}
+                  </span>
                 </SideText>
               </SideElement>
             )}
