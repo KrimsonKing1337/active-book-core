@@ -1,5 +1,7 @@
 import type { CSSProperties, RefObject } from 'react';
 
+import classNames from 'classnames';
+
 import type { SideShadowItem } from 'hooks/effects/side/@types';
 
 import * as styles from './SideShadow.module.scss';
@@ -43,13 +45,12 @@ export const SideShadow = ({ options, elementRef, className }: SideShadowProps) 
     animationFillMode: 'forwards',
   };
 
-  const classNames = [
-    styles.SideShadow,
-    isAnimated ? styles.Pulse : '',
-    className,
-  ].filter(Boolean).join(' ');
+  const sideShadowClassNames = classNames({
+    [styles.SideShadow]: true,
+    [styles.Pulse]: isAnimated,
+  }, className);
 
   return (
-    <div ref={elementRef} className={classNames} style={shadowStyle} />
+    <div ref={elementRef} className={sideShadowClassNames} style={shadowStyle} />
   );
 };

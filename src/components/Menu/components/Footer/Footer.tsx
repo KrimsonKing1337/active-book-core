@@ -27,9 +27,12 @@ export const Footer = () => {
     dispatch(mainActions.setMenuActiveState(null));
   };
 
+  const tableOfContentsButtonClassNames = getClassNames(styles.isTableOfContents);
+  const closeButtonClassNames = getClassNames(styles.isClose);
+
   return (
     <div className={styles.Footer}>
-      <button className={getClassNames(styles.isTableOfContents)} onClick={tableOfContentsButtonClickHandler}>
+      <button className={tableOfContentsButtonClassNames} onClick={tableOfContentsButtonClickHandler}>
         Оглавление
       </button>
 
@@ -38,7 +41,7 @@ export const Footer = () => {
         Прогресс достижений
       </button>*/}
 
-      <button className={getClassNames(styles.isClose)} onClick={closeButtonClickHandler}>
+      <button className={closeButtonClassNames} onClick={closeButtonClickHandler}>
         Закрыть
       </button>
     </div>

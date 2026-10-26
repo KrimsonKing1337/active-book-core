@@ -1,5 +1,7 @@
 import { type CSSProperties, type PropsWithChildren, Children } from 'react';
 
+import classNames from 'classnames';
+
 import type { SideAnimation } from 'hooks/effects/side/@types';
 
 import * as styles from './SideText.module.scss';
@@ -32,20 +34,20 @@ export const SideText = ({ children, animation, style }: SideTextProps) => {
     animationName,
   };
 
-  const leftClassName = [
-    styles.SideTextScrollLeft,
-    isStatic ? styles.Static : '',
-  ].filter(Boolean).join(' ');
+  const leftClassNames = classNames({
+    [styles.SideTextScrollLeft]: true,
+    [styles.Static]: isStatic,
+  });
 
-  const rightClassName = [
-    styles.SideTextScrollRight,
-    isStatic ? styles.Static : '',
-  ].filter(Boolean).join(' ');
+  const rightClassNames = classNames({
+    [styles.SideTextScrollRight]: true,
+    [styles.Static]: isStatic,
+  });
 
   return (
     <div className={styles.SideTextScrollWrapper}>
       <div className={styles.SideTextScrollLeftWrapper}>
-        <div className={leftClassName} style={animationStyle}>
+        <div className={leftClassNames} style={animationStyle}>
           <div className={styles.SideTextScrollContent} style={style}>
             {childrenAsArray[0]}
           </div>
@@ -53,7 +55,7 @@ export const SideText = ({ children, animation, style }: SideTextProps) => {
       </div>
 
       <div className={styles.SideTextScrollRightWrapper}>
-        <div className={rightClassName} style={animationStyle}>
+        <div className={rightClassNames} style={animationStyle}>
           <div className={styles.SideTextScrollContent} style={style}>
             {childrenAsArray[1]}
           </div>
