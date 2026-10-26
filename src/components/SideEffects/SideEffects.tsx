@@ -21,8 +21,16 @@ export const SideEffects = () => {
           Component,
         } = effectCur;
 
+        const zIndex = shadows?.[0]?.style?.zIndex ?? texts?.[0]?.style?.zIndex;
+
         return (
-          <div key={id}>
+          <div
+            key={id}
+            id={`effect-${id}`}
+            data-effect-id={id}
+            className={styles.EffectWrapper}
+            style={{ zIndex }}
+          >
             {shadows?.map((shadowCur) => {
               const preset = shadowCur.animation?.preset;
 

@@ -108,6 +108,16 @@ export const BackgroundEffects = memo(() => {
         style = {},
       } = effectCur;
 
+      const wrapperZIndex = style.zIndex
+        ?? images[0]?.style?.zIndex
+        ?? videos[0]?.style?.zIndex
+        ?? shadow.style?.zIndex;
+
+      const wrapperStyle = {
+        ...style,
+        zIndex: wrapperZIndex,
+      };
+
       const hasBackgroundStyle = Object.keys(style).length > 0;
 
       const isVisible =
@@ -123,7 +133,12 @@ export const BackgroundEffects = memo(() => {
 
       return (
         <Child key={id}>
-          <div style={style} className={styles.BackgroundObjectsWrapper}>
+          <div
+            id={`effect-${id}`}
+            data-effect-id={id}
+            style={wrapperStyle}
+            className={styles.BackgroundObjectsWrapper}
+          >
             <Shadow options={shadow} />
 
             {Component}
