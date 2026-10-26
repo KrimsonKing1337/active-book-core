@@ -118,7 +118,7 @@ export const BackgroundEffects = memo(() => {
       const showShadow = kind === 'shadow' && shadow;
       const showImage = kind === 'image' && image && image?.src.trim();
       const showVideo = kind === 'video' && video && video?.src.trim();
-      const showComponent = kind === 'component' && Boolean(Component);
+      const componentContent = kind === 'component' ? Component : null;
 
       return (
         <div
@@ -157,9 +157,7 @@ export const BackgroundEffects = memo(() => {
             />
           )}
 
-          {showComponent && (
-            Component
-          )}
+          {componentContent}
         </div>
       );
     });

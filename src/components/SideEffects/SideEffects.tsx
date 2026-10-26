@@ -35,7 +35,7 @@ export const SideEffects = () => {
 
         const showShadow = kind === 'shadow' && shadow;
         const showText = kind === 'text' && text;
-        const showComponent = kind === 'component' && Boolean(Component);
+        const componentContent = kind === 'component' ? Component : null;
 
         return (
           <div
@@ -65,9 +65,7 @@ export const SideEffects = () => {
               </SideElement>
             )}
 
-            {showComponent && (
-              Component
-            )}
+            {componentContent}
           </div>
         );
       })}
