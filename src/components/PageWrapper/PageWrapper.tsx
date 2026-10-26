@@ -1,4 +1,4 @@
-import { HTMLAttributes, type PropsWithChildren, useEffect } from 'react';
+import { type HTMLAttributes, type PropsWithChildren, useEffect } from 'react';
 
 import classNames from 'classnames';
 
@@ -8,6 +8,7 @@ import { mainSelectors } from 'store/main';
 import { effectsSelectors } from 'store/effects/common';
 import { segmentsActions } from 'store/segments';
 import { backgroundEffectsActions } from 'store/effects/background';
+import { sideEffectsActions } from 'store/effects/side/effects';
 
 import { Toolbar } from 'components/Toolbar';
 import { Menu } from 'components/Menu';
@@ -40,6 +41,7 @@ export const PageWrapper = ({
     return () => {
       dispatch(segmentsActions.reset());
       dispatch(backgroundEffectsActions.setEffects({}));
+      dispatch(sideEffectsActions.setEffects({}));
     };
   }, []);
 

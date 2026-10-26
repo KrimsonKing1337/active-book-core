@@ -19,8 +19,7 @@ import { backgroundEffectsReducer, watchBackgroundEffectsActions } from './effec
 import { fontEffectsReducer } from './effects/font';
 import { audioEffectsReducer, watchAudioEffectsActions } from './effects/audio/audio';
 import { audioBgEffectsReducer, watchAudioBgEffectsActions } from './effects/audio/audioBg';
-import { sideShadowReducer, watchSideShadowActions } from './effects/side/shadow';
-import { sideTextReducer, watchSideTextActions } from './effects/side/text';
+import { sideEffectsReducer } from './effects/side/effects';
 import { bookmarksReducer, watchBookmarksActions } from './bookmarks';
 import { segmentsReducer, watchSegmentsActions } from './segments';
 
@@ -35,8 +34,7 @@ const reducer = {
   effects: effectsReducer,
   audioEffects: audioEffectsReducer,
   audioBgEffects: audioBgEffectsReducer,
-  sideShadowEffect: sideShadowReducer,
-  sideTextEffect: sideTextReducer,
+  sideEffects: sideEffectsReducer,
   backgroundEffects: backgroundEffectsReducer,
   fontEffects: fontEffectsReducer,
   bookmarks: bookmarksReducer,
@@ -51,8 +49,15 @@ const middleware = [
 
 export const store = configureStore({
   reducer,
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({ serializableCheck: false }).concat(middleware),
+
+  middleware: (getDefaultMiddleware) => {
+    const defaultMiddleware = getDefaultMiddleware({
+      serializableCheck: false,
+    });
+
+    return defaultMiddleware.concat(middleware);
+  },
+
   devTools: process.env.mode !== 'production',
 });
 
@@ -62,8 +67,6 @@ sagaMiddleware.run(watchEffectsActions);
 sagaMiddleware.run(watchAudioEffectsActions);
 sagaMiddleware.run(watchAudioBgEffectsActions);
 sagaMiddleware.run(watchBookmarksActions);
-sagaMiddleware.run(watchSideShadowActions);
-sagaMiddleware.run(watchSideTextActions);
 sagaMiddleware.run(watchVolumeActions);
 sagaMiddleware.run(watchBackgroundEffectsActions);
 sagaMiddleware.run(watchSegmentsActions);

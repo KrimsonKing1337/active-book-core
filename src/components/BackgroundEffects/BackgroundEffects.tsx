@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from 'store';
 import { backgroundEffectsSelectors } from 'store/effects/background';
 import { effectsActions } from 'store/effects/common';
 
-import { Videos, Images, Shadow, Dots, Wrapper } from './components';
+import { Videos, Images, Shadow, Wrapper } from './components';
 
 import * as styles from './BackgroundEffects.module.scss';
 
@@ -138,8 +138,6 @@ export const BackgroundEffects = memo(() => {
 
   return (
     <Wrapper id="background-effects">
-      <Dots />
-
       {backgroundWrappers}
     </Wrapper>
   );

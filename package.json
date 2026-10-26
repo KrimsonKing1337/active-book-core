@@ -1,6 +1,6 @@
 {
   "name": "activebook-react-core-next",
-  "version": "0.0.12",
+  "version": "0.0.18",
   "description": "",
   "main": "./lib/src/index.js",
   "type": "module",

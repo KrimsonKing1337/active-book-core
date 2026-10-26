@@ -1,10 +1,9 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { type PayloadAction, createSlice } from '@reduxjs/toolkit';
 
 import { State, VideoCurrentTime } from './@types';
 
 export const initialState: State = {
   inverseColorIsActive: false,
-  dotsIsActive: false,
 
   dotLottieAmount: 0,
   dotLottieReadyAmount: 0,
@@ -26,9 +25,6 @@ const slice = createSlice({
   reducers: {
     setInverseColorActiveState(state, action: PayloadAction<State['inverseColorIsActive']>) {
       state.inverseColorIsActive = action.payload;
-    },
-    setDotsActiveState(state, action: PayloadAction<State['dotsIsActive']>) {
-      state.dotsIsActive = action.payload;
     },
 
     setDotLottieAmount(state, action: PayloadAction<State['dotLottieAmount']>) {
@@ -62,6 +58,7 @@ const slice = createSlice({
       state.audiosReadyAmount = action.payload;
     },
     setAudioReady() {},
+
     setAudiosAmountInc(state) {
       state.audiosAmount += 1;
     },
