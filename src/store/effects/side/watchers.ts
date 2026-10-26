@@ -11,7 +11,7 @@ import type {
 import { actions } from './slice';
 import { selectors } from './selectors';
 
-export function* watchUpdateShadow(action: PayloadAction<UpdateSideShadow>) {
+export function* handleShadowUpdate(action: PayloadAction<UpdateSideShadow>) {
   const {
     effectId,
     shadowId,
@@ -54,7 +54,7 @@ export function* watchUpdateShadow(action: PayloadAction<UpdateSideShadow>) {
   yield put(actions.setEffect(updatedEffect));
 }
 
-export function* watchUpdateText(action: PayloadAction<UpdateSideText>) {
+export function* handleTextUpdate(action: PayloadAction<UpdateSideText>) {
   const {
     effectId,
     textId,
@@ -98,6 +98,6 @@ export function* watchUpdateText(action: PayloadAction<UpdateSideText>) {
 }
 
 export function* watchActions() {
-  yield takeEvery(actions.updateShadow, watchUpdateShadow);
-  yield takeEvery(actions.updateText, watchUpdateText);
+  yield takeEvery(actions.updateShadow, handleShadowUpdate);
+  yield takeEvery(actions.updateText, handleTextUpdate);
 }
