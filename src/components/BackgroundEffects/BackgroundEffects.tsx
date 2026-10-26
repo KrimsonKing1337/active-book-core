@@ -1,59 +1,36 @@
-import {
-  type PropsWithChildren,
+import { memo, useCallback, useEffect, useMemo, useRef } from 'react';
 
-  Fragment,
-  memo,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-} from 'react';
+import { Img } from 'components/Img';
+import { Video } from 'components/Video';
 
 import { useDispatch, useSelector } from 'store';
 
 import { backgroundEffectsSelectors } from 'store/effects/background';
 import { effectsActions } from 'store/effects/common';
 
-import { Videos, Images, Shadow, Wrapper } from './components';
+import { Shadow, Wrapper } from './components';
 
 import * as styles from './BackgroundEffects.module.scss';
 
 type MediaKind = 'image' | 'video';
 
-const Child = memo(({ children }: PropsWithChildren) => {
-  return (
-    <Fragment>
-      {children}
-    </Fragment>
-  );
-});
-
 export const BackgroundEffects = memo(() => {
   const dispatch = useDispatch();
-
   const effects = useSelector(backgroundEffectsSelectors.effects);
 
   const loadedImagesRef = useRef(new Set<string>());
   const loadedVideosRef = useRef(new Set<string>());
 
   const imageKeys = useMemo(() => {
-    return Object.values(effects).flatMap((effectCur) => {
-      const images = effectCur.images?.filter((imageCur) => imageCur.src.trim()) ?? [];
-
-      return images.map((imageCur) => {
-        return JSON.stringify([effectCur.id, imageCur.id, imageCur.src]);
-      });
-    });
+    return Object.values(effects)
+      .filter((effectCur) => effectCur.kind === 'image' && effectCur.image?.src.trim())
+      .map((effectCur) => JSON.stringify([effectCur.id, effectCur.image?.src]));
   }, [effects]);
 
   const videoKeys = useMemo(() => {
-    return Object.values(effects).flatMap((effectCur) => {
-      const videos = effectCur.videos?.filter((videoCur) => videoCur.src.trim()) ?? [];
-
-      return videos.map((videoCur) => {
-        return JSON.stringify([effectCur.id, videoCur.id, videoCur.src]);
-      });
-    });
+    return Object.values(effects)
+      .filter((effectCur) => effectCur.kind === 'video' && effectCur.video?.src.trim())
+      .map((effectCur) => JSON.stringify([effectCur.id, effectCur.video?.src]));
   }, [effects]);
 
   useEffect(() => {
@@ -80,7 +57,6 @@ export const BackgroundEffects = memo(() => {
 
   const markReady = useCallback((kind: MediaKind, key: string) => {
     const isImage = kind === 'image';
-
     const validKeys = isImage ? imageKeys : videoKeys;
     const loaded = isImage ? loadedImagesRef.current : loadedVideosRef.current;
 
@@ -99,44 +75,58 @@ export const BackgroundEffects = memo(() => {
 
   const backgroundWrappers = useMemo(() => {
     return Object.values(effects).map((effectCur) => {
-      const {
-        id,
-        videos: allVideos = [],
-        images: allImages = [],
-        Component = null,
-        shadow = {},
-        style = {},
-      } = effectCur;
+      const { id, kind, image, video, shadow, style = {}, Component } = effectCur;
 
-      const images = allImages.filter((imageCur) => imageCur.src.trim());
-      const videos = allVideos.filter((videoCur) => videoCur.src.trim());
+      const zIndex = style.zIndex
+        ?? image?.style?.zIndex
+        ?? video?.style?.zIndex
+        ?? shadow?.style?.zIndex;
 
-      const wrapperZIndex = style.zIndex
-        ?? images[0]?.style?.zIndex
-        ?? videos[0]?.style?.zIndex
-        ?? shadow.style?.zIndex;
+      const wrapperStyle = kind === 'background' ? style : { zIndex };
 
-      const wrapperStyle = {
-        ...style,
-        zIndex: wrapperZIndex,
-      };
+      const imageKey = JSON.stringify([id, image?.src]);
+      const videoKey = JSON.stringify([id, video?.src]);
+
+      const onImageReady = () => markReady('image', imageKey);
+      const onVideoReady = () => markReady('video', videoKey);
 
       return (
-        <Child key={id}>
-          <div
-            id={`effect-${id}`}
-            data-effect-id={id}
-            style={wrapperStyle}
-            className={styles.BackgroundObjectsWrapper}
-          >
-            <Shadow options={shadow} />
+        <div
+          key={id}
+          id={`effect-${id}`}
+          data-effect-id={id}
+          className={styles.BackgroundObjectsWrapper}
+          style={wrapperStyle}
+        >
+          {kind === 'shadow' && shadow && <Shadow options={shadow} />}
 
-            {Component}
+          {kind === 'image' && image?.src.trim() && (
+            <Img
+              src={image.src}
+              className={styles.Media}
+              style={image.style}
+              onLoad={onImageReady}
+              onError={onImageReady}
+            />
+          )}
 
-            <Videos backgroundId={id} videos={videos} onReady={markReady} />
-            <Images backgroundId={id} images={images} onReady={markReady} />
-          </div>
-        </Child>
+          {kind === 'video' && video?.src.trim() && (
+            <Video
+              id={image?.id ?? video.id}
+              src={video.src}
+              className={styles.Media}
+              style={video.style}
+              autoPlay={video.autoPlay ?? true}
+              loop={video.loop ?? true}
+              muted={video.muted ?? true}
+              relativeVolume={video.relativeVolume ?? 100}
+              onCanPlay={onVideoReady}
+              onError={onVideoReady}
+            />
+          )}
+
+          {kind === 'component' && Component}
+        </div>
       );
     });
   }, [effects, markReady]);

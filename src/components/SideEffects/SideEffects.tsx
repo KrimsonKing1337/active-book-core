@@ -14,14 +14,16 @@ export const SideEffects = () => {
   return (
     <div id="side-effects" className={styles.SideEffects}>
       {Object.values(effects).map((effectCur) => {
-        const {
-          id,
-          shadows,
-          texts,
-          Component,
-        } = effectCur;
+        const { id, kind, shadow, text, Component } = effectCur;
+        const zIndex = shadow?.style?.zIndex ?? text?.style?.zIndex;
 
-        const zIndex = shadows?.[0]?.style?.zIndex ?? texts?.[0]?.style?.zIndex;
+        let ShadowComponent = SideShadow;
+
+        if (shadow?.animation?.preset === 'police') {
+          ShadowComponent = Police;
+        } else if (shadow?.animation?.preset === 'caramel') {
+          ShadowComponent = Caramelldansen;
+        }
 
         return (
           <div
@@ -31,49 +33,22 @@ export const SideEffects = () => {
             className={styles.EffectWrapper}
             style={{ zIndex }}
           >
-            {shadows?.map((shadowCur) => {
-              const preset = shadowCur.animation?.preset;
+            {kind === 'shadow' && shadow && (
+              <SideElement {...shadow}>
+                <ShadowComponent options={shadow} />
+              </SideElement>
+            )}
 
-              let ShadowComponent = SideShadow;
+            {kind === 'text' && text && (
+              <SideElement {...text}>
+                <SideText animation={text.animation} style={text.style}>
+                  <span>{text.leftText}</span>
+                  <span>{text.rightText}</span>
+                </SideText>
+              </SideElement>
+            )}
 
-              if (preset === 'police') {
-                ShadowComponent = Police;
-              } else if (preset === 'caramel') {
-                ShadowComponent = Caramelldansen;
-              }
-
-              return (
-                <SideElement key={shadowCur.id} {...shadowCur}>
-                  <ShadowComponent options={shadowCur} />
-                </SideElement>
-              );
-            })}
-
-            {texts?.map((textCur) => {
-              const {
-                id,
-                animation,
-                style,
-                leftText,
-                rightText,
-              } = textCur;
-
-              return (
-                <SideElement key={id} {...textCur}>
-                  <SideText animation={animation} style={style}>
-                    <span>
-                      {leftText}
-                    </span>
-
-                    <span>
-                      {rightText}
-                    </span>
-                  </SideText>
-                </SideElement>
-              );
-            })}
-
-            {Component}
+            {kind === 'component' && Component}
           </div>
         );
       })}

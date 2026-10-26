@@ -33,19 +33,14 @@ const slice = createSlice({
     },
     updateShadow(state, action: PayloadAction<UpdateSideShadow>) {
       const { effectId, shadowId, changes } = action.payload;
-      const shadow = state.effects[effectId]?.shadows?.find((cur) => cur.id === shadowId);
+      const shadow = state.effects[effectId]?.shadow;
 
-      if (!shadow) {
+      if (!shadow || shadow.id !== shadowId) {
         return;
       }
 
-      const style = changes.style
-        ? { ...shadow.style, ...changes.style }
-        : shadow.style;
-
-      const animation = changes.animation
-        ? { ...shadow.animation, ...changes.animation }
-        : shadow.animation;
+      const style = changes.style ? { ...shadow.style, ...changes.style } : shadow.style;
+      const animation = changes.animation ? { ...shadow.animation, ...changes.animation } : shadow.animation;
 
       Object.assign(shadow, changes);
 
@@ -59,19 +54,14 @@ const slice = createSlice({
     },
     updateText(state, action: PayloadAction<UpdateSideText>) {
       const { effectId, textId, changes } = action.payload;
-      const item = state.effects[effectId]?.texts?.find((textCur) => textCur.id === textId);
+      const item = state.effects[effectId]?.text;
 
-      if (!item) {
+      if (!item || item.id !== textId) {
         return;
       }
 
-      const style = changes.style
-        ? { ...item.style, ...changes.style }
-        : item.style;
-
-      const animation = changes.animation
-        ? { ...item.animation, ...changes.animation }
-        : item.animation;
+      const style = changes.style ? { ...item.style, ...changes.style } : item.style;
+      const animation = changes.animation ? { ...item.animation, ...changes.animation } : item.animation;
 
       Object.assign(item, changes);
 
