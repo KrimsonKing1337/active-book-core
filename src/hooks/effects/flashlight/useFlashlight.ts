@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useId, useRef } from 'react';
 
 import type { FlashlightEffectOptions } from '@types';
-import type { SideAnimation, SideEffect, SideShadowItem } from 'hooks/effects/side/@types';
 
 import { useSelector } from 'store';
 import { configSelectors } from 'store/config';
 import { mainSelectors } from 'store/main';
+
+import type { SideAnimation, SideEffect, SideShadowItem } from 'hooks/effects/side/@types';
 
 import { useSideEffect } from 'hooks/effects/side/useSideEffect';
 import { useSideEffects } from 'hooks/effects/side/useSideEffects';
@@ -49,12 +50,14 @@ export const useFlashlight = (options: Partial<FlashlightEffectOptions> = {}) =>
     animation: shadowAnimation,
   };
 
-  const shadowEffect: SideEffect | null = withSideShadow
-    ? {
+  let shadowEffect: SideEffect | null = null;
+
+  if (withSideShadow) {
+    shadowEffect = {
       id: shadowEffectId,
       shadows: [shadow],
-    }
-    : null;
+    };
+  }
 
   useSideEffect(shadowEffect);
 
@@ -69,6 +72,7 @@ export const useFlashlight = (options: Partial<FlashlightEffectOptions> = {}) =>
 
     if (timerRef.current !== null) {
       clearTimeout(timerRef.current);
+
       timerRef.current = null;
     }
 

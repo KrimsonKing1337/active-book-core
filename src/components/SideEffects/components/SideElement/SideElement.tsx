@@ -1,22 +1,14 @@
 import type { CSSProperties, PropsWithChildren } from 'react';
 
-import type { SideElementLayout, SidePosition } from 'hooks/effects/side/@types';
+import type { SideElementLayout } from 'hooks/effects/side/@types';
+
+import { getPositionCoordinatesDefault } from './utils';
 
 import * as styles from './SideElement.module.scss';
 
 type SideElementProps = PropsWithChildren<SideElementLayout>;
 
-const positionCoordinates: Record<SidePosition, [string, string, string, string]> = {
-  'top-left': ['0%', '0%', '0%', '0%'],
-  top: ['50%', '0%', '-50%', '0%'],
-  'top-right': ['100%', '0%', '-100%', '0%'],
-  left: ['0%', '50%', '0%', '-50%'],
-  center: ['50%', '50%', '-50%', '-50%'],
-  right: ['100%', '50%', '-100%', '-50%'],
-  'bottom-left': ['0%', '100%', '0%', '-100%'],
-  bottom: ['50%', '100%', '-50%', '-100%'],
-  'bottom-right': ['100%', '100%', '-100%', '-100%'],
-};
+const positionCoordinates = getPositionCoordinatesDefault();
 
 export const SideElement = ({
   children,
@@ -37,11 +29,14 @@ export const SideElement = ({
     shiftY,
   ] = positionCoordinates[position];
 
+  const zIndex = elementStyle?.zIndex;
+  const transform = `translate(calc(${shiftX} + ${offsetX}), calc(${shiftY} + ${offsetY}))`;
+
   const positionStyle: CSSProperties = {
     left,
     top,
-    zIndex: elementStyle?.zIndex,
-    transform: `translate(calc(${shiftX} + ${offsetX}), calc(${shiftY} + ${offsetY}))`,
+    zIndex,
+    transform,
   };
 
   return (

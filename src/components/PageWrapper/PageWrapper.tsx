@@ -1,4 +1,4 @@
-import { HTMLAttributes, type PropsWithChildren, useEffect } from 'react';
+import { type HTMLAttributes, type PropsWithChildren, useEffect } from 'react';
 
 import classNames from 'classnames';
 

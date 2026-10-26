@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { type PayloadAction, createSlice } from '@reduxjs/toolkit';
 
 import { State, VideoCurrentTime } from './@types';
 
@@ -58,6 +58,7 @@ const slice = createSlice({
       state.audiosReadyAmount = action.payload;
     },
     setAudioReady() {},
+
     setAudiosAmountInc(state) {
       state.audiosAmount += 1;
     },

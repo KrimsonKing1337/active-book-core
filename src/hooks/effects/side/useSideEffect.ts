@@ -1,12 +1,14 @@
 import { useEffect, useRef } from 'react';
 
 import { useDispatch } from 'store';
+
 import { sideEffectsActions } from 'store/effects/side/effects';
 
 import type { SideEffect } from './@types';
 
 export const useSideEffect = (effect: SideEffect | null) => {
   const dispatch = useDispatch();
+
   const registeredEffectRef = useRef<SideEffect | null>(null);
   const registeredOptionsKeyRef = useRef('');
 
@@ -42,6 +44,7 @@ export const useSideEffect = (effect: SideEffect | null) => {
     if (optionsChanged || componentChanged) {
       registeredEffectRef.current = effect;
       registeredOptionsKeyRef.current = optionsKey;
+
       dispatch(sideEffectsActions.setEffect(effect));
     }
   }, [dispatch, effect]);
@@ -53,6 +56,7 @@ export const useSideEffect = (effect: SideEffect | null) => {
       if (registered) {
         registeredEffectRef.current = null;
         registeredOptionsKeyRef.current = '';
+
         dispatch(sideEffectsActions.deleteEffect(registered.id));
       }
     };

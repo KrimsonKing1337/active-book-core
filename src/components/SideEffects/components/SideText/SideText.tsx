@@ -1,15 +1,13 @@
-import type { CSSProperties, PropsWithChildren } from 'react';
-
-import { Children } from 'react';
+import { type CSSProperties, type PropsWithChildren, Children } from 'react';
 
 import type { SideAnimation } from 'hooks/effects/side/@types';
 
 import * as styles from './SideText.module.scss';
 
-type SideTextProps = PropsWithChildren<{
+type SideTextProps = PropsWithChildren & {
   animation?: SideAnimation;
   style?: CSSProperties;
-}>;
+};
 
 export const SideText = ({ children, animation, style }: SideTextProps) => {
   const childrenAsArray = Children.toArray(children);
@@ -20,12 +18,18 @@ export const SideText = ({ children, animation, style }: SideTextProps) => {
 
   const isStatic = animation?.preset === 'none' || animation?.playState === 'stopped';
 
+  const animationDuration = animation?.duration ?? 60000;
+  const animationDelay = animation?.delay ?? 0;
+  const animationIterationCount = animation?.iterations ?? 'infinite';
+  const animationPlayState = animation?.playState === 'paused' ? 'paused' : 'running';
+  const animationName = isStatic ? 'none' : undefined;
+
   const animationStyle: CSSProperties = {
-    animationDuration: `${animation?.duration ?? 60000}ms`,
-    animationDelay: `${animation?.delay ?? 0}ms`,
-    animationIterationCount: animation?.iterations ?? 'infinite',
-    animationPlayState: animation?.playState === 'paused' ? 'paused' : 'running',
-    animationName: isStatic ? 'none' : undefined,
+    animationDuration: `${animationDuration}ms`,
+    animationDelay: `${animationDelay}ms`,
+    animationIterationCount,
+    animationPlayState,
+    animationName,
   };
 
   const leftClassName = [

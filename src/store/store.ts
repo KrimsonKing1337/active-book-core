@@ -49,8 +49,15 @@ const middleware = [
 
 export const store = configureStore({
   reducer,
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({ serializableCheck: false }).concat(middleware),
+
+  middleware: (getDefaultMiddleware) => {
+    const defaultMiddleware = getDefaultMiddleware({
+      serializableCheck: false,
+    });
+
+    return defaultMiddleware.concat(middleware);
+  },
+
   devTools: process.env.mode !== 'production',
 });
 
