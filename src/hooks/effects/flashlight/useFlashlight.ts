@@ -55,7 +55,8 @@ export const useFlashlight = (options: Partial<FlashlightEffectOptions> = {}) =>
   if (withSideShadow) {
     shadowEffect = {
       id: shadowEffectId,
-      shadows: [shadow],
+      kind: 'shadow',
+      shadow,
     };
   }
 
