@@ -1,6 +1,6 @@
 import { useSelector } from 'store';
 
-import { sideEffectsSelectors } from 'store/effects/side/effects';
+import { sideEffectsSelectors } from 'store/effects/side';
 
 import { SideElement } from './components/SideElement';
 import { SideShadow, Police, Caramelldansen } from './components/SideShadow';
@@ -16,56 +16,56 @@ export const SideEffects = () => {
       {Object.values(effects).map((effectCur) => {
         const {
           id,
-          shadows,
-          texts,
+          kind,
+          shadow,
+          text,
           Component,
+          style,
         } = effectCur;
+        const zIndex = shadow?.style?.zIndex ?? text?.style?.zIndex;
+        const wrapperStyle = kind === 'component' ? style : { zIndex };
+
+        let ShadowComponent = SideShadow;
+
+        if (shadow?.animation?.preset === 'police') {
+          ShadowComponent = Police;
+        } else if (shadow?.animation?.preset === 'caramel') {
+          ShadowComponent = Caramelldansen;
+        }
+
+        const showShadow = kind === 'shadow' && shadow;
+        const showText = kind === 'text' && text;
+        const componentContent = kind === 'component' ? Component : null;
 
         return (
-          <div key={id}>
-            {shadows?.map((shadowCur) => {
-              const preset = shadowCur.animation?.preset;
+          <div
+            key={id}
+            id={`effect-${id}`}
+            data-effect-id={id}
+            style={wrapperStyle}
+            className={styles.EffectWrapper}
+          >
+            {showShadow && (
+              <SideElement {...shadow}>
+                <ShadowComponent options={shadow} />
+              </SideElement>
+            )}
 
-              let ShadowComponent = SideShadow;
+            {showText && (
+              <SideElement {...text}>
+                <SideText animation={text.animation} style={text.style}>
+                  <span>
+                    {text.leftText}
+                  </span>
 
-              if (preset === 'police') {
-                ShadowComponent = Police;
-              } else if (preset === 'caramel') {
-                ShadowComponent = Caramelldansen;
-              }
+                  <span>
+                    {text.rightText}
+                  </span>
+                </SideText>
+              </SideElement>
+            )}
 
-              return (
-                <SideElement key={shadowCur.id} {...shadowCur}>
-                  <ShadowComponent options={shadowCur} />
-                </SideElement>
-              );
-            })}
-
-            {texts?.map((textCur) => {
-              const {
-                id,
-                animation,
-                style,
-                leftText,
-                rightText,
-              } = textCur;
-
-              return (
-                <SideElement key={id} {...textCur}>
-                  <SideText animation={animation} style={style}>
-                    <span>
-                      {leftText}
-                    </span>
-
-                    <span>
-                      {rightText}
-                    </span>
-                  </SideText>
-                </SideElement>
-              );
-            })}
-
-            {Component}
+            {componentContent}
           </div>
         );
       })}

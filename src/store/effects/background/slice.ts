@@ -12,11 +12,12 @@ const slice = createSlice({
   name: '@effects/background',
   initialState,
   reducers: {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    setEffect(_state, _action: PayloadAction<BackgroundEffect>) {},
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    deleteEffect(_state, _action: PayloadAction<string>) {},
-
+    setEffect(state, action: PayloadAction<BackgroundEffect>) {
+      state.effects[action.payload.id] = action.payload;
+    },
+    deleteEffect(state, action: PayloadAction<string>) {
+      delete state.effects[action.payload];
+    },
     setEffects(state, action: PayloadAction<BackgroundEffects>) {
       state.effects = action.payload;
     },

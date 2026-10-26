@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 
 import { useDispatch } from 'store';
 
-import { sideEffectsActions } from 'store/effects/side/effects';
+import { sideEffectsActions } from 'store/effects/side';
 
 import type { SideEffect } from './@types';
 
@@ -26,10 +26,20 @@ export const useSideEffect = (effect: SideEffect | null) => {
       return;
     }
 
+    const {
+      id,
+      kind,
+      shadow,
+      text,
+      style,
+    } = effect;
+
     const options = {
-      id: effect.id,
-      shadows: effect.shadows,
-      texts: effect.texts,
+      id,
+      kind,
+      shadow,
+      text,
+      style,
     };
 
     const optionsKey = JSON.stringify(options);

@@ -11,7 +11,12 @@ export type SidePosition =
   | 'bottom'
   | 'bottom-right';
 
-export type SideAnimationPreset = 'none' | 'pulse' | 'police' | 'caramel' | 'scroll';
+export type SideAnimationPreset =
+  | 'none'
+  | 'pulse'
+  | 'police'
+  | 'caramel'
+  | 'scroll';
 
 export type SideAnimation = {
   preset?: SideAnimationPreset;
@@ -44,7 +49,9 @@ export type SideTextItem = SideElementLayout & {
 
 export type SideEffect = {
   id: string;
-  shadows?: SideShadowItem[];
-  texts?: SideTextItem[];
+  kind: 'shadow' | 'text' | 'component';
+  shadow?: SideShadowItem;
+  text?: SideTextItem;
   Component?: ReactNode;
+  style?: CSSProperties;
 };

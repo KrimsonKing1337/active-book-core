@@ -3,6 +3,7 @@ import { useCallback, useEffect, useId, useRef } from 'react';
 import type { FlashlightEffectOptions } from '@types';
 
 import { useSelector } from 'store';
+
 import { configSelectors } from 'store/config';
 import { mainSelectors } from 'store/main';
 
@@ -55,7 +56,8 @@ export const useFlashlight = (options: Partial<FlashlightEffectOptions> = {}) =>
   if (withSideShadow) {
     shadowEffect = {
       id: shadowEffectId,
-      shadows: [shadow],
+      kind: 'shadow',
+      shadow,
     };
   }
 

@@ -15,26 +15,32 @@ export type BackgroundEffectMediaOptions = {
   style?: React.CSSProperties;
 };
 
-export type UseBackgroundEffectImageOptions = BackgroundEffectMediaOptions;
-
 export type BackgroundEffectVideoOptions = BackgroundEffectMediaOptions & {
   loop?: boolean;
   autoPlay?: boolean;
   muted?: boolean;
   relativeVolume?: number;
-}
+};
 
 export type BackgroundEffectShadowOptions = {
   style?: React.CSSProperties;
   show?: boolean;
 };
 
+export type BackgroundEffectKind =
+  | 'background'
+  | 'image'
+  | 'video'
+  | 'shadow'
+  | 'component';
+
 export type BackgroundEffect = {
   id: string;
+  kind: BackgroundEffectKind;
   inRange?: boolean;
   style?: React.CSSProperties;
-  images?: UseBackgroundEffectImageOptions[];
-  videos?: BackgroundEffectVideoOptions[];
+  image?: BackgroundEffectMediaOptions;
+  video?: BackgroundEffectVideoOptions;
   Component?: React.ReactNode;
   shadow?: BackgroundEffectShadowOptions;
 };

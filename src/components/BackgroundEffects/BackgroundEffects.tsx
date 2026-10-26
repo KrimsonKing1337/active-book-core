@@ -1,32 +1,18 @@
-import {
-  type PropsWithChildren,
-
-  Fragment,
-  memo,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-} from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef } from 'react';
 
 import { useDispatch, useSelector } from 'store';
 
 import { backgroundEffectsSelectors } from 'store/effects/background';
 import { effectsActions } from 'store/effects/common';
 
-import { Videos, Images, Shadow, Wrapper } from './components';
+import { Video } from 'components/Video';
+import { Img } from 'components/Img';
+
+import { Shadow, Wrapper } from './components';
 
 import * as styles from './BackgroundEffects.module.scss';
 
 type MediaKind = 'image' | 'video';
-
-const Child = memo(({ children }: PropsWithChildren) => {
-  return (
-    <Fragment>
-      {children}
-    </Fragment>
-  );
-});
 
 export const BackgroundEffects = memo(() => {
   const dispatch = useDispatch();
@@ -36,25 +22,32 @@ export const BackgroundEffects = memo(() => {
   const loadedImagesRef = useRef(new Set<string>());
   const loadedVideosRef = useRef(new Set<string>());
 
-  const imageKeys = useMemo(() => {
-    return Object.values(effects).flatMap((effectCur) => {
-      const images = effectCur.images ?? [];
+  const keys = useMemo(() => {
+    const imageKeys: string[] = [];
+    const videoKeys: string[] = [];
 
-      return images.map((imageCur) => {
-        return JSON.stringify([effectCur.id, imageCur.id, imageCur.src]);
-      });
-    });
+    for (const effectCur of Object.values(effects)) {
+      const {
+        id,
+        kind,
+        image,
+        video,
+      } = effectCur;
+
+      if (kind === 'image' && image?.src.trim()) {
+        imageKeys.push(JSON.stringify([id, image.src]));
+      } else if (kind === 'video' && video?.src.trim()) {
+        videoKeys.push(JSON.stringify([id, video.src]));
+      }
+    }
+
+    return {
+      imageKeys,
+      videoKeys,
+    };
   }, [effects]);
 
-  const videoKeys = useMemo(() => {
-    return Object.values(effects).flatMap((effectCur) => {
-      const videos = effectCur.videos ?? [];
-
-      return videos.map((videoCur) => {
-        return JSON.stringify([effectCur.id, videoCur.id, videoCur.src]);
-      });
-    });
-  }, [effects]);
+  const { imageKeys, videoKeys } = keys;
 
   useEffect(() => {
     const currentImages = new Set(imageKeys);
@@ -101,37 +94,71 @@ export const BackgroundEffects = memo(() => {
     return Object.values(effects).map((effectCur) => {
       const {
         id,
-        videos = [],
-        images = [],
-        Component = null,
-        shadow = {},
+        kind,
+        image,
+        video,
+        shadow,
         style = {},
+        Component,
       } = effectCur;
 
-      const hasBackgroundStyle = Object.keys(style).length > 0;
+      const zIndex = style.zIndex
+        ?? image?.style?.zIndex
+        ?? video?.style?.zIndex
+        ?? shadow?.style?.zIndex;
 
-      const isVisible =
-        !!videos.length
-        || !!images.length
-        || !!Component
-        || !!shadow.show
-        || hasBackgroundStyle;
+      const wrapperStyle = kind === 'background' ? style : { zIndex };
 
-      if (!isVisible) {
-        return null;
-      }
+      const imageKey = JSON.stringify([id, image?.src]);
+      const videoKey = JSON.stringify([id, video?.src]);
+
+      const onImageReady = () => markReady('image', imageKey);
+      const onVideoReady = () => markReady('video', videoKey);
+
+      const showShadow = kind === 'shadow' && shadow;
+      const showImage = kind === 'image' && image && image?.src.trim();
+      const showVideo = kind === 'video' && video && video?.src.trim();
+      const componentContent = kind === 'component' ? Component : null;
 
       return (
-        <Child key={id}>
-          <div style={style} className={styles.BackgroundObjectsWrapper}>
+        <div
+          key={id}
+          id={`effect-${id}`}
+          data-effect-id={id}
+          className={styles.BackgroundObjectsWrapper}
+          style={wrapperStyle}
+        >
+          {showShadow && (
             <Shadow options={shadow} />
+          )}
 
-            {Component}
+          {showImage && (
+            <Img
+              src={image.src}
+              className={styles.Media}
+              style={image.style}
+              onLoad={onImageReady}
+              onError={onImageReady}
+            />
+          )}
 
-            <Videos backgroundId={id} videos={videos} onReady={markReady} />
-            <Images backgroundId={id} images={images} onReady={markReady} />
-          </div>
-        </Child>
+          {showVideo && (
+            <Video
+              id={video.id}
+              src={video.src}
+              className={styles.Media}
+              style={video.style}
+              autoPlay={video.autoPlay ?? true}
+              loop={video.loop ?? true}
+              muted={video.muted ?? true}
+              relativeVolume={video.relativeVolume ?? 100}
+              onCanPlay={onVideoReady}
+              onError={onVideoReady}
+            />
+          )}
+
+          {componentContent}
+        </div>
       );
     });
   }, [effects, markReady]);
