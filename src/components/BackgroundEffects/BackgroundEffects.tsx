@@ -121,19 +121,6 @@ export const BackgroundEffects = memo(() => {
         zIndex: wrapperZIndex,
       };
 
-      const hasBackgroundStyle = Object.keys(style).length > 0;
-
-      const isVisible =
-        !!videos.length
-        || !!images.length
-        || !!Component
-        || !!shadow.show
-        || hasBackgroundStyle;
-
-      if (!isVisible) {
-        return null;
-      }
-
       return (
         <Child key={id}>
           <div
