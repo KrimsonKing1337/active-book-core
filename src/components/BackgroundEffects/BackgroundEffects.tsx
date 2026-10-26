@@ -1,12 +1,12 @@
 import { memo, useCallback, useEffect, useMemo, useRef } from 'react';
 
-import { Img } from 'components/Img';
-import { Video } from 'components/Video';
-
 import { useDispatch, useSelector } from 'store';
 
 import { backgroundEffectsSelectors } from 'store/effects/background';
 import { effectsActions } from 'store/effects/common';
+
+import { Video } from 'components/Video';
+import { Img } from 'components/Img';
 
 import { Shadow, Wrapper } from './components';
 
@@ -16,6 +16,7 @@ type MediaKind = 'image' | 'video';
 
 export const BackgroundEffects = memo(() => {
   const dispatch = useDispatch();
+
   const effects = useSelector(backgroundEffectsSelectors.effects);
 
   const loadedImagesRef = useRef(new Set<string>());
@@ -57,6 +58,7 @@ export const BackgroundEffects = memo(() => {
 
   const markReady = useCallback((kind: MediaKind, key: string) => {
     const isImage = kind === 'image';
+
     const validKeys = isImage ? imageKeys : videoKeys;
     const loaded = isImage ? loadedImagesRef.current : loadedVideosRef.current;
 
@@ -98,6 +100,11 @@ export const BackgroundEffects = memo(() => {
       const onImageReady = () => markReady('image', imageKey);
       const onVideoReady = () => markReady('video', videoKey);
 
+      const showShadow = kind === 'shadow' && shadow;
+      const showImage = kind === 'image' && image && image?.src.trim();
+      const showVideo = kind === 'video' && video && video?.src.trim();
+      const showComponent = kind === 'component' && Boolean(Component);
+
       return (
         <div
           key={id}
@@ -106,11 +113,11 @@ export const BackgroundEffects = memo(() => {
           className={styles.BackgroundObjectsWrapper}
           style={wrapperStyle}
         >
-          {kind === 'shadow' && shadow && (
+          {showShadow && (
             <Shadow options={shadow} />
           )}
 
-          {kind === 'image' && image?.src.trim() && (
+          {showImage && (
             <Img
               src={image.src}
               className={styles.Media}
@@ -120,7 +127,7 @@ export const BackgroundEffects = memo(() => {
             />
           )}
 
-          {kind === 'video' && video?.src.trim() && (
+          {showVideo && (
             <Video
               id={video.id}
               src={video.src}
@@ -135,7 +142,9 @@ export const BackgroundEffects = memo(() => {
             />
           )}
 
-          {kind === 'component' && Component}
+          {showComponent && (
+            Component
+          )}
         </div>
       );
     });
