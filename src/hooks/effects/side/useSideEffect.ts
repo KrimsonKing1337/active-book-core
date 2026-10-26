@@ -31,6 +31,7 @@ export const useSideEffect = (effect: SideEffect | null) => {
       kind: effect.kind,
       shadow: effect.shadow,
       text: effect.text,
+      style: effect.style,
     };
 
     const optionsKey = JSON.stringify(options);

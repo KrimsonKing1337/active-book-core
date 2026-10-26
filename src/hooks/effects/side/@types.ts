@@ -48,4 +48,5 @@ export type SideEffect = {
   shadow?: SideShadowItem;
   text?: SideTextItem;
   Component?: ReactNode;
+  style?: CSSProperties;
 };
