@@ -75,7 +75,15 @@ export const BackgroundEffects = memo(() => {
 
   const backgroundWrappers = useMemo(() => {
     return Object.values(effects).map((effectCur) => {
-      const { id, kind, image, video, shadow, style = {}, Component } = effectCur;
+      const {
+        id,
+        kind,
+        image,
+        video,
+        shadow,
+        style = {},
+        Component,
+      } = effectCur;
 
       const zIndex = style.zIndex
         ?? image?.style?.zIndex
@@ -98,7 +106,9 @@ export const BackgroundEffects = memo(() => {
           className={styles.BackgroundObjectsWrapper}
           style={wrapperStyle}
         >
-          {kind === 'shadow' && shadow && <Shadow options={shadow} />}
+          {kind === 'shadow' && shadow && (
+            <Shadow options={shadow} />
+          )}
 
           {kind === 'image' && image?.src.trim() && (
             <Img

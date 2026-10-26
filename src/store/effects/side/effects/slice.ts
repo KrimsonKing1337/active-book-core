@@ -39,8 +39,13 @@ const slice = createSlice({
         return;
       }
 
-      const style = changes.style ? { ...shadow.style, ...changes.style } : shadow.style;
-      const animation = changes.animation ? { ...shadow.animation, ...changes.animation } : shadow.animation;
+      const style = changes.style
+        ? { ...shadow.style, ...changes.style }
+        : shadow.style;
+
+      const animation = changes.animation
+        ? { ...shadow.animation, ...changes.animation }
+        : shadow.animation;
 
       Object.assign(shadow, changes);
 
@@ -60,8 +65,13 @@ const slice = createSlice({
         return;
       }
 
-      const style = changes.style ? { ...item.style, ...changes.style } : item.style;
-      const animation = changes.animation ? { ...item.animation, ...changes.animation } : item.animation;
+      const style = changes.style
+        ? { ...item.style, ...changes.style }
+        : item.style;
+
+      const animation = changes.animation
+        ? { ...item.animation, ...changes.animation }
+        : item.animation;
 
       Object.assign(item, changes);
 

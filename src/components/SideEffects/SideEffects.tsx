@@ -14,7 +14,14 @@ export const SideEffects = () => {
   return (
     <div id="side-effects" className={styles.SideEffects}>
       {Object.values(effects).map((effectCur) => {
-        const { id, kind, shadow, text, Component, style } = effectCur;
+        const {
+          id,
+          kind,
+          shadow,
+          text,
+          Component,
+          style,
+        } = effectCur;
         const zIndex = shadow?.style?.zIndex ?? text?.style?.zIndex;
         const wrapperStyle = kind === 'component' ? style : { zIndex };
 
