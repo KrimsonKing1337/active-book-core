@@ -22,16 +22,29 @@ export const BackgroundEffects = memo(() => {
   const loadedImagesRef = useRef(new Set<string>());
   const loadedVideosRef = useRef(new Set<string>());
 
-  const imageKeys = useMemo(() => {
-    return Object.values(effects)
-      .filter((effectCur) => effectCur.kind === 'image' && effectCur.image?.src.trim())
-      .map((effectCur) => JSON.stringify([effectCur.id, effectCur.image?.src]));
-  }, [effects]);
+  const { imageKeys, videoKeys } = useMemo(() => {
+    const imageKeys: string[] = [];
+    const videoKeys: string[] = [];
 
-  const videoKeys = useMemo(() => {
-    return Object.values(effects)
-      .filter((effectCur) => effectCur.kind === 'video' && effectCur.video?.src.trim())
-      .map((effectCur) => JSON.stringify([effectCur.id, effectCur.video?.src]));
+    for (const effectCur of Object.values(effects)) {
+      const {
+        id,
+        kind,
+        image,
+        video,
+      } = effectCur;
+
+      if (kind === 'image' && image?.src.trim()) {
+        imageKeys.push(JSON.stringify([id, image.src]));
+      } else if (kind === 'video' && video?.src.trim()) {
+        videoKeys.push(JSON.stringify([id, video.src]));
+      }
+    }
+
+    return {
+      imageKeys,
+      videoKeys,
+    };
   }, [effects]);
 
   useEffect(() => {
