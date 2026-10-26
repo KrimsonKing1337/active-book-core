@@ -38,7 +38,7 @@ export const BackgroundEffects = memo(() => {
 
   const imageKeys = useMemo(() => {
     return Object.values(effects).flatMap((effectCur) => {
-      const images = effectCur.images ?? [];
+      const images = effectCur.images?.filter((imageCur) => imageCur.src.trim()) ?? [];
 
       return images.map((imageCur) => {
         return JSON.stringify([effectCur.id, imageCur.id, imageCur.src]);
@@ -48,7 +48,7 @@ export const BackgroundEffects = memo(() => {
 
   const videoKeys = useMemo(() => {
     return Object.values(effects).flatMap((effectCur) => {
-      const videos = effectCur.videos ?? [];
+      const videos = effectCur.videos?.filter((videoCur) => videoCur.src.trim()) ?? [];
 
       return videos.map((videoCur) => {
         return JSON.stringify([effectCur.id, videoCur.id, videoCur.src]);
@@ -101,12 +101,15 @@ export const BackgroundEffects = memo(() => {
     return Object.values(effects).map((effectCur) => {
       const {
         id,
-        videos = [],
-        images = [],
+        videos: allVideos = [],
+        images: allImages = [],
         Component = null,
         shadow = {},
         style = {},
       } = effectCur;
+
+      const images = allImages.filter((imageCur) => imageCur.src.trim());
+      const videos = allVideos.filter((videoCur) => videoCur.src.trim());
 
       const wrapperZIndex = style.zIndex
         ?? images[0]?.style?.zIndex
