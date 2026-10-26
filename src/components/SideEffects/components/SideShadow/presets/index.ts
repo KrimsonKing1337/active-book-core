@@ -6,12 +6,12 @@ export * from './Caramelldansen';
 export type SideShadowPreset = {
   value: Exclude<SideAnimationPreset, 'scroll'>;
   label: string;
-  canChangeColor: boolean;
+  canChangeColor?: boolean;
 };
 
 export const SIDE_SHADOW_PRESETS = [
   { value: 'none', label: 'Без анимации', canChangeColor: true },
   { value: 'pulse', label: 'Пульсация', canChangeColor: true },
-  { value: 'police', label: 'Полиция', canChangeColor: false },
-  { value: 'caramel', label: 'Caramelldansen', canChangeColor: false },
+  { value: 'police', label: 'Полиция' },
+  { value: 'caramel', label: 'Caramelldansen' },
 ] as const satisfies readonly SideShadowPreset[];
