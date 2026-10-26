@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 
 import { useDispatch } from 'store';
 
-import { sideEffectsActions } from 'store/effects/side/effects';
+import { sideEffectsActions } from 'store/effects/side';
 
 import type { SideEffect } from './@types';
 
