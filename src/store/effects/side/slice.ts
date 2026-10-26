@@ -1,4 +1,4 @@
-import type { PayloadAction } from '@reduxjs/toolkit';
+import { type PayloadAction, createSlice } from '@reduxjs/toolkit';
 
 import type { SideEffect } from 'hooks/effects/side/@types';
 
@@ -8,8 +8,6 @@ import type {
   UpdateSideShadow,
   UpdateSideText,
 } from './@types';
-
-import { createSlice } from '@reduxjs/toolkit';
 
 export const initialState: State = {
   effects: {},

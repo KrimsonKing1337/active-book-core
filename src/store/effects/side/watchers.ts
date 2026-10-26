@@ -19,6 +19,7 @@ export function* watchUpdateShadow(action: PayloadAction<UpdateSideShadow>) {
   } = action.payload;
 
   const effects: SideEffects = yield select(selectors.effects);
+
   const effect = effects[effectId];
   const shadow = effect?.shadow;
 
@@ -61,6 +62,7 @@ export function* watchUpdateText(action: PayloadAction<UpdateSideText>) {
   } = action.payload;
 
   const effects: SideEffects = yield select(selectors.effects);
+
   const effect = effects[effectId];
   const text = effect?.text;
 
