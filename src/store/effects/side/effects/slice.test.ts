@@ -8,8 +8,13 @@ const firstEffect: SideEffect = {
   shadow: {
     id: 'glow',
     thickness: 30,
-    style: { color: '#ff0000', zIndex: 3 },
-    animation: { preset: 'none' },
+    style: {
+      color: '#ff0000',
+      zIndex: 3,
+    },
+    animation: {
+      preset: 'none',
+    },
   },
 };
 
@@ -18,7 +23,9 @@ const secondEffect: SideEffect = {
   kind: 'shadow',
   shadow: {
     id: 'glow',
-    style: { color: '#0000ff' },
+    style: {
+      color: '#0000ff',
+    },
   },
 };
 
@@ -40,7 +47,9 @@ test('updates one side shadow without changing unrelated effects', () => {
     shadowId: 'glow',
     changes: {
       thickness: 50,
-      style: { color: '#00ff00' },
+      style: {
+        color: '#00ff00',
+      },
     },
   }));
 

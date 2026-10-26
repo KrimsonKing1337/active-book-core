@@ -5,13 +5,19 @@ import { actions, initialState, reducer } from './slice';
 const image: BackgroundEffect = {
   id: 'image-one',
   kind: 'image',
-  image: { id: 'media-one', src: 'forest.webp' },
+  image: {
+    id: 'media-one',
+    src: 'forest.webp',
+  },
 };
 
 const video: BackgroundEffect = {
   id: 'video-two',
   kind: 'video',
-  video: { id: 'media-two', src: 'fog.webm' },
+  video: {
+    id: 'media-two',
+    src: 'fog.webm',
+  },
 };
 
 test('keeps multiple independently added background effects', () => {
