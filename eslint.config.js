@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { fixupPluginRules } from '@eslint/compat';
 import js from '@eslint/js';
 import { FlatCompat } from '@eslint/eslintrc';
+import stylistic from '@stylistic/eslint-plugin';
 
 import _import from 'eslint-plugin-import';
 import tsParser from '@typescript-eslint/parser';
@@ -38,6 +39,7 @@ export default defineConfig([globIgnores, {
 
   plugins: {
     import: fixupPluginRules(_import),
+    '@stylistic': stylistic,
     '@typescript-eslint': typescriptEslint,
     react,
     'react-hooks': fixupPluginRules(reactHooks),
@@ -91,14 +93,14 @@ export default defineConfig([globIgnores, {
       pathGroupsExcludedImportTypes: ['builtin'],
     }],
 
-    'eol-last': ['error', 'always'],
-    'comma-dangle': ['error', 'always-multiline'],
-    semi: ['error', 'always'],
-    indent: ['error', 2],
-    quotes: ['error', 'single'],
-    'object-curly-spacing': ['error', 'always'],
+    '@stylistic/eol-last': ['error', 'always'],
+    '@stylistic/comma-dangle': ['error', 'always-multiline'],
+    '@stylistic/semi': ['error', 'always'],
+    '@stylistic/indent': ['error', 2],
+    '@stylistic/quotes': ['error', 'single'],
+    '@stylistic/object-curly-spacing': ['error', 'always'],
 
-    'max-len': ['error', {
+    '@stylistic/max-len': ['error', {
       code: 120,
     }],
 
@@ -116,25 +118,24 @@ export default defineConfig([globIgnores, {
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'warn',
 
-    'react/jsx-max-props-per-line': [2, {
+    '@stylistic/jsx-max-props-per-line': [2, {
       maximum: {
         single: 3,
         multi: 1,
       },
     }],
 
-    'react/jsx-closing-bracket-location': [2, {
+    '@stylistic/jsx-closing-bracket-location': [2, {
       nonEmpty: 'tag-aligned',
       selfClosing: 'line-aligned',
     }],
 
-    'react/jsx-closing-tag-location': 1,
-    'react/jsx-first-prop-new-line': [2, 'multiline'],
-    'react/jsx-curly-brace-presence': ['error', 'never'],
+    '@stylistic/jsx-closing-tag-location': 1,
+    '@stylistic/jsx-first-prop-new-line': [2, 'multiline'],
+    '@stylistic/jsx-curly-brace-presence': ['error', 'never'],
     'react/self-closing-comp': 'error',
 
     '@typescript-eslint/no-empty-function': 'off',
-    '@typescript-eslint/indent': 'off',
     '@typescript-eslint/camelcase': 0,
     '@typescript-eslint/interface-name-prefix': 0,
     '@typescript-eslint/explicit-function-return-type': 0,
