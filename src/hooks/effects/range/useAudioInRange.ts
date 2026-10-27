@@ -6,15 +6,15 @@ import type {
   AudioEffectOptionsRange,
 } from '@types';
 
-import { mainSelectors } from 'store/main';
-import { audioBgEffectsActions, audioBgEffectsSelectors } from 'store/effects/audio/audioBg';
+import { mainSelectors } from '@store/main';
+import { audioBgEffectsActions, audioBgEffectsSelectors } from '@store/effects/audio/audioBg';
 
-import { useDispatch, useSelector } from 'store';
+import { useDispatch, useSelector } from '@store';
 
-import { effectsActions } from 'store/effects/common';
+import { effectsActions } from '@store/effects/common';
 
-import { HowlWrapper } from 'utils/effects/audio/HowlWrapper';
-import { getEffectsInRange } from 'utils/effects/rangeEffects';
+import { HowlWrapper } from '@utils/effects/audio/HowlWrapper';
+import { getEffectsInRange } from '@utils/effects/rangeEffects';
 
 export const useAudioInRange = (effects: RangeEffects) => {
   const dispatch = useDispatch();

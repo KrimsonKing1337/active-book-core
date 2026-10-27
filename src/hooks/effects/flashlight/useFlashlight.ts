@@ -2,17 +2,17 @@ import { useCallback, useEffect, useId, useRef } from 'react';
 
 import type { FlashlightEffectOptions } from '@types';
 
-import { useSelector } from 'store';
+import { useSelector } from '@store';
 
-import { configSelectors } from 'store/config';
-import { mainSelectors } from 'store/main';
+import { configSelectors } from '@store/config';
+import { mainSelectors } from '@store/main';
 
-import type { SideAnimation, SideEffect, SideShadowItem } from 'hooks/effects/side/@types';
+import type { SideAnimation, SideEffect, SideShadowItem } from '@hooks/effects/side/@types';
 
-import { useSideEffect } from 'hooks/effects/side/useSideEffect';
-import { useSideEffects } from 'hooks/effects/side/useSideEffects';
+import { useSideEffect } from '@hooks/effects/side/useSideEffect';
+import { useSideEffects } from '@hooks/effects/side/useSideEffects';
 
-import { flashlightInst } from 'utils/effects/flashlight';
+import { flashlightInst } from '@utils/effects/flashlight';
 
 export const useFlashlight = (options: Partial<FlashlightEffectOptions> = {}) => {
   const currentPage = useSelector(mainSelectors.page);

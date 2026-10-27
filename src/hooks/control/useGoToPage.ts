@@ -2,9 +2,9 @@ import { useCallback } from 'react';
 
 import { useNavigate, useLocation } from 'react-router-dom';
 
-import { useDispatch, useSelector } from 'store';
+import { useDispatch, useSelector } from '@store';
 
-import { mainActions, mainSelectors } from 'store/main';
+import { mainActions, mainSelectors } from '@store/main';
 
 export const useGoToPage = () => {
   const dispatch = useDispatch();

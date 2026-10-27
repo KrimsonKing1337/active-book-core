@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 
-import { useDispatch } from 'store';
-import { backgroundEffectsActions } from 'store/effects/background';
+import { useDispatch } from '@store';
+import { backgroundEffectsActions } from '@store/effects/background';
 
 import type { BackgroundEffect } from './@types';
 
