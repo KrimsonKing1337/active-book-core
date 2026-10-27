@@ -5,7 +5,7 @@ import type { AudioType } from '@types';
 
 import type { HowlInstances } from '@types';
 
-import { getAudioInstances } from 'utils/effects/audio/getAudioInstances';
+import { getAudioInstances } from '@utils/effects/audio/getAudioInstances';
 
 import type { State } from './@types';
 
