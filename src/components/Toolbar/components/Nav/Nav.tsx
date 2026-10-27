@@ -2,20 +2,20 @@ import { useEffect, useRef, useState } from 'react';
 
 import classNames from 'classnames';
 
-import ArrowLeft from 'assets/img/toolbar/i-arrow-left.svg';
-import ArrowRight from 'assets/img/toolbar/i-arrow-right.svg';
+import ArrowLeft from '@assets/img/toolbar/i-arrow-left.svg';
+import ArrowRight from '@assets/img/toolbar/i-arrow-right.svg';
 
-import { mainSelectors } from 'store/main';
+import { mainSelectors } from '@store/main';
 
-import { useSelector } from 'store';
+import { useSelector } from '@store';
 
-import { useAppMode } from 'components/App/AppModeContext';
+import { useAppMode } from '@components/App/AppModeContext';
 
-import { useGoToPage } from 'hooks/control/useGoToPage';
+import { useGoToPage } from '@hooks/control/useGoToPage';
 
-import { Item } from 'components/Toolbar/components/Item';
+import { Item } from '@components/Toolbar/components/Item';
 
-import { Flags, modalsWereShowed } from 'utils/localStorage/modalsWereShowed';
+import { Flags, modalsWereShowed } from '@utils/localStorage/modalsWereShowed';
 
 import { Modal } from './components';
 

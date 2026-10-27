@@ -1,4 +1,4 @@
-import { ModalDialog, Article, Header, P } from 'components';
+import { ModalDialog, Article, Header, P } from '@components';
 
 export type ModalProps = {
   isActive: boolean;
