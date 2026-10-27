@@ -1,8 +1,8 @@
 import { useCallback } from 'react';
 
-import { useDispatch, useSelector } from 'store';
+import { useDispatch, useSelector } from '@store';
 
-import { sideEffectsActions, sideEffectsSelectors } from 'store/effects/side';
+import { sideEffectsActions, sideEffectsSelectors } from '@store/effects/side';
 
 import type { SideShadowItem, SideTextItem } from './@types';
 

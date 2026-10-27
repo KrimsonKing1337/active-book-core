@@ -2,11 +2,11 @@ import { useCallback, useEffect } from 'react';
 
 import type { VibrationEffectOptions } from '@types';
 
-import { useSelector } from 'store';
-import { configSelectors } from 'store/config';
-import { mainSelectors } from 'store/main';
+import { useSelector } from '@store';
+import { configSelectors } from '@store/config';
+import { mainSelectors } from '@store/main';
 
-import { off as vibrationOff, on as vibrationOn } from 'utils/effects/vibration';
+import { off as vibrationOff, on as vibrationOn } from '@utils/effects/vibration';
 
 export const useVibration = (options?: VibrationEffectOptions) => {
   const currentPage = useSelector(mainSelectors.page);

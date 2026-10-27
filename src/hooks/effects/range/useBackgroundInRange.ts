@@ -2,14 +2,14 @@ import { useEffect } from 'react';
 
 import type { RangeEffects } from '@types';
 
-import { store, useDispatch, useSelector } from 'store';
+import { store, useDispatch, useSelector } from '@store';
 
-import { mainSelectors } from 'store/main';
-import { backgroundEffectsActions } from 'store/effects/background';
+import { mainSelectors } from '@store/main';
+import { backgroundEffectsActions } from '@store/effects/background';
 
-import type { BackgroundEffect } from 'hooks/effects/background/@types';
+import type { BackgroundEffect } from '@hooks/effects/background/@types';
 
-import { getEffectsInRange } from 'utils/effects/rangeEffects';
+import { getEffectsInRange } from '@utils/effects/rangeEffects';
 
 export const useBackgroundInRange = (effects: RangeEffects) => {
   const dispatch = useDispatch();

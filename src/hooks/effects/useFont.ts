@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
-import { useDispatch } from 'store';
-import { fontEffectsActions } from 'store/effects/font';
+import { useDispatch } from '@store';
+import { fontEffectsActions } from '@store/effects/font';
 
 export type UseFontOptions = Pick<React.CSSProperties, 'color'
   | 'fontFamily'

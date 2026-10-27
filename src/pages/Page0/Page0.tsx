@@ -1,20 +1,20 @@
 import { useEffect, useState } from 'react';
 
-import { configSelectors } from 'store/config';
+import { configSelectors } from '@store/config';
 
-import { useDispatch, useSelector } from 'store';
+import { useDispatch, useSelector } from '@store';
 
-import { mainActions, mainSelectors } from 'store/main';
+import { mainActions, mainSelectors } from '@store/main';
 
-import { useGoToPage } from 'hooks/control/useGoToPage';
+import { useGoToPage } from '@hooks/control/useGoToPage';
 
-import { PageWrapper, Action, WelcomeTour, Header, Article } from 'components';
+import { PageWrapper, Action, WelcomeTour, Header, Article } from '@components';
 
-import { Flags, modalsWereShowed } from 'utils/localStorage/modalsWereShowed';
-import { flashlightInst } from 'utils/effects/flashlight';
-import { get as localStorageGet } from 'utils/localStorage/localStorage';
+import { Flags, modalsWereShowed } from '@utils/localStorage/modalsWereShowed';
+import { flashlightInst } from '@utils/effects/flashlight';
+import { get as localStorageGet } from '@utils/localStorage/localStorage';
 
-import { HowlWrapper } from 'utils/effects/audio/HowlWrapper';
+import { HowlWrapper } from '@utils/effects/audio/HowlWrapper';
 
 import { Modal } from './components';
 
