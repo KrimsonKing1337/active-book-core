@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 
-import { useDispatch } from 'store';
-import { mainActions } from 'store/main';
+import { useDispatch } from '@store';
+import { mainActions } from '@store/main';
 
 import * as styles from './Footer.module.scss';
 

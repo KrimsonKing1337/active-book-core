@@ -1,15 +1,15 @@
 import { useEffect } from 'react';
 
-import { useDispatch, useSelector } from 'store';
-import { configActions } from 'store/config';
-import { mainSelectors } from 'store/main';
+import { useDispatch, useSelector } from '@store';
+import { configActions } from '@store/config';
+import { mainSelectors } from '@store/main';
 
-import { useFlashlight } from 'hooks/effects/flashlight';
+import { useFlashlight } from '@hooks/effects/flashlight';
 
-import { Spoiler } from 'components/Spoiler';
-import { Toggle } from 'components/Toggle';
+import { Spoiler } from '@components/Spoiler';
+import { Toggle } from '@components/Toggle';
 
-import { flashlightInst } from 'utils/effects/flashlight';
+import { flashlightInst } from '@utils/effects/flashlight';
 
 import * as styles from './Flashlight.module.scss';
 

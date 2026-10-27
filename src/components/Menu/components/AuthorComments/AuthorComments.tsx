@@ -1,7 +1,7 @@
-import { useDispatch, useSelector } from 'store';
-import { configActions, configSelectors } from 'store/config';
+import { useDispatch, useSelector } from '@store';
+import { configActions, configSelectors } from '@store/config';
 
-import { Toggle } from 'components/Toggle';
+import { Toggle } from '@components/Toggle';
 
 export const AuthorComments = () => {
   const dispatch = useDispatch();

@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
 
-import { useDispatch, useSelector } from 'store';
-import { mainActions, mainSelectors } from 'store/main';
+import { useDispatch, useSelector } from '@store';
+import { mainActions, mainSelectors } from '@store/main';
 
-import { Overflow } from 'components/Overflow';
-import { MenuHeader } from 'components/MenuHeader';
+import { Overflow } from '@components/Overflow';
+import { MenuHeader } from '@components/MenuHeader';
 
 import {
   Volume,
