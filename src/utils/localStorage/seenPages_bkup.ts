@@ -1,6 +1,6 @@
-import { get as localStorageGet, set as localStorageSet } from 'utils/localStorage/localStorage';
+import { get as localStorageGet, set as localStorageSet } from '@utils/localStorage/localStorage';
 
-import { cryptr } from 'utils/cryptr';
+import { cryptr } from '@utils/cryptr';
 
 const key = 'seenPages';
 
