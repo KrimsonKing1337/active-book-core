@@ -13,6 +13,7 @@
     "up": "npm version patch --git-tag-version false --commit-hooks false",
     "scss": "npx sass src:src",
     "test": "echo \"Error: no test specified\" && exit 1",
+    "test:scss-alias": "node --test ./scripts/scssAlias.test.js",
     "postinstall": "node ./scripts/postinstall.js",
     "lint-staged": "lint-staged",
     "lint:ts": "eslint \"./src/**/*.{ts,tsx}\" --fix",
