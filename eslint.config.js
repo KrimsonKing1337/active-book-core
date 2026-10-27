@@ -133,7 +133,7 @@ export default defineConfig([globIgnores, {
     '@stylistic/jsx-closing-tag-location': 1,
     '@stylistic/jsx-first-prop-new-line': [2, 'multiline'],
     '@stylistic/jsx-curly-brace-presence': ['error', 'never'],
-    'react/self-closing-comp': 'error',
+    '@stylistic/jsx-self-closing-comp': 'error',
 
     '@typescript-eslint/no-empty-function': 'off',
     '@typescript-eslint/camelcase': 0,
