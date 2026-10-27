@@ -51,6 +51,7 @@ const resolveAlias = ({ alias, filePath, outputDirectory }) => {
   const suffix = suffixStart === -1 ? '' : aliasPath.slice(suffixStart);
   const targetPath = path.resolve(outputDirectory, relativeTarget);
   const relativeToRoot = path.relative(outputDirectory, targetPath);
+
   const isOutsideOutput = relativeToRoot === '..'
     || relativeToRoot.startsWith(`..${path.sep}`)
     || path.isAbsolute(relativeToRoot);
@@ -78,6 +79,7 @@ const findStringEnd = (content, startIndex) => {
   for (let index = startIndex + 1; index < content.length; index += 1) {
     if (content[index] === '\\') {
       index += 1;
+
       continue;
     }
 
@@ -139,10 +141,12 @@ const scanUrl = ({ content, startIndex, replacements, filePath, outputDirectory 
 
   const hasQuotes = content[index] === '"' || content[index] === "'";
   const pathStart = hasQuotes ? index + 1 : index;
+
   let pathEnd;
 
   if (hasQuotes) {
     pathEnd = findStringEnd(content, index);
+
     index = pathEnd + 1;
   } else {
     const closingIndex = content.indexOf(')', index);
@@ -182,12 +186,14 @@ const scanUrl = ({ content, startIndex, replacements, filePath, outputDirectory 
 const isUrlAt = (content, index) => {
   const previousCharacter = content[index - 1];
   const hasValidBoundary = index === 0 || !/[\w-]/.test(previousCharacter);
+  const hasUrl = /^url\s*\(/i.test(content.slice(index));
 
-  return hasValidBoundary && /^url\s*\(/i.test(content.slice(index));
+  return hasValidBoundary && hasUrl;
 };
 
 const scanAtRule = ({ content, startIndex, replacements, filePath, outputDirectory }) => {
   const match = /^@(use|forward|import)\b/i.exec(content.slice(startIndex));
+
   let index = startIndex + match[0].length;
 
   while (index < content.length) {
@@ -195,6 +201,7 @@ const scanAtRule = ({ content, startIndex, replacements, filePath, outputDirecto
 
     if (nextIndex !== null) {
       index = nextIndex;
+
       continue;
     }
 
@@ -214,6 +221,7 @@ const scanAtRule = ({ content, startIndex, replacements, filePath, outputDirecto
       });
 
       index = endIndex + 1;
+
       continue;
     }
 
@@ -225,6 +233,7 @@ const scanAtRule = ({ content, startIndex, replacements, filePath, outputDirecto
         filePath,
         outputDirectory,
       });
+
       continue;
     }
 
@@ -247,6 +256,7 @@ export const rewriteScss = ({ content, filePath, outputDirectory }) => {
 
     if (nextIndex !== null) {
       index = nextIndex;
+
       continue;
     }
 
@@ -254,11 +264,14 @@ export const rewriteScss = ({ content, filePath, outputDirectory }) => {
     const isQuotedString = currentCharacter === '"' || currentCharacter === "'";
 
     if (isQuotedString) {
-      index = findStringEnd(content, index) + 1;
+      index = findStringEnd(content, index) + 1
+      ;
       continue;
     }
 
-    if (/^@(use|forward|import)\b/i.test(content.slice(index))) {
+    const re = /^@(use|forward|import)\b/i;
+
+    if (re.test(content.slice(index))) {
       index = scanAtRule({
         content,
         startIndex: index,
@@ -266,6 +279,7 @@ export const rewriteScss = ({ content, filePath, outputDirectory }) => {
         filePath,
         outputDirectory,
       });
+
       continue;
     }
 
@@ -289,6 +303,7 @@ export const rewriteScss = ({ content, filePath, outputDirectory }) => {
   for (const replacementCur of replacements) {
     fragments.push(content.slice(lastIndex, replacementCur.startIndex));
     fragments.push(replacementCur.replacement);
+
     lastIndex = replacementCur.endIndex;
   }
 
@@ -322,9 +337,11 @@ const findScssFiles = (directoryPath) => {
 export const run = (args = process.argv.slice(2)) => {
   const dryRun = args.includes('--dry-run');
   const directoryArg = args.find((cur) => cur !== '--dry-run');
+
   const outputDirectory = directoryArg
     ? path.resolve(process.cwd(), directoryArg)
     : defaultOutputDirectory;
+
   const sourceDirectory = path.join(repositoryRoot, 'src');
 
   if (outputDirectory === sourceDirectory) {
@@ -336,11 +353,13 @@ export const run = (args = process.argv.slice(2)) => {
   }
 
   const scssFiles = findScssFiles(outputDirectory);
+
   const pendingChanges = [];
   let totalReplacements = 0;
 
   for (const filePath of scssFiles) {
     const originalContent = fs.readFileSync(filePath, 'utf8');
+
     const result = rewriteScss({
       content: originalContent,
       filePath,
@@ -365,20 +384,21 @@ export const run = (args = process.argv.slice(2)) => {
 
   const actionLabel = dryRun ? 'Dry run' : 'Completed';
   const changesLabel = dryRun ? 'files to update' : 'files updated';
+
   const logMessage = `[scss-alias] ${actionLabel}: ${scssFiles.length} SCSS files scanned; `
     + `${changesLabel}: ${pendingChanges.length}; replacements: ${totalReplacements}`;
 
   console.log(logMessage);
 };
 
-const isDirectExecution = process.argv[1]
-  && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+const isDirectExecution = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 
 if (isDirectExecution) {
   try {
     run();
   } catch (error) {
     console.error(error);
+
     process.exitCode = 1;
   }
 }
