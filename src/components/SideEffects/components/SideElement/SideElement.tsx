@@ -1,6 +1,6 @@
 import type { CSSProperties, PropsWithChildren } from 'react';
 
-import type { SideElementLayout } from 'hooks/effects/side/@types';
+import type { SideElementLayout } from '@hooks/effects/side/@types';
 
 import { getPositionCoordinatesDefault } from './utils';
 

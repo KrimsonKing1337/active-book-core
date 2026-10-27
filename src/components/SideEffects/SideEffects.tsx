@@ -1,6 +1,6 @@
-import { useSelector } from 'store';
+import { useSelector } from '@store';
 
-import { sideEffectsSelectors } from 'store/effects/side';
+import { sideEffectsSelectors } from '@store/effects/side';
 
 import { SideElement } from './components/SideElement';
 import { SideShadow, Police, Caramelldansen } from './components/SideShadow';

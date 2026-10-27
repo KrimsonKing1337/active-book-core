@@ -1,8 +1,8 @@
 import type { FlashlightEffectOptions } from '@types';
 
-import { useFlashlight } from 'hooks/effects/flashlight';
+import { useFlashlight } from '@hooks/effects/flashlight';
 
-import { useAppMode } from 'components/App/AppModeContext';
+import { useAppMode } from '@components/App/AppModeContext';
 
 export type FlashlightProps = FlashlightEffectOptions;
 

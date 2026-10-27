@@ -1,4 +1,4 @@
-import type { SidePosition } from 'hooks/effects/side/@types';
+import type { SidePosition } from '@hooks/effects/side/@types';
 
 export type PositionCoordinates = Record<SidePosition, [string, string, string, string]>;
 

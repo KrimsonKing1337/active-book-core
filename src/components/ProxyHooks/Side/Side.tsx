@@ -1,6 +1,6 @@
-import type { SideEffect } from 'hooks/effects/side/@types';
+import type { SideEffect } from '@hooks/effects/side/@types';
 
-import { useSideEffect } from 'hooks/effects/side/useSideEffect';
+import { useSideEffect } from '@hooks/effects/side/useSideEffect';
 
 export type SideProps = SideEffect;
 

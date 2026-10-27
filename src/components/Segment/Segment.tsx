@@ -7,10 +7,10 @@ import classNames from 'classnames';
 
 import { nanoid } from 'nanoid';
 
-import { mainSelectors } from 'store/main';
-import { segmentsActions, segmentsSelectors } from 'store/segments';
+import { mainSelectors } from '@store/main';
+import { segmentsActions, segmentsSelectors } from '@store/segments';
 
-import { useDispatch, useSelector } from 'store';
+import { useDispatch, useSelector } from '@store';
 
 import * as styles from './Segment.module.scss';
 
