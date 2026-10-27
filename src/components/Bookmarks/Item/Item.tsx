@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
-import { useGoToPage } from 'hooks/control/useGoToPage';
+import { useGoToPage } from '@hooks/control/useGoToPage';
 
 import * as styles from './Item.module.scss';
 

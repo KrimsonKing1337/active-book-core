@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
 
-import { useDispatch, useSelector } from 'store';
-import { bookmarksActions, bookmarksSelectors } from 'store/bookmarks';
+import { useDispatch, useSelector } from '@store';
+import { bookmarksActions, bookmarksSelectors } from '@store/bookmarks';
 
-import { mainSelectors } from 'store/main';
+import { mainSelectors } from '@store/main';
 
-import { get as localStorageGet } from 'utils/localStorage/localStorage';
+import { get as localStorageGet } from '@utils/localStorage/localStorage';
 
 export const useBookmarks = () => {
   const dispatch = useDispatch();

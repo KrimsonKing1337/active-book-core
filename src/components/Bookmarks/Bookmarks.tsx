@@ -3,12 +3,12 @@ import { useEffect } from 'react';
 import classNames from 'classnames';
 
 
-import { useDispatch, useSelector } from 'store';
-import { mainSelectors } from 'store/main';
-import { bookmarksActions, bookmarksSelectors } from 'store/bookmarks';
+import { useDispatch, useSelector } from '@store';
+import { mainSelectors } from '@store/main';
+import { bookmarksActions, bookmarksSelectors } from '@store/bookmarks';
 
-import { Overflow } from 'components/Overflow';
-import { MenuHeader } from 'components/MenuHeader';
+import { Overflow } from '@components/Overflow';
+import { MenuHeader } from '@components/MenuHeader';
 
 import { Item } from './Item';
 import { useBookmarks } from './hooks';
