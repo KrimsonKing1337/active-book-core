@@ -1,12 +1,12 @@
 import { PayloadAction } from '@reduxjs/toolkit';
 import { call, put, select, takeLatest } from 'redux-saga/effects';
 
-import { mainSelectors } from 'store/main';
+import { mainSelectors } from '@store/main';
 
-import { setThemeCss } from 'utils/styles/setThemeCss';
-import { set as localStorageSet } from 'utils/localStorage/localStorage';
+import { setThemeCss } from '@utils/styles/setThemeCss';
+import { set as localStorageSet } from '@utils/localStorage/localStorage';
 
-import { setCssVariable } from 'utils/styles/setCssVariable';
+import { setCssVariable } from '@utils/styles/setCssVariable';
 
 import { State } from './@types';
 import { actions } from './slice';

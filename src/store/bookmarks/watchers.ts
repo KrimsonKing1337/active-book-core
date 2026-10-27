@@ -1,8 +1,8 @@
 import { call, select, takeLatest } from 'redux-saga/effects';
 
-import { mainSelectors } from 'store/main';
+import { mainSelectors } from '@store/main';
 
-import { set as localStorageSet } from 'utils/localStorage/localStorage';
+import { set as localStorageSet } from '@utils/localStorage/localStorage';
 
 import { State } from './@types';
 import { actions } from './slice';

@@ -1,11 +1,11 @@
 import { useState } from 'react';
 
-import { useSelector } from 'store';
+import { useSelector } from '@store';
 
-import { mainSelectors } from 'store/main';
+import { mainSelectors } from '@store/main';
 
-import { Flags as ModalsFlags } from 'utils/localStorage/modalsWereShowed';
-import { modalsWereShowed } from 'utils/localStorage/modalsWereShowed';
+import { Flags as ModalsFlags } from '@utils/localStorage/modalsWereShowed';
+import { modalsWereShowed } from '@utils/localStorage/modalsWereShowed';
 
 export const useModal = () => {
   const id = useSelector(mainSelectors.id);
