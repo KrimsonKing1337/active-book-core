@@ -1,4 +1,4 @@
-import type { SideAnimationPreset } from 'hooks/effects/side/@types';
+import type { SideAnimationPreset } from '@hooks/effects/side/@types';
 
 export * from './Police';
 export * from './Caramelldansen';

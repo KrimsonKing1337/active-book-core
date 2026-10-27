@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 
-import type { SideShadowItem } from 'hooks/effects/side/@types';
+import type { SideShadowItem } from '@hooks/effects/side/@types';
 
 import { SideShadow } from '../../SideShadow';
 

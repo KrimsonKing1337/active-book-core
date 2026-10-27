@@ -2,7 +2,7 @@ import type { CSSProperties, RefObject } from 'react';
 
 import classNames from 'classnames';
 
-import type { SideShadowItem } from 'hooks/effects/side/@types';
+import type { SideShadowItem } from '@hooks/effects/side/@types';
 
 import * as styles from './SideShadow.module.scss';
 

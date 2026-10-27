@@ -2,7 +2,7 @@ import { type CSSProperties, type PropsWithChildren, Children } from 'react';
 
 import classNames from 'classnames';
 
-import type { SideAnimation } from 'hooks/effects/side/@types';
+import type { SideAnimation } from '@hooks/effects/side/@types';
 
 import * as styles from './SideText.module.scss';
 
