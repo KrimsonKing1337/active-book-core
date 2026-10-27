@@ -5,22 +5,8 @@ import { fileURLToPath } from 'node:url';
 const scriptsDirectory = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = path.resolve(scriptsDirectory, '..');
 const defaultOutputDirectory = path.join(repositoryRoot, 'lib/src');
-const isAliasPath = (val) => /^~[A-Za-z_][A-Za-z0-9_-]*(?:\/|$)/.test(val);
 
-const unquotedPathDelimiters = new Set([
-  ' ',
-  '\t',
-  '\r',
-  '\n',
-  '"',
-  "'",
-  '(',
-  ')',
-  ',',
-  ';',
-  '{',
-  '}',
-]);
+const isAliasPath = (val) => /^~[A-Za-z_][A-Za-z0-9_-]*(?:\/|$)/.test(val);
 
 const isFile = (filePath) => {
   try {
@@ -31,22 +17,20 @@ const isFile = (filePath) => {
 };
 
 const getPossibleFilePaths = (filePath) => {
-  const fileExtension = path.extname(filePath);
-
-  if (fileExtension) {
+  if (path.extname(filePath)) {
     return [filePath];
   }
 
-  const fileDirectory = path.dirname(filePath);
+  const directory = path.dirname(filePath);
   const fileName = path.basename(filePath);
 
   return [
     filePath,
-    filePath + '.scss',
-    filePath + '.sass',
-    filePath + '.css',
-    path.join(fileDirectory, '_' + fileName + '.scss'),
-    path.join(fileDirectory, '_' + fileName + '.sass'),
+    `${filePath}.scss`,
+    `${filePath}.sass`,
+    `${filePath}.css`,
+    path.join(directory, `_${fileName}.scss`),
+    path.join(directory, `_${fileName}.sass`),
     path.join(filePath, '_index.scss'),
     path.join(filePath, 'index.scss'),
     path.join(filePath, '_index.sass'),
@@ -56,40 +40,36 @@ const getPossibleFilePaths = (filePath) => {
 
 const resolveAlias = ({ alias, filePath, outputDirectory }) => {
   const aliasPath = alias.slice(1);
+  const hasInterpolation = aliasPath.includes('#{') || aliasPath.includes('$');
 
-  if (aliasPath.includes('#{') || aliasPath.includes('$')) {
-    throw new Error('Динамический путь не поддерживается: ' + alias);
+  if (hasInterpolation) {
+    throw new Error(`Dynamic alias paths are not supported: ${alias}`);
   }
 
-  const pathEnd = aliasPath.search(/[?#]/);
-  const relativeTarget = pathEnd === -1 ? aliasPath : aliasPath.slice(0, pathEnd);
-  const suffix = pathEnd === -1 ? '' : aliasPath.slice(pathEnd);
+  const suffixStart = aliasPath.search(/[?#]/);
+  const relativeTarget = suffixStart === -1 ? aliasPath : aliasPath.slice(0, suffixStart);
+  const suffix = suffixStart === -1 ? '' : aliasPath.slice(suffixStart);
   const targetPath = path.resolve(outputDirectory, relativeTarget);
-  const targetRelativePath = path.relative(outputDirectory, targetPath);
-
-  const isOutsideOutput = targetRelativePath === '..'
-    || targetRelativePath.startsWith('..' + path.sep)
-    || path.isAbsolute(targetRelativePath);
+  const relativeToRoot = path.relative(outputDirectory, targetPath);
+  const isOutsideOutput = relativeToRoot === '..'
+    || relativeToRoot.startsWith(`..${path.sep}`)
+    || path.isAbsolute(relativeToRoot);
 
   if (!relativeTarget || isOutsideOutput) {
-    throw new Error('Недопустимый путь: ' + alias);
+    throw new Error(`Invalid alias path: ${alias}`);
   }
 
-  const possibleFilePaths = getPossibleFilePaths(targetPath);
-  const targetExists = possibleFilePaths.some(isFile);
+  const targetExists = getPossibleFilePaths(targetPath).some(isFile);
 
   if (!targetExists) {
-    throw new Error('Файл не найден для пути ' + alias + ' в ' + filePath);
+    throw new Error(`Alias target not found: ${alias} (in ${filePath})`);
   }
 
   const relativePath = path.relative(path.dirname(filePath), targetPath);
   const normalizedPath = relativePath.split(path.sep).join('/');
+  const prefixedPath = normalizedPath.startsWith('.') ? normalizedPath : `./${normalizedPath}`;
 
-  const prefixedPath = normalizedPath.startsWith('.')
-    ? normalizedPath
-    : './' + normalizedPath;
-
-  return prefixedPath + suffix;
+  return `${prefixedPath}${suffix}`;
 };
 
 const findStringEnd = (content, startIndex) => {
@@ -106,44 +86,115 @@ const findStringEnd = (content, startIndex) => {
     }
   }
 
-  throw new Error('Незакрытая строка в SCSS');
+  throw new Error('Unterminated string in SCSS');
 };
 
-const rewriteScss = ({ content, filePath, outputDirectory }) => {
-  const fragments = [];
+const skipComment = (content, startIndex) => {
+  if (content.startsWith('/*', startIndex)) {
+    const endIndex = content.indexOf('*/', startIndex + 2);
 
-  let lastWrittenIndex = 0;
-  let replacementsCount = 0;
-  let index = 0;
-
-  const appendReplacement = (startIndex, endIndex, alias) => {
-    const replacement = resolveAlias({
-      alias,
-      filePath,
-      outputDirectory,
-    });
-
-    fragments.push(content.slice(lastWrittenIndex, startIndex));
-    fragments.push(replacement);
-
-    replacementsCount += 1;
-    lastWrittenIndex = endIndex;
-  };
-
-  while (index < content.length) {
-    if (content.startsWith('/*', index)) {
-      const endIndex = content.indexOf('*/', index + 2);
-
-      index = endIndex === -1 ? content.length : endIndex + 2;
-
-      continue;
+    if (endIndex === -1) {
+      throw new Error('Unterminated block comment in SCSS');
     }
 
-    if (content.startsWith('//', index) && content[index - 1] !== ':') {
-      const endIndex = content.indexOf('\n', index + 2);
+    return endIndex + 2;
+  }
 
-      index = endIndex === -1 ? content.length : endIndex + 1;
+  if (content.startsWith('//', startIndex) && content[startIndex - 1] !== ':') {
+    const endIndex = content.indexOf('\n', startIndex + 2);
 
+    return endIndex === -1 ? content.length : endIndex + 1;
+  }
+
+  return null;
+};
+
+const recordAlias = ({ content, startIndex, endIndex, replacements, filePath, outputDirectory }) => {
+  const alias = content.slice(startIndex, endIndex);
+
+  if (!isAliasPath(alias)) {
+    return;
+  }
+
+  const replacement = resolveAlias({
+    alias,
+    filePath,
+    outputDirectory,
+  });
+
+  replacements.push({
+    startIndex,
+    endIndex,
+    replacement,
+  });
+};
+
+const scanUrl = ({ content, startIndex, replacements, filePath, outputDirectory }) => {
+  const urlMatch = /^url\s*\(/i.exec(content.slice(startIndex));
+  let index = startIndex + urlMatch[0].length;
+
+  while (/\s/.test(content[index] ?? '') && index < content.length) {
+    index += 1;
+  }
+
+  const hasQuotes = content[index] === '"' || content[index] === "'";
+  const pathStart = hasQuotes ? index + 1 : index;
+  let pathEnd;
+
+  if (hasQuotes) {
+    pathEnd = findStringEnd(content, index);
+    index = pathEnd + 1;
+  } else {
+    const closingIndex = content.indexOf(')', index);
+
+    if (closingIndex === -1) {
+      throw new Error('Unterminated url() in SCSS');
+    }
+
+    pathEnd = closingIndex;
+
+    while (pathEnd > pathStart && /\s/.test(content[pathEnd - 1])) {
+      pathEnd -= 1;
+    }
+
+    index = closingIndex;
+  }
+
+  recordAlias({
+    content,
+    startIndex: pathStart,
+    endIndex: pathEnd,
+    replacements,
+    filePath,
+    outputDirectory,
+  });
+
+  const trailingContent = content.slice(index);
+  const closingMatch = /^\s*\)/.exec(trailingContent);
+
+  if (!closingMatch) {
+    throw new Error('Invalid url() in SCSS');
+  }
+
+  return index + closingMatch[0].length;
+};
+
+const isUrlAt = (content, index) => {
+  const previousCharacter = content[index - 1];
+  const hasValidBoundary = index === 0 || !/[\w-]/.test(previousCharacter);
+
+  return hasValidBoundary && /^url\s*\(/i.test(content.slice(index));
+};
+
+const scanAtRule = ({ content, startIndex, replacements, filePath, outputDirectory }) => {
+  const match = /^@(use|forward|import)\b/i.exec(content.slice(startIndex));
+  let index = startIndex + match[0].length;
+
+  while (index < content.length) {
+    const nextIndex = skipComment(content, index);
+
+    if (nextIndex !== null) {
+      index = nextIndex;
       continue;
     }
 
@@ -152,53 +203,100 @@ const rewriteScss = ({ content, filePath, outputDirectory }) => {
 
     if (isQuotedString) {
       const endIndex = findStringEnd(content, index);
-      const stringContent = content.slice(index + 1, endIndex);
-      const pathIsAlias = isAliasPath(stringContent);
 
-      if (pathIsAlias) {
-        appendReplacement(index + 1, endIndex, stringContent);
-      }
+      recordAlias({
+        content,
+        startIndex: index + 1,
+        endIndex,
+        replacements,
+        filePath,
+        outputDirectory,
+      });
 
       index = endIndex + 1;
-
       continue;
     }
 
-    const isAlias = isAliasPath(content.slice(index));
+    if (isUrlAt(content, index)) {
+      index = scanUrl({
+        content,
+        startIndex: index,
+        replacements,
+        filePath,
+        outputDirectory,
+      });
+      continue;
+    }
 
-    const previousCharacter = content[index - 1];
+    if (currentCharacter === ';') {
+      return index + 1;
+    }
 
-    const hasPathBoundary = index === 0
-      || unquotedPathDelimiters.has(previousCharacter)
-      || previousCharacter === ':'
-      || previousCharacter === '=';
+    index += 1;
+  }
 
-    if (isAlias && hasPathBoundary) {
-      let endIndex = index + 1;
+  return index;
+};
 
-      const delimitersHasEndIndex = unquotedPathDelimiters.has(content[endIndex]);
+export const rewriteScss = ({ content, filePath, outputDirectory }) => {
+  const replacements = [];
+  let index = 0;
 
-      while (endIndex < content.length && !delimitersHasEndIndex) {
-        endIndex += 1;
-      }
+  while (index < content.length) {
+    const nextIndex = skipComment(content, index);
 
-      const alias = content.slice(index, endIndex);
+    if (nextIndex !== null) {
+      index = nextIndex;
+      continue;
+    }
 
-      appendReplacement(index, endIndex, alias);
+    const currentCharacter = content[index];
+    const isQuotedString = currentCharacter === '"' || currentCharacter === "'";
 
-      index = endIndex;
+    if (isQuotedString) {
+      index = findStringEnd(content, index) + 1;
+      continue;
+    }
 
+    if (/^@(use|forward|import)\b/i.test(content.slice(index))) {
+      index = scanAtRule({
+        content,
+        startIndex: index,
+        replacements,
+        filePath,
+        outputDirectory,
+      });
+      continue;
+    }
+
+    if (isUrlAt(content, index)) {
+      index = scanUrl({
+        content,
+        startIndex: index,
+        replacements,
+        filePath,
+        outputDirectory,
+      });
       continue;
     }
 
     index += 1;
   }
 
-  fragments.push(content.slice(lastWrittenIndex));
+  const fragments = [];
+  let lastIndex = 0;
+
+  for (const replacementCur of replacements) {
+    fragments.push(content.slice(lastIndex, replacementCur.startIndex));
+    fragments.push(replacementCur.replacement);
+    lastIndex = replacementCur.endIndex;
+  }
+
+  fragments.push(content.slice(lastIndex));
 
   return {
     content: fragments.join(''),
-    replacementsCount,
+    replacementsCount: replacements.length,
   };
 };
 
@@ -207,11 +305,13 @@ const findScssFiles = (directoryPath) => {
 
   for (const entryCur of fs.readdirSync(directoryPath, { withFileTypes: true })) {
     const entryPath = path.join(directoryPath, entryCur.name);
-    const entryCurIsDirectory = entryCur.isDirectory();
 
-    if (entryCurIsDirectory) {
+    if (entryCur.isDirectory()) {
       files.push(...findScssFiles(entryPath));
-    } else if (entryCur.isFile() && entryCur.name.endsWith('.scss')) {
+      continue;
+    }
+
+    if (entryCur.isFile() && entryCur.name.endsWith('.scss')) {
       files.push(entryPath);
     }
   }
@@ -219,33 +319,28 @@ const findScssFiles = (directoryPath) => {
   return files;
 };
 
-const run = () => {
-  const args = process.argv.slice(2);
+export const run = (args = process.argv.slice(2)) => {
   const dryRun = args.includes('--dry-run');
   const directoryArg = args.find((cur) => cur !== '--dry-run');
-
   const outputDirectory = directoryArg
     ? path.resolve(process.cwd(), directoryArg)
     : defaultOutputDirectory;
-
   const sourceDirectory = path.join(repositoryRoot, 'src');
 
   if (outputDirectory === sourceDirectory) {
-    throw new Error('Нельзя изменять исходную директорию src');
+    throw new Error('Cannot modify the source directory');
   }
 
   if (!fs.existsSync(outputDirectory)) {
-    throw new Error('Выходная директория не найдена: ' + outputDirectory);
+    throw new Error(`Output directory not found: ${outputDirectory}`);
   }
 
   const scssFiles = findScssFiles(outputDirectory);
-
   const pendingChanges = [];
   let totalReplacements = 0;
 
   for (const filePath of scssFiles) {
     const originalContent = fs.readFileSync(filePath, 'utf8');
-
     const result = rewriteScss({
       content: originalContent,
       filePath,
@@ -268,20 +363,22 @@ const run = () => {
     }
   }
 
-  const mode = dryRun ? 'Проверено' : 'Обработано';
-  const changedMode = dryRun ? 'требуют изменения' : 'изменено';
-
-  const logMessage = `[scss-alias]: ${mode}: ${scssFiles.length} SCSS-файлов, `
-    + `${pendingChanges.length} ${changedMode}, `
-    + `${totalReplacements} замен`;
+  const actionLabel = dryRun ? 'Dry run' : 'Completed';
+  const changesLabel = dryRun ? 'files to update' : 'files updated';
+  const logMessage = `[scss-alias] ${actionLabel}: ${scssFiles.length} SCSS files scanned; `
+    + `${changesLabel}: ${pendingChanges.length}; replacements: ${totalReplacements}`;
 
   console.log(logMessage);
 };
 
-try {
-  run();
-} catch (error) {
-  console.error(error);
+const isDirectExecution = process.argv[1]
+  && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 
-  process.exitCode = 1;
+if (isDirectExecution) {
+  try {
+    run();
+  } catch (error) {
+    console.error(error);
+    process.exitCode = 1;
+  }
 }
