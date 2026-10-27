@@ -8,7 +8,7 @@ import { mainSelectors } from 'store/main';
 import { effectsSelectors } from 'store/effects/common';
 import { segmentsActions } from 'store/segments';
 import { backgroundEffectsActions } from 'store/effects/background';
-import { sideEffectsActions } from 'store/effects/side/effects';
+import { sideEffectsActions } from 'store/effects/side';
 
 import { Toolbar } from 'components/Toolbar';
 import { Menu } from 'components/Menu';
