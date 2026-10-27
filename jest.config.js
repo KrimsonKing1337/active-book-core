@@ -62,6 +62,9 @@ export default {
     '.+\\.(css|scss|png|jpg|jpeg|ttf|woff|woff2)$': 'jest-transform-stub',
     '\\.svg': '<rootDir>/src/test/svg-mock.ts',
     '^react($|/.+)': '<rootDir>/node_modules/react$1',
+    '^@types$': '<rootDir>/src/@types.ts',
+    '^@(assets|components|pages|hooks|utils|store|styles)$': '<rootDir>/src/$1',
+    '^@(assets|components|pages|hooks|utils|store|styles)/(.*)$': '<rootDir>/src/$1/$2',
   },
 
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
