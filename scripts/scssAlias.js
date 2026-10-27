@@ -222,10 +222,11 @@ const run = () => {
     throw new Error('Выходная директория не найдена: ' + outputDirectory);
   }
 
+  const scssFiles = findScssFiles(outputDirectory);
   const pendingChanges = [];
   let totalReplacements = 0;
 
-  for (const filePath of findScssFiles(outputDirectory)) {
+  for (const filePath of scssFiles) {
     const originalContent = fs.readFileSync(filePath, 'utf8');
     const result = rewriteScss({
       content: originalContent,
@@ -250,10 +251,12 @@ const run = () => {
   }
 
   const mode = dryRun ? 'Проверено' : 'Обработано';
+  const changedMode = dryRun ? 'требуют изменения' : 'изменено';
 
   console.log(
-    mode + ': ' + pendingChanges.length + ' SCSS-файлов, '
-    + totalReplacements + ' замен',
+    `${mode}: ${scssFiles.length} SCSS-файлов, `
+    + `${pendingChanges.length} ${changedMode}, `
+    + `${totalReplacements} замен`,
   );
 };
 
