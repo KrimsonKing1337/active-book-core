@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 const scriptsDirectory = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = path.resolve(scriptsDirectory, '..');
 const defaultOutputDirectory = path.join(repositoryRoot, 'lib/src');
+const isAliasPath = (val) => /^~[A-Za-z_][A-Za-z0-9_-]*(?:\/|$)/.test(val);
 
 const unquotedPathDelimiters = new Set([
   ' ',
@@ -54,7 +55,7 @@ const getPossibleFilePaths = (filePath) => {
 };
 
 const resolveAlias = ({ alias, filePath, outputDirectory }) => {
-  const aliasPath = alias.slice(2);
+  const aliasPath = alias.slice(1);
 
   if (aliasPath.includes('#{') || aliasPath.includes('$')) {
     throw new Error('Динамический путь не поддерживается: ' + alias);
@@ -146,7 +147,7 @@ const rewriteScss = ({ content, filePath, outputDirectory }) => {
       const endIndex = findStringEnd(content, index);
       const stringContent = content.slice(index + 1, endIndex);
 
-      if (stringContent.startsWith('~/')) {
+      if (isAliasPath(stringContent)) {
         appendReplacement(index + 1, endIndex, stringContent);
       }
 
@@ -154,7 +155,7 @@ const rewriteScss = ({ content, filePath, outputDirectory }) => {
       continue;
     }
 
-    const isAlias = content.startsWith('~/', index);
+    const isAlias = isAliasPath(content.slice(index));
     const previousCharacter = content[index - 1];
     const hasPathBoundary = index === 0
       || unquotedPathDelimiters.has(previousCharacter)
@@ -162,7 +163,7 @@ const rewriteScss = ({ content, filePath, outputDirectory }) => {
       || previousCharacter === '=';
 
     if (isAlias && hasPathBoundary) {
-      let endIndex = index + 2;
+      let endIndex = index + 1;
 
       while (
         endIndex < content.length
