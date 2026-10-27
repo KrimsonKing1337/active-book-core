@@ -1,6 +1,6 @@
 import { type PayloadAction, createSlice } from '@reduxjs/toolkit';
 
-import type { SideEffect } from 'hooks/effects/side/@types';
+import type { SideEffect } from '@hooks/effects/side/@types';
 
 import type {
   SideEffects,

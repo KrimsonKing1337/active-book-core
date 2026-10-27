@@ -1,4 +1,4 @@
-import type { SideEffect, SideShadowItem, SideTextItem } from 'hooks/effects/side/@types';
+import type { SideEffect, SideShadowItem, SideTextItem } from '@hooks/effects/side/@types';
 
 export type SideEffects = Record<string, SideEffect>;
 

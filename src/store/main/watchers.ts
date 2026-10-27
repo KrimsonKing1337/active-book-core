@@ -1,7 +1,7 @@
 import type { Task } from 'redux-saga';
 import { call, put, takeLatest, delay, fork, select, take, cancel } from 'redux-saga/effects';
 
-import { effectsActions } from 'store/effects/common';
+import { effectsActions } from '@store/effects/common';
 
 import { actions } from './slice';
 import { selectors } from './selectors';

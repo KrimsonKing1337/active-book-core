@@ -1,4 +1,4 @@
-import type { SideEffect } from 'hooks/effects/side/@types';
+import type { SideEffect } from '@hooks/effects/side/@types';
 
 import { actions, initialState, reducer } from './slice';
 

@@ -1,6 +1,6 @@
-import type { RootState } from 'store';
+import type { RootState } from '@store';
 
-import { effectsSelectors } from 'store/effects/common';
+import { effectsSelectors } from '@store/effects/common';
 
 const isPending = (state: RootState) => {
   return effectsSelectors.isDotLottieLoading(state)
