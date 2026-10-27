@@ -1,12 +1,12 @@
 import classNames from 'classnames';
 
 
-import { useDispatch, useSelector } from 'store';
-import { configActions, configSelectors } from 'store/config';
+import { useDispatch, useSelector } from '@store';
+import { configActions, configSelectors } from '@store/config';
 
-import { Label } from 'components/Label';
+import { Label } from '@components/Label';
 
-import { getNewValueForNarrativeTextStyle } from 'utils/styles/getNewValueForNarrativeTextStyle';
+import { getNewValueForNarrativeTextStyle } from '@utils/styles/getNewValueForNarrativeTextStyle';
 
 import * as styles from './LineHeight.module.scss';
 

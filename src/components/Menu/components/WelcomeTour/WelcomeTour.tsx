@@ -1,9 +1,9 @@
 import { toast } from 'react-toastify';
 
-import { useDispatch, useSelector } from 'store';
-import { configActions, configSelectors } from 'store/config';
+import { useDispatch, useSelector } from '@store';
+import { configActions, configSelectors } from '@store/config';
 
-import { Toggle } from 'components/Toggle';
+import { Toggle } from '@components/Toggle';
 
 import * as styles from './WelcomeTour.module.scss';
 

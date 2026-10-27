@@ -1,12 +1,12 @@
-import { useDispatch, useSelector } from 'store';
+import { useDispatch, useSelector } from '@store';
 
-import { volumeActions, volumeSelectors } from 'store/volume';
-import { mainSelectors } from 'store/main';
+import { volumeActions, volumeSelectors } from '@store/volume';
+import { mainSelectors } from '@store/main';
 
-import { Label } from 'components/Label';
-import { Slider } from 'components/Slider';
+import { Label } from '@components/Label';
+import { Slider } from '@components/Slider';
 
-import { set as localStorageSet } from 'utils/localStorage/localStorage';
+import { set as localStorageSet } from '@utils/localStorage/localStorage';
 
 import * as styles from './Volume.module.scss';
 
