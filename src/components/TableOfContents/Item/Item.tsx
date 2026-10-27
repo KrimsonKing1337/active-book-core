@@ -1,7 +1,7 @@
-import { useSelector } from 'store';
-import { mainSelectors } from 'store/main';
+import { useSelector } from '@store';
+import { mainSelectors } from '@store/main';
 
-import { useGoToPage } from 'hooks/control/useGoToPage';
+import { useGoToPage } from '@hooks/control/useGoToPage';
 
 import * as styles from './Item.module.scss';
 

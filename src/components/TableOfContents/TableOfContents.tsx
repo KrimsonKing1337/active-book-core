@@ -1,7 +1,7 @@
-import { useDispatch, useSelector } from 'store';
-import { mainActions, mainSelectors } from 'store/main';
+import { useDispatch, useSelector } from '@store';
+import { mainActions, mainSelectors } from '@store/main';
 
-import { Overflow, MenuHeader } from 'components';
+import { Overflow, MenuHeader } from '@components';
 
 import { Item } from './Item';
 

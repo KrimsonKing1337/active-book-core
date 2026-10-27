@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import classNames from 'classnames';
 
-import { Label } from 'components/Label';
+import { Label } from '@components/Label';
 
 import * as styles from './Toggle.module.scss';
 
