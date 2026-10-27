@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react';
 
 import { toast } from 'react-toastify';
 
-import { useDispatch } from 'store';
-import { configActions } from 'store/config';
+import { useDispatch } from '@store';
+import { configActions } from '@store/config';
 
-import { useVibration } from 'hooks/effects/useVibration';
+import { useVibration } from '@hooks/effects/useVibration';
 
-import { Action, Button, P } from 'components';
+import { Action, Button, P } from '@components';
 
 import { Modal, Segments } from './components';
 

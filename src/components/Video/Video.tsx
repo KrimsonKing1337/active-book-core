@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react';
 
-import { useDispatch, useSelector } from 'store';
-import { volumeSelectors } from 'store/volume';
-import { effectsActions, effectsSelectors } from 'store/effects/common';
+import { useDispatch, useSelector } from '@store';
+import { volumeSelectors } from '@store/volume';
+import { effectsActions, effectsSelectors } from '@store/effects/common';
 
 type VideoProps = React.MediaHTMLAttributes<HTMLVideoElement> & {
   id: string;
