@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCompress, faCrop, faExpand, faTimes } from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames';
 
-import { useAppMode } from 'components/App/AppModeContext';
+import { useAppMode } from '@components/App/AppModeContext';
 
 import * as styles from './Modal.module.scss';
 

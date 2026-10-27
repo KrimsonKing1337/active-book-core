@@ -2,16 +2,16 @@ import { PropsWithChildren, useEffect, useRef } from 'react';
 
 import Hammer from 'hammerjs';
 
-import { configSelectors } from 'store/config';
-import { fontEffectsSelectors } from 'store/effects/font';
+import { configSelectors } from '@store/config';
+import { fontEffectsSelectors } from '@store/effects/font';
 
-import { useSelector } from 'store';
+import { useSelector } from '@store';
 
-import { mainSelectors } from 'store/main';
+import { mainSelectors } from '@store/main';
 
-import { useGoToPage } from 'hooks/control/useGoToPage';
+import { useGoToPage } from '@hooks/control/useGoToPage';
 
-import { useAppMode } from 'components/App/AppModeContext';
+import { useAppMode } from '@components/App/AppModeContext';
 
 import * as styles from './Narrative.module.scss';
 

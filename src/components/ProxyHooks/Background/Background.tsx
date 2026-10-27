@@ -1,6 +1,6 @@
-import type { BackgroundEffect } from 'hooks/effects/background/@types';
+import type { BackgroundEffect } from '@hooks/effects/background/@types';
 
-import { useBackground } from 'hooks/effects/background';
+import { useBackground } from '@hooks/effects/background';
 
 export type BackgroundProps = BackgroundEffect;
 

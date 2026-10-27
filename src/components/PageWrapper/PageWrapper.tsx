@@ -2,20 +2,20 @@ import { type HTMLAttributes, type PropsWithChildren, useEffect } from 'react';
 
 import classNames from 'classnames';
 
-import { useDispatch, useSelector } from 'store';
+import { useDispatch, useSelector } from '@store';
 
-import { mainSelectors } from 'store/main';
-import { effectsSelectors } from 'store/effects/common';
-import { segmentsActions } from 'store/segments';
-import { backgroundEffectsActions } from 'store/effects/background';
-import { sideEffectsActions } from 'store/effects/side';
+import { mainSelectors } from '@store/main';
+import { effectsSelectors } from '@store/effects/common';
+import { segmentsActions } from '@store/segments';
+import { backgroundEffectsActions } from '@store/effects/background';
+import { sideEffectsActions } from '@store/effects/side';
 
-import { Toolbar } from 'components/Toolbar';
-import { Menu } from 'components/Menu';
-import { TableOfContents } from 'components/TableOfContents';
-import { Bookmarks } from 'components/Bookmarks';
-import { SideEffects } from 'components/SideEffects';
-import { BackgroundEffects } from 'components/BackgroundEffects';
+import { Toolbar } from '@components/Toolbar';
+import { Menu } from '@components/Menu';
+import { TableOfContents } from '@components/TableOfContents';
+import { Bookmarks } from '@components/Bookmarks';
+import { SideEffects } from '@components/SideEffects';
+import { BackgroundEffects } from '@components/BackgroundEffects';
 
 import { Narrative } from './components/Narrative';
 

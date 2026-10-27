@@ -3,12 +3,12 @@ import { PropsWithChildren, useEffect, useRef } from 'react';
 import classNames from 'classnames';
 
 
-import { useDispatch } from 'store';
+import { useDispatch } from '@store';
 
-import { useAppMode } from 'components/App/AppModeContext';
-import { mainActions } from 'store/main';
+import { useAppMode } from '@components/App/AppModeContext';
+import { mainActions } from '@store/main';
 
-import { getNarrativeElement } from 'components/PageWrapper/components/Narrative/utils';
+import { getNarrativeElement } from '@components/PageWrapper/components/Narrative/utils';
 
 import * as styles from './Overflow.module.scss';
 

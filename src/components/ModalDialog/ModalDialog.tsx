@@ -2,8 +2,8 @@ import { type PropsWithChildren, useEffect, useRef, useState } from 'react';
 
 import type { Interval, Timer } from '@types';
 
-import { type ModalProps, Modal } from 'components/Modal';
-import { Button } from 'components/Button';
+import { type ModalProps, Modal } from '@components/Modal';
+import { Button } from '@components/Button';
 
 import * as styles from './ModalDialog.module.scss';
 
