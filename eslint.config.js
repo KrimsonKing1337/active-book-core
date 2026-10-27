@@ -61,7 +61,7 @@ export default defineConfig([globIgnores, {
     react: {
       version: 'detect',
     },
-    'import/internal-regex': '^@(assets|components|pages|hooks|utils|store|styles|types)(/.*)?$',
+    'import/internal-regex': '^(?:@types$|@(assets|components|pages|hooks|utils|store|styles)(/.*)?)$',
   },
 
   rules: {
@@ -78,7 +78,7 @@ export default defineConfig([globIgnores, {
         { pattern: 'react', group: 'external', position: 'before' },
         { pattern: 'react-redux', group: 'external', position: 'before' },
 
-        { pattern: '@types{,/**}', group: 'internal', position: 'before' },
+        { pattern: '@types', group: 'internal', position: 'before' },
         { pattern: '@assets{,/**}', group: 'internal', position: 'after' },
         { pattern: '@styles{,/**}', group: 'internal', position: 'after' },
         { pattern: '@pages{,/**}', group: 'internal', position: 'after' },
