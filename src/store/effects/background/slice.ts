@@ -1,6 +1,6 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
-import type { BackgroundEffect } from 'hooks/effects/background/@types';
+import type { BackgroundEffect } from '@hooks/effects/background/@types';
 
 import type { BackgroundEffects, State } from './@types';
 

@@ -1,4 +1,4 @@
-import type { BackgroundEffect } from 'hooks/effects/background/@types';
+import type { BackgroundEffect } from '@hooks/effects/background/@types';
 
 import { actions, initialState, reducer } from './slice';
 

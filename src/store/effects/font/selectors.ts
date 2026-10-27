@@ -1,4 +1,4 @@
-import type { RootState } from 'store';
+import type { RootState } from '@store';
 
 export const selectors = {
   color: (state: RootState) => state.fontEffects.color,

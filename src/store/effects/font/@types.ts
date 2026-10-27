@@ -1,4 +1,4 @@
-import type { UseFontOptions } from 'hooks/effects/useFont';
+import type { UseFontOptions } from '@hooks/effects/useFont';
 
 export interface State {
   color: UseFontOptions['color'];
