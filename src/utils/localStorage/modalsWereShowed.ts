@@ -1,4 +1,4 @@
-import { get as localStorageGet, set as localStorageSet } from 'utils/localStorage/localStorage';
+import { get as localStorageGet, set as localStorageSet } from '@utils/localStorage/localStorage';
 
 const key = 'modalsWereShowed';
 

@@ -2,7 +2,7 @@ import { Howl, type HowlOptions } from 'howler';
 
 import type { AudioType, Timer } from '@types';
 
-import { store } from 'store';
+import { store } from '@store';
 
 export type HowlWrapperOptions = {
   id: string;

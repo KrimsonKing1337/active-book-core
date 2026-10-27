@@ -1,5 +1,5 @@
-import { store } from 'store';
-import { mainActions } from 'store/main';
+import { store } from '@store';
+import { mainActions } from '@store/main';
 
 export class Flashlight {
   private track: MediaStreamTrack | null;

@@ -1,4 +1,4 @@
-import { scrollDown, scrollUp } from 'utils/control/scroll';
+import { scrollDown, scrollUp } from '@utils/control/scroll';
 
 type Fn = () => void;
 
