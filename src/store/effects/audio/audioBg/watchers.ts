@@ -3,7 +3,7 @@ import { put, select, takeLatest } from 'redux-saga/effects';
 
 import type { HowlInst, HowlInstances } from '@types';
 
-import { unloadAudio } from 'utils/effects/audio/unloadAudio';
+import { unloadAudio } from '@utils/effects/audio/unloadAudio';
 
 import { actions } from './slice';
 import { selectors } from './selectors';
