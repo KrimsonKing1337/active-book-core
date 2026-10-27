@@ -2,9 +2,9 @@ import { type PropsWithChildren, lazy, useMemo } from 'react';
 
 import { Route, Routes as ReactRouterRoutes } from 'react-router-dom';
 
-import { mainSelectors } from 'store/main';
+import { mainSelectors } from '@store/main';
 
-import { useSelector } from 'store';
+import { useSelector } from '@store';
 
 // todo: сделать все страницы либо через ленивую загрузку, либо по-обычному
 // todo: в кордове проблемы с подгрузкой компонента через ленивую загрузку
@@ -15,7 +15,7 @@ const getPageComponents = (pages: number) => {
 
   for (let i = 0; i <= pages; i++) {
     const PageComponent = lazy(() =>
-      import(`pages/Page${i}`).then((m) => {
+      import(`@pages/Page${i}`).then((m) => {
         window.dispatchEvent(new CustomEvent('pageChunkLoaded', { detail: { i } }));
 
         return m;

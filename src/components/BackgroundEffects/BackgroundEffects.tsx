@@ -1,12 +1,12 @@
 import { memo, useCallback, useEffect, useMemo, useRef } from 'react';
 
-import { useDispatch, useSelector } from 'store';
+import { useDispatch, useSelector } from '@store';
 
-import { backgroundEffectsSelectors } from 'store/effects/background';
-import { effectsActions } from 'store/effects/common';
+import { backgroundEffectsSelectors } from '@store/effects/background';
+import { effectsActions } from '@store/effects/common';
 
-import { Video } from 'components/Video';
-import { Img } from 'components/Img';
+import { Video } from '@components/Video';
+import { Img } from '@components/Img';
 
 import { Shadow, Wrapper } from './components';
 

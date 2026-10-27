@@ -6,20 +6,20 @@ import { ToastContainer } from 'react-toastify';
 
 import type { Config, RangeEffects, TableOfContents } from '@types';
 
-import { useDispatch, useSelector } from 'store';
+import { useDispatch, useSelector } from '@store';
 
-import { useAppMode } from 'components/App/AppModeContext';
+import { useAppMode } from '@components/App/AppModeContext';
 
-import { mainActions, mainSelectors } from 'store/main';
-import { audioEffectsSelectors } from 'store/effects/audio/audio';
-import { audioBgEffectsSelectors } from 'store/effects/audio/audioBg';
+import { mainActions, mainSelectors } from '@store/main';
+import { audioEffectsSelectors } from '@store/effects/audio/audio';
+import { audioBgEffectsSelectors } from '@store/effects/audio/audioBg';
 
-import { useEffectsInRange } from 'hooks/effects/range';
-import { useGoToPage } from 'hooks/control/useGoToPage';
+import { useEffectsInRange } from '@hooks/effects/range';
+import { useGoToPage } from '@hooks/control/useGoToPage';
 
-import { removeCssHover } from 'utils/touch/removeCssHover';
-import { addKeyboardControl } from 'utils/control/keyboardControl';
-import { hideAddressBarInMobileDevices } from 'utils/mobile/hideAddressBarInMobileDevices';
+import { removeCssHover } from '@utils/touch/removeCssHover';
+import { addKeyboardControl } from '@utils/control/keyboardControl';
+import { hideAddressBarInMobileDevices } from '@utils/mobile/hideAddressBarInMobileDevices';
 
 import {
   useAllPagesSeen,
@@ -31,7 +31,7 @@ import {
 
 import { startToPlayAllAudiosWithPlayOnLoad, startToPlayAllVideosWithPlayOnLoad } from './utils';
 
-import 'styles/common.scss';
+import '@styles/common.scss';
 
 import * as styles from './AppWrapper.module.scss';
 

@@ -1,6 +1,6 @@
 import type { HowlInstances } from '@types';
 
-import { store } from 'store';
+import { store } from '@store';
 
 export const setMuteToAllVideos = (muted: boolean) => {
   const videos = document.querySelectorAll('video');

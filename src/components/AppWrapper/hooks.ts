@@ -6,23 +6,23 @@ import { Howler } from 'howler';
 
 import type { Config } from '@types';
 
-import { useDispatch, useSelector } from 'store';
+import { useDispatch, useSelector } from '@store';
 
-import { mainActions, mainSelectors } from 'store/main';
-import { effectsActions, effectsSelectors } from 'store/effects/common';
-import { configActions } from 'store/config';
-import { initialState as configInitialState } from 'store/config/slice';
-import { initialState as volumeInitialState } from 'store/volume/slice';
-import { volumeActions } from 'store/volume';
+import { mainActions, mainSelectors } from '@store/main';
+import { effectsActions, effectsSelectors } from '@store/effects/common';
+import { configActions } from '@store/config';
+import { initialState as configInitialState } from '@store/config/slice';
+import { initialState as volumeInitialState } from '@store/volume/slice';
+import { volumeActions } from '@store/volume';
 
-import { useVibration } from 'hooks/effects/useVibration';
+import { useVibration } from '@hooks/effects/useVibration';
 
-import { setMuteToAllVideos } from 'components/AppWrapper/utils';
+import { setMuteToAllVideos } from '@components/AppWrapper/utils';
 
-import { flashlightInst } from 'utils/effects/flashlight';
-import { seenPages } from 'utils/localStorage/seenPages';
-import { getThemes } from 'utils/styles/getThemes';
-import { set as localStorageSet, get as localStorageGet } from 'utils/localStorage/localStorage';
+import { flashlightInst } from '@utils/effects/flashlight';
+import { seenPages } from '@utils/localStorage/seenPages';
+import { getThemes } from '@utils/styles/getThemes';
+import { set as localStorageSet, get as localStorageGet } from '@utils/localStorage/localStorage';
 
 export const useVisibilityChangeHandler = () => {
   const { vibrationOff } = useVibration();
