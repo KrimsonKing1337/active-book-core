@@ -38,5 +38,13 @@
     "allowSyntheticDefaultImports": true,
   },
   "include": ["d.ts", "src/**/*"],
-  "exclude": ["node_modules", "build", "dist", "public", "jest", "lib", "lib-esm"]
+  "exclude": [
+    "node_modules",
+    "build",
+    "dist",
+    "public",
+    "jest",
+    "lib",
+    "lib-esm"
+  ]
 }
