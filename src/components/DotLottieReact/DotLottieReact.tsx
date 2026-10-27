@@ -8,8 +8,8 @@ import {
 
 import type { EventType } from '@lottiefiles/dotlottie-web';
 
-import { useDispatch } from 'store';
-import { effectsActions } from 'store/effects/common';
+import { useDispatch } from '@store';
+import { effectsActions } from '@store/effects/common';
 
 export type DotLottie = DotLottieOriginal;
 

@@ -1,7 +1,7 @@
 import { type PropsWithChildren, useEffect } from 'react';
 
-import { useDispatch } from 'store';
-import { effectsActions } from 'store/effects/common';
+import { useDispatch } from '@store';
+import { effectsActions } from '@store/effects/common';
 
 export type DotLottieReactWrapperProps = PropsWithChildren & React.HTMLAttributes<HTMLDivElement> & {
   className?: string;

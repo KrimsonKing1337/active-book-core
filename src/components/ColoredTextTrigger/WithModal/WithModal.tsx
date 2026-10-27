@@ -1,9 +1,9 @@
 import { PropsWithChildren, useEffect, useRef, useState } from 'react';
 
-import { Modal as ModalComponent, ModalProps } from 'components/Modal';
-import { Action } from 'components/ColoredTextTrigger/Action';
-import { AuthorComment } from 'components/ColoredTextTrigger/AuthorComment';
-import { EasterEgg } from 'components/ColoredTextTrigger/EasterEgg';
+import { Modal as ModalComponent, ModalProps } from '@components/Modal';
+import { Action } from '@components/ColoredTextTrigger/Action';
+import { AuthorComment } from '@components/ColoredTextTrigger/AuthorComment';
+import { EasterEgg } from '@components/ColoredTextTrigger/EasterEgg';
 
 import * as styles from './WithModal.module.scss';
 

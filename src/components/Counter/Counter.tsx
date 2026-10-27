@@ -1,5 +1,5 @@
-import { useDispatch, useSelector } from 'store';
-import { counterSelectors, counterActions } from 'store/counter';
+import { useDispatch, useSelector } from '@store';
+import { counterSelectors, counterActions } from '@store/counter';
 
 import * as styles from './Counter.module.scss';
 
