@@ -66,6 +66,7 @@ const resolveAlias = ({ alias, filePath, outputDirectory }) => {
   const suffix = pathEnd === -1 ? '' : aliasPath.slice(pathEnd);
   const targetPath = path.resolve(outputDirectory, relativeTarget);
   const targetRelativePath = path.relative(outputDirectory, targetPath);
+
   const isOutsideOutput = targetRelativePath === '..'
     || targetRelativePath.startsWith('..' + path.sep)
     || path.isAbsolute(targetRelativePath);
@@ -83,6 +84,7 @@ const resolveAlias = ({ alias, filePath, outputDirectory }) => {
 
   const relativePath = path.relative(path.dirname(filePath), targetPath);
   const normalizedPath = relativePath.split(path.sep).join('/');
+
   const prefixedPath = normalizedPath.startsWith('.')
     ? normalizedPath
     : './' + normalizedPath;
@@ -109,6 +111,7 @@ const findStringEnd = (content, startIndex) => {
 
 const rewriteScss = ({ content, filePath, outputDirectory }) => {
   const fragments = [];
+
   let lastWrittenIndex = 0;
   let replacementsCount = 0;
   let index = 0;
@@ -130,13 +133,17 @@ const rewriteScss = ({ content, filePath, outputDirectory }) => {
   while (index < content.length) {
     if (content.startsWith('/*', index)) {
       const endIndex = content.indexOf('*/', index + 2);
+
       index = endIndex === -1 ? content.length : endIndex + 2;
+
       continue;
     }
 
     if (content.startsWith('//', index) && content[index - 1] !== ':') {
       const endIndex = content.indexOf('\n', index + 2);
+
       index = endIndex === -1 ? content.length : endIndex + 1;
+
       continue;
     }
 
@@ -146,17 +153,21 @@ const rewriteScss = ({ content, filePath, outputDirectory }) => {
     if (isQuotedString) {
       const endIndex = findStringEnd(content, index);
       const stringContent = content.slice(index + 1, endIndex);
+      const pathIsAlias = isAliasPath(stringContent);
 
-      if (isAliasPath(stringContent)) {
+      if (pathIsAlias) {
         appendReplacement(index + 1, endIndex, stringContent);
       }
 
       index = endIndex + 1;
+
       continue;
     }
 
     const isAlias = isAliasPath(content.slice(index));
+
     const previousCharacter = content[index - 1];
+
     const hasPathBoundary = index === 0
       || unquotedPathDelimiters.has(previousCharacter)
       || previousCharacter === ':'
@@ -165,17 +176,18 @@ const rewriteScss = ({ content, filePath, outputDirectory }) => {
     if (isAlias && hasPathBoundary) {
       let endIndex = index + 1;
 
-      while (
-        endIndex < content.length
-        && !unquotedPathDelimiters.has(content[endIndex])
-      ) {
+      const delimitersHasEndIndex = unquotedPathDelimiters.has(content[endIndex]);
+
+      while (endIndex < content.length && !delimitersHasEndIndex) {
         endIndex += 1;
       }
 
       const alias = content.slice(index, endIndex);
 
       appendReplacement(index, endIndex, alias);
+
       index = endIndex;
+
       continue;
     }
 
@@ -195,8 +207,9 @@ const findScssFiles = (directoryPath) => {
 
   for (const entryCur of fs.readdirSync(directoryPath, { withFileTypes: true })) {
     const entryPath = path.join(directoryPath, entryCur.name);
+    const entryCurIsDirectory = entryCur.isDirectory();
 
-    if (entryCur.isDirectory()) {
+    if (entryCurIsDirectory) {
       files.push(...findScssFiles(entryPath));
     } else if (entryCur.isFile() && entryCur.name.endsWith('.scss')) {
       files.push(entryPath);
@@ -210,9 +223,11 @@ const run = () => {
   const args = process.argv.slice(2);
   const dryRun = args.includes('--dry-run');
   const directoryArg = args.find((cur) => cur !== '--dry-run');
+
   const outputDirectory = directoryArg
     ? path.resolve(process.cwd(), directoryArg)
     : defaultOutputDirectory;
+
   const sourceDirectory = path.join(repositoryRoot, 'src');
 
   if (outputDirectory === sourceDirectory) {
@@ -224,11 +239,13 @@ const run = () => {
   }
 
   const scssFiles = findScssFiles(outputDirectory);
+
   const pendingChanges = [];
   let totalReplacements = 0;
 
   for (const filePath of scssFiles) {
     const originalContent = fs.readFileSync(filePath, 'utf8');
+
     const result = rewriteScss({
       content: originalContent,
       filePath,
@@ -254,16 +271,17 @@ const run = () => {
   const mode = dryRun ? 'Проверено' : 'Обработано';
   const changedMode = dryRun ? 'требуют изменения' : 'изменено';
 
-  console.log(
-    `${mode}: ${scssFiles.length} SCSS-файлов, `
+  const logMessage = `[scss-alias]: ${mode}: ${scssFiles.length} SCSS-файлов, `
     + `${pendingChanges.length} ${changedMode}, `
-    + `${totalReplacements} замен`,
-  );
+    + `${totalReplacements} замен`;
+
+  console.log(logMessage);
 };
 
 try {
   run();
 } catch (error) {
   console.error(error);
+
   process.exitCode = 1;
 }
