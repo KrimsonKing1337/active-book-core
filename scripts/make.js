@@ -6,6 +6,7 @@ try {
   execSync('npm run copy-files', { stdio: 'inherit' });
   execSync('npm run ts', { stdio: 'inherit' });
   execSync('tsc-alias', { stdio: 'inherit' });
+  execSync('node ./scripts/scssAlias.js', { stdio: 'inherit' });
   execSync('npm run up', { stdio: 'inherit' });
   execSync('npm run packaging', { stdio: 'inherit' });
 } catch (e) {
