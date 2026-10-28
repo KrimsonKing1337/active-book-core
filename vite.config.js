@@ -1,6 +1,14 @@
 import { fileURLToPath } from 'node:url';
 
-// Keep these aliases aligned with the ~paths resolved by scripts/scssAlias.js.
+/*
+На данный момент этот конфиг выполняет только одну функцию - подсветка путей
+в scss в IDE. Тильда заменяет /src/. Это нужно, чтобы не пришлось писать ../../.
+А резолв путей при сборке делает scripts/scssAlias.js.
+Так что это два независимых механизма.
+В будущем планируется полный переход на Vite для сборки,
+и это, в том числе, будет использоваться
+*/
+
 export default {
   resolve: {
     alias: {
