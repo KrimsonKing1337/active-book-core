@@ -1,6 +1,6 @@
-import { useCallback, useId, useRef } from 'react';
-
 import type { SideEffect, SideShadowItem } from '@hooks/effects/side/@types';
+
+import { useCallback, useId, useRef } from 'react';
 
 import { useDispatch } from '@store';
 import { sideEffectsActions } from '@store/effects/side';
