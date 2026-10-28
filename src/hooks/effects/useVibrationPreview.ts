@@ -1,4 +1,4 @@
-import type { SideEffect, SideShadowItem } from '@hooks/effects/side/@types';
+import type { SideAnimation, SideEffect, SideShadowItem } from '@hooks/effects/side/@types';
 
 import { useCallback, useId, useRef } from 'react';
 
@@ -21,12 +21,17 @@ export const useVibrationPreview = () => {
 
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const shadowAnimation: SideAnimation = {
+    preset: 'pulse',
+    duration: 160,
+  };
+
   const shadow: SideShadowItem = {
     id: shadowId,
     hidden: true,
     thickness: 35,
     style: { color: '#bb89ff' },
-    animation: { preset: 'pulse', duration: 160 },
+    animation: shadowAnimation,
   };
 
   let effect: SideEffect | null = null;
@@ -61,7 +66,11 @@ export const useVibrationPreview = () => {
   }, [appMode, setHidden]);
 
   const start = useCallback((duration: number) => {
-    if (appMode !== 'editor' || !Number.isFinite(duration) || duration <= 0) {
+    if (
+      appMode !== 'editor'
+      || !Number.isFinite(duration)
+      || duration <= 0
+    ) {
       return;
     }
 
