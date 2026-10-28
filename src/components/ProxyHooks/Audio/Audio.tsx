@@ -1,6 +1,6 @@
 import type { AudioEffectOptions } from '@types';
 
-import { useAudio } from '@hooks/effects/useAudio';
+import { useAudio } from '@hooks/effects/audio';
 
 import { useAppMode } from '@components/App/AppModeContext';
 
