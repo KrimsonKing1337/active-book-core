@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { useDispatch } from '@store';
 import { configActions } from '@store/config';
 
-import { useVibration } from '@hooks/effects/useVibration';
+import { useVibration } from '@hooks/effects/vibration/useVibration';
 
 import { Action, Button, P } from '@components';
 

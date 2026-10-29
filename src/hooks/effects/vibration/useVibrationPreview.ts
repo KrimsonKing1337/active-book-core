@@ -3,6 +3,7 @@ import type { SideAnimation, SideEffect, SideShadowItem } from '@hooks/effects/s
 import { useCallback, useId, useRef } from 'react';
 
 import { useDispatch } from '@store';
+
 import { sideEffectsActions } from '@store/effects/side';
 
 import { useAppMode } from '@components/App/AppModeContext';
@@ -12,8 +13,9 @@ import { useSideEffect } from '@hooks/effects/side/useSideEffect';
 const MIN_VISIBLE_DURATION = 200;
 
 export const useVibrationPreview = () => {
-  const appMode = useAppMode();
   const dispatch = useDispatch();
+
+  const appMode = useAppMode();
 
   const generatedId = useId();
   const effectId = `vibration-preview-${generatedId}`;
@@ -57,6 +59,7 @@ export const useVibrationPreview = () => {
   const stop = useCallback(() => {
     if (timerRef.current !== null) {
       clearTimeout(timerRef.current);
+
       timerRef.current = null;
     }
 
@@ -66,11 +69,7 @@ export const useVibrationPreview = () => {
   }, [appMode, setHidden]);
 
   const start = useCallback((duration: number) => {
-    if (
-      appMode !== 'editor'
-      || !Number.isFinite(duration)
-      || duration <= 0
-    ) {
+    if (appMode !== 'editor' || !Number.isFinite(duration) || duration <= 0) {
       return;
     }
 
@@ -80,11 +79,17 @@ export const useVibrationPreview = () => {
 
     setHidden(false);
 
+    const delay = Math.max(duration, MIN_VISIBLE_DURATION);
+
     timerRef.current = setTimeout(() => {
       timerRef.current = null;
+
       setHidden(true);
-    }, Math.max(duration, MIN_VISIBLE_DURATION));
+    }, delay);
   }, [appMode, setHidden]);
 
-  return { start, stop };
+  return {
+    start,
+    stop,
+  };
 };

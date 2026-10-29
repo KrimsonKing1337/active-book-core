@@ -3,6 +3,7 @@ import { useCallback, useEffect } from 'react';
 import type { VibrationEffectOptions } from '@types';
 
 import { useSelector } from '@store';
+
 import { configSelectors } from '@store/config';
 import { mainSelectors } from '@store/main';
 

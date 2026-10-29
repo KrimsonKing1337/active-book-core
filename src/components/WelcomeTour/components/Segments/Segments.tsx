@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import classNames from 'classnames';
 
-import { useVibration } from '@hooks/effects/useVibration';
+import { useVibration } from '@hooks/effects/vibration/useVibration';
 
 import { Segment, P } from '@components';
 
