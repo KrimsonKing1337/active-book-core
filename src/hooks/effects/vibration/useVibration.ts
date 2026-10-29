@@ -3,12 +3,20 @@ import { useCallback, useEffect } from 'react';
 import type { VibrationEffectOptions } from '@types';
 
 import { useSelector } from '@store';
+
 import { configSelectors } from '@store/config';
 import { mainSelectors } from '@store/main';
+
+import { useAppMode } from '@components/App/AppModeContext';
+
+import { useVibrationPreview } from './useVibrationPreview';
 
 import { off as vibrationOff, on as vibrationOn } from '@utils/effects/vibration';
 
 export const useVibration = (options?: VibrationEffectOptions) => {
+  const appMode = useAppMode();
+  const { start: startPreview, stop: stopPreview } = useVibrationPreview();
+
   const currentPage = useSelector(mainSelectors.page);
   const isVibrationAvailable = useSelector(mainSelectors.isVibrationAvailable);
   const vibrationEnabled = useSelector(configSelectors.vibration);
@@ -20,26 +28,28 @@ export const useVibration = (options?: VibrationEffectOptions) => {
   const playOnLoad = options?.playOnLoad ?? false;
 
   const on = useCallback((n: number) => {
-    if (!isVibrationAvailable) {
-      return;
-    }
-
     if (document.hidden) {
       return;
     }
 
-    vibrationOn(n);
+    startPreview(n);
 
-    console.log(`___ vibrated: ${n}`);
-  }, [isVibrationAvailable]);
+    // The editor can preview vibration without a supported device.
+    // Reader-mode imperative calls retain their existing behavior.
+    const canVibrate = isVibrationAvailable && (appMode !== 'editor' || vibrationEnabled);
+
+    if (canVibrate) {
+      vibrationOn(n);
+    }
+  }, [appMode, isVibrationAvailable, vibrationEnabled, startPreview]);
 
   const off = useCallback(() => {
-    if (!isVibrationAvailable) {
-      return;
-    }
+    stopPreview();
 
-    vibrationOff();
-  }, [isVibrationAvailable]);
+    if (isVibrationAvailable) {
+      vibrationOff();
+    }
+  }, [isVibrationAvailable, stopPreview]);
 
   // Keep the existing imperative useVibration() behavior: stop a running vibration on unmount
   useEffect(() => {
