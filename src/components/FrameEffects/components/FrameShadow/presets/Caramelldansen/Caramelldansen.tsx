@@ -1,15 +1,15 @@
 import { useRef } from 'react';
 
-import type { SideShadowItem } from '@hooks/effects/side/@types';
+import type { FrameShadowItem } from '@hooks/effects/frame/@types';
 
-import { SideShadow } from '../../SideShadow';
+import { FrameShadow } from '../../FrameShadow';
 
 import { useColorCarameldansen } from './hooks';
 
 import * as styles from './Caramelldansen.module.scss';
 
 type CaramelldansenProps = {
-  options: SideShadowItem;
+  options: FrameShadowItem;
 };
 
 export const Caramelldansen = ({ options }: CaramelldansenProps) => {
@@ -18,7 +18,7 @@ export const Caramelldansen = ({ options }: CaramelldansenProps) => {
   useColorCarameldansen(shadowRef);
 
   return (
-    <SideShadow
+    <FrameShadow
       elementRef={shadowRef}
       options={options}
       className={styles.Caramelldansen}
