@@ -58,6 +58,7 @@ export const useFlashlight = (options: Partial<FlashlightEffectOptions> = {}) =>
     shadowEffect = {
       id: shadowEffectId,
       kind: 'shadow',
+      layer: 'behind',
       shadow,
     };
   }

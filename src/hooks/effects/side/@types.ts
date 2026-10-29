@@ -2,6 +2,8 @@ import type { CSSProperties, ReactNode } from 'react';
 
 export type FrameSide = 'top' | 'right' | 'bottom' | 'left';
 
+export type SideLayer = 'behind' | 'above';
+
 export type FrameMask = {
   enabled: boolean;
   sides: FrameSide[];
@@ -58,6 +60,7 @@ export type SideTextItem = SideElementLayout & {
 export type SideEffect = {
   id: string;
   kind: 'shadow' | 'text' | 'component';
+  layer?: SideLayer;
   shadow?: SideShadowItem;
   text?: SideTextItem;
   Component?: ReactNode;

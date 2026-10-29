@@ -65,6 +65,7 @@
 
 .NarrativeFrame {
   position: relative;
+  isolation: isolate;
 
   flex: 1;
   width: 100%;
