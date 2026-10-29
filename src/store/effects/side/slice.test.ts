@@ -64,3 +64,29 @@ test('leaves update commands for the saga', () => {
 
   expect(nextState).toBe(state);
 });
+
+test('keeps masked and unmasked components independent', () => {
+  const maskedEffect: SideEffect = {
+    id: 'masked',
+    kind: 'component',
+    frameMask: {
+      enabled: true,
+      sides: ['bottom'],
+    },
+  };
+  const unmaskedEffect: SideEffect = {
+    id: 'unmasked',
+    kind: 'component',
+    frameMask: {
+      enabled: false,
+      sides: ['top'],
+    },
+  };
+
+  let state = reducer(initialState, actions.setEffect(maskedEffect));
+
+  state = reducer(state, actions.setEffect(unmaskedEffect));
+
+  expect(state.effects.masked.frameMask?.sides).toEqual(['bottom']);
+  expect(state.effects.unmasked.frameMask?.enabled).toBe(false);
+});

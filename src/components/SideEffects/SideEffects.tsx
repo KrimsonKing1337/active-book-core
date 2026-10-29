@@ -35,7 +35,7 @@ export const SideEffects = () => {
 
         let wrapperStyle: CSSProperties = kind === 'component' ? (style ?? {}) : { zIndex };
 
-        if (isFrameMasked) {
+        if (isFrameMasked && frameMask) {
           wrapperStyle = {
             ...wrapperStyle,
             maskImage: getFrameMaskImage(frameMask.sides),
