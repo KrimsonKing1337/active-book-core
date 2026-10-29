@@ -17,7 +17,7 @@ export * from './Modal';
 export * from './ModalDialog';
 export * from './Overflow';
 export * from './PageWrapper';
-export * from './SideEffects';
+export * from './FrameEffects';
 export * from './SlideShow';
 export * from './Spoiler';
 export * from './TableOfContents';

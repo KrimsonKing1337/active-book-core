@@ -1,14 +1,14 @@
-import type { SideEffect, SideShadowItem } from '@hooks/effects/side/@types';
+import type { FrameEffect, FrameShadowItem } from '@hooks/effects/frame/@types';
 
 import { useCallback, useId, useRef } from 'react';
 
 import { useDispatch } from '@store';
 
-import { sideEffectsActions } from '@store/effects/side';
+import { frameEffectsActions } from '@store/effects/frame';
 
 import { useAppMode } from '@components/App/AppModeContext';
 
-import { useSideEffect } from '@hooks/effects/side/useSideEffect';
+import { useFrameEffect } from '@hooks/effects/frame/useFrameEffect';
 
 const MIN_PREVIEW_DURATION = 15;
 
@@ -23,7 +23,7 @@ export const useVibrationPreview = () => {
 
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const shadow: SideShadowItem = {
+  const shadow: FrameShadowItem = {
     id: shadowId,
     hidden: true,
     sides: ['left', 'right'],
@@ -31,20 +31,21 @@ export const useVibrationPreview = () => {
     style: { color: '#bb89ff' },
   };
 
-  let effect: SideEffect | null = null;
+  let effect: FrameEffect | null = null;
 
   if (appMode === 'editor') {
     effect = {
       id: effectId,
       kind: 'shadow',
+      layer: 'overlay',
       shadow,
     };
   }
 
-  useSideEffect(effect);
+  useFrameEffect(effect);
 
   const setHidden = useCallback((hidden: boolean) => {
-    dispatch(sideEffectsActions.updateShadow({
+    dispatch(frameEffectsActions.updateShadow({
       effectId,
       shadowId,
       changes: { hidden },
