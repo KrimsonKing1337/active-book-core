@@ -1,3 +1,7 @@
+import type { CSSProperties } from 'react';
+
+import classNames from 'classnames';
+
 import { useSelector } from '@store';
 
 import { sideEffectsSelectors } from '@store/effects/side';
@@ -5,6 +9,8 @@ import { sideEffectsSelectors } from '@store/effects/side';
 import { SideElement } from './components/SideElement';
 import { SideShadow, Police, Caramelldansen } from './components/SideShadow';
 import { SideText } from './components/SideText';
+
+import { getFrameMaskImage } from './utils';
 
 import * as styles from './SideEffects.module.scss';
 
@@ -20,10 +26,27 @@ export const SideEffects = () => {
           shadow,
           text,
           Component,
+          frameMask,
           style,
         } = effectCur;
+
         const zIndex = shadow?.style?.zIndex ?? text?.style?.zIndex;
-        const wrapperStyle = kind === 'component' ? style : { zIndex };
+        const isFrameMasked = kind === 'component' && frameMask?.enabled === true;
+
+        let wrapperStyle: CSSProperties = kind === 'component' ? (style ?? {}) : { zIndex };
+
+        if (isFrameMasked) {
+          wrapperStyle = {
+            ...wrapperStyle,
+            maskImage: getFrameMaskImage(frameMask.sides),
+            maskComposite: 'add',
+          };
+        }
+
+        const wrapperClassNames = classNames({
+          [styles.EffectWrapper]: true,
+          [styles.isFrameMasked]: isFrameMasked,
+        });
 
         let ShadowComponent = SideShadow;
 
@@ -43,7 +66,7 @@ export const SideEffects = () => {
             id={`effect-${id}`}
             data-effect-id={id}
             style={wrapperStyle}
-            className={styles.EffectWrapper}
+            className={wrapperClassNames}
           >
             {showShadow && (
               <SideElement {...shadow}>

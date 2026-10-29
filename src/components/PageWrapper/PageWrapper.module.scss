@@ -24,6 +24,13 @@
 }
 
 .MainContent {
+  --frame-base: clamp(12px, 1.5vw, 24px);
+  --frame-top: var(--frame-base);
+  --frame-right: var(--frame-base);
+  --frame-bottom: var(--frame-base);
+  --frame-left: var(--frame-base);
+  --narrative-controls-height: clamp(48px, 6vh, 80px);
+
   position: relative;
   z-index: 2;
 
