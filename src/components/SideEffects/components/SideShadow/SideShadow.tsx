@@ -1,8 +1,8 @@
 import type { CSSProperties, RefObject } from 'react';
 
-import classNames from 'classnames';
-
 import type { FrameSide, SideShadowItem } from '@hooks/effects/side/@types';
+
+import classNames from 'classnames';
 
 import * as styles from './SideShadow.module.scss';
 

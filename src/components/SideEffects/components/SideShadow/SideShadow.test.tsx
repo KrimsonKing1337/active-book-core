@@ -1,13 +1,13 @@
-import { renderToStaticMarkup } from 'react-dom/server';
-
 import type { FrameSide } from '@hooks/effects/side/@types';
+
+import { renderToStaticMarkup } from 'react-dom/server';
 
 import { SideShadow } from './SideShadow';
 
 const renderShadow = (sides: FrameSide[]) => {
-  return renderToStaticMarkup((
+  return renderToStaticMarkup(
     <SideShadow options={{ id: 'shadow', sides, thickness: 20 }} />
-  ));
+  );
 };
 
 test('renders only the selected sides of a shadow', () => {
