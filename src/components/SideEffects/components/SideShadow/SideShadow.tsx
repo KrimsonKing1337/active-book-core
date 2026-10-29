@@ -2,7 +2,7 @@ import type { CSSProperties, RefObject } from 'react';
 
 import classNames from 'classnames';
 
-import type { SideShadowItem } from '@hooks/effects/side/@types';
+import type { FrameSide, SideShadowItem } from '@hooks/effects/side/@types';
 
 import * as styles from './SideShadow.module.scss';
 
@@ -16,6 +16,7 @@ export const SideShadow = ({ options, elementRef, className }: SideShadowProps) 
   const {
     animation,
     style,
+    sides,
     thickness = 30,
   } = options;
 
@@ -27,8 +28,14 @@ export const SideShadow = ({ options, elementRef, className }: SideShadowProps) 
 
   const color = 'var(--side-shadow-color, currentColor)';
 
-  const leftShadow = `inset ${size} 0 ${size} -${size} ${color}`;
-  const rightShadow = `inset -${size} 0 ${size} -${size} ${color}`;
+  const shadows: Record<FrameSide, string> = {
+    top: `inset 0 ${size} ${size} -${size} ${color}`,
+    right: `inset -${size} 0 ${size} -${size} ${color}`,
+    bottom: `inset 0 -${size} ${size} -${size} ${color}`,
+    left: `inset ${size} 0 ${size} -${size} ${color}`,
+  };
+
+  const boxShadow = sides.map((sideCur) => shadows[sideCur]).join(', ');
 
   const animationDuration = animation?.duration ?? 1000;
   const animationDelay = animation?.delay ?? 0;
@@ -37,7 +44,7 @@ export const SideShadow = ({ options, elementRef, className }: SideShadowProps) 
 
   const shadowStyle: CSSProperties = {
     ...style,
-    boxShadow: `${leftShadow}, ${rightShadow}`,
+    boxShadow,
     animationDuration: `${animationDuration}ms`,
     animationDelay: `${animationDelay}ms`,
     animationIterationCount,

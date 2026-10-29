@@ -46,6 +46,7 @@ export const useFlashlight = (options: Partial<FlashlightEffectOptions> = {}) =>
 
   const shadow: SideShadowItem = {
     id: shadowId,
+    sides: ['left', 'right'],
     style: shadowStyle,
     hidden: true,
     animation: shadowAnimation,

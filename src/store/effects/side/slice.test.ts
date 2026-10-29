@@ -7,6 +7,7 @@ const shadowEffect: SideEffect = {
   kind: 'shadow',
   shadow: {
     id: 'glow',
+    sides: ['left', 'right'],
     thickness: 30,
   },
 };
