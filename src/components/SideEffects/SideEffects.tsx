@@ -33,12 +33,16 @@ export const SideEffects = () => {
         const zIndex = shadow?.style?.zIndex ?? text?.style?.zIndex;
         const isFrameMasked = kind === 'component' && frameMask?.enabled === true;
 
-        let wrapperStyle: CSSProperties = kind === 'component' ? (style ?? {}) : { zIndex };
+        const styleSafe = style ?? {};
+
+        let wrapperStyle: CSSProperties = kind === 'component' ? styleSafe : { zIndex };
 
         if (isFrameMasked && frameMask) {
+          const maskImage = getFrameMaskImage(frameMask.sides);
+
           wrapperStyle = {
             ...wrapperStyle,
-            maskImage: getFrameMaskImage(frameMask.sides),
+            maskImage,
             maskComposite: 'add',
           };
         }

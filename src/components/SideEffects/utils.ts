@@ -21,5 +21,7 @@ export const getFrameMaskImage = (sides: FrameSide[]): string => {
     return 'linear-gradient(transparent, transparent)';
   }
 
-  return sides.map((sideCur) => frameMaskGradients[sideCur]).join(', ');
+  const sideWithGradients = sides.map((cur) => frameMaskGradients[cur]);
+
+  return sideWithGradients.join(', ');
 };
