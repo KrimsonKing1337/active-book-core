@@ -1,7 +1,5 @@
 import type { CSSProperties } from 'react';
 
-import classNames from 'classnames';
-
 import { useSelector } from '@store';
 
 import { sideEffectsSelectors } from '@store/effects/side';
@@ -47,11 +45,6 @@ export const SideEffects = () => {
           };
         }
 
-        const wrapperClassNames = classNames({
-          [styles.EffectWrapper]: true,
-          [styles.isFrameMasked]: isFrameMasked,
-        });
-
         let ShadowComponent = SideShadow;
 
         if (shadow?.animation?.preset === 'police') {
@@ -70,7 +63,7 @@ export const SideEffects = () => {
             id={`effect-${id}`}
             data-effect-id={id}
             style={wrapperStyle}
-            className={wrapperClassNames}
+            className={styles.EffectWrapper}
           >
             {showShadow && (
               <SideElement {...shadow}>

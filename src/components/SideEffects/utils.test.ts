@@ -11,12 +11,10 @@ test('limits a custom effect to the selected sides', () => {
   expect(image).not.toContain('var(--frame-bottom)');
 });
 
-test('places the bottom frame directly above the narrative controls', () => {
+test('places the bottom frame at the edge of the narrative area', () => {
   const image = getFrameMaskImage(['bottom']);
 
-  expect(image).toContain('var(--narrative-controls-height)');
-  expect(image).toContain('var(--frame-bottom)');
-  expect(image).toContain('transparent calc(var(--narrative-controls-height) + var(--frame-bottom))');
+  expect(image).toBe('linear-gradient(to top, black 0 var(--frame-bottom), transparent var(--frame-bottom))');
 });
 
 test('combines independent side masks into one component surface', () => {
