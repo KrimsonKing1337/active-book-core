@@ -1,4 +1,4 @@
 export * from './audio';
-export * from './side';
+export * from './frame';
 export * from './flashlight';
 export * from './vibration';

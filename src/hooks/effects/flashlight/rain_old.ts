@@ -92,7 +92,7 @@ async function play(flashlightOn: FlashLightOn) {
 }
 
 export function useRain() {
-  const { flashlightOn, flashlightOff } = useFlashlight({ withSideShadow: true });
+  const { flashlightOn, flashlightOff } = useFlashlight({ withFrameShadow: true });
 
   useEffect(() => {
     letItBe = true;
