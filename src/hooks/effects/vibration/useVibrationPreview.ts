@@ -26,6 +26,7 @@ export const useVibrationPreview = () => {
   const shadow: SideShadowItem = {
     id: shadowId,
     hidden: true,
+    sides: ['left', 'right'],
     thickness: 35,
     style: { color: '#bb89ff' },
   };
