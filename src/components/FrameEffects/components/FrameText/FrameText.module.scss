@@ -1,14 +1,14 @@
 @use "~styles/__variables" as vars;
 
-.SideTextScrollWrapper {
+.FrameTextScrollWrapper {
   position: absolute;
   inset: 0;
   container-type: size;
   pointer-events: none;
 }
 
-.SideTextScrollLeftWrapper,
-.SideTextScrollRightWrapper {
+.FrameTextScrollLeftWrapper,
+.FrameTextScrollRightWrapper {
   position: absolute;
   top: 0;
   bottom: 0;
@@ -16,45 +16,45 @@
   overflow: hidden;
 }
 
-.SideTextScrollLeftWrapper {
+.FrameTextScrollLeftWrapper {
   left: 0;
 }
 
-.SideTextScrollRightWrapper {
+.FrameTextScrollRightWrapper {
   right: 0;
 }
 
-.SideTextScrollLeft,
-.SideTextScrollRight {
+.FrameTextScrollLeft,
+.FrameTextScrollRight {
   position: absolute;
   width: 100%;
   will-change: transform;
 }
 
-.SideTextScrollLeft {
+.FrameTextScrollLeft {
   top: 100%;
   left: 0;
   animation: scroll-text-up 60000ms linear infinite;
 
-  .SideTextScrollContent {
+  .FrameTextScrollContent {
     transform: rotate(180deg);
   }
 }
 
-.SideTextScrollRight {
+.FrameTextScrollRight {
   right: 0;
   bottom: 100%;
   animation: scroll-text-down 60000ms linear infinite;
 }
 
-.SideTextScrollLeft.Static,
-.SideTextScrollRight.Static {
+.FrameTextScrollLeft.Static,
+.FrameTextScrollRight.Static {
   top: 50%;
   bottom: auto;
   transform: translateY(-50%);
 }
 
-.SideTextScrollContent {
+.FrameTextScrollContent {
   display: flex;
   flex-direction: row;
   gap: 5px;

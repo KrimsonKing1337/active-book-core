@@ -1,15 +1,15 @@
 import { useRef } from 'react';
 
-import type { SideShadowItem } from '@hooks/effects/side/@types';
+import type { FrameShadowItem } from '@hooks/effects/frame/@types';
 
-import { SideShadow } from '../../SideShadow';
+import { FrameShadow } from '../../FrameShadow';
 
 import { useColorPolice } from './hooks';
 
 import * as styles from './Police.module.scss';
 
 type PoliceProps = {
-  options: SideShadowItem;
+  options: FrameShadowItem;
 };
 
 export const Police = ({ options }: PoliceProps) => {
@@ -18,7 +18,7 @@ export const Police = ({ options }: PoliceProps) => {
   useColorPolice(shadowRef);
 
   return (
-    <SideShadow
+    <FrameShadow
       elementRef={shadowRef}
       options={options}
       className={styles.Police}

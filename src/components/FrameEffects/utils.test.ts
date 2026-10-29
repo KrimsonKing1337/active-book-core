@@ -1,4 +1,4 @@
-import type { FrameSide } from '@hooks/effects/side/@types';
+import type { FrameSide } from '@hooks/effects/frame/@types';
 
 import { getFrameMaskImage } from './utils';
 

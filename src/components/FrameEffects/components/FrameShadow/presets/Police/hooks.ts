@@ -14,19 +14,19 @@ export const useColorPolice = (shadowRef: RefObject<HTMLDivElement | null>) => {
 
     let index = 0;
 
-    element.style.setProperty('--side-shadow-color', COLORS[index]);
+    element.style.setProperty('--frame-shadow-color', COLORS[index]);
 
     const handleIteration = () => {
       index = (index + 1) % COLORS.length;
 
-      element.style.setProperty('--side-shadow-color', COLORS[index]);
+      element.style.setProperty('--frame-shadow-color', COLORS[index]);
     };
 
     element.addEventListener('animationiteration', handleIteration);
 
     return () => {
       element.removeEventListener('animationiteration', handleIteration);
-      element.style.removeProperty('--side-shadow-color');
+      element.style.removeProperty('--frame-shadow-color');
     };
   }, [shadowRef]);
 };

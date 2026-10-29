@@ -1,17 +1,17 @@
-import type { SideAnimationPreset } from '@hooks/effects/side/@types';
+import type { FrameAnimationPreset } from '@hooks/effects/frame/@types';
 
 export * from './Police';
 export * from './Caramelldansen';
 
-export type SideShadowPreset = {
-  value: Exclude<SideAnimationPreset, 'scroll'>;
+export type FrameShadowPreset = {
+  value: Exclude<FrameAnimationPreset, 'scroll'>;
   label: string;
   canChangeColor?: boolean;
 };
 
-export const SIDE_SHADOW_PRESETS = [
+export const FRAME_SHADOW_PRESETS = [
   { value: 'none', label: 'Без анимации', canChangeColor: true },
   { value: 'pulse', label: 'Пульсация', canChangeColor: true },
   { value: 'police', label: 'Полиция' },
   { value: 'caramel', label: 'Caramelldansen' },
-] as const satisfies readonly SideShadowPreset[];
+] as const satisfies readonly FrameShadowPreset[];

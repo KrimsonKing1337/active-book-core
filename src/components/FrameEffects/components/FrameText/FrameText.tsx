@@ -2,20 +2,20 @@ import { type CSSProperties, type PropsWithChildren, Children } from 'react';
 
 import classNames from 'classnames';
 
-import type { SideAnimation } from '@hooks/effects/side/@types';
+import type { FrameAnimation } from '@hooks/effects/frame/@types';
 
-import * as styles from './SideText.module.scss';
+import * as styles from './FrameText.module.scss';
 
-type SideTextProps = PropsWithChildren & {
-  animation?: SideAnimation;
+type FrameTextProps = PropsWithChildren & {
+  animation?: FrameAnimation;
   style?: CSSProperties;
 };
 
-export const SideText = ({ children, animation, style }: SideTextProps) => {
+export const FrameText = ({ children, animation, style }: FrameTextProps) => {
   const childrenAsArray = Children.toArray(children);
 
   if (childrenAsArray.length !== 2) {
-    throw new Error('There must be two children in SideText');
+    throw new Error('There must be two children in FrameText');
   }
 
   const isStatic = animation?.preset === 'none' || animation?.playState === 'stopped';
@@ -35,28 +35,28 @@ export const SideText = ({ children, animation, style }: SideTextProps) => {
   };
 
   const leftClassNames = classNames({
-    [styles.SideTextScrollLeft]: true,
+    [styles.FrameTextScrollLeft]: true,
     [styles.Static]: isStatic,
   });
 
   const rightClassNames = classNames({
-    [styles.SideTextScrollRight]: true,
+    [styles.FrameTextScrollRight]: true,
     [styles.Static]: isStatic,
   });
 
   return (
-    <div className={styles.SideTextScrollWrapper}>
-      <div className={styles.SideTextScrollLeftWrapper}>
+    <div className={styles.FrameTextScrollWrapper}>
+      <div className={styles.FrameTextScrollLeftWrapper}>
         <div className={leftClassNames} style={animationStyle}>
-          <div className={styles.SideTextScrollContent} style={style}>
+          <div className={styles.FrameTextScrollContent} style={style}>
             {childrenAsArray[0]}
           </div>
         </div>
       </div>
 
-      <div className={styles.SideTextScrollRightWrapper}>
+      <div className={styles.FrameTextScrollRightWrapper}>
         <div className={rightClassNames} style={animationStyle}>
-          <div className={styles.SideTextScrollContent} style={style}>
+          <div className={styles.FrameTextScrollContent} style={style}>
             {childrenAsArray[1]}
           </div>
         </div>

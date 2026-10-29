@@ -1,4 +1,4 @@
-import type { FrameSide } from '@hooks/effects/side/@types';
+import type { FrameSide } from '@hooks/effects/frame/@types';
 
 const frameMaskGradients: Record<FrameSide, string> = {
   top: 'linear-gradient(to bottom, black 0 var(--frame-top), transparent var(--frame-top))',
