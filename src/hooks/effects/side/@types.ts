@@ -2,6 +2,11 @@ import type { CSSProperties, ReactNode } from 'react';
 
 export type FrameSide = 'top' | 'right' | 'bottom' | 'left';
 
+export type FrameMask = {
+  enabled: boolean;
+  sides: FrameSide[];
+};
+
 export type SidePosition =
   | 'top-left'
   | 'top'
@@ -56,5 +61,6 @@ export type SideEffect = {
   shadow?: SideShadowItem;
   text?: SideTextItem;
   Component?: ReactNode;
+  frameMask?: FrameMask;
   style?: CSSProperties;
 };

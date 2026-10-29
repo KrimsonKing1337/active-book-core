@@ -31,6 +31,7 @@ export const useSideEffect = (effect: SideEffect | null) => {
       kind,
       shadow,
       text,
+      frameMask,
       style,
     } = effect;
 
@@ -39,6 +40,7 @@ export const useSideEffect = (effect: SideEffect | null) => {
       kind,
       shadow,
       text,
+      frameMask,
       style,
     };
 

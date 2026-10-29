@@ -24,6 +24,12 @@
 }
 
 .MainContent {
+  --frame-base: clamp(12px, 1.5vw, 24px);
+  --frame-top: var(--frame-base);
+  --frame-right: var(--frame-base);
+  --frame-bottom: var(--frame-base);
+  --frame-left: var(--frame-base);
+
   position: relative;
   z-index: 2;
 
@@ -55,4 +61,12 @@
     border-radius: 0;
     box-shadow: none;
   }
+}
+
+.NarrativeFrame {
+  position: relative;
+
+  flex: 1;
+  width: 100%;
+  min-height: 0;
 }

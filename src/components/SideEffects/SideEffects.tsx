@@ -1,3 +1,5 @@
+import type { CSSProperties } from 'react';
+
 import { useSelector } from '@store';
 
 import { sideEffectsSelectors } from '@store/effects/side';
@@ -5,6 +7,8 @@ import { sideEffectsSelectors } from '@store/effects/side';
 import { SideElement } from './components/SideElement';
 import { SideShadow, Police, Caramelldansen } from './components/SideShadow';
 import { SideText } from './components/SideText';
+
+import { getFrameMaskImage } from './utils';
 
 import * as styles from './SideEffects.module.scss';
 
@@ -20,10 +24,26 @@ export const SideEffects = () => {
           shadow,
           text,
           Component,
+          frameMask,
           style,
         } = effectCur;
+
         const zIndex = shadow?.style?.zIndex ?? text?.style?.zIndex;
-        const wrapperStyle = kind === 'component' ? style : { zIndex };
+        const isFrameMasked = kind === 'component' && frameMask?.enabled === true;
+
+        const styleSafe = style ?? {};
+
+        let wrapperStyle: CSSProperties = kind === 'component' ? styleSafe : { zIndex };
+
+        if (isFrameMasked && frameMask) {
+          const maskImage = getFrameMaskImage(frameMask.sides);
+
+          wrapperStyle = {
+            ...wrapperStyle,
+            maskImage,
+            maskComposite: 'add',
+          };
+        }
 
         let ShadowComponent = SideShadow;
 
