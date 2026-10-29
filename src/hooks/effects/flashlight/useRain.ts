@@ -28,7 +28,7 @@ const play = async (flashlightOn: (n: number) => void) => {
 };
 
 export const useRain = () => {
-  const { flashlightOn, flashlightOff } = useFlashlight({ withSideShadow: true });
+  const { flashlightOn, flashlightOff } = useFlashlight({ withFrameShadow: true });
 
   useEffect(() => {
     letItBe = true;

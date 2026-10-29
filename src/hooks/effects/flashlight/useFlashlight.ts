@@ -7,10 +7,10 @@ import { useSelector } from '@store';
 import { configSelectors } from '@store/config';
 import { mainSelectors } from '@store/main';
 
-import type { SideAnimation, SideEffect, SideShadowItem } from '@hooks/effects/side/@types';
+import type { FrameAnimation, FrameEffect, FrameShadowItem } from '@hooks/effects/frame/@types';
 
-import { useSideEffect } from '@hooks/effects/side/useSideEffect';
-import { useSideEffects } from '@hooks/effects/side/useSideEffects';
+import { useFrameEffect } from '@hooks/effects/frame/useFrameEffect';
+import { useFrameEffects } from '@hooks/effects/frame/useFrameEffects';
 
 import { flashlightInst } from '@utils/effects/flashlight';
 
@@ -25,26 +25,26 @@ export const useFlashlight = (options: Partial<FlashlightEffectOptions> = {}) =>
     duration = 0,
     delay = 0,
     playOnLoad = false,
-    withSideShadow = false,
+    withFrameShadow = false,
     speed = 150,
   } = options;
 
   const color = theme === 'dark' ? '#fff' : '#9addf4';
 
   const generatedId = useId();
-  const shadowEffectId = `flashlight-side-${generatedId}`;
+  const shadowEffectId = `flashlight-frame-${generatedId}`;
   const shadowId = 'glow';
 
   const shadowStyle = {
     color,
   };
 
-  const shadowAnimation: SideAnimation = {
+  const shadowAnimation: FrameAnimation = {
     preset: 'pulse',
     duration: speed,
   };
 
-  const shadow: SideShadowItem = {
+  const shadow: FrameShadowItem = {
     id: shadowId,
     sides: ['left', 'right'],
     style: shadowStyle,
@@ -52,20 +52,20 @@ export const useFlashlight = (options: Partial<FlashlightEffectOptions> = {}) =>
     animation: shadowAnimation,
   };
 
-  let shadowEffect: SideEffect | null = null;
+  let shadowEffect: FrameEffect | null = null;
 
-  if (withSideShadow) {
+  if (withFrameShadow) {
     shadowEffect = {
       id: shadowEffectId,
       kind: 'shadow',
-      layer: 'behind',
+      layer: 'overlay',
       shadow,
     };
   }
 
-  useSideEffect(shadowEffect);
+  useFrameEffect(shadowEffect);
 
-  const { updateShadow } = useSideEffects();
+  const { updateShadow } = useFrameEffects();
 
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const resolvePulseRef = useRef<(() => void) | null>(null);
@@ -84,18 +84,18 @@ export const useFlashlight = (options: Partial<FlashlightEffectOptions> = {}) =>
     resolvePulseRef.current?.();
     resolvePulseRef.current = null;
 
-    if (withSideShadow) {
+    if (withFrameShadow) {
       updateShadow(shadowEffectId, shadowId, { hidden: true });
     }
 
     flashlightInst.off();
-  }, [withSideShadow, updateShadow, shadowEffectId]);
+  }, [withFrameShadow, updateShadow, shadowEffectId]);
 
   const on = useCallback(async (pulseDuration?: number) => {
     // Invalidate pending camera initialization and any previous auto-off timer.
     off();
 
-    if (document.hidden || (!flashlightEnabled && !withSideShadow)) {
+    if (document.hidden || (!flashlightEnabled && !withFrameShadow)) {
       return;
     }
 
@@ -115,7 +115,7 @@ export const useFlashlight = (options: Partial<FlashlightEffectOptions> = {}) =>
       return;
     }
 
-    if (withSideShadow) {
+    if (withFrameShadow) {
       updateShadow(shadowEffectId, shadowId, { hidden: false });
     }
 
@@ -129,7 +129,7 @@ export const useFlashlight = (options: Partial<FlashlightEffectOptions> = {}) =>
         timerRef.current = setTimeout(off, pulseDuration);
       });
     }
-  }, [flashlightEnabled, withSideShadow, off, updateShadow, shadowEffectId]);
+  }, [flashlightEnabled, withFrameShadow, off, updateShadow, shadowEffectId]);
 
   // Preserve the original imperative hook's behavior on unmount.
   useEffect(() => {
@@ -143,8 +143,8 @@ export const useFlashlight = (options: Partial<FlashlightEffectOptions> = {}) =>
       return;
     }
 
-    // A visual sideShadow imitation is allowed even without a physical torch.
-    if (!flashlightEnabled && !withSideShadow) {
+    // A visual frameShadow imitation is allowed even without a physical torch.
+    if (!flashlightEnabled && !withFrameShadow) {
       return;
     }
 
@@ -164,7 +164,7 @@ export const useFlashlight = (options: Partial<FlashlightEffectOptions> = {}) =>
     duration,
     delay,
     playOnLoad,
-    withSideShadow,
+    withFrameShadow,
     on,
     off,
   ]);

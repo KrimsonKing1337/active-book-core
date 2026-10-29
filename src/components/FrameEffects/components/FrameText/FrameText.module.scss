@@ -1,0 +1,92 @@
+@use "~styles/__variables" as vars;
+
+.FrameTextScrollWrapper {
+  position: absolute;
+  inset: 0;
+  container-type: size;
+  pointer-events: none;
+}
+
+.FrameTextScrollLeftWrapper,
+.FrameTextScrollRightWrapper {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: clamp(8px, 0.8vw, 18px);
+  overflow: hidden;
+}
+
+.FrameTextScrollLeftWrapper {
+  left: 0;
+}
+
+.FrameTextScrollRightWrapper {
+  right: 0;
+}
+
+.FrameTextScrollLeft,
+.FrameTextScrollRight {
+  position: absolute;
+  width: 100%;
+  will-change: transform;
+}
+
+.FrameTextScrollLeft {
+  top: 100%;
+  left: 0;
+  animation: scroll-text-up 60000ms linear infinite;
+
+  .FrameTextScrollContent {
+    transform: rotate(180deg);
+  }
+}
+
+.FrameTextScrollRight {
+  right: 0;
+  bottom: 100%;
+  animation: scroll-text-down 60000ms linear infinite;
+}
+
+.FrameTextScrollLeft.Static,
+.FrameTextScrollRight.Static {
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%);
+}
+
+.FrameTextScrollContent {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  align-items: center;
+  width: 100%;
+  padding-top: 5px;
+
+  color: #a3a3a3;
+  font-size: vars.$fs-12;
+  line-height: 1;
+  white-space: nowrap;
+  writing-mode: vertical-rl;
+  text-orientation: sideways;
+  text-transform: lowercase;
+
+  background-color: rgb(255 255 255 / 10%);
+
+  .defaultMargin {
+    margin-bottom: clamp(32px, 5vw, 96px);
+  }
+
+  .warning { color: #f2c94c; }
+  .error { color: #fd0006; }
+  .ok { color: #0c3; }
+}
+
+@keyframes scroll-text-up {
+  from { transform: translateY(0); }
+  to { transform: translateY(calc(-100% - 100cqh)); }
+}
+
+@keyframes scroll-text-down {
+  from { transform: translateY(0); }
+  to { transform: translateY(calc(100% + 100cqh)); }
+}

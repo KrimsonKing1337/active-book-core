@@ -1,0 +1,31 @@
+.EffectWrapper {
+  position: absolute;
+  inset: 0;
+}
+
+.FrameEffects {
+  position: absolute;
+  inset: 0;
+
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.BehindLayer,
+.AboveLayer,
+.OverlayLayer {
+  position: absolute;
+  inset: 0;
+}
+
+.BehindLayer {
+  z-index: 0;
+}
+
+.AboveLayer {
+  z-index: 2;
+}
+
+.OverlayLayer {
+  z-index: 3;
+}

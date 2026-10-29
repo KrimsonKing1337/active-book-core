@@ -52,7 +52,7 @@ export type FlashlightEffectOptions = {
   duration: number;
   delay?: number;
   playOnLoad?: boolean;
-  withSideShadow?: boolean;
+  withFrameShadow?: boolean;
   speed?: number;
 };
 

@@ -8,13 +8,13 @@ import { mainSelectors } from '@store/main';
 import { effectsSelectors } from '@store/effects/common';
 import { segmentsActions } from '@store/segments';
 import { backgroundEffectsActions } from '@store/effects/background';
-import { sideEffectsActions } from '@store/effects/side';
+import { frameEffectsActions } from '@store/effects/frame';
 
 import { Toolbar } from '@components/Toolbar';
 import { Menu } from '@components/Menu';
 import { TableOfContents } from '@components/TableOfContents';
 import { Bookmarks } from '@components/Bookmarks';
-import { SideEffects } from '@components/SideEffects';
+import { FrameEffects } from '@components/FrameEffects';
 import { BackgroundEffects } from '@components/BackgroundEffects';
 
 import { Narrative } from './components/Narrative';
@@ -41,7 +41,7 @@ export const PageWrapper = ({
     return () => {
       dispatch(segmentsActions.reset());
       dispatch(backgroundEffectsActions.setEffects({}));
-      dispatch(sideEffectsActions.setEffects({}));
+      dispatch(frameEffectsActions.setEffects({}));
     };
   }, []);
 
@@ -63,7 +63,7 @@ export const PageWrapper = ({
             {children}
           </Narrative>
 
-          <SideEffects />
+          <FrameEffects />
         </div>
 
         <BackgroundEffects />
