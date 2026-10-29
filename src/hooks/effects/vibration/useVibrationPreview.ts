@@ -10,6 +10,8 @@ import { useAppMode } from '@components/App/AppModeContext';
 
 import { useSideEffect } from '@hooks/effects/side/useSideEffect';
 
+const MIN_PREVIEW_DURATION = 15;
+
 export const useVibrationPreview = () => {
   const dispatch = useDispatch();
 
@@ -71,11 +73,13 @@ export const useVibrationPreview = () => {
 
     setHidden(false);
 
+    const previewDuration = Math.max(duration, MIN_PREVIEW_DURATION);
+
     timerRef.current = setTimeout(() => {
       timerRef.current = null;
 
       setHidden(true);
-    }, duration);
+    }, previewDuration);
   }, [appMode, setHidden]);
 
   return {
