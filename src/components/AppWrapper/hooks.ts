@@ -15,7 +15,7 @@ import { initialState as configInitialState } from '@store/config/slice';
 import { initialState as volumeInitialState } from '@store/volume/slice';
 import { volumeActions } from '@store/volume';
 
-import { useVibration } from '@hooks/effects/vibration/useVibration';
+import { useVibration } from '@hooks/effects/vibration';
 
 import { setMuteToAllVideos } from '@components/AppWrapper/utils';
 

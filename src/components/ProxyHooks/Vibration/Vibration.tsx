@@ -1,6 +1,6 @@
 import type { VibrationEffectOptions } from '@types';
 
-import { useVibration } from '@hooks/effects/vibration/useVibration';
+import { useVibration } from '@hooks/effects/vibration';
 
 import { useAppMode } from '@components/App/AppModeContext';
 

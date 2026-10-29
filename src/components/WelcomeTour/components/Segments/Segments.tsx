@@ -2,10 +2,9 @@ import { useState } from 'react';
 
 import classNames from 'classnames';
 
-import { useVibration } from '@hooks/effects/vibration/useVibration';
+import { useVibration } from '@hooks/effects/vibration';
 
 import { Segment, P } from '@components';
-
 
 import * as styles from './Segments.module.scss';
 
