@@ -1,4 +1,4 @@
-import type { SideEffect } from '@hooks/effects/side/@types';
+import type { FrameEffect } from '@hooks/effects/frame/@types';
 
 import { configureStore } from '@reduxjs/toolkit';
 import createSagaMiddleware from 'redux-saga';
@@ -6,7 +6,7 @@ import createSagaMiddleware from 'redux-saga';
 import { actions, reducer } from './slice';
 import { watchActions } from './watchers';
 
-const firstEffect: SideEffect = {
+const firstEffect: FrameEffect = {
   id: 'first',
   kind: 'shadow',
   shadow: {
@@ -24,7 +24,7 @@ const firstEffect: SideEffect = {
   },
 };
 
-const secondEffect: SideEffect = {
+const secondEffect: FrameEffect = {
   id: 'second',
   kind: 'shadow',
   shadow: {
@@ -36,7 +36,7 @@ const secondEffect: SideEffect = {
   },
 };
 
-const textEffect: SideEffect = {
+const textEffect: FrameEffect = {
   id: 'text',
   kind: 'text',
   text: {
@@ -55,7 +55,7 @@ const createTestStore = () => {
 
   const store = configureStore({
     reducer: {
-      sideEffects: reducer,
+      frameEffects: reducer,
     },
     middleware: (getDefaultMiddleware) => {
       return getDefaultMiddleware().concat(sagaMiddleware);
@@ -87,7 +87,7 @@ test('merges shadow styles and animations without touching other effects', () =>
     },
   }));
 
-  const effects = store.getState().sideEffects.effects;
+  const effects = store.getState().frameEffects.effects;
 
   expect(effects.first.shadow?.thickness).toBe(50);
   expect(effects.first.shadow?.style).toEqual({
@@ -120,7 +120,7 @@ test('updates text independently and preserves its remaining options', () => {
     },
   }));
 
-  const effects = store.getState().sideEffects.effects;
+  const effects = store.getState().frameEffects.effects;
 
   expect(effects.text.text?.leftText).toBe('updated');
   expect(effects.text.text?.rightText).toBe('right');
@@ -138,7 +138,7 @@ test('ignores requests with unknown effect or item IDs', () => {
 
   store.dispatch(actions.setEffect(firstEffect));
 
-  const originalState = store.getState().sideEffects;
+  const originalState = store.getState().frameEffects;
 
   store.dispatch(actions.updateShadow({
     effectId: 'absent',
@@ -164,5 +164,5 @@ test('ignores requests with unknown effect or item IDs', () => {
     },
   }));
 
-  expect(store.getState().sideEffects).toBe(originalState);
+  expect(store.getState().frameEffects).toBe(originalState);
 });

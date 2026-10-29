@@ -2,14 +2,14 @@ import type { CSSProperties, ReactNode } from 'react';
 
 export type FrameSide = 'top' | 'right' | 'bottom' | 'left';
 
-export type SideLayer = 'behind' | 'above';
+export type FrameLayer = 'behind' | 'above';
 
 export type FrameMask = {
   enabled: boolean;
   sides: FrameSide[];
 };
 
-export type SidePosition =
+export type FramePosition =
   | 'top-left'
   | 'top'
   | 'top-right'
@@ -20,49 +20,49 @@ export type SidePosition =
   | 'bottom'
   | 'bottom-right';
 
-export type SideAnimationPreset =
+export type FrameAnimationPreset =
   | 'none'
   | 'pulse'
   | 'police'
   | 'caramel'
   | 'scroll';
 
-export type SideAnimation = {
-  preset?: SideAnimationPreset;
+export type FrameAnimation = {
+  preset?: FrameAnimationPreset;
   duration?: number;
   delay?: number;
   iterations?: number | 'infinite';
   playState?: 'running' | 'paused' | 'stopped';
 };
 
-export type SideElementLayout = {
-  position?: SidePosition;
+export type FrameElementLayout = {
+  position?: FramePosition;
   offsetX?: string;
   offsetY?: string;
   style?: CSSProperties;
   hidden?: boolean;
 };
 
-export type SideShadowItem = SideElementLayout & {
+export type FrameShadowItem = FrameElementLayout & {
   id: string;
   sides: FrameSide[];
   thickness?: number;
-  animation?: SideAnimation;
+  animation?: FrameAnimation;
 };
 
-export type SideTextItem = SideElementLayout & {
+export type FrameTextItem = FrameElementLayout & {
   id: string;
   leftText: string;
   rightText: string;
-  animation?: SideAnimation;
+  animation?: FrameAnimation;
 };
 
-export type SideEffect = {
+export type FrameEffect = {
   id: string;
   kind: 'shadow' | 'text' | 'component';
-  layer?: SideLayer;
-  shadow?: SideShadowItem;
-  text?: SideTextItem;
+  layer?: FrameLayer;
+  shadow?: FrameShadowItem;
+  text?: FrameTextItem;
   Component?: ReactNode;
   frameMask?: FrameMask;
   style?: CSSProperties;

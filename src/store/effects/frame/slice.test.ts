@@ -1,8 +1,8 @@
-import type { SideEffect } from '@hooks/effects/side/@types';
+import type { FrameEffect } from '@hooks/effects/frame/@types';
 
 import { actions, initialState, reducer } from './slice';
 
-const shadowEffect: SideEffect = {
+const shadowEffect: FrameEffect = {
   id: 'shadow',
   kind: 'shadow',
   shadow: {
@@ -12,7 +12,7 @@ const shadowEffect: SideEffect = {
   },
 };
 
-const textEffect: SideEffect = {
+const textEffect: FrameEffect = {
   id: 'text',
   kind: 'text',
   text: {
@@ -66,7 +66,7 @@ test('leaves update commands for the saga', () => {
 });
 
 test('keeps masked and unmasked components independent', () => {
-  const maskedEffect: SideEffect = {
+  const maskedEffect: FrameEffect = {
     id: 'masked',
     kind: 'component',
     frameMask: {
@@ -74,7 +74,7 @@ test('keeps masked and unmasked components independent', () => {
       sides: ['bottom'],
     },
   };
-  const unmaskedEffect: SideEffect = {
+  const unmaskedEffect: FrameEffect = {
     id: 'unmasked',
     kind: 'component',
     frameMask: {

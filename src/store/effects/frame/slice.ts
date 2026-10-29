@@ -1,12 +1,12 @@
 import { type PayloadAction, createSlice } from '@reduxjs/toolkit';
 
-import type { SideEffect } from '@hooks/effects/side/@types';
+import type { FrameEffect } from '@hooks/effects/frame/@types';
 
 import type {
-  SideEffects,
+  FrameEffects,
   State,
-  UpdateSideShadow,
-  UpdateSideText,
+  UpdateFrameShadow,
+  UpdateFrameText,
 } from './@types';
 
 export const initialState: State = {
@@ -14,10 +14,10 @@ export const initialState: State = {
 };
 
 const slice = createSlice({
-  name: '@effects/side',
+  name: '@effects/frame',
   initialState,
   reducers: {
-    setEffect(state, action: PayloadAction<SideEffect>) {
+    setEffect(state, action: PayloadAction<FrameEffect>) {
       state.effects[action.payload.id] = action.payload;
     },
     deleteEffect(state, action: PayloadAction<string>) {
@@ -25,10 +25,10 @@ const slice = createSlice({
     },
     // Сага объединяет изменения и отправляет готовый эффект через setEffect.
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    updateShadow(_state, _action: PayloadAction<UpdateSideShadow>) {},
+    updateShadow(_state, _action: PayloadAction<UpdateFrameShadow>) {},
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    updateText(_state, _action: PayloadAction<UpdateSideText>) {},
-    setEffects(state, action: PayloadAction<SideEffects>) {
+    updateText(_state, _action: PayloadAction<UpdateFrameText>) {},
+    setEffects(state, action: PayloadAction<FrameEffects>) {
       state.effects = action.payload;
     },
   },

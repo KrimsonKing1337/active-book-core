@@ -3,22 +3,22 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import { put, select, takeEvery } from 'redux-saga/effects';
 
 import type {
-  SideEffects,
-  UpdateSideShadow,
-  UpdateSideText,
+  FrameEffects,
+  UpdateFrameShadow,
+  UpdateFrameText,
 } from './@types';
 
 import { actions } from './slice';
 import { selectors } from './selectors';
 
-export function* handleShadowUpdate(action: PayloadAction<UpdateSideShadow>) {
+export function* handleShadowUpdate(action: PayloadAction<UpdateFrameShadow>) {
   const {
     effectId,
     shadowId,
     changes,
   } = action.payload;
 
-  const effects: SideEffects = yield select(selectors.effects);
+  const effects: FrameEffects = yield select(selectors.effects);
 
   const effect = effects[effectId];
   const shadow = effect?.shadow;
@@ -54,14 +54,14 @@ export function* handleShadowUpdate(action: PayloadAction<UpdateSideShadow>) {
   yield put(actions.setEffect(updatedEffect));
 }
 
-export function* handleTextUpdate(action: PayloadAction<UpdateSideText>) {
+export function* handleTextUpdate(action: PayloadAction<UpdateFrameText>) {
   const {
     effectId,
     textId,
     changes,
   } = action.payload;
 
-  const effects: SideEffects = yield select(selectors.effects);
+  const effects: FrameEffects = yield select(selectors.effects);
 
   const effect = effects[effectId];
   const text = effect?.text;

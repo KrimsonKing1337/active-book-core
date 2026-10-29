@@ -2,19 +2,19 @@ import { useCallback } from 'react';
 
 import { useDispatch, useSelector } from '@store';
 
-import { sideEffectsActions, sideEffectsSelectors } from '@store/effects/side';
+import { frameEffectsActions, frameEffectsSelectors } from '@store/effects/frame';
 
-import type { SideShadowItem, SideTextItem } from './@types';
+import type { FrameShadowItem, FrameTextItem } from './@types';
 
-export const useSideEffects = () => {
+export const useFrameEffects = () => {
   const dispatch = useDispatch();
 
-  const effects = useSelector(sideEffectsSelectors.effects);
+  const effects = useSelector(frameEffectsSelectors.effects);
 
   const updateShadow = useCallback((
     effectId: string,
     shadowId: string,
-    changes: Partial<SideShadowItem>,
+    changes: Partial<FrameShadowItem>,
   ) => {
     const update = {
       effectId,
@@ -22,13 +22,13 @@ export const useSideEffects = () => {
       changes,
     };
 
-    dispatch(sideEffectsActions.updateShadow(update));
+    dispatch(frameEffectsActions.updateShadow(update));
   }, [dispatch]);
 
   const updateText = useCallback((
     effectId: string,
     textId: string,
-    changes: Partial<SideTextItem>,
+    changes: Partial<FrameTextItem>,
   ) => {
     const update = {
       effectId,
@@ -36,7 +36,7 @@ export const useSideEffects = () => {
       changes,
     };
 
-    dispatch(sideEffectsActions.updateText(update));
+    dispatch(frameEffectsActions.updateText(update));
   }, [dispatch]);
 
   return {

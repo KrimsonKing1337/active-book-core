@@ -2,14 +2,14 @@ import { useEffect, useRef } from 'react';
 
 import { useDispatch } from '@store';
 
-import { sideEffectsActions } from '@store/effects/side';
+import { frameEffectsActions } from '@store/effects/frame';
 
-import type { SideEffect } from './@types';
+import type { FrameEffect } from './@types';
 
-export const useSideEffect = (effect: SideEffect | null) => {
+export const useFrameEffect = (effect: FrameEffect | null) => {
   const dispatch = useDispatch();
 
-  const registeredEffectRef = useRef<SideEffect | null>(null);
+  const registeredEffectRef = useRef<FrameEffect | null>(null);
   const registeredOptionsKeyRef = useRef('');
 
   useEffect(() => {
@@ -17,7 +17,7 @@ export const useSideEffect = (effect: SideEffect | null) => {
 
     if (!effect) {
       if (registered) {
-        dispatch(sideEffectsActions.deleteEffect(registered.id));
+        dispatch(frameEffectsActions.deleteEffect(registered.id));
       }
 
       registeredEffectRef.current = null;
@@ -49,7 +49,7 @@ export const useSideEffect = (effect: SideEffect | null) => {
     const optionsKey = JSON.stringify(options);
 
     if (registered && registered.id !== effect.id) {
-      dispatch(sideEffectsActions.deleteEffect(registered.id));
+      dispatch(frameEffectsActions.deleteEffect(registered.id));
     }
 
     const optionsChanged = registeredOptionsKeyRef.current !== optionsKey;
@@ -59,7 +59,7 @@ export const useSideEffect = (effect: SideEffect | null) => {
       registeredEffectRef.current = effect;
       registeredOptionsKeyRef.current = optionsKey;
 
-      dispatch(sideEffectsActions.setEffect(effect));
+      dispatch(frameEffectsActions.setEffect(effect));
     }
   }, [dispatch, effect]);
 
@@ -71,7 +71,7 @@ export const useSideEffect = (effect: SideEffect | null) => {
         registeredEffectRef.current = null;
         registeredOptionsKeyRef.current = '';
 
-        dispatch(sideEffectsActions.deleteEffect(registered.id));
+        dispatch(frameEffectsActions.deleteEffect(registered.id));
       }
     };
   }, [dispatch]);
