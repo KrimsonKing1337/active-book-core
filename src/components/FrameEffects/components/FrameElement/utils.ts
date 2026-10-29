@@ -1,6 +1,6 @@
-import type { SidePosition } from '@hooks/effects/side/@types';
+import type { FramePosition } from '@hooks/effects/frame/@types';
 
-export type PositionCoordinates = Record<SidePosition, [string, string, string, string]>;
+export type PositionCoordinates = Record<FramePosition, [string, string, string, string]>;
 
 export const getPositionCoordinatesDefault = (): PositionCoordinates => {
   return {

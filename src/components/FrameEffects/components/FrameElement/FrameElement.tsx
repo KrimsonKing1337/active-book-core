@@ -1,23 +1,23 @@
 import type { CSSProperties, PropsWithChildren } from 'react';
 
-import type { SideElementLayout } from '@hooks/effects/side/@types';
+import type { FrameElementLayout } from '@hooks/effects/frame/@types';
 
 import { getPositionCoordinatesDefault } from './utils';
 
-import * as styles from './SideElement.module.scss';
+import * as styles from './FrameElement.module.scss';
 
-type SideElementProps = PropsWithChildren<SideElementLayout>;
+type FrameElementProps = PropsWithChildren<FrameElementLayout>;
 
 const positionCoordinates = getPositionCoordinatesDefault();
 
-export const SideElement = ({
+export const FrameElement = ({
   children,
   position = 'top-left',
   offsetX = '0px',
   offsetY = '0px',
   style: elementStyle,
   hidden = false,
-}: SideElementProps) => {
+}: FrameElementProps) => {
   if (hidden) {
     return null;
   }
@@ -40,7 +40,7 @@ export const SideElement = ({
   };
 
   return (
-    <div className={styles.SideElement} style={positionStyle}>
+    <div className={styles.FrameElement} style={positionStyle}>
       {children}
     </div>
   );

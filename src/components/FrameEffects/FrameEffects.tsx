@@ -1,26 +1,26 @@
 import type { CSSProperties } from 'react';
 
-import type { SideEffect } from '@hooks/effects/side/@types';
+import type { FrameEffect } from '@hooks/effects/frame/@types';
 
 import { useSelector } from '@store';
 
-import { sideEffectsSelectors } from '@store/effects/side';
+import { frameEffectsSelectors } from '@store/effects/frame';
 
-import { SideElement } from './components/SideElement';
-import { SideShadow, Police, Caramelldansen } from './components/SideShadow';
-import { SideText } from './components/SideText';
+import { FrameElement } from './components/FrameElement';
+import { FrameShadow, Police, Caramelldansen } from './components/FrameShadow';
+import { FrameText } from './components/FrameText';
 
 import { getFrameMaskImage } from './utils';
 
-import * as styles from './SideEffects.module.scss';
+import * as styles from './FrameEffects.module.scss';
 
-export const SideEffects = () => {
-  const effects = Object.values(useSelector(sideEffectsSelectors.effects));
+export const FrameEffects = () => {
+  const effects = Object.values(useSelector(frameEffectsSelectors.effects));
 
   const behindEffects = effects.filter((effectCur) => effectCur.layer !== 'above');
   const aboveEffects = effects.filter((effectCur) => effectCur.layer === 'above');
 
-  const renderEffect = (effectCur: SideEffect) => {
+  const renderEffect = (effectCur: FrameEffect) => {
     const {
       id,
       kind,
@@ -48,7 +48,7 @@ export const SideEffects = () => {
       };
     }
 
-    let ShadowComponent = SideShadow;
+    let ShadowComponent = FrameShadow;
 
     if (shadow?.animation?.preset === 'police') {
       ShadowComponent = Police;
@@ -69,14 +69,14 @@ export const SideEffects = () => {
         className={styles.EffectWrapper}
       >
         {showShadow && (
-          <SideElement {...shadow}>
+          <FrameElement {...shadow}>
             <ShadowComponent options={shadow} />
-          </SideElement>
+          </FrameElement>
         )}
 
         {showText && (
-          <SideElement {...text}>
-            <SideText animation={text.animation} style={text.style}>
+          <FrameElement {...text}>
+            <FrameText animation={text.animation} style={text.style}>
               <span>
                 {text.leftText}
               </span>
@@ -84,8 +84,8 @@ export const SideEffects = () => {
               <span>
                 {text.rightText}
               </span>
-            </SideText>
-          </SideElement>
+            </FrameText>
+          </FrameElement>
         )}
 
         {componentContent}
@@ -94,7 +94,7 @@ export const SideEffects = () => {
   };
 
   return (
-    <div id="side-effects" className={styles.SideEffects} inert>
+    <div id="frame-effects" className={styles.FrameEffects} inert>
       <div className={styles.BehindLayer} data-frame-layer="behind">
         {behindEffects.map(renderEffect)}
       </div>
