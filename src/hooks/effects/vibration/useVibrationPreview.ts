@@ -10,7 +10,6 @@ import { useAppMode } from '@components/App/AppModeContext';
 
 import { useSideEffect } from '@hooks/effects/side/useSideEffect';
 
-
 export const useVibrationPreview = () => {
   const dispatch = useDispatch();
 
