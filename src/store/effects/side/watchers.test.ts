@@ -11,6 +11,7 @@ const firstEffect: SideEffect = {
   kind: 'shadow',
   shadow: {
     id: 'glow',
+    sides: ['left', 'right'],
     thickness: 30,
     style: {
       color: '#ff0000',
@@ -28,6 +29,7 @@ const secondEffect: SideEffect = {
   kind: 'shadow',
   shadow: {
     id: 'glow',
+    sides: ['bottom'],
     style: {
       color: '#0000ff',
     },

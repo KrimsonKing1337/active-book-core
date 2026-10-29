@@ -1,5 +1,7 @@
 import type { CSSProperties, ReactNode } from 'react';
 
+export type FrameSide = 'top' | 'right' | 'bottom' | 'left';
+
 export type SidePosition =
   | 'top-left'
   | 'top'
@@ -36,6 +38,7 @@ export type SideElementLayout = {
 
 export type SideShadowItem = SideElementLayout & {
   id: string;
+  sides: FrameSide[];
   thickness?: number;
   animation?: SideAnimation;
 };
