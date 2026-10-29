@@ -91,16 +91,15 @@ export const SideEffects = () => {
         {componentContent}
       </div>
     );
-
   };
 
   return (
     <div id="side-effects" className={styles.SideEffects} inert>
-      <div className={styles.BehindLayer}>
+      <div className={styles.BehindLayer} data-frame-layer="behind">
         {behindEffects.map(renderEffect)}
       </div>
 
-      <div className={styles.AboveLayer}>
+      <div className={styles.AboveLayer} data-frame-layer="above">
         {aboveEffects.map(renderEffect)}
       </div>
     </div>

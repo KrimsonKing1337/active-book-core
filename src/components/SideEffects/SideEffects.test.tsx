@@ -31,8 +31,13 @@ test('renders effects in the correct frame layers', () => {
 
   const markup = renderToStaticMarkup(<SideEffects />);
 
-  expect(markup).toContain('id="side-effects"');
-  expect(markup.indexOf('BEHIND_EFFECT')).toBeLessThan(markup.indexOf('ABOVE_EFFECT'));
+  const behindMarkup = markup.split('data-frame-layer="behind"')[1].split('data-frame-layer="above"')[0];
+  const aboveMarkup = markup.split('data-frame-layer="above"')[1];
+
+  expect(behindMarkup).toContain('BEHIND_EFFECT');
+  expect(behindMarkup).not.toContain('ABOVE_EFFECT');
+  expect(aboveMarkup).toContain('ABOVE_EFFECT');
+  expect(aboveMarkup).not.toContain('BEHIND_EFFECT');
 });
 
 test('places a programmatic effect behind the narrative by default', () => {
@@ -46,5 +51,7 @@ test('places a programmatic effect behind the narrative by default', () => {
 
   const markup = renderToStaticMarkup(<SideEffects />);
 
-  expect(markup).toContain('DEFAULT_EFFECT');
+  const behindMarkup = markup.split('data-frame-layer="behind"')[1].split('data-frame-layer="above"')[0];
+
+  expect(behindMarkup).toContain('DEFAULT_EFFECT');
 });
