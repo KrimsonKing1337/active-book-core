@@ -29,6 +29,7 @@ export const useSideEffect = (effect: SideEffect | null) => {
     const {
       id,
       kind,
+      layer,
       shadow,
       text,
       frameMask,
@@ -38,6 +39,7 @@ export const useSideEffect = (effect: SideEffect | null) => {
     const options = {
       id,
       kind,
+      layer,
       shadow,
       text,
       frameMask,
