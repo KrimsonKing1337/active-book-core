@@ -17,8 +17,9 @@ import * as styles from './FrameEffects.module.scss';
 export const FrameEffects = () => {
   const effects = Object.values(useSelector(frameEffectsSelectors.effects));
 
-  const behindEffects = effects.filter((effectCur) => effectCur.layer !== 'above');
+  const behindEffects = effects.filter((effectCur) => !effectCur.layer || effectCur.layer === 'behind');
   const aboveEffects = effects.filter((effectCur) => effectCur.layer === 'above');
+  const overlayEffects = effects.filter((effectCur) => effectCur.layer === 'overlay');
 
   const renderEffect = (effectCur: FrameEffect) => {
     const {
@@ -101,6 +102,10 @@ export const FrameEffects = () => {
 
       <div className={styles.AboveLayer} data-frame-layer="above">
         {aboveEffects.map(renderEffect)}
+      </div>
+
+      <div className={styles.OverlayLayer} data-frame-layer="overlay">
+        {overlayEffects.map(renderEffect)}
       </div>
     </div>
   );

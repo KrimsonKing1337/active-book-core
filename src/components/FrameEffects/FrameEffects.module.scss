@@ -12,7 +12,8 @@
 }
 
 .BehindLayer,
-.AboveLayer {
+.AboveLayer,
+.OverlayLayer {
   position: absolute;
   inset: 0;
 }
@@ -23,4 +24,8 @@
 
 .AboveLayer {
   z-index: 2;
+}
+
+.OverlayLayer {
+  z-index: 3;
 }

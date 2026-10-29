@@ -2,7 +2,8 @@ import type { CSSProperties, ReactNode } from 'react';
 
 export type FrameSide = 'top' | 'right' | 'bottom' | 'left';
 
-export type FrameLayer = 'behind' | 'above';
+// The overlay layer is reserved for system feedback and is not author-editable.
+export type FrameLayer = 'behind' | 'above' | 'overlay';
 
 export type FrameMask = {
   enabled: boolean;

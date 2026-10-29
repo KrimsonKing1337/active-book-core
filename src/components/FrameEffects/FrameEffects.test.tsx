@@ -17,6 +17,12 @@ test('renders effects in the correct frame layers', () => {
     layer: 'behind',
     Component: <span>BEHIND_EFFECT</span>,
   };
+  const overlayEffect: FrameEffect = {
+    id: 'overlay',
+    kind: 'component',
+    layer: 'overlay',
+    Component: <span>OVERLAY_EFFECT</span>,
+  };
   const aboveEffect: FrameEffect = {
     id: 'above',
     kind: 'component',
@@ -27,17 +33,22 @@ test('renders effects in the correct frame layers', () => {
   jest.mocked(useSelector).mockReturnValue({
     behind: behindEffect,
     above: aboveEffect,
+    overlay: overlayEffect,
   });
 
   const markup = renderToStaticMarkup(<FrameEffects />);
 
   const behindMarkup = markup.split('data-frame-layer="behind"')[1].split('data-frame-layer="above"')[0];
-  const aboveMarkup = markup.split('data-frame-layer="above"')[1];
+  const aboveMarkup = markup.split('data-frame-layer="above"')[1].split('data-frame-layer="overlay"')[0];
+  const overlayMarkup = markup.split('data-frame-layer="overlay"')[1];
 
   expect(behindMarkup).toContain('BEHIND_EFFECT');
   expect(behindMarkup).not.toContain('ABOVE_EFFECT');
   expect(aboveMarkup).toContain('ABOVE_EFFECT');
   expect(aboveMarkup).not.toContain('BEHIND_EFFECT');
+  expect(aboveMarkup).not.toContain('OVERLAY_EFFECT');
+  expect(overlayMarkup).toContain('OVERLAY_EFFECT');
+  expect(overlayMarkup).not.toContain('ABOVE_EFFECT');
 });
 
 test('places a programmatic effect behind the narrative by default', () => {
