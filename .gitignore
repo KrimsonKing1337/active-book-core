@@ -5,3 +5,4 @@ lib
 
 *.bak
 *.tgz
+test-report.xml
