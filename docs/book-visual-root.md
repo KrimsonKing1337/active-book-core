@@ -74,9 +74,9 @@ Background/Frame renderers, hooks, Redux slices, and page-unmount cleanup are un
 `PageWrapper` still resets its page-owned segments and visual effect stores when it
 unmounts. That cleanup has not moved to `BookVisualRoot`.
 
-Persistence of the root does not establish continuous range animation. Common
-registration and page/range reconciliation remain later stages. Placement surfaces
-and masks are supplied independently by the stage 3 host input.
+Persistence of the root does not establish continuous range animation. Book-owned
+registration and page/range activation now use the [stage 4 session](visual-lifecycle.md).
+The existing legacy stores still retain their original cleanup.
 
 ## Checks
 

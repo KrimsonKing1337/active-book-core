@@ -1,5 +1,8 @@
 # Visual placement surfaces (stage 3)
 
+Book-owned registration and page/range activation are described in
+[visual lifecycle](visual-lifecycle.md).
+
 `BookVisualRoot` accepts a controlled `surfaces` list. `App` and `AppWrapper` forward
 it as `visualSurfaces`. A `VisualSurfaceItem` contains `id`, `placement`, `visibility`,
 `depth`, and `content: ReactNode`. This is a host rendering input, not an instance

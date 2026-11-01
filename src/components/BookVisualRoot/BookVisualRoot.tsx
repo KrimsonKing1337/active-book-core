@@ -8,7 +8,10 @@ import type { VisualSurfaceItem } from '@components/VisualSurfaces';
 
 import { VisualSurfaces } from '@components/VisualSurfaces';
 
+import type { VisualEffects } from '@@/visualEffects';
+
 import { useBookGeometry } from './geometry';
+import { useVisualEffectSurfaces } from './hooks/useVisualEffectSurfaces';
 
 import * as styles from './BookVisualRoot.module.scss';
 
@@ -16,19 +19,44 @@ export type BookVisualRootProps = HTMLAttributes<HTMLDivElement> & {
   ref?: Ref<HTMLDivElement>;
   surfaces?: readonly VisualSurfaceItem[];
   inverseColors?: boolean;
+  visualEffects?: VisualEffects;
+  page?: number;
 };
 
 export const BookVisualRoot = ({
   children,
   className = '',
   ref,
-  surfaces = [],
+  surfaces: suppliedSurfaces = [],
+  visualEffects,
+  page = 0,
   inverseColors = false,
   ...etc
 }: BookVisualRootProps) => {
   const bookRef = useRef<HTMLDivElement>(null);
+  const shouldMeasure = suppliedSurfaces.length > 0 || !!visualEffects;
+
+  const geometry = useBookGeometry(bookRef, shouldMeasure);
+
+  const registeredSurfaces = useVisualEffectSurfaces({
+    visualEffects,
+    page,
+    geometry,
+  });
+
+  const surfaces = [...suppliedSurfaces, ...registeredSurfaces];
+
   const hasSurfaces = surfaces.length > 0;
-  const geometry = useBookGeometry(bookRef, hasSurfaces);
+
+  const ids = new Set<string>();
+
+  for (const surfaceCur of surfaces) {
+    if (ids.has(surfaceCur.id)) {
+      throw new Error(`Duplicate visual surface ID in book: ${surfaceCur.id}`);
+    }
+
+    ids.add(surfaceCur.id);
+  }
 
   const rootClassNames = classNames({
     [styles.BookVisualRoot]: true,

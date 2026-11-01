@@ -1,0 +1,1 @@
+export { StaticRenderer } from './StaticRenderer';
