@@ -4,6 +4,8 @@ node_modules
 src
 tgz
 test-report.xml
+tests
+scripts/bookVisualRoot.browser.test.js
 
 !lib/src
 !lib-esm/src

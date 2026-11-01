@@ -1,4 +1,6 @@
-import { type PropsWithChildren, useEffect, useRef } from 'react';
+import type { PropsWithChildren, ReactNode, Ref } from 'react';
+
+import { useEffect } from 'react';
 
 import classNames from 'classnames';
 import { setWasmUrl } from '@lottiefiles/dotlottie-react';
@@ -8,14 +10,15 @@ import type { Config, RangeEffects, TableOfContents } from '@types';
 
 import { useDispatch, useSelector } from '@store';
 
-import { useAppMode } from '@components/App/AppModeContext';
-
 import { mainActions, mainSelectors } from '@store/main';
 import { audioEffectsSelectors } from '@store/effects/audio/audio';
 import { audioBgEffectsSelectors } from '@store/effects/audio/audioBg';
 
 import { useEffectsInRange } from '@hooks/effects/range';
 import { useGoToPage } from '@hooks/control/useGoToPage';
+
+import { BookVisualRoot } from '@components/BookVisualRoot';
+import { useAppMode } from '@components/App/AppModeContext';
 
 import { removeCssHover } from '@utils/touch/removeCssHover';
 import { addKeyboardControl } from '@utils/control/keyboardControl';
@@ -39,9 +42,18 @@ export type AppWrapperProps = {
   config: Config;
   tableOfContents: TableOfContents;
   rangeEffects: RangeEffects;
+  editorTools?: ReactNode;
+  ref?: Ref<HTMLDivElement>;
 };
 
-export const AppWrapper = ({ children, config, tableOfContents, rangeEffects }: PropsWithChildren<AppWrapperProps>) => {
+export const AppWrapper = ({
+  children,
+  config,
+  tableOfContents,
+  rangeEffects,
+  editorTools,
+  ref,
+}: PropsWithChildren<AppWrapperProps>) => {
   const dispatch = useDispatch();
   const appMode = useAppMode();
 
@@ -142,8 +154,6 @@ export const AppWrapper = ({ children, config, tableOfContents, rangeEffects }: 
   useBeforeUnloadHandler();
   useEffectsInRange(rangeEffects);
 
-  const ref = useRef<HTMLDivElement>(null);
-
   const appWrapperClassNames = classNames({
     [styles.AppWrapper]: true,
     [styles.isLoading]: showLoader,
@@ -151,8 +161,12 @@ export const AppWrapper = ({ children, config, tableOfContents, rangeEffects }: 
 
   return (
     <>
-      <div ref={ref} className={appWrapperClassNames}>
-        {children}
+      <div className={appWrapperClassNames}>
+        <BookVisualRoot ref={ref}>
+          {children}
+        </BookVisualRoot>
+
+        {editorTools}
       </div>
 
       <ToastContainer

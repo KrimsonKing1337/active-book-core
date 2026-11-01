@@ -152,4 +152,11 @@ export default defineConfig([globIgnores, {
     'jest/prefer-to-have-length': 'warn',
     'jest/valid-expect': 'error',
   },
+}, {
+  files: ['tests/**/*.{ts,tsx}'],
+  languageOptions: {
+    parserOptions: {
+      project: './tests/tsconfig.json',
+    },
+  },
 }]);
