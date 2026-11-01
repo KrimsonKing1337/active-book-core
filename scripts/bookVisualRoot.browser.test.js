@@ -11,6 +11,7 @@ const sourcePath = (name) => fileURLToPath(new URL(`../src/${name}`, import.meta
 const aliases = ['assets', 'components', 'pages', 'hooks', 'utils', 'store', 'styles'];
 const alias = Object.fromEntries(aliases.map((name) => [`@${name}`, sourcePath(name)]));
 
+alias['@@'] = sourcePath('');
 alias['@types'] = sourcePath('@types.ts');
 alias['~styles'] = sourcePath('styles');
 alias['~assets'] = sourcePath('assets');
@@ -114,6 +115,16 @@ test('persistent book root and existing page rendering in Chromium', async (cont
           assert.equal(await page.locator(`[data-frame-layer="${layer}"] [data-effect-id="${layer}-one"]`).count(), 1);
         }
         assert.equal(await page.locator('#background-effects').evaluate((element) => getComputedStyle(element).zIndex), '0');
+
+        const fontButton = page.locator('[data-welcome-tour-id="font"] > div').last();
+        await fontButton.click();
+        const fontScale = await page.locator('html').evaluate((element) => getComputedStyle(element)
+          .getPropertyValue('--font-scale'));
+        await page.getByTestId('grow-book').click();
+        await page.getByText('1 из 5', { exact: true }).waitFor();
+        assert.equal(await page.locator('html').evaluate((element) => getComputedStyle(element)
+          .getPropertyValue('--font-scale')), fontScale, 'page count updates preserve reader settings');
+        assert.equal(await book.evaluate((element) => element === document.querySelector('[data-book-region="book"]')), true);
 
         await page.getByTestId('loading').click();
         await page.waitForFunction(() => JSON.parse(document.querySelector('[data-testid="geometry"]').textContent)
