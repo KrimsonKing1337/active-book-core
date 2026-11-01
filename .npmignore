@@ -2,6 +2,8 @@
 tsconfig.json
 node_modules
 src
+tgz
+test-report.xml
 
 !lib/src
 !lib-esm/src
