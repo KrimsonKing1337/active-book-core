@@ -25,6 +25,8 @@ import { removeCssHover } from '@utils/touch/removeCssHover';
 import { addKeyboardControl } from '@utils/control/keyboardControl';
 import { hideAddressBarInMobileDevices } from '@utils/mobile/hideAddressBarInMobileDevices';
 
+import type { VisualEffects } from '../../visualEffects';
+
 import {
   useAllPagesSeen,
   useBeforeUnloadHandler,
@@ -46,6 +48,7 @@ export type AppWrapperProps = {
   editorTools?: ReactNode;
   ref?: Ref<HTMLDivElement>;
   visualSurfaces?: readonly VisualSurfaceItem[];
+  visualEffects?: VisualEffects;
 };
 
 export const AppWrapper = ({
@@ -56,6 +59,7 @@ export const AppWrapper = ({
   editorTools,
   ref,
   visualSurfaces,
+  visualEffects,
 }: PropsWithChildren<AppWrapperProps>) => {
   const dispatch = useDispatch();
   const appMode = useAppMode();
@@ -169,6 +173,8 @@ export const AppWrapper = ({
         <BookVisualRoot
           ref={ref}
           surfaces={visualSurfaces}
+          visualEffects={visualEffects}
+          page={page}
           inverseColors={inverseColors}
         >
           {children}

@@ -32,3 +32,5 @@ export * from './WelcomeTour';
 export * from './Typography';
 export * from './Slider';
 export * from './ProxyHooks';
+export { createVisualEffects } from '../visualEffects';
+export type { VisualEffects, CreateVisualEffectsOptions, VisualEffectChanges } from '../visualEffects';

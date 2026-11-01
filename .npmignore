@@ -11,3 +11,4 @@ scripts/browserFixture.js
 
 !lib/src
 !lib-esm/src
+scripts/visualLifecycle.browser.test.js

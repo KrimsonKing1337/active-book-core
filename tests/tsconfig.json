@@ -3,5 +3,13 @@
   "compilerOptions": {
     "noEmit": true
   },
-  "include": ["../d.ts", "bookVisualRoot/**/*.ts", "bookVisualRoot/**/*.tsx", "visualPlacement/**/*.ts", "visualPlacement/**/*.tsx"]
+  "include": [
+    "../d.ts",
+    "bookVisualRoot/**/*.ts",
+    "bookVisualRoot/**/*.tsx",
+    "visualPlacement/**/*.ts",
+    "visualPlacement/**/*.tsx",
+    "visualLifecycle/**/*.ts",
+    "visualLifecycle/**/*.tsx"
+  ]
 }

@@ -11,6 +11,8 @@ import { StoreProvider } from '@store';
 import type { VisualSurfaceItem } from '@components/VisualSurfaces';
 import { AppWrapper } from '@components/AppWrapper';
 
+import type { VisualEffects } from '../../visualEffects';
+
 import { AppModeContext } from './AppModeContext';
 import { Routes } from './Routes';
 
@@ -21,6 +23,7 @@ export type AppProps = {
   rangeEffects: RangeEffects;
   editorTools?: ReactNode;
   visualSurfaces?: readonly VisualSurfaceItem[];
+  visualEffects?: VisualEffects;
 };
 
 export const App = ({
@@ -31,6 +34,7 @@ export const App = ({
   rangeEffects,
   editorTools,
   visualSurfaces,
+  visualEffects,
 }: PropsWithChildren<AppProps>) => {
   return (
     <AppModeContext.Provider value={appMode}>
@@ -42,6 +46,7 @@ export const App = ({
             rangeEffects={rangeEffects}
             editorTools={editorTools}
             visualSurfaces={visualSurfaces}
+            visualEffects={visualEffects}
           >
             <Suspense fallback={null}>
               <Routes>
