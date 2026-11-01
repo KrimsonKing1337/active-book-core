@@ -40,6 +40,7 @@ export const resolveVisualSurface = ({ item, geometry }: ResolveVisualSurfacePar
 
     visibilityStyle.maskImage = getFrameMaskImage([...item.visibility.sides]);
     visibilityStyle.maskComposite = 'add';
+
     visibilityStyle['--frame-top'] = `${insets.top}px`;
     visibilityStyle['--frame-right'] = `${insets.right}px`;
     visibilityStyle['--frame-bottom'] = `${insets.bottom}px`;

@@ -1,13 +1,16 @@
-import { useVibrationPreview } from '../../../src/hooks/effects/vibration/useVibrationPreview';
-import { useFlashlight } from '../../../src/hooks/effects/flashlight/useFlashlight';
-import { useInverseColor } from '../../../src/hooks/effects/useInverseColor';
+import { useVibrationPreview, useFlashlight } from '@hooks/effects';
+import { useInverseColor } from '@hooks/effects/useInverseColor';
 
 export const PlacementControls = () => {
   const { start, stop } = useVibrationPreview();
   const { flashlightOn, flashlightOff } = useFlashlight({ withFrameShadow: true, speed: 1000 });
   const { inverseColorOn, inverseColorOff } = useInverseColor();
+
   const handlePreview = () => start(60000);
-  const handleFlash = () => { void flashlightOn(); };
+
+  const handleFlash = () => {
+    void flashlightOn();
+  };
 
   const style = {
     position: 'fixed' as const,

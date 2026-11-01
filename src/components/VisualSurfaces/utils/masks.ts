@@ -9,6 +9,7 @@ export const resolveShapeMask = (mask: VisualMask, region: BookRegionRect): stri
     const x = resolveVisualLength(mask.center.x, region.width);
     const y = resolveVisualLength(mask.center.y, region.height);
     const radius = resolveVisualLength(mask.radius, Math.min(region.width, region.height));
+
     const hasFiniteCircle = [x, y, radius].every(Number.isFinite);
 
     if (!hasFiniteCircle || radius < 0) {

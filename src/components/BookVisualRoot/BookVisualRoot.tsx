@@ -20,7 +20,7 @@ export type BookVisualRootProps = HTMLAttributes<HTMLDivElement> & {
 
 export const BookVisualRoot = ({
   children,
-  className,
+  className = '',
   ref,
   surfaces = [],
   inverseColors = false,
@@ -29,7 +29,10 @@ export const BookVisualRoot = ({
   const bookRef = useRef<HTMLDivElement>(null);
   const hasSurfaces = surfaces.length > 0;
   const geometry = useBookGeometry(bookRef, hasSurfaces);
-  const rootClassNames = classNames(styles.BookVisualRoot, className, {
+
+  const rootClassNames = classNames({
+    [styles.BookVisualRoot]: true,
+    [className]: !!className,
     [styles.inverseColors]: inverseColors,
   });
 
@@ -42,6 +45,7 @@ export const BookVisualRoot = ({
       if (cleanup) {
         return () => {
           bookRef.current = null;
+
           cleanup();
         };
       }

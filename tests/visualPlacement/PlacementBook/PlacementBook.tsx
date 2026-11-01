@@ -2,13 +2,13 @@ import { useEffect, useRef, useState } from 'react';
 
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 
-import type { Config } from '../../../src/@types';
+import type { Config } from '@types';
 import type { SurfaceSpec } from '../@types';
 
-import { StoreProvider } from '../../../src/store';
-import { AppWrapper } from '../../../src/components/AppWrapper';
-import { AppModeContext } from '../../../src/components/App/AppModeContext';
-import { useBookGeometry } from '../../../src/components/BookVisualRoot';
+import { StoreProvider } from '@store';
+
+import { AppModeContext } from '@components/App/AppModeContext';
+import { AppWrapper, useBookGeometry } from '@components';
 
 import { TestControls } from '../../bookVisualRoot/TestControls';
 import { TestPage } from '../../bookVisualRoot/TestPage';
@@ -34,16 +34,17 @@ export const PlacementBook = () => {
   const surfaces = specs.map((specCur) => {
     const { background, ...item } = specCur;
 
+    const content = <Probe id={item.id} background={background} />;
+
     return {
       ...item,
-      content: <Probe id={item.id} background={background} />,
+      content,
     };
   });
 
   const tools = (
     <>
       <TestControls />
-
       <PlacementControls />
 
       <output data-testid="geometry" hidden>

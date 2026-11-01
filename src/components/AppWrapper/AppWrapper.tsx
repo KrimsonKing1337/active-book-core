@@ -1,5 +1,4 @@
 import type { PropsWithChildren, ReactNode, Ref } from 'react';
-
 import { useEffect } from 'react';
 
 import classNames from 'classnames';
@@ -18,8 +17,8 @@ import { effectsSelectors } from '@store/effects/common';
 import { useEffectsInRange } from '@hooks/effects/range';
 import { useGoToPage } from '@hooks/control/useGoToPage';
 
-import { BookVisualRoot } from '@components/BookVisualRoot';
 import type { VisualSurfaceItem } from '@components/VisualSurfaces';
+import { BookVisualRoot } from '@components/BookVisualRoot';
 import { useAppMode } from '@components/App/AppModeContext';
 
 import { removeCssHover } from '@utils/touch/removeCssHover';
@@ -167,7 +166,11 @@ export const AppWrapper = ({
   return (
     <>
       <div className={appWrapperClassNames}>
-        <BookVisualRoot ref={ref} surfaces={visualSurfaces} inverseColors={inverseColors}>
+        <BookVisualRoot
+          ref={ref}
+          surfaces={visualSurfaces}
+          inverseColors={inverseColors}
+        >
           {children}
         </BookVisualRoot>
 

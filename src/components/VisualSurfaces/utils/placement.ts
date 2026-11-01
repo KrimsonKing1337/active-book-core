@@ -15,7 +15,7 @@ const anchorPoints: Record<AnchorPoint, readonly [number, number]> = {
 };
 
 export const resolveVisualLength = (length: VisualLength, reference: number): number => {
-  return length.unit === '%' ? reference * length.value / 100 : length.value;
+  return length.unit === '%' ? (reference * length.value / 100) : length.value;
 };
 
 export const resolvePlacement = (placement: VisualPlacement, geometry: BookGeometry): BookRegionRect | null => {
@@ -30,6 +30,7 @@ export const resolvePlacement = (placement: VisualPlacement, geometry: BookGeome
   const height = resolveVisualLength(placement.size.height, coordinates.height);
   const offsetX = resolveVisualLength(placement.offset.x, coordinates.width);
   const offsetY = resolveVisualLength(placement.offset.y, coordinates.height);
+
   const [anchorX, anchorY] = anchorPoints[placement.anchor.point];
   const [originX, originY] = anchorPoints[placement.origin];
 

@@ -8,8 +8,8 @@ import type { AppMode, RangeEffects, Config, TableOfContents } from '@types';
 
 import { StoreProvider } from '@store';
 
-import { AppWrapper } from '@components/AppWrapper';
 import type { VisualSurfaceItem } from '@components/VisualSurfaces';
+import { AppWrapper } from '@components/AppWrapper';
 
 import { AppModeContext } from './AppModeContext';
 import { Routes } from './Routes';

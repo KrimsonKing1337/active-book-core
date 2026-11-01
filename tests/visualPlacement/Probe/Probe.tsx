@@ -7,6 +7,7 @@ type ProbeProps = {
 
 export const Probe = ({ id, background }: ProbeProps) => {
   const [token] = useState(() => crypto.randomUUID());
+
   const style = {
     width: '100%',
     height: '100%',

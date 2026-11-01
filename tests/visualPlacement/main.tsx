@@ -2,7 +2,7 @@ import { createRoot } from 'react-dom/client';
 
 import { PlacementBook } from './PlacementBook';
 
-import '../../src/styles/styles.scss';
+import '@styles/styles.scss';
 
 const root = document.getElementById('root');
 

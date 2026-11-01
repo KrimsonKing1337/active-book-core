@@ -7,6 +7,7 @@ import type { BookGeometry } from '@components/BookVisualRoot/geometry';
 import type { VisualSurfaceItem } from './@types';
 
 import { VisualSurface } from './components/VisualSurface';
+
 import { compareVisualSurfaces } from './utils/order';
 
 import * as styles from './VisualSurfaces.module.scss';
@@ -22,7 +23,10 @@ export const VisualSurfaces = ({ items, geometry }: VisualSurfacesProps) => {
   return (
     <>
       {planes.map((planeCur) => {
-        const planeItems = items.filter((itemCur) => itemCur.depth.plane === planeCur).sort(compareVisualSurfaces);
+        const planeItems = items
+          .filter((itemCur) => itemCur.depth.plane === planeCur)
+          .sort(compareVisualSurfaces);
+
         const planeClassNames = classNames(styles.Plane, styles[planeCur]);
 
         return (

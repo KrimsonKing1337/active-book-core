@@ -1,4 +1,4 @@
-import type { VisualSurfaceItem } from '../../src/components/VisualSurfaces';
+import type { VisualSurfaceItem } from '@components';
 
 export type SurfaceSpec = Omit<VisualSurfaceItem, 'content'> & {
   background: string;
