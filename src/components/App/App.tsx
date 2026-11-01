@@ -8,6 +8,7 @@ import type { AppMode, RangeEffects, Config, TableOfContents } from '@types';
 
 import { StoreProvider } from '@store';
 
+import type { VisualSurfaceItem } from '@components/VisualSurfaces';
 import { AppWrapper } from '@components/AppWrapper';
 
 import { AppModeContext } from './AppModeContext';
@@ -19,6 +20,7 @@ export type AppProps = {
   tableOfContents: TableOfContents;
   rangeEffects: RangeEffects;
   editorTools?: ReactNode;
+  visualSurfaces?: readonly VisualSurfaceItem[];
 };
 
 export const App = ({
@@ -28,6 +30,7 @@ export const App = ({
   tableOfContents,
   rangeEffects,
   editorTools,
+  visualSurfaces,
 }: PropsWithChildren<AppProps>) => {
   return (
     <AppModeContext.Provider value={appMode}>
@@ -38,6 +41,7 @@ export const App = ({
             tableOfContents={tableOfContents}
             rangeEffects={rangeEffects}
             editorTools={editorTools}
+            visualSurfaces={visualSurfaces}
           >
             <Suspense fallback={null}>
               <Routes>

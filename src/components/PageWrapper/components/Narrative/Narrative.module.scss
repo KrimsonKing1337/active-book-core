@@ -2,7 +2,7 @@
 
 .Narrative {
   position: relative;
-  z-index: 1;
+  z-index: var(--book-narrative-layer, 1);
 
   width: 100%;
   height: 100%;

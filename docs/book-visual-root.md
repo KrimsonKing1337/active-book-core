@@ -24,10 +24,11 @@ AppWrapper
 └─ editorTools                            optional editor-owned UI, outside book
 ```
 
-The page DOM, overflow rules, isolation, stacking order, and controls stay together.
 Controls are included in `book` geometry and excluded from `page` geometry without
-being reparented. No new clipping or stacking context is applied to the book root.
-The loader and start-screen audio unlock retain their existing owners.
+being reparented. Stage 3 adds root-owned placement surfaces and an isolated,
+clipped book boundary. Page/frame stacking contexts release their layers into that
+root; see [visual placement](visual-placement.md) for the complete painting order.
+The page overflow rules, loader and start-screen audio unlock retain their owners.
 
 ## Geometry access
 
@@ -56,8 +57,8 @@ viewport. `frameInsets` reads Narrative's computed padding, which already resolv
 the existing `--frame-*` variables and responsive `clamp()` values.
 
 No relationship between coordinate selection and visibility is imposed. Existing
-Narrative overflow still behaves as before; future root-level effect surfaces will
-choose their own visibility independently.
+Narrative overflow still behaves as before; root-level effect surfaces choose their
+own visibility independently.
 
 The hook uses one ResizeObserver for the root and fixed region elements, captured
 scroll events, and window resize events. A local child-list MutationObserver detects
@@ -74,8 +75,8 @@ Background/Frame renderers, hooks, Redux slices, and page-unmount cleanup are un
 unmounts. That cleanup has not moved to `BookVisualRoot`.
 
 Persistence of the root does not establish continuous range animation. Common
-registration, page/range reconciliation, root-level effect surfaces, masks, and
-placement are later stages.
+registration and page/range reconciliation remain later stages. Placement surfaces
+and masks are supplied independently by the stage 3 host input.
 
 ## Checks
 

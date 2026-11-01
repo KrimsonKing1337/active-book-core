@@ -6,6 +6,8 @@ tgz
 test-report.xml
 tests
 scripts/bookVisualRoot.browser.test.js
+scripts/visualPlacement.browser.test.js
+scripts/browserFixture.js
 
 !lib/src
 !lib-esm/src

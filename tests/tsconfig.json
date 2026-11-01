@@ -3,5 +3,5 @@
   "compilerOptions": {
     "noEmit": true
   },
-  "include": ["../d.ts", "bookVisualRoot/**/*.ts", "bookVisualRoot/**/*.tsx"]
+  "include": ["../d.ts", "bookVisualRoot/**/*.ts", "bookVisualRoot/**/*.tsx", "visualPlacement/**/*.ts", "visualPlacement/**/*.tsx"]
 }

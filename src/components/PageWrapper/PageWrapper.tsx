@@ -5,7 +5,6 @@ import classNames from 'classnames';
 import { useDispatch, useSelector } from '@store';
 
 import { mainSelectors } from '@store/main';
-import { effectsSelectors } from '@store/effects/common';
 import { segmentsActions } from '@store/segments';
 import { backgroundEffectsActions } from '@store/effects/background';
 import { frameEffectsActions } from '@store/effects/frame';
@@ -34,7 +33,6 @@ export const PageWrapper = ({
 }: PropsWithChildren<PageWrapperProps>) => {
   const dispatch = useDispatch();
 
-  const inverseColorIsActive = useSelector(effectsSelectors.inverseColorIsActive);
   const showLoader = useSelector(mainSelectors.showLoader);
 
   useEffect(() => {
@@ -47,7 +45,6 @@ export const PageWrapper = ({
 
   const pageWrapperClassNames = classNames({
     [styles.PageWrapper]: true,
-    [styles.inverseColorIsActive]: inverseColorIsActive,
   });
 
   const mainContendClassNames = classNames({
