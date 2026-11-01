@@ -13,11 +13,13 @@ import { useDispatch, useSelector } from '@store';
 import { mainActions, mainSelectors } from '@store/main';
 import { audioEffectsSelectors } from '@store/effects/audio/audio';
 import { audioBgEffectsSelectors } from '@store/effects/audio/audioBg';
+import { effectsSelectors } from '@store/effects/common';
 
 import { useEffectsInRange } from '@hooks/effects/range';
 import { useGoToPage } from '@hooks/control/useGoToPage';
 
 import { BookVisualRoot } from '@components/BookVisualRoot';
+import type { VisualSurfaceItem } from '@components/VisualSurfaces';
 import { useAppMode } from '@components/App/AppModeContext';
 
 import { removeCssHover } from '@utils/touch/removeCssHover';
@@ -44,6 +46,7 @@ export type AppWrapperProps = {
   rangeEffects: RangeEffects;
   editorTools?: ReactNode;
   ref?: Ref<HTMLDivElement>;
+  visualSurfaces?: readonly VisualSurfaceItem[];
 };
 
 export const AppWrapper = ({
@@ -53,6 +56,7 @@ export const AppWrapper = ({
   rangeEffects,
   editorTools,
   ref,
+  visualSurfaces,
 }: PropsWithChildren<AppWrapperProps>) => {
   const dispatch = useDispatch();
   const appMode = useAppMode();
@@ -62,6 +66,7 @@ export const AppWrapper = ({
   const isLoading = useSelector(mainSelectors.isPending);
   const showLoader = useSelector(mainSelectors.showLoader);
   const page = useSelector(mainSelectors.page);
+  const inverseColors = useSelector(effectsSelectors.inverseColorIsActive);
   const audioInstances = useSelector(audioEffectsSelectors.audioInstances);
   const audioInstancesBg = useSelector(audioBgEffectsSelectors.audioInstances);
 
@@ -162,7 +167,7 @@ export const AppWrapper = ({
   return (
     <>
       <div className={appWrapperClassNames}>
-        <BookVisualRoot ref={ref}>
+        <BookVisualRoot ref={ref} surfaces={visualSurfaces} inverseColors={inverseColors}>
           {children}
         </BookVisualRoot>
 

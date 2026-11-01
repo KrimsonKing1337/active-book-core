@@ -7,13 +7,13 @@ import type { BookGeometry } from './@types';
 import { getBookGeometry } from './getBookGeometry';
 
 /** Observe a persistent root supplied by the host; no application-wide DOM registry is needed. */
-export const useBookGeometry = (bookRef: RefObject<HTMLElement | null>): BookGeometry | null => {
+export const useBookGeometry = (bookRef: RefObject<HTMLElement | null>, enabled = true): BookGeometry | null => {
   const [geometry, setGeometry] = useState<BookGeometry | null>(null);
 
   useLayoutEffect(() => {
     const book = bookRef.current;
 
-    if (!book) {
+    if (!book || !enabled) {
       return;
     }
 
@@ -94,7 +94,7 @@ export const useBookGeometry = (bookRef: RefObject<HTMLElement | null>): BookGeo
         cancelAnimationFrame(pendingFrame);
       }
     };
-  }, [bookRef]);
+  }, [bookRef, enabled]);
 
-  return geometry;
+  return enabled ? geometry : null;
 };

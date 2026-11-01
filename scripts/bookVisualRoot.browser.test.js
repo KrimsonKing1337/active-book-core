@@ -109,11 +109,11 @@ test('persistent book root and existing page rendering in Chromium', async (cont
         assert.equal(layerInfo.pointerEvents, 'none');
         assert(layerInfo.bottom <= layerInfo.toolbarTop + 1);
         assert.equal(layerInfo.toolbarHit, true);
-        assert.deepEqual(layerInfo.layers, ['0', '2', '3']);
+        assert.deepEqual(layerInfo.layers, ['1', '4', '30']);
         for (const layer of ['behind', 'above', 'overlay']) {
           assert.equal(await page.locator(`[data-frame-layer="${layer}"] [data-effect-id="${layer}-one"]`).count(), 1);
         }
-        assert.equal(await page.locator('#background-effects').evaluate((element) => getComputedStyle(element).zIndex), '-2');
+        assert.equal(await page.locator('#background-effects').evaluate((element) => getComputedStyle(element).zIndex), '0');
 
         await page.getByTestId('loading').click();
         await page.waitForFunction(() => JSON.parse(document.querySelector('[data-testid="geometry"]').textContent)
