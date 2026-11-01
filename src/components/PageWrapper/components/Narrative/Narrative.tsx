@@ -87,11 +87,12 @@ export const Narrative = ({ children }: PropsWithChildren) => {
     <div
       ref={ref}
       id="narrative"
+      data-book-region="narrativeViewport"
       className={styles.Narrative}
       style={narrativeStyle}
       tabIndex={0}
     >
-      <div className="Narrative__Text" style={textStyle}>
+      <div className="Narrative__Text" style={textStyle} data-book-region="narrativeContent">
         {children}
       </div>
     </div>

@@ -1,4 +1,6 @@
-import { type PropsWithChildren, Suspense } from 'react';
+import type { PropsWithChildren, ReactNode } from 'react';
+
+import { Suspense } from 'react';
 
 import { MemoryRouter } from 'react-router-dom';
 
@@ -16,14 +18,27 @@ export type AppProps = {
   config: Config;
   tableOfContents: TableOfContents;
   rangeEffects: RangeEffects;
+  editorTools?: ReactNode;
 };
 
-export const App = ({ children, appMode = 'reader', config, tableOfContents, rangeEffects }: PropsWithChildren<AppProps>) => {
+export const App = ({
+  children,
+  appMode = 'reader',
+  config,
+  tableOfContents,
+  rangeEffects,
+  editorTools,
+}: PropsWithChildren<AppProps>) => {
   return (
     <AppModeContext.Provider value={appMode}>
       <StoreProvider>
         <MemoryRouter>
-          <AppWrapper config={config} tableOfContents={tableOfContents} rangeEffects={rangeEffects}>
+          <AppWrapper
+            config={config}
+            tableOfContents={tableOfContents}
+            rangeEffects={rangeEffects}
+            editorTools={editorTools}
+          >
             <Suspense fallback={null}>
               <Routes>
                 {children}

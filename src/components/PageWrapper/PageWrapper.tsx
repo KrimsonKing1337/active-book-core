@@ -58,7 +58,7 @@ export const PageWrapper = ({
   return (
     <div id="page-wrapper" className={pageWrapperClassNames} {...etc}>
       <div id="main-content-wrapper" className={mainContendClassNames}>
-        <div className={styles.NarrativeFrame}>
+        <div className={styles.NarrativeFrame} data-book-region="page frame">
           <Narrative>
             {children}
           </Narrative>
