@@ -46,8 +46,14 @@ export const useBookGeometry = (bookRef: RefObject<HTMLElement | null>): BookGeo
 
     const observeRegions = () => {
       const regions = Array.from(book.querySelectorAll('[data-book-region]'));
-      const hasSameRegions = regions.length === observedRegions.length
-        && regions.every((regionCur, index) => regionCur === observedRegions[index]);
+
+      const lengthIsSame = regions.length === observedRegions.length;
+
+      const regionsIsSame = regions.every((regionCur, index) => {
+        return regionCur === observedRegions[index];
+      });
+
+      const hasSameRegions = lengthIsSame && regionsIsSame;
 
       if (hasSameRegions) {
         return;
@@ -67,15 +73,20 @@ export const useBookGeometry = (bookRef: RefObject<HTMLElement | null>): BookGeo
     const mutationObserver = new MutationObserver(observeRegions);
 
     resizeObserver.observe(book);
+
     observeRegions();
+
     mutationObserver.observe(book, { childList: true, subtree: true });
+
     book.addEventListener('scroll', scheduleMeasurement, true);
     window.addEventListener('resize', scheduleMeasurement);
+
     measure();
 
     return () => {
       resizeObserver.disconnect();
       mutationObserver.disconnect();
+
       book.removeEventListener('scroll', scheduleMeasurement, true);
       window.removeEventListener('resize', scheduleMeasurement);
 

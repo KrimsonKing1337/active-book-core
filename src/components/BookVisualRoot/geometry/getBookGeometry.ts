@@ -7,9 +7,12 @@ const measureRegion = (element: HTMLElement | null, bookRect: DOMRect): BookRegi
 
   const rect = element.getBoundingClientRect();
 
+  const x = rect.left - bookRect.left;
+  const y = rect.top - bookRect.top;
+
   return {
-    x: rect.left - bookRect.left,
-    y: rect.top - bookRect.top,
+    x,
+    y,
     width: rect.width,
     height: rect.height,
   };
@@ -28,9 +31,12 @@ export const getBookGeometry = (book: HTMLElement): BookGeometry => {
   let frameInsets: FrameInsets | null = null;
 
   if (viewport && viewportRect) {
+    const x = viewportRect.x + viewport.clientLeft;
+    const y = viewportRect.y + viewport.clientTop;
+
     viewportRect = {
-      x: viewportRect.x + viewport.clientLeft,
-      y: viewportRect.y + viewport.clientTop,
+      x,
+      y,
       width: viewport.clientWidth,
       height: viewport.clientHeight,
     };
@@ -54,13 +60,15 @@ export const getBookGeometry = (book: HTMLElement): BookGeometry => {
     };
   }
 
+  const bookRegion = {
+    x: 0,
+    y: 0,
+    width: bookRect.width,
+    height: bookRect.height,
+  };
+
   const regions: BookGeometry['regions'] = {
-    book: {
-      x: 0,
-      y: 0,
-      width: bookRect.width,
-      height: bookRect.height,
-    },
+    book: bookRegion,
     page: pageRect,
     frame: pageRect,
     narrativeViewport: viewportRect,
