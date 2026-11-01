@@ -15,6 +15,7 @@ export const createVisualEffects = ({ definitions, pages }: CreateVisualEffectsO
   const registrations = new Map<string, VisualEffectRegistration>();
   const generations = new Map<string, number>();
   const listeners = new Set<() => void>();
+
   let snapshot: readonly VisualEffectRegistration[] = Object.freeze([]);
   let nextGeneration = 0;
   let hasHost = false;
@@ -32,7 +33,8 @@ export const createVisualEffects = ({ definitions, pages }: CreateVisualEffectsO
 
   const publish = () => {
     snapshot = Object.freeze([...registrations.values()]);
-    listeners.forEach((listenerCur) => listenerCur());
+
+    listeners.forEach((cur) => cur());
   };
 
   const getDefinition = (id: string) => {
@@ -49,6 +51,7 @@ export const createVisualEffects = ({ definitions, pages }: CreateVisualEffectsO
     if (registrations.delete(id)) {
       controllers.invalidate(id);
       generations.delete(id);
+
       publish();
     }
   };
@@ -70,6 +73,7 @@ export const createVisualEffects = ({ definitions, pages }: CreateVisualEffectsO
 
     registrations.set(id, copied);
     generations.set(id, generation);
+
     publish();
 
     // An old declaration's delayed cleanup must not delete a replacement with the same ID.
@@ -88,49 +92,63 @@ export const createVisualEffects = ({ definitions, pages }: CreateVisualEffectsO
     }
 
     const copiedChanges = copyVisualData(changes);
+
     const effect = Object.freeze({
       ...previous.effect,
       ...copiedChanges.effect,
       id,
       definitionId: previous.effect.definitionId,
     });
+
     const lifetime = copiedChanges.lifetime ?? previous.lifetime;
 
     validateVisualLifetime(lifetime, pages);
+
     registrations.set(id, Object.freeze({
       effect,
       lifetime,
     }));
+
     publish();
+  };
+
+  const getSnapshot = () => snapshot;
+
+  const subscribe = (listener: () => void) => {
+    listeners.add(listener);
+
+    return () => {
+      listeners.delete(listener);
+    };
+  };
+
+  const getGeneration = (id: string) => generations.get(id);
+
+  const connectHost = () => {
+    if (hasHost) {
+      throw new Error('A visual effects session can only belong to one book root');
+    }
+
+    hasHost = true;
+
+    return () => {
+      hasHost = false;
+
+      controllers.clear();
+    };
   };
 
   return {
     register,
     update,
     remove,
-    getController: controllers.get,
-    getSnapshot: () => snapshot,
-    subscribe: (listener: () => void) => {
-      listeners.add(listener);
-
-      return () => { listeners.delete(listener); };
-    },
-    /** Host bindings, used by the persistent book root rather than page components. */
+    getSnapshot,
+    subscribe,
     getDefinition,
-    getGeneration: (id: string) => generations.get(id),
+    getGeneration,
+    connectHost,
     attachController: controllers.attach,
-    connectHost: () => {
-      if (hasHost) {
-        throw new Error('A visual effects session can only belong to one book root');
-      }
-
-      hasHost = true;
-
-      return () => {
-        hasHost = false;
-        controllers.clear();
-      };
-    },
+    getController: controllers.get,
   };
 };
 

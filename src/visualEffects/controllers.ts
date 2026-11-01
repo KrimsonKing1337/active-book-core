@@ -31,6 +31,7 @@ export const createVisualControllers = ({ remove }: VisualControllersOptions) =>
           remove(id);
         }
       },
+
       get playback() {
         const playback = readPlayback();
 
@@ -46,11 +47,13 @@ export const createVisualControllers = ({ remove }: VisualControllersOptions) =>
               return playback.play();
             }
           },
+
           pause: () => {
             if (canCall()) {
               playback.pause();
             }
           },
+
           stop: () => {
             if (canCall()) {
               playback.stop();
@@ -69,10 +72,13 @@ export const createVisualControllers = ({ remove }: VisualControllersOptions) =>
     };
   };
 
+  const get = (id: string) => controllers.get(id);
+  const clear = () => controllers.clear();
+
   return {
     attach,
     invalidate,
-    get: (id: string) => controllers.get(id),
-    clear: () => controllers.clear(),
+    get,
+    clear,
   };
 };

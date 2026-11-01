@@ -8,7 +8,7 @@ import type { VisualSurfaceItem } from '@components/VisualSurfaces';
 
 import { VisualSurfaces } from '@components/VisualSurfaces';
 
-import type { VisualEffects } from '../../visualEffects';
+import type { VisualEffects } from '@@/visualEffects';
 
 import { useBookGeometry } from './geometry';
 import { useVisualEffectSurfaces } from './hooks/useVisualEffectSurfaces';
@@ -35,14 +35,19 @@ export const BookVisualRoot = ({
 }: BookVisualRootProps) => {
   const bookRef = useRef<HTMLDivElement>(null);
   const shouldMeasure = suppliedSurfaces.length > 0 || !!visualEffects;
+
   const geometry = useBookGeometry(bookRef, shouldMeasure);
+
   const registeredSurfaces = useVisualEffectSurfaces({
     visualEffects,
     page,
     geometry,
   });
+
   const surfaces = [...suppliedSurfaces, ...registeredSurfaces];
+
   const hasSurfaces = surfaces.length > 0;
+
   const ids = new Set<string>();
 
   for (const surfaceCur of surfaces) {

@@ -6,7 +6,7 @@ import type { BookGeometry } from '@components/BookVisualRoot/geometry';
 
 import { resolvePlacement } from '@components/VisualSurfaces/utils/placement';
 
-import type { VisualEffects } from '../../visualEffects';
+import type { VisualEffects } from '@@/visualEffects';
 
 type RegisteredVisualEffectProps = {
   effect: VisualEffectInstance;
@@ -16,33 +16,43 @@ type RegisteredVisualEffectProps = {
 
 export const RegisteredVisualEffect = memo(({ effect, visualEffects, geometry }: RegisteredVisualEffectProps) => {
   const { id, definitionId, params } = effect;
-  const definition = visualEffects.getDefinition(definitionId);
-  const { Renderer, defaultParams } = definition;
+
+  const { Renderer, defaultParams } = visualEffects.getDefinition(definitionId);
+
   const playbackRef = useRef<VisualPlayback | null>(null);
+
   const previousGeometry = useRef<VisualGeometry>({
     width: 0,
     height: 0,
   });
+
   const bounds = geometry ? resolvePlacement(effect.placement, geometry) : null;
+
   const width = bounds?.width ?? previousGeometry.current.width;
   const height = bounds?.height ?? previousGeometry.current.height;
+
   const rendererGeometry = useMemo(() => ({
     width,
     height,
   }), [width, height]);
-  const resolvedParams = useMemo(() => ({
-    ...defaultParams,
-    ...params,
-  }), [defaultParams, params]);
+
+  const resolvedParams = useMemo(() => {
+    return {
+      ...defaultParams,
+      ...params,
+    };
+  }, [defaultParams, params]);
 
   useLayoutEffect(() => {
     previousGeometry.current = rendererGeometry;
   }, [rendererGeometry]);
 
   useLayoutEffect(() => {
+    const readPlayback = () => playbackRef.current;
+
     return visualEffects.attachController({
       id,
-      readPlayback: () => playbackRef.current,
+      readPlayback,
     });
   }, [id, visualEffects]);
 

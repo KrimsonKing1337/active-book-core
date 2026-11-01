@@ -6,18 +6,19 @@ import { RegisteredVisualEffect } from '@components/RegisteredVisualEffect';
 
 import type { VisualSurfaceItem } from '@components/VisualSurfaces';
 
-import type { VisualEffects } from '../../../visualEffects';
-import { isVisualEffectActive } from '../../../visualEffects/lifetime';
+import type { VisualEffects } from '@@/visualEffects';
+import { isVisualEffectActive } from '@@/visualEffects/lifetime';
 
 import type { BookGeometry } from '../geometry';
 
-type VisualEffectSurfacesOptions = {
+export type VisualEffectSurfacesOptions = {
   visualEffects?: VisualEffects;
   page: number;
   geometry: BookGeometry | null;
 };
 
 const emptySnapshot: readonly VisualEffectRegistration[] = [];
+
 const readEmptySnapshot = () => emptySnapshot;
 const subscribeEmpty = () => () => {};
 
@@ -35,10 +36,13 @@ export const useVisualEffectSurfaces = ({ visualEffects, page, geometry }: Visua
       return [];
     }
 
-    const active = registrations.filter((registrationCur) => isVisualEffectActive(registrationCur.lifetime, page));
+    const active = registrations.filter((registrationCur) => {
+      return isVisualEffectActive(registrationCur.lifetime, page);
+    });
 
     return active.map(({ effect }) => {
       const generation = visualEffects.getGeneration(effect.id);
+
       const content = (
         <RegisteredVisualEffect
           key={generation}
