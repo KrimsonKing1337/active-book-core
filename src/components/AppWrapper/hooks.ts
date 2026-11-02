@@ -155,9 +155,12 @@ export const useSetUpConfig = (passedConfig: Config) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    dispatch(mainActions.setPages(passedConfig.pages));
+  }, [passedConfig.pages, dispatch]);
+
+  useEffect(() => {
     const {
       id,
-      pages,
       defaultTheme,
       customThemes,
       disableThemes = false,
@@ -178,7 +181,6 @@ export const useSetUpConfig = (passedConfig: Config) => {
 
     dispatch(configActions.setThemes(themes));
     dispatch(mainActions.setId(id));
-    dispatch(mainActions.setPages(pages));
     dispatch(mainActions.setAuthorComments(authorComments));
 
     const configForSet = config ?? configInitialState;

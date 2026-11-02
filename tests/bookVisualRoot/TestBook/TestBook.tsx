@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 
@@ -24,12 +24,18 @@ const query = new URLSearchParams(window.location.search);
 const mode: AppMode = query.get('mode') === 'editor' ? 'editor' : 'reader';
 
 export const TestBook = () => {
+  const [pages, setPages] = useState(config.pages);
+  const currentConfig = { ...config, pages };
   const bookRef = useRef<HTMLDivElement>(null);
   const geometry = useBookGeometry(bookRef);
 
   const tools = (
     <>
       <TestControls />
+
+      <button data-testid="grow-book" style={{ position: 'fixed', top: 0, right: 0 }} onClick={() => setPages(5)}>
+        Add pages
+      </button>
 
       <output data-testid="geometry" hidden>
         {JSON.stringify(geometry)}
@@ -43,7 +49,7 @@ export const TestBook = () => {
         <MemoryRouter>
           <AppWrapper
             ref={bookRef}
-            config={config}
+            config={currentConfig}
             tableOfContents={[]}
             rangeEffects={[]}
             editorTools={tools}

@@ -11,6 +11,7 @@ export const openBrowserFixture = async (context) => {
   const sourcePath = (name) => fileURLToPath(new URL(`../src/${name}`, import.meta.url));
   const aliases = ['assets', 'components', 'pages', 'hooks', 'utils', 'store', 'styles'];
   const alias = Object.fromEntries(aliases.map((name) => [`@${name}`, sourcePath(name)]));
+  alias['@@'] = sourcePath('');
   alias['@types'] = sourcePath('@types.ts');
   alias['~styles'] = sourcePath('styles');
   alias['~assets'] = sourcePath('assets');
