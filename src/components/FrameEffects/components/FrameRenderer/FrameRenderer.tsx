@@ -1,39 +1,29 @@
-import type { CSSProperties } from 'react';
+import type { CSSProperties, PropsWithChildren } from 'react';
 
 import type { JsonObject, VisualRendererProps } from '@active-book/types';
-
-import { useVisualEffects } from '@controllers/visualEffects';
 
 import type { FrameEffect } from '@hooks/effects/frame/@types';
 
 import { FrameElement } from '../FrameElement';
-import { FrameShadow, Police, Caramelldansen } from '../FrameShadow';
+import { FrameShadow } from '../FrameShadow';
+import { Police, Caramelldansen } from '../FrameShadow/presets';
 import { FrameText } from '../FrameText';
 
 import * as styles from '../../FrameEffects.module.scss';
 
-type FrameParams = JsonObject & Omit<FrameEffect, 'id' | 'Component'>;
+type FrameParams = JsonObject & Omit<FrameEffect, 'id'>;
 
-export const FrameRenderer = ({ id, params }: VisualRendererProps) => {
-  const session = useVisualEffects();
+export type FrameRendererProps = PropsWithChildren & VisualRendererProps;
 
+export const FrameRenderer = ({ id, params, children }: FrameRendererProps) => {
   const options = params as FrameParams;
-
-  const component = session.getRuntimeComponent(id);
-
-  const effectCur = {
-    ...options,
-    id,
-    Component: component,
-  };
 
   const {
     kind,
     shadow,
     text,
-    Component,
     style,
-  } = effectCur;
+  } = options;
 
   const zIndex = shadow?.style?.zIndex ?? text?.style?.zIndex;
 
@@ -51,7 +41,7 @@ export const FrameRenderer = ({ id, params }: VisualRendererProps) => {
 
   const showShadow = kind === 'shadow' && shadow;
   const showText = kind === 'text' && text;
-  const componentContent = kind === 'component' ? Component : null;
+  const componentContent = kind === 'component' ? children : null;
 
   return (
     <div

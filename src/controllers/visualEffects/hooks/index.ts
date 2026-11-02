@@ -1,3 +1,2 @@
-export * from './useBuiltinDeclarations';
 export * from './usePageLifetime';
-export * from './useVisualRanges';
+export * from './useVisualRegistrations';

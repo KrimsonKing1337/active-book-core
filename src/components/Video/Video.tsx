@@ -1,11 +1,9 @@
-import type { RefObject } from 'react';
+import { type RefObject, useEffect, useRef } from 'react';
 
-import { useEffect, useRef } from 'react';
-
-import { useDispatch, useSelector } from '@store';
+import { useDispatch, useSelector, useStore } from '@store';
 
 import { volumeSelectors } from '@store/volume';
-import { effectsActions, effectsSelectors } from '@store/effects/common';
+import { effectsActions } from '@store/effects/common';
 
 type VideoProps = React.MediaHTMLAttributes<HTMLVideoElement> & {
   id: string;
@@ -33,6 +31,7 @@ export const Video = ({
   onError,
   ...etc
 }: VideoProps) => {
+  const store = useStore();
   const dispatch = useDispatch();
 
   const ownRef = useRef<HTMLVideoElement>(null);
@@ -41,7 +40,6 @@ export const Video = ({
   const ref = elementRef ?? ownRef;
 
   const { videos: videosVolume, global: globalVolume } = useSelector(volumeSelectors.all);
-  const videosCurrentTime = useSelector(effectsSelectors.videosCurrentTime);
 
   useEffect(() => {
     const element = ref.current;
@@ -62,32 +60,64 @@ export const Video = ({
   }, [preserveTime, ref]);
 
   useEffect(() => {
-    if (!ref.current) {
+    const element = ref.current;
+
+    if (!element) {
       return;
     }
 
-    ref.current.volume = (videosVolume / 100) * (relativeVolume / 100) * (globalVolume / 100);
-    ref.current.setAttribute('data-relativeVolume', relativeVolume.toString());
+    element.volume = (videosVolume / 100) * (relativeVolume / 100) * (globalVolume / 100);
 
-    if (preserveTime && videosCurrentTime[id]) {
-      ref.current.currentTime = videosCurrentTime[id];
+    element.setAttribute('data-relativeVolume', relativeVolume.toString());
+  }, [videosVolume, globalVolume, relativeVolume, ref]);
+
+  useEffect(() => {
+    const element = ref.current;
+
+    const savedTime = store.getState().effects.videosCurrentTime[id];
+
+    if (!element || !preserveTime || !savedTime) {
+      return;
     }
 
-    ref.current.addEventListener('timeupdate', () => {
-      refCurrentTime.current = ref.current?.currentTime || 0;
-    });
+    const restoreTime = () => {
+      element.currentTime = savedTime;
+    };
+    if (element.readyState >= 1) {
+      restoreTime();
+    } else {
+      element.addEventListener('loadedmetadata', restoreTime, { once: true });
+    }
+
+    return () => element.removeEventListener('loadedmetadata', restoreTime);
+  }, [id, src, preserveTime, ref, store]);
+
+  useEffect(() => {
+    const element = ref.current;
+
+    if (!element) {
+      return;
+    }
+
+    refCurrentTime.current = element.currentTime;
+
+    const handleTimeUpdate = () => {
+      refCurrentTime.current = element.currentTime;
+    };
+
+    element.addEventListener('timeupdate', handleTimeUpdate);
 
     return () => {
-      if (!preserveTime || !refCurrentTime.current) {
-        return;
-      }
+      element.removeEventListener('timeupdate', handleTimeUpdate);
 
-      dispatch(effectsActions.setVideoCurrentTime({
-        id,
-        currentTime: refCurrentTime.current,
-      }));
+      if (preserveTime && refCurrentTime.current) {
+        dispatch(effectsActions.setVideoCurrentTime({
+          id,
+          currentTime: refCurrentTime.current,
+        }));
+      }
     };
-  }, []);
+  }, [id, src, preserveTime, ref, dispatch]);
 
   return (
     <video

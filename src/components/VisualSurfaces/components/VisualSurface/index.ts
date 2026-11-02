@@ -1,1 +1,1 @@
-export { VisualSurface } from './VisualSurface';
+export * from './VisualSurface';

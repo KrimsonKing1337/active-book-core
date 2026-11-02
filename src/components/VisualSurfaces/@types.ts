@@ -13,6 +13,7 @@ export type SystemFeedbackDepth = {
 export type VisualSurfaceItem = Pick<VisualEffectInstance, 'id' | 'placement' | 'visibility'> & {
   depth: VisualSurfaceDepth;
   content: ReactNode;
+  hidden?: boolean;
 };
 
 export type VisibilityStyle = CSSProperties & {

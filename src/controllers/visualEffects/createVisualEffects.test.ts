@@ -91,3 +91,64 @@ test('the same IDs are independent in different books and a session has one host
   disconnect();
   first.connectHost()();
 });
+
+test('restores ranges outside a shortened book without rewriting endpoints', () => {
+  const session = createVisualEffects({ ...options, pages: 2 });
+  const lifetime = { type: 'range' as const, range: [{ from: 3, to: 5 }] };
+  session.register({ ...registration, lifetime });
+  session.update('test', { lifetime });
+  session.setPageCount(1);
+  session.setPageCount(5);
+  expect(session.getSnapshot()[0].lifetime).toEqual(lifetime);
+});
+
+test('definition changes publish only when needed and keep existing registrations', () => {
+  const visualEffects = createVisualEffects(options);
+  visualEffects.register(registration);
+
+  const onChange = jest.fn();
+  visualEffects.subscribe(onChange);
+  const originalSnapshot = visualEffects.getSnapshot();
+  const originalDefinition = visualEffects.getDefinition('static');
+
+  visualEffects.setDefinitions(options.definitions);
+
+  expect(visualEffects.getSnapshot()).toBe(originalSnapshot);
+  expect(visualEffects.getDefinition('static')).toBe(originalDefinition);
+  expect(onChange).not.toHaveBeenCalled();
+
+  const additionalDefinition = {
+    id: 'additional',
+    defaultParams: {},
+    Renderer: () => null,
+  };
+
+  visualEffects.setDefinitions([...options.definitions, additionalDefinition]);
+
+  expect(visualEffects.hasDefinition('additional')).toBe(true);
+  expect(visualEffects.getSnapshot()).toEqual([registration]);
+  expect(onChange).toHaveBeenCalledTimes(1);
+
+  visualEffects.setDefinitions(options.definitions);
+
+  expect(visualEffects.hasDefinition('additional')).toBe(false);
+  expect(visualEffects.getSnapshot()).toEqual([registration]);
+  expect(onChange).toHaveBeenCalledTimes(2);
+});
+
+test('destroy releases registrations, definitions, controllers and listeners exactly once', () => {
+  const session = createVisualEffects(options);
+  session.register(registration);
+  const onChange = jest.fn();
+  session.subscribe(onChange);
+  session.attachController({ id: 'test', readPlayback: () => null });
+  const controller = session.getController('test');
+  session.destroy();
+  session.destroy();
+  expect(session.getSnapshot()).toEqual([]);
+  expect(session.hasDefinition('static')).toBe(false);
+  expect(session.getController('test')).toBeUndefined();
+  expect(onChange).toHaveBeenCalledTimes(1);
+  expect(() => controller?.destroy()).not.toThrow();
+  expect(() => session.update('test', {})).toThrow('destroyed');
+});

@@ -6,7 +6,8 @@ import {
   type BuiltinDeclaration,
   VisualEffectsContext,
   usePageLifetime,
-  useBuiltinDeclarations,
+  useVisualRegistrations,
+  createBuiltinRegistration,
 } from '@controllers/visualEffects';
 
 import type { FrameEffect } from './@types';
@@ -27,5 +28,7 @@ export const useFrameEffect = (effect: FrameEffect | null, lifetime?: VisualEffe
     });
   }
 
-  useBuiltinDeclarations(session, declarations);
+  const registrations = declarations.map(createBuiltinRegistration);
+
+  useVisualRegistrations({ session, registrations });
 };

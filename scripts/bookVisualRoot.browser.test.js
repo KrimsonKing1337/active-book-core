@@ -8,7 +8,7 @@ import svgr from 'vite-plugin-svgr';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const sourcePath = (name) => fileURLToPath(new URL(`../src/${name}`, import.meta.url));
-const aliases = ['assets', 'components', 'pages', 'hooks', 'utils', 'store', 'styles'];
+const aliases = ['assets', 'components', 'controllers', 'pages', 'hooks', 'utils', 'store', 'styles'];
 const alias = Object.fromEntries(aliases.map((name) => [`@${name}`, sourcePath(name)]));
 
 alias['@@'] = sourcePath('');

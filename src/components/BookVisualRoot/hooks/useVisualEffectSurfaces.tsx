@@ -12,21 +12,25 @@ import type { BookGeometry } from '../geometry';
 export type VisualEffectSurfacesOptions = {
   visualEffects?: VisualEffects;
   page: number;
+  hiddenVisualEffects: readonly string[];
   geometry: BookGeometry | null;
 };
 
 const emptySnapshot: readonly VisualEffectRegistration[] = [];
 
 const readEmptySnapshot = () => emptySnapshot;
+const readNoPages = () => 0;
 const subscribeEmpty = () => () => {};
 
 export const useVisualEffectSurfaces = ({
   visualEffects,
   page,
   geometry,
+  hiddenVisualEffects,
 }: VisualEffectSurfacesOptions) => {
   const visualEffectsSubscribe = visualEffects?.subscribe ?? subscribeEmpty;
   const visualEffectsSnapshot = visualEffects?.getSnapshot ?? readEmptySnapshot;
+  const visualEffectsPageCount = visualEffects?.getPageCount ?? readNoPages;
 
   const registrations = useSyncExternalStore(
     visualEffectsSubscribe,
@@ -34,12 +38,18 @@ export const useVisualEffectSurfaces = ({
     visualEffectsSnapshot,
   );
 
+  const pages = useSyncExternalStore(
+    visualEffectsSubscribe,
+    visualEffectsPageCount,
+    visualEffectsPageCount,
+  );
+
   useLayoutEffect(() => {
     return visualEffects?.connectHost();
   }, [visualEffects]);
 
   return useMemo<VisualSurfaceItem[]>(() => {
-    if (!visualEffects) {
+    if (!visualEffects || page < 1 || page > pages) {
       return [];
     }
 
@@ -66,10 +76,13 @@ export const useVisualEffectSurfaces = ({
         <RegisteredVisualEffect
           key={generation}
           effect={effect}
+          definition={definition}
           visualEffects={visualEffects}
           geometry={geometry}
         />
       );
+
+      const isHidden = hiddenVisualEffects.includes(id);
 
       return {
         id: id,
@@ -77,7 +90,8 @@ export const useVisualEffectSurfaces = ({
         visibility: visibility,
         depth,
         content,
+        hidden: isHidden,
       };
     });
-  }, [registrations, page, geometry, visualEffects]);
+  }, [registrations, page, pages, geometry, visualEffects, hiddenVisualEffects]);
 };

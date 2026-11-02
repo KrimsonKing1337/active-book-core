@@ -35,14 +35,12 @@ export const TestPage = ({ name }: TestPageProps) => {
     id: `above-${name}`,
     kind: 'component',
     layer: 'above',
-    Component: <span data-testid="above-content" />,
   });
 
   useFrameEffect({
     id: `overlay-${name}`,
     kind: 'component',
     layer: 'overlay',
-    Component: <span data-testid="overlay-content" />,
   });
 
   return (

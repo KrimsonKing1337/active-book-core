@@ -1,1 +1,1 @@
-export { RegisteredVisualEffect } from './RegisteredVisualEffect';
+export * from './RegisteredVisualEffect';

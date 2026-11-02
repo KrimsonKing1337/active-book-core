@@ -13,7 +13,7 @@ import { useFlashlight } from '@hooks/effects/flashlight';
 import { createVisualEffects } from '../createVisualEffects';
 import { VisualEffectsContext } from '../context';
 import { createBuiltinRegistration } from './declarations';
-import { useVisualRanges } from '../hooks/useVisualRanges';
+import { useVisualRegistrations } from '../hooks/useVisualRegistrations';
 
 const frame: FrameEffect = {
   id: 'frame',
@@ -147,7 +147,6 @@ test('frame controls merge style and animation changes through the common sessio
 
 test('range declarations reconcile equal input without replacing registration or serializing React nodes', () => {
   const session = createVisualEffects({ pages: 5 });
-  const component = <span>RUNTIME COMPONENT</span>;
   const ranges = [{
     id: 'range',
     type: 'frame' as const,
@@ -160,19 +159,30 @@ test('range declarations reconcile equal input without replacing registration or
     }],
     options: {
       kind: 'component' as const,
-      Component: component,
     },
   }];
-  const { rerender, unmount } = renderHook(() => useVisualRanges(session, ranges));
+  const { rerender, unmount } = renderHook(() => {
+    const registrations = ranges.map((rangeCur) => createBuiltinRegistration({
+      type: rangeCur.type,
+      options: {
+        ...rangeCur.options,
+        id: rangeCur.id,
+      },
+      lifetime: {
+        type: 'range',
+        range: rangeCur.range,
+      },
+    }));
+
+    return useVisualRegistrations({ session, registrations });
+  });
   const snapshot = session.getSnapshot();
   rerender();
   expect(session.getSnapshot()).toBe(snapshot);
   expect(JSON.stringify(snapshot)).not.toContain('RUNTIME COMPONENT');
   expect(snapshot[0].effect.params).not.toHaveProperty('id');
-  expect(session.getRuntimeComponent('range')).toBe(component);
   unmount();
   expect(session.getSnapshot()).toEqual([]);
-  expect(session.getRuntimeComponent('range')).toBeUndefined();
 });
 
 test('page count changes preserve registrations and authored endpoints while validating new lifetimes', () => {

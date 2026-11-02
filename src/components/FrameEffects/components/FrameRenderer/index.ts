@@ -1,1 +1,1 @@
-export { FrameRenderer } from './FrameRenderer';
+export * from './FrameRenderer';

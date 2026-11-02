@@ -3,12 +3,11 @@ import type { CSSProperties } from 'react';
 import type { BookGeometry } from '@components/BookVisualRoot/geometry';
 
 import type { VisualSurfaceItem } from '@components/VisualSurfaces';
-
-import { resolveVisualSurface } from '../../utils/resolveVisualSurface';
+import { resolveVisualSurface } from '@components/VisualSurfaces/utils';
 
 import * as styles from './VisualSurface.module.scss';
 
-type VisualSurfaceProps = {
+export type VisualSurfaceProps = {
   item: VisualSurfaceItem;
   geometry: BookGeometry | null;
   order: number;
@@ -17,7 +16,7 @@ type VisualSurfaceProps = {
 export const VisualSurface = ({ item, geometry, order }: VisualSurfaceProps) => {
   const resolved = resolveVisualSurface({ item, geometry });
 
-  const visibility = resolved ? 'visible' : 'hidden';
+  const visibility = resolved && !item.hidden ? 'visible' : 'hidden';
   const display = resolved ? undefined : 'none';
 
   const visibilityStyle: CSSProperties = {

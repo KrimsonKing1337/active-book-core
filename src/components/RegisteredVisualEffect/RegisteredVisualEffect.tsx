@@ -1,26 +1,27 @@
 import { memo, useLayoutEffect, useMemo, useRef } from 'react';
 
-import type { VisualEffectInstance, VisualGeometry, VisualPlayback } from '@active-book/types';
+import type { VisualEffectDefinition, VisualEffectInstance, VisualGeometry, VisualPlayback } from '@active-book/types';
 
 import type { VisualEffects } from '@controllers/visualEffects';
 
-import type { BookGeometry } from '@components/BookVisualRoot/geometry';
-import { resolvePlacement } from '@components/VisualSurfaces/utils/placement';
+import type { BookGeometry, BookRegionRect } from '@components/BookVisualRoot/geometry';
+import { resolvePlacement } from '@components/VisualSurfaces/utils';
 
 type RegisteredVisualEffectProps = {
   effect: VisualEffectInstance;
+  definition: VisualEffectDefinition;
   visualEffects: VisualEffects;
   geometry: BookGeometry | null;
 };
 
 export const RegisteredVisualEffect = memo(({
   effect,
+  definition,
   visualEffects,
   geometry,
 }: RegisteredVisualEffectProps) => {
-  const { id, definitionId, params } = effect;
-
-  const { Renderer, defaultParams } = visualEffects.getDefinition(definitionId);
+  const { id, params } = effect;
+  const { Renderer, defaultParams } = definition;
 
   const playbackRef = useRef<VisualPlayback | null>(null);
 
@@ -29,15 +30,21 @@ export const RegisteredVisualEffect = memo(({
     height: 0,
   });
 
-  const bounds = geometry ? resolvePlacement(effect.placement, geometry) : null;
+  let bounds: BookRegionRect | null = null;
+
+  if (geometry) {
+    bounds = resolvePlacement(effect.placement, geometry);
+  }
 
   const width = bounds?.width ?? previousGeometry.current.width;
   const height = bounds?.height ?? previousGeometry.current.height;
 
-  const rendererGeometry = useMemo(() => ({
-    width,
-    height,
-  }), [width, height]);
+  const rendererGeometry = useMemo(() => {
+    return {
+      width,
+      height,
+    };
+  }, [width, height]);
 
   const resolvedParams = useMemo(() => {
     return {
