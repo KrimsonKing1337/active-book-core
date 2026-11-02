@@ -2,7 +2,10 @@ import type { BookGeometry, BookRegionRect, FrameInsets } from './@types';
 
 import { getRegionCorners } from './regionCorners';
 
-const measureRegion = (element: HTMLElement | null, bookRect: DOMRect): BookRegionRect | null => {
+const measureRegion = (
+  element: HTMLElement | null,
+  bookRect: DOMRect,
+): BookRegionRect | null => {
   if (!element || element.getClientRects().length === 0) {
     return null;
   }
@@ -23,6 +26,7 @@ const measureRegion = (element: HTMLElement | null, bookRect: DOMRect): BookRegi
 /** Reads only the fixed book regions; this does not apply clipping or coordinate transforms. */
 export const getBookGeometry = (book: HTMLElement): BookGeometry => {
   const bookRect = book.getBoundingClientRect();
+
   const page = book.querySelector<HTMLElement>('[data-book-region~="page"]');
   const bookViewport = book.querySelector<HTMLElement>('[data-book-region="bookViewport"]');
   const viewport = book.querySelector<HTMLElement>('[data-book-region="narrativeViewport"]');
@@ -30,15 +34,24 @@ export const getBookGeometry = (book: HTMLElement): BookGeometry => {
 
   const pageRect = measureRegion(page, bookRect);
   const bookViewportRect = measureRegion(bookViewport, bookRect);
+
   if (bookViewport && bookViewportRect) {
     const style = getComputedStyle(bookViewport);
+
     bookViewportRect.borderRadius = style.borderRadius;
+
     if (pageRect) {
-      pageRect.borderRadius = getRegionCorners({ region: pageRect, clip: bookViewportRect, style });
+      pageRect.borderRadius = getRegionCorners({
+        region: pageRect,
+        clip: bookViewportRect,
+        style,
+      });
     }
   }
+
   let viewportRect = measureRegion(viewport, bookRect);
   let contentRect = measureRegion(content, bookRect);
+
   let frameInsets: FrameInsets | null = null;
 
   if (viewport && viewportRect) {

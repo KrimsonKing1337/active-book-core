@@ -1,22 +1,27 @@
 import { useCallback, useLayoutEffect, useRef } from 'react';
 
 import { useStore } from '@store';
+
 import { effectsActions } from '@store/effects/common';
 
 type MediaKind = 'images' | 'videos';
+
 type MediaLoad = {
   src: string;
   ready: boolean;
 };
 
+type MediaElement = HTMLImageElement | HTMLVideoElement;
+
 /** Redux retains loading counters, never visual instances or their lifetime. */
-export const useMediaReadiness = <Element extends HTMLImageElement | HTMLVideoElement>(
+export const useMediaReadiness = <T extends MediaElement>(
   kind: MediaKind,
   src?: string,
 ) => {
   const store = useStore();
+
   const activeRef = useRef<MediaLoad | null>(null);
-  const elementRef = useRef<Element | null>(null);
+  const elementRef = useRef<T | null>(null);
 
   const changeCount = useCallback((amount: number, ready: boolean) => {
     const state = store.getState().effects;
@@ -41,14 +46,20 @@ export const useMediaReadiness = <Element extends HTMLImageElement | HTMLVideoEl
 
     const element = elementRef.current;
     const sameSource = element?.currentSrc === element?.src;
-    const ready = sameSource && (element instanceof HTMLImageElement
-      ? element.complete
-      : element instanceof HTMLVideoElement && element.readyState >= 2);
+
+    const imageIsReady = element instanceof HTMLImageElement && element.complete;
+    const videoIsReady = element instanceof HTMLVideoElement && element.readyState >= 2;
+
+    const mediaIsReady = imageIsReady || videoIsReady;
+    const ready = sameSource && mediaIsReady;
+
     const load = {
       src,
       ready,
     };
+
     activeRef.current = load;
+
     changeCount(1, false);
     if (ready) {
       changeCount(1, true);
@@ -56,6 +67,7 @@ export const useMediaReadiness = <Element extends HTMLImageElement | HTMLVideoEl
 
     return () => {
       activeRef.current = null;
+
       changeCount(-1, false);
       if (load.ready) {
         changeCount(-1, true);
@@ -65,11 +77,13 @@ export const useMediaReadiness = <Element extends HTMLImageElement | HTMLVideoEl
 
   const markReady = useCallback(() => {
     const load = activeRef.current;
+
     if (!load || load.src !== src || load.ready) {
       return;
     }
 
     load.ready = true;
+
     changeCount(1, true);
   }, [src, changeCount]);
 

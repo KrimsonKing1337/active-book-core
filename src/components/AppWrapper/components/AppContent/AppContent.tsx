@@ -1,10 +1,8 @@
-import type { PropsWithChildren } from 'react';
-import { useEffect, useLayoutEffect } from 'react';
+import { type PropsWithChildren, useEffect, useLayoutEffect } from 'react';
 
 import classNames from 'classnames';
 import { setWasmUrl } from '@lottiefiles/dotlottie-react';
 import { ToastContainer } from 'react-toastify';
-
 
 import { useDispatch, useSelector } from '@store';
 
@@ -12,6 +10,8 @@ import { mainActions, mainSelectors } from '@store/main';
 import { audioEffectsSelectors } from '@store/effects/audio/audio';
 import { audioBgEffectsSelectors } from '@store/effects/audio/audioBg';
 import { effectsSelectors } from '@store/effects/common';
+
+import { type VisualEffects, useVisualRanges } from '@controllers';
 
 import { useEffectsInRange } from '@hooks/effects/range';
 import { useGoToPage } from '@hooks/control/useGoToPage';
@@ -23,9 +23,7 @@ import { removeCssHover } from '@utils/touch/removeCssHover';
 import { addKeyboardControl } from '@utils/control/keyboardControl';
 import { hideAddressBarInMobileDevices } from '@utils/mobile/hideAddressBarInMobileDevices';
 
-import type { VisualEffects } from '../../../../controllers/visualEffects';
 import type { AppWrapperProps } from '../../@types';
-import { useVisualRanges } from '../../../../controllers/visualEffects/useVisualRanges';
 
 import {
   useAllPagesSeen,
@@ -41,7 +39,6 @@ import '@styles/common.scss';
 
 import * as styles from '../../AppWrapper.module.scss';
 
-
 export const AppContent = ({
   children,
   config,
@@ -54,8 +51,12 @@ export const AppContent = ({
 }: PropsWithChildren<AppWrapperProps & { visualEffects: VisualEffects }>) => {
   const dispatch = useDispatch();
 
-  useLayoutEffect(() => visualEffects.setPageCount(config.pages), [config.pages, visualEffects]);
+  useLayoutEffect(() => {
+    visualEffects.setPageCount(config.pages);
+  }, [config.pages, visualEffects]);
+
   useVisualRanges(visualEffects, rangeEffects);
+
   const appMode = useAppMode();
 
   const { goPrevPage, goNextPage } = useGoToPage();

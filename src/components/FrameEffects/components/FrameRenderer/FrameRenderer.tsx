@@ -2,10 +2,9 @@ import type { CSSProperties } from 'react';
 
 import type { JsonObject, VisualRendererProps } from '@active-book/types';
 
-import { useVisualEffects } from '@@/controllers/visualEffects/context';
+import { useVisualEffects } from '@controllers/visualEffects/context';
 
 import type { FrameEffect } from '@hooks/effects/frame/@types';
-
 
 import { FrameElement } from '../FrameElement';
 import { FrameShadow, Police, Caramelldansen } from '../FrameShadow';
@@ -17,11 +16,15 @@ type FrameParams = JsonObject & Omit<FrameEffect, 'id' | 'Component'>;
 
 export const FrameRenderer = ({ id, params }: VisualRendererProps) => {
   const session = useVisualEffects();
+
   const options = params as FrameParams;
+
+  const component = session.getRuntimeComponent(id);
+
   const effectCur = {
     ...options,
     id,
-    Component: session.getRuntimeComponent(id),
+    Component: component,
   };
 
   const {
@@ -37,8 +40,6 @@ export const FrameRenderer = ({ id, params }: VisualRendererProps) => {
   const styleSafe = style ?? {};
 
   const wrapperStyle: CSSProperties = kind === 'component' ? styleSafe : { zIndex };
-
-
 
   let ShadowComponent = FrameShadow;
 

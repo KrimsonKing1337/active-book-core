@@ -85,6 +85,7 @@ export default defineConfig([globIgnores, {
         { pattern: '@styles{,/**}', group: 'internal', position: 'after' },
         { pattern: '@pages{,/**}', group: 'internal', position: 'after' },
         { pattern: '@store{,/**}', group: 'internal', position: 'after' },
+        { pattern: '@controllers{,/**}', group: 'internal', position: 'after' },
         { pattern: '@hooks{,/**}', group: 'internal', position: 'after' },
         { pattern: '@components{,/**}', group: 'internal', position: 'after' },
         { pattern: '@utils{,/**}', group: 'internal', position: 'after' },

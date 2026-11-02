@@ -1,10 +1,11 @@
 import type { VisualEffectLifetime } from '@active-book/types';
 
 import type { FrameEffect } from '@hooks/effects/frame/@types';
+import { useFrameEffect } from '@hooks/effects/frame';
 
-import { useFrameEffect } from '@hooks/effects/frame/useFrameEffect';
-
-export type FrameProps = FrameEffect & { lifetime?: VisualEffectLifetime };
+export type FrameProps = FrameEffect & {
+  lifetime?: VisualEffectLifetime;
+};
 
 export const Frame = ({ lifetime, ...props }: FrameProps) => {
   useFrameEffect(props, lifetime);

@@ -3,6 +3,7 @@ import type { RefObject } from 'react';
 import { useEffect, useRef } from 'react';
 
 import { useDispatch, useSelector } from '@store';
+
 import { volumeSelectors } from '@store/volume';
 import { effectsActions, effectsSelectors } from '@store/effects/common';
 
@@ -13,6 +14,7 @@ type VideoProps = React.MediaHTMLAttributes<HTMLVideoElement> & {
   relativeVolume?: number;
   preserveTime?: boolean;
   elementRef?: RefObject<HTMLVideoElement | null>;
+
   onCanPlay?: () => void;
   onError?: () => void;
 };
@@ -26,6 +28,7 @@ export const Video = ({
   autoPlay = true,
   preserveTime = true,
   elementRef,
+
   onCanPlay,
   onError,
   ...etc
@@ -33,8 +36,9 @@ export const Video = ({
   const dispatch = useDispatch();
 
   const ownRef = useRef<HTMLVideoElement>(null);
-  const ref = elementRef ?? ownRef;
   const refCurrentTime = useRef(0);
+
+  const ref = elementRef ?? ownRef;
 
   const { videos: videosVolume, global: globalVolume } = useSelector(volumeSelectors.all);
   const videosCurrentTime = useSelector(effectsSelectors.videosCurrentTime);

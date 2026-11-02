@@ -1,6 +1,6 @@
 import type { JsonObject, VisualRendererProps } from '@active-book/types';
 
-import { useVisualEffects } from '@@/controllers/visualEffects/context';
+import { useVisualEffects } from '@controllers/visualEffects/context';
 
 import type { BackgroundEffect } from '@hooks/effects/background/@types';
 
@@ -19,13 +19,17 @@ export const BackgroundRenderer = ({ id, params }: VisualRendererProps) => {
   const session = useVisualEffects();
   // Built-in parameters are the JSON copy of the typed Background declaration, without runtime nodes.
   const options = params as BackgroundParams;
+  const component = session.getRuntimeComponent(id);
+
   const effectCur = {
     ...options,
     id,
-    Component: session.getRuntimeComponent(id),
+    Component: component,
   };
+
   const imageSource = options.kind === 'image' ? options.image?.src : undefined;
   const imageLoad = useMediaReadiness<HTMLImageElement>('images', imageSource);
+
   const videoSource = options.kind === 'video' ? options.video?.src : undefined;
   const videoLoad = useMediaReadiness<HTMLVideoElement>('videos', videoSource);
 

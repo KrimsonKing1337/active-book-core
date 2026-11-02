@@ -3,8 +3,15 @@ import type { CSSProperties, ReactNode } from 'react';
 import type { VisualDepth, VisualEffectInstance } from '@active-book/types';
 
 /** Controlled rendering input, not a registered effect or a saved book schema. */
+export type VisualSurfaceDepth = VisualDepth | SystemFeedbackDepth;
+
+export type SystemFeedbackDepth = {
+  plane: 'systemFeedback';
+  order: number;
+};
+
 export type VisualSurfaceItem = Pick<VisualEffectInstance, 'id' | 'placement' | 'visibility'> & {
-  depth: VisualDepth | { plane: 'systemFeedback'; order: number };
+  depth: VisualSurfaceDepth;
   content: ReactNode;
 };
 

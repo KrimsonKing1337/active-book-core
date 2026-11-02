@@ -4,7 +4,7 @@ import type { BookGeometry } from '@components/BookVisualRoot/geometry';
 
 import type { VisualSurfaceItem } from './@types';
 
-import { VisualSurface } from './components/VisualSurface';
+import { VisualSurface } from './components';
 
 import { compareVisualSurfaces } from './utils/order';
 

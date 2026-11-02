@@ -2,12 +2,10 @@ import { memo, useLayoutEffect, useMemo, useRef } from 'react';
 
 import type { VisualEffectInstance, VisualGeometry, VisualPlayback } from '@active-book/types';
 
-import type { VisualEffects } from '@@/controllers/visualEffects';
+import type { VisualEffects } from '@controllers/visualEffects';
 
 import type { BookGeometry } from '@components/BookVisualRoot/geometry';
-
 import { resolvePlacement } from '@components/VisualSurfaces/utils/placement';
-
 
 type RegisteredVisualEffectProps = {
   effect: VisualEffectInstance;
@@ -15,7 +13,11 @@ type RegisteredVisualEffectProps = {
   geometry: BookGeometry | null;
 };
 
-export const RegisteredVisualEffect = memo(({ effect, visualEffects, geometry }: RegisteredVisualEffectProps) => {
+export const RegisteredVisualEffect = memo(({
+  effect,
+  visualEffects,
+  geometry,
+}: RegisteredVisualEffectProps) => {
   const { id, definitionId, params } = effect;
 
   const { Renderer, defaultParams } = visualEffects.getDefinition(definitionId);

@@ -2,14 +2,10 @@ import { useLayoutEffect, useMemo, useSyncExternalStore } from 'react';
 
 import type { VisualEffectRegistration } from '@active-book/types';
 
-import type { VisualEffects } from '@@/controllers/visualEffects';
-
-import { isVisualEffectActive } from '@@/controllers/visualEffects/lifetime';
-
-import { RegisteredVisualEffect } from '@components/RegisteredVisualEffect';
+import { isVisualEffectActive, type VisualEffects } from '@controllers/visualEffects';
 
 import type { VisualSurfaceItem } from '@components/VisualSurfaces';
-
+import { RegisteredVisualEffect } from '@components/RegisteredVisualEffect';
 
 import type { BookGeometry } from '../geometry';
 
@@ -24,14 +20,23 @@ const emptySnapshot: readonly VisualEffectRegistration[] = [];
 const readEmptySnapshot = () => emptySnapshot;
 const subscribeEmpty = () => () => {};
 
-export const useVisualEffectSurfaces = ({ visualEffects, page, geometry }: VisualEffectSurfacesOptions) => {
+export const useVisualEffectSurfaces = ({
+  visualEffects,
+  page,
+  geometry,
+}: VisualEffectSurfacesOptions) => {
+  const visualEffectsSubscribe = visualEffects?.subscribe ?? subscribeEmpty;
+  const visualEffectsSnapshot = visualEffects?.getSnapshot ?? readEmptySnapshot;
+
   const registrations = useSyncExternalStore(
-    visualEffects?.subscribe ?? subscribeEmpty,
-    visualEffects?.getSnapshot ?? readEmptySnapshot,
-    visualEffects?.getSnapshot ?? readEmptySnapshot,
+    visualEffectsSubscribe,
+    visualEffectsSnapshot,
+    visualEffectsSnapshot,
   );
 
-  useLayoutEffect(() => visualEffects?.connectHost(), [visualEffects]);
+  useLayoutEffect(() => {
+    return visualEffects?.connectHost();
+  }, [visualEffects]);
 
   return useMemo<VisualSurfaceItem[]>(() => {
     if (!visualEffects) {
@@ -43,11 +48,19 @@ export const useVisualEffectSurfaces = ({ visualEffects, page, geometry }: Visua
     });
 
     return active.map(({ effect }) => {
-      const generation = visualEffects.getGeneration(effect.id);
-      const definition = visualEffects.getDefinition(effect.definitionId);
-      const depth: VisualSurfaceItem['depth'] = definition.systemFeedback
-        ? { plane: 'systemFeedback', order: effect.depth.order }
-        : effect.depth;
+      const { definitionId, visibility, depth: effectDepth, id, placement } = effect;
+
+      const generation = visualEffects.getGeneration(id);
+      const definition = visualEffects.getDefinition(definitionId);
+
+      let depth: VisualSurfaceItem['depth'] = effectDepth;
+
+      if (definition.systemFeedback) {
+        depth = {
+          plane: 'systemFeedback',
+          order: effectDepth.order,
+        };
+      }
 
       const content = (
         <RegisteredVisualEffect
@@ -59,9 +72,9 @@ export const useVisualEffectSurfaces = ({ visualEffects, page, geometry }: Visua
       );
 
       return {
-        id: effect.id,
-        placement: effect.placement,
-        visibility: effect.visibility,
+        id: id,
+        placement: placement,
+        visibility: visibility,
         depth,
         content,
       };
