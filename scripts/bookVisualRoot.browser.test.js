@@ -93,28 +93,27 @@ test('persistent book root and existing page rendering in Chromium', async (cont
         assert(mobile.regions.page.width <= 360);
         assert(mobile.regions.page.height < mobile.regions.book.height);
 
-        const layerInfo = await page.locator('#frame-effects').evaluate((frame) => {
+        const layerInfo = await page.locator('[data-visual-plane="scene"]').evaluate((plane) => {
           const toolbar = document.querySelector('#Toolbar').getBoundingClientRect();
-          const rect = frame.getBoundingClientRect();
+          const frame = document.querySelector('[data-visual-surface="behind-one"]').getBoundingClientRect();
           const hit = document.elementFromPoint(toolbar.x + toolbar.width / 2, toolbar.y + toolbar.height / 2);
           return {
-            inert: frame.inert,
-            pointerEvents: getComputedStyle(frame).pointerEvents,
-            bottom: rect.bottom,
+            inert: plane.inert,
+            pointerEvents: getComputedStyle(plane).pointerEvents,
+            bottom: frame.bottom,
             toolbarTop: toolbar.top,
             toolbarHit: document.querySelector('#Toolbar').contains(hit),
-            layers: Array.from(frame.children).map((layer) => getComputedStyle(layer).zIndex),
           };
         });
         assert.equal(layerInfo.inert, true);
         assert.equal(layerInfo.pointerEvents, 'none');
         assert(layerInfo.bottom <= layerInfo.toolbarTop + 1);
         assert.equal(layerInfo.toolbarHit, true);
-        assert.deepEqual(layerInfo.layers, ['1', '4', '30']);
-        for (const layer of ['behind', 'above', 'overlay']) {
-          assert.equal(await page.locator(`[data-frame-layer="${layer}"] [data-effect-id="${layer}-one"]`).count(), 1);
+        for (const [id, plane] of [['behind', 'scene'], ['above', 'aboveNarrative'], ['overlay', 'systemFeedback']]) {
+          assert.equal(await page.locator(`[data-visual-plane="${plane}"] [data-effect-id="${id}-one"]`).count(), 1);
         }
-        assert.equal(await page.locator('#background-effects').evaluate((element) => getComputedStyle(element).zIndex), '0');
+        assert.equal(await page.locator('[data-visual-plane="background"]')
+          .evaluate((element) => getComputedStyle(element).zIndex), '0');
 
         const fontButton = page.locator('[data-welcome-tour-id="font"] > div').last();
         await fontButton.click();
@@ -146,7 +145,8 @@ test('persistent book root and existing page rendering in Chromium', async (cont
         await page.getByTestId('empty').click();
         await page.waitForFunction(() => JSON.parse(document.querySelector('[data-testid="geometry"]').textContent)
           .regions.page === null);
-        assert.equal(await page.locator('[data-effect-id]').count(), 0);
+        assert.equal(await page.locator('[data-visual-plane]:not([data-visual-plane="systemFeedback"]) [data-effect-id]')
+          .count(), 0);
         assert.equal(await book.evaluate((element) => element === document.querySelector('[data-book-region="book"]')), true);
         assert.deepEqual(errors, []);
       } finally {

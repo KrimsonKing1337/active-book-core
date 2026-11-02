@@ -12,3 +12,4 @@ scripts/browserFixture.js
 !lib/src
 !lib-esm/src
 scripts/visualLifecycle.browser.test.js
+scripts/unifiedVisualEffects.browser.test.js

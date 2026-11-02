@@ -1,19 +1,19 @@
-import type { FrameEffect, FrameShadowItem } from '@hooks/effects/frame/@types';
-
 import { useCallback, useId, useRef } from 'react';
 
-import { useDispatch } from '@store';
+import type { FrameEffect, FrameShadowItem } from '@hooks/effects/frame/@types';
 
-import { frameEffectsActions } from '@store/effects/frame';
+
+import { useFrameEffects } from '@hooks/effects/frame/useFrameEffects';
+
+import { useFrameEffect } from '@hooks/effects/frame/useFrameEffect';
 
 import { useAppMode } from '@components/App/AppModeContext';
 
-import { useFrameEffect } from '@hooks/effects/frame/useFrameEffect';
 
 const MIN_PREVIEW_DURATION = 15;
 
 export const useVibrationPreview = () => {
-  const dispatch = useDispatch();
+  const { updateShadow } = useFrameEffects();
 
   const appMode = useAppMode();
 
@@ -45,12 +45,8 @@ export const useVibrationPreview = () => {
   useFrameEffect(effect);
 
   const setHidden = useCallback((hidden: boolean) => {
-    dispatch(frameEffectsActions.updateShadow({
-      effectId,
-      shadowId,
-      changes: { hidden },
-    }));
-  }, [dispatch, effectId]);
+    updateShadow(effectId, shadowId, { hidden });
+  }, [updateShadow, effectId]);
 
   const stop = useCallback(() => {
     if (timerRef.current !== null) {

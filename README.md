@@ -19,3 +19,5 @@ https://github.com/KrimsonKing1337/activeBook-fairytale-forest
 
 Почитать можно здесь (не работает во встроенном браузере телеграмма и аналогов): \
 https://active-books.ru
+
+Текущая архитектура Background/Frame: [общая визуальная сессия](docs/unified-background-frame.md).

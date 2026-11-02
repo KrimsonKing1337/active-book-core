@@ -15,11 +15,9 @@ import { mainReducer, watchMainActions } from './main';
 import { configReducer, watchConfigActions } from './config';
 import { volumeReducer, watchVolumeActions } from './volume';
 import { effectsReducer, watchEffectsActions } from './effects/common';
-import { backgroundEffectsReducer } from './effects/background';
 import { fontEffectsReducer } from './effects/font';
 import { audioEffectsReducer, watchAudioEffectsActions } from './effects/audio/audio';
 import { audioBgEffectsReducer, watchAudioBgEffectsActions } from './effects/audio/audioBg';
-import { frameEffectsReducer, watchFrameEffectsActions } from './effects/frame';
 import { bookmarksReducer, watchBookmarksActions } from './bookmarks';
 import { segmentsReducer, watchSegmentsActions } from './segments';
 
@@ -34,8 +32,6 @@ const reducer = {
   effects: effectsReducer,
   audioEffects: audioEffectsReducer,
   audioBgEffects: audioBgEffectsReducer,
-  frameEffects: frameEffectsReducer,
-  backgroundEffects: backgroundEffectsReducer,
   fontEffects: fontEffectsReducer,
   bookmarks: bookmarksReducer,
   segments: segmentsReducer,
@@ -66,7 +62,6 @@ sagaMiddleware.run(watchMainActions);
 sagaMiddleware.run(watchEffectsActions);
 sagaMiddleware.run(watchAudioEffectsActions);
 sagaMiddleware.run(watchAudioBgEffectsActions);
-sagaMiddleware.run(watchFrameEffectsActions);
 sagaMiddleware.run(watchBookmarksActions);
 sagaMiddleware.run(watchVolumeActions);
 sagaMiddleware.run(watchSegmentsActions);

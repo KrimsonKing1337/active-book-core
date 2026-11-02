@@ -2,31 +2,3 @@
   position: absolute;
   inset: 0;
 }
-
-.FrameEffects {
-  position: absolute;
-  inset: 0;
-
-  overflow: hidden;
-
-  pointer-events: none;
-}
-
-.BehindLayer,
-.AboveLayer,
-.OverlayLayer {
-  position: absolute;
-  inset: 0;
-}
-
-.BehindLayer {
-  z-index: var(--book-frame-behind-layer, 0);
-}
-
-.AboveLayer {
-  z-index: var(--book-frame-above-layer, 2);
-}
-
-.OverlayLayer {
-  z-index: var(--book-frame-overlay-layer, 3);
-}

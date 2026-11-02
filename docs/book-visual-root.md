@@ -1,5 +1,8 @@
 # Persistent book visual root
 
+Current Background/Frame registration, rendering and cleanup supersede the legacy
+paths described in this stage; see [stage 5](unified-background-frame.md).
+
 `AppWrapper` is mounted above routing in both `App` (including editor preview) and
 the built reader. It now owns one `BookVisualRoot`, which remains mounted while
 routes and loading states replace or hide page content. The root occupies the

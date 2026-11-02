@@ -6,15 +6,11 @@ import { useDispatch, useSelector } from '@store';
 
 import { mainSelectors } from '@store/main';
 import { segmentsActions } from '@store/segments';
-import { backgroundEffectsActions } from '@store/effects/background';
-import { frameEffectsActions } from '@store/effects/frame';
 
 import { Toolbar } from '@components/Toolbar';
 import { Menu } from '@components/Menu';
 import { TableOfContents } from '@components/TableOfContents';
 import { Bookmarks } from '@components/Bookmarks';
-import { FrameEffects } from '@components/FrameEffects';
-import { BackgroundEffects } from '@components/BackgroundEffects';
 
 import { Narrative } from './components/Narrative';
 
@@ -38,8 +34,6 @@ export const PageWrapper = ({
   useEffect(() => {
     return () => {
       dispatch(segmentsActions.reset());
-      dispatch(backgroundEffectsActions.setEffects({}));
-      dispatch(frameEffectsActions.setEffects({}));
     };
   }, []);
 
@@ -54,16 +48,14 @@ export const PageWrapper = ({
 
   return (
     <div id="page-wrapper" className={pageWrapperClassNames} {...etc}>
-      <div id="main-content-wrapper" className={mainContendClassNames}>
+      <div id="main-content-wrapper" className={mainContendClassNames} data-book-region="bookViewport">
         <div className={styles.NarrativeFrame} data-book-region="page frame">
           <Narrative>
             {children}
           </Narrative>
 
-          <FrameEffects />
         </div>
 
-        <BackgroundEffects />
 
         {!withoutToolbar && (
           <Toolbar sbMode={sbMode} />

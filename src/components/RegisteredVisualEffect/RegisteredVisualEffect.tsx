@@ -2,11 +2,12 @@ import { memo, useLayoutEffect, useMemo, useRef } from 'react';
 
 import type { VisualEffectInstance, VisualGeometry, VisualPlayback } from '@active-book/types';
 
+import type { VisualEffects } from '@@/controllers/visualEffects';
+
 import type { BookGeometry } from '@components/BookVisualRoot/geometry';
 
 import { resolvePlacement } from '@components/VisualSurfaces/utils/placement';
 
-import type { VisualEffects } from '@@/visualEffects';
 
 type RegisteredVisualEffectProps = {
   effect: VisualEffectInstance;

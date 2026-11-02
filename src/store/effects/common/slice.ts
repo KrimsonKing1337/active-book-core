@@ -39,7 +39,7 @@ const slice = createSlice({
       state.videosAmount = action.payload;
     },
     setVideosReadyAmount(state, action: PayloadAction<State['videosReadyAmount']>) {
-      state.dotLottieReadyAmount = action.payload;
+      state.videosReadyAmount = action.payload;
     },
     setVideoReady() {},
 

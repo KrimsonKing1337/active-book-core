@@ -29,6 +29,7 @@ export const resolveVisualSurface = ({ item, geometry }: ResolveVisualSurfacePar
     top: region.y,
     width: region.width,
     height: region.height,
+    borderRadius: region.borderRadius,
   };
 
   if (item.visibility.region === 'frame') {

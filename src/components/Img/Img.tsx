@@ -1,5 +1,5 @@
 export type ImgProps = React.HTMLAttributes<HTMLImageElement> & {
-  passedRef?: React.RefObject<HTMLImageElement>
+  passedRef?: React.RefObject<HTMLImageElement | null>;
   className?: string;
   src: string;
   onLoad?: () => void;

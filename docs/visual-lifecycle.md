@@ -1,5 +1,8 @@
 # Visual effect registration and lifetime (stage 4)
 
+Current Background/Frame registration, rendering and cleanup supersede the legacy
+paths described in this stage; see [stage 5](unified-background-frame.md).
+
 `createVisualEffects({ definitions, pages })` creates a session for one book. Pass
 that stable object to `App.visualEffects` or `AppWrapper.visualEffects`. Direct
 `BookVisualRoot` hosts also supply their current `page` prop. The normal AppWrapper

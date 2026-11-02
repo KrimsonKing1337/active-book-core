@@ -36,6 +36,7 @@ test('visual placement in Chromium', async (context) => {
     page.on('pageerror', (error) => errors.push(error.message));
     try {
       await page.goto(`${origin}/tests/visualPlacement/`);
+      await page.getByTestId('first').click();
       await page.getByTestId('page-one').waitFor();
       await page.waitForFunction(() => window.setVisualTestSurfaces
         && JSON.parse(document.querySelector('[data-testid="geometry"]').textContent)?.regions.narrativeContent);

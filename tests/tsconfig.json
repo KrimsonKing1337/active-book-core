@@ -5,6 +5,8 @@
   },
   "include": [
     "../d.ts",
+    "unifiedVisualEffects/**/*.ts",
+    "unifiedVisualEffects/**/*.tsx",
     "bookVisualRoot/**/*.ts",
     "bookVisualRoot/**/*.tsx",
     "visualPlacement/**/*.ts",

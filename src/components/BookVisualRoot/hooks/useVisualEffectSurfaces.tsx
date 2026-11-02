@@ -2,12 +2,14 @@ import { useLayoutEffect, useMemo, useSyncExternalStore } from 'react';
 
 import type { VisualEffectRegistration } from '@active-book/types';
 
+import type { VisualEffects } from '@@/controllers/visualEffects';
+
+import { isVisualEffectActive } from '@@/controllers/visualEffects/lifetime';
+
 import { RegisteredVisualEffect } from '@components/RegisteredVisualEffect';
 
 import type { VisualSurfaceItem } from '@components/VisualSurfaces';
 
-import type { VisualEffects } from '@@/visualEffects';
-import { isVisualEffectActive } from '@@/visualEffects/lifetime';
 
 import type { BookGeometry } from '../geometry';
 
@@ -42,6 +44,10 @@ export const useVisualEffectSurfaces = ({ visualEffects, page, geometry }: Visua
 
     return active.map(({ effect }) => {
       const generation = visualEffects.getGeneration(effect.id);
+      const definition = visualEffects.getDefinition(effect.definitionId);
+      const depth: VisualSurfaceItem['depth'] = definition.systemFeedback
+        ? { plane: 'systemFeedback', order: effect.depth.order }
+        : effect.depth;
 
       const content = (
         <RegisteredVisualEffect
@@ -56,7 +62,7 @@ export const useVisualEffectSurfaces = ({ visualEffects, page, geometry }: Visua
         id: effect.id,
         placement: effect.placement,
         visibility: effect.visibility,
-        depth: effect.depth,
+        depth,
         content,
       };
     });

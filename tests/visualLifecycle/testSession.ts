@@ -5,7 +5,7 @@ import type {
   VisualPlayback,
 } from '@active-book/types';
 
-import { createVisualEffects } from '../../src/visualEffects';
+import { createVisualEffects } from '../../src/controllers/visualEffects';
 
 import { CounterRenderer } from './CounterRenderer';
 import { StaticRenderer } from './StaticRenderer';
@@ -52,8 +52,12 @@ export const testApi = {
   metrics,
   registration,
   ready: false,
-  goToPage: (page: number) => { void page; },
-  setBookVisible: (visible: boolean) => { void visible; },
+  goToPage: (page: number) => {
+    void page;
+  },
+  setBookVisible: (visible: boolean) => {
+    void visible;
+  },
   heldController: undefined as VisualEffectController | undefined,
   heldPlayback: undefined as VisualPlayback | undefined,
 };
