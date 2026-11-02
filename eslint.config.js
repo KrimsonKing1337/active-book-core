@@ -100,7 +100,7 @@ export default defineConfig([globIgnores, {
     '@stylistic/quotes': ['error', 'single'],
     '@stylistic/object-curly-spacing': ['error', 'always'],
     '@stylistic/curly-newline': ['error', {
-      'min-elements': 1,
+      'minElements': 1,
     }],
 
     '@stylistic/max-len': ['error', {
