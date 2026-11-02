@@ -1,21 +1,21 @@
-import type { CSSProperties } from 'react';
-
-import type { ReactNode } from 'react';
+import type { CSSProperties, PropsWithChildren } from 'react';
 
 import type { JsonObject, VisualRendererProps } from '@active-book/types';
-
 
 import type { FrameEffect } from '@hooks/effects/frame/@types';
 
 import { FrameElement } from '../FrameElement';
-import { FrameShadow, Police, Caramelldansen } from '../FrameShadow';
+import { FrameShadow } from '../FrameShadow';
+import { Police, Caramelldansen } from '../FrameShadow/presets';
 import { FrameText } from '../FrameText';
 
 import * as styles from '../../FrameEffects.module.scss';
 
 type FrameParams = JsonObject & Omit<FrameEffect, 'id'>;
 
-export const FrameRenderer = ({ id, params, children }: VisualRendererProps & { children?: ReactNode }) => {
+export type FrameRendererProps = PropsWithChildren & VisualRendererProps;
+
+export const FrameRenderer = ({ id, params, children }: FrameRendererProps) => {
   const options = params as FrameParams;
 
   const {

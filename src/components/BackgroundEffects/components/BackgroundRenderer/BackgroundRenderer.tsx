@@ -1,7 +1,6 @@
-import type { ReactNode } from 'react';
+import type { PropsWithChildren } from 'react';
 
 import type { JsonObject, VisualRendererProps } from '@active-book/types';
-
 
 import type { BackgroundEffect } from '@hooks/effects/background/@types';
 
@@ -16,8 +15,11 @@ import * as styles from '../../BackgroundEffects.module.scss';
 
 type BackgroundParams = JsonObject & Omit<BackgroundEffect, 'id'>;
 
-export const BackgroundRenderer = ({ id, params, children }: VisualRendererProps & { children?: ReactNode }) => {
+export type BackgroundRendererProps = PropsWithChildren & VisualRendererProps;
+
+export const BackgroundRenderer = ({ id, params, children }: BackgroundRendererProps) => {
   const options = params as BackgroundParams;
+
   const imageSource = options.kind === 'image' ? options.image?.src : undefined;
   const imageLoad = useMediaReadiness<HTMLImageElement>('images', imageSource);
   const videoSource = options.kind === 'video' ? options.video?.src : undefined;
@@ -42,6 +44,8 @@ export const BackgroundRenderer = ({ id, params, children }: VisualRendererProps
   const showImage = kind === 'image' && image && image?.src.trim();
   const showVideo = kind === 'video' && video && video?.src.trim();
   const componentContent = kind === 'component' ? children : null;
+
+  const videoRelativeVolume = video?.relativeVolume ?? 100;
 
   return (
     <div
@@ -76,7 +80,7 @@ export const BackgroundRenderer = ({ id, params, children }: VisualRendererProps
           autoPlay={video.autoPlay ?? true}
           loop={video.loop ?? true}
           muted={video.muted ?? true}
-          relativeVolume={video.relativeVolume ?? 100}
+          relativeVolume={videoRelativeVolume}
           onCanPlay={videoLoad.markReady}
           onError={videoLoad.markReady}
         />

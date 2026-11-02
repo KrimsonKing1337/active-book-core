@@ -1,6 +1,4 @@
-import type { RefObject } from 'react';
-
-import { useEffect, useRef } from 'react';
+import { type RefObject, useEffect, useRef } from 'react';
 
 import { useDispatch, useSelector, useStore } from '@store';
 
@@ -33,8 +31,8 @@ export const Video = ({
   onError,
   ...etc
 }: VideoProps) => {
-  const dispatch = useDispatch();
   const store = useStore();
+  const dispatch = useDispatch();
 
   const ownRef = useRef<HTMLVideoElement>(null);
   const refCurrentTime = useRef(0);
@@ -63,17 +61,21 @@ export const Video = ({
 
   useEffect(() => {
     const element = ref.current;
+
     if (!element) {
       return;
     }
 
     element.volume = (videosVolume / 100) * (relativeVolume / 100) * (globalVolume / 100);
+
     element.setAttribute('data-relativeVolume', relativeVolume.toString());
   }, [videosVolume, globalVolume, relativeVolume, ref]);
 
   useEffect(() => {
     const element = ref.current;
+
     const savedTime = store.getState().effects.videosCurrentTime[id];
+
     if (!element || !preserveTime || !savedTime) {
       return;
     }
@@ -92,17 +94,22 @@ export const Video = ({
 
   useEffect(() => {
     const element = ref.current;
+
     if (!element) {
       return;
     }
+
     refCurrentTime.current = element.currentTime;
+
     const handleTimeUpdate = () => {
       refCurrentTime.current = element.currentTime;
     };
+
     element.addEventListener('timeupdate', handleTimeUpdate);
 
     return () => {
       element.removeEventListener('timeupdate', handleTimeUpdate);
+
       if (preserveTime && refCurrentTime.current) {
         dispatch(effectsActions.setVideoCurrentTime({
           id,

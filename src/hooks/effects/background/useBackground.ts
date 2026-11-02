@@ -1,7 +1,7 @@
 import type { VisualEffectLifetime } from '@active-book/types';
 
 import {
-  BuiltinDeclaration,
+  type BuiltinDeclaration,
   useVisualRegistrations,
   createBuiltinRegistration,
   usePageLifetime,
@@ -26,5 +26,7 @@ export const useBackground = (effect: BackgroundEffect, lifetime?: VisualEffectL
     });
   }
 
-  return useVisualRegistrations({ session, registrations: declarations.map(createBuiltinRegistration) });
+  const registrations = declarations.map(createBuiltinRegistration);
+
+  return useVisualRegistrations({ session, registrations });
 };

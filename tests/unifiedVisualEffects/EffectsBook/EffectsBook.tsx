@@ -6,7 +6,7 @@ import type { VisualEffectDefinition, VisualEffectRegistration } from '@active-b
 
 import { createBuiltinRegistration } from '../../../src/controllers/visualEffects/utils/declarations';
 import { BackgroundRenderer } from '../../../src/components/BackgroundEffects/components/BackgroundRenderer';
-import { FrameRenderer } from '../../../src/components/FrameEffects/components/FrameRenderer';
+import { FrameRendererProps } from '../../../src/components/FrameEffects/components/FrameRenderer';
 import { AppModeContext } from '../../../src/components/App/AppModeContext';
 import { AppWrapper } from '../../../src/components/AppWrapper';
 import { useBookGeometry } from '../../../src/components/BookVisualRoot';

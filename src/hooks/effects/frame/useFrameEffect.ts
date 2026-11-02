@@ -28,5 +28,7 @@ export const useFrameEffect = (effect: FrameEffect | null, lifetime?: VisualEffe
     });
   }
 
-  useVisualRegistrations({ session, registrations: declarations.map(createBuiltinRegistration) });
+  const registrations = declarations.map(createBuiltinRegistration);
+
+  useVisualRegistrations({ session, registrations });
 };

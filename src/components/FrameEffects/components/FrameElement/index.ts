@@ -1,1 +1,1 @@
-export { FrameElement } from './FrameElement';
+export * from './FrameElement';

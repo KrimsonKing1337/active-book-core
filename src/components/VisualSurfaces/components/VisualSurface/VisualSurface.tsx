@@ -3,12 +3,11 @@ import type { CSSProperties } from 'react';
 import type { BookGeometry } from '@components/BookVisualRoot/geometry';
 
 import type { VisualSurfaceItem } from '@components/VisualSurfaces';
-
-import { resolveVisualSurface } from '../../utils/resolveVisualSurface';
+import { resolveVisualSurface } from '@components/VisualSurfaces/utils';
 
 import * as styles from './VisualSurface.module.scss';
 
-type VisualSurfaceProps = {
+export type VisualSurfaceProps = {
   item: VisualSurfaceItem;
   geometry: BookGeometry | null;
   order: number;

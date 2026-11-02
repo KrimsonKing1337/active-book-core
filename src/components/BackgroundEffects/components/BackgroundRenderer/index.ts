@@ -1,1 +1,1 @@
-export { BackgroundRenderer } from './BackgroundRenderer';
+export * from './BackgroundRenderer';

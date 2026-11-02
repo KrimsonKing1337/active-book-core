@@ -14,7 +14,7 @@ type OwnedRegistration = {
 const empty: readonly VisualEffectRegistration[] = [];
 
 /** Reconcile this owner's descriptions; other declarations in the same session are independent. */
-type VisualRegistrationsOptions = {
+export type VisualRegistrationsOptions = {
   session: VisualEffects | null;
   registrations?: readonly VisualEffectRegistration[];
   definitions?: readonly VisualEffectDefinition[];
@@ -31,36 +31,57 @@ export const useVisualRegistrations = ({
     if (!session) {
       return;
     }
+
     if (definitions) {
       session.setDefinitions(definitions);
     }
+
     const owned = ownedRef.current;
-    const available = registrations.filter((cur) => session.hasDefinition(cur.effect.definitionId));
-    const ids = new Set(available.map((cur) => cur.effect.id));
+
+    const availableRegistrations = registrations.filter((registrationCur) => {
+      return session.hasDefinition(registrationCur.effect.definitionId);
+    });
+
+    const ids = new Set(
+      availableRegistrations.map((cur) => cur.effect.id),
+    );
+
     for (const [id, previous] of owned) {
       if (!ids.has(id)) {
         previous.remove();
+
         owned.delete(id);
       }
     }
 
-    for (const registrationCur of available) {
+    for (const registrationCur of availableRegistrations) {
       const { id, definitionId } = registrationCur.effect;
+
       let previous = owned.get(id);
+
       if (previous && previous.registration.effect.definitionId !== definitionId) {
         previous.remove();
+
         owned.delete(id);
+
         previous = undefined;
       }
+
       if (previous && isEqual(previous.registration, registrationCur)) {
         continue;
       }
+
       if (previous && session.getGeneration(id) !== undefined) {
         session.update(id, registrationCur);
+
         previous.registration = registrationCur;
       } else {
         const remove = session.register(registrationCur);
-        owned.set(id, { registration: registrationCur, remove });
+
+        owned.set(id, {
+          registration: registrationCur,
+          remove,
+        });
       }
     }
   }, [session, registrations, definitions]);
@@ -70,7 +91,9 @@ export const useVisualRegistrations = ({
     ownedRef.current.clear();
   }, []);
 
-  useEffect(() => clear, [session, clear]);
+  useEffect(() => {
+    return clear;
+  }, [session, clear]);
 
   return clear;
 };

@@ -4,8 +4,7 @@ import type { VisualEffectRegistration } from '@active-book/types';
 
 import { isVisualEffectActive, type VisualEffects } from '@controllers/visualEffects';
 
-import type { VisualSurfaceItem } from '@components/VisualSurfaces';
-import { RegisteredVisualEffect } from '@components/RegisteredVisualEffect';
+import { type VisualSurfaceItem, RegisteredVisualEffect } from '@components';
 
 import type { BookGeometry } from '../geometry';
 
@@ -30,6 +29,7 @@ export const useVisualEffectSurfaces = ({
 }: VisualEffectSurfacesOptions) => {
   const visualEffectsSubscribe = visualEffects?.subscribe ?? subscribeEmpty;
   const visualEffectsSnapshot = visualEffects?.getSnapshot ?? readEmptySnapshot;
+  const visualEffectsPageCount = visualEffects?.getPageCount ?? readNoPages;
 
   const registrations = useSyncExternalStore(
     visualEffectsSubscribe,
@@ -39,8 +39,8 @@ export const useVisualEffectSurfaces = ({
 
   const pages = useSyncExternalStore(
     visualEffectsSubscribe,
-    visualEffects?.getPageCount ?? readNoPages,
-    visualEffects?.getPageCount ?? readNoPages,
+    visualEffectsPageCount,
+    visualEffectsPageCount,
   );
 
   useLayoutEffect(() => {
@@ -81,13 +81,15 @@ export const useVisualEffectSurfaces = ({
         />
       );
 
+      const isHidden = hiddenVisualEffects.includes(id);
+
       return {
         id: id,
         placement: placement,
         visibility: visibility,
         depth,
         content,
-        hidden: hiddenVisualEffects.includes(id),
+        hidden: isHidden,
       };
     });
   }, [registrations, page, pages, geometry, visualEffects, hiddenVisualEffects]);

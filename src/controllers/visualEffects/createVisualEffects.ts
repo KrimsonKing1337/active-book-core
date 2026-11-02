@@ -3,8 +3,9 @@ import { isEqual } from 'lodash-es';
 import type { VisualEffectDefinition, VisualEffectRegistration } from '@active-book/types';
 
 import type { CreateVisualEffectsOptions, HostVisualEffectDefinition, VisualEffectChanges } from './@types';
+
 import { builtinVisualDefinitions } from './definitions';
-import { createVisualControllers, copyVisualData, validateVisualLifetime } from './utils';
+import { copyVisualData, createVisualControllers, validateVisualLifetime } from './utils';
 
 export const createVisualEffects = ({ definitions = [], pages }: CreateVisualEffectsOptions) => {
   if (!Number.isInteger(pages) || pages < 1) {
@@ -27,14 +28,20 @@ export const createVisualEffects = ({ definitions = [], pages }: CreateVisualEff
     }
   };
 
-  for (const definitionCur of [...builtinVisualDefinitions, ...definitions]) {
-    if (!definitionCur.id || implementations.has(definitionCur.id)) {
-      throw new Error(`Duplicate or empty visual definition ID: ${definitionCur.id}`);
+  const allDefinitions = [...builtinVisualDefinitions, ...definitions];
+
+  for (const definitionCur of allDefinitions) {
+    const { id } = definitionCur;
+
+    if (!id || implementations.has(id)) {
+      throw new Error(`Duplicate or empty visual definition ID: ${id}`);
     }
 
-    implementations.set(definitionCur.id, Object.freeze({
+    const defaultParams = copyVisualData(definitionCur.defaultParams);
+
+    implementations.set(id, Object.freeze({
       ...definitionCur,
-      defaultParams: copyVisualData(definitionCur.defaultParams),
+      defaultParams,
     }));
   }
 
@@ -56,7 +63,9 @@ export const createVisualEffects = ({ definitions = [], pages }: CreateVisualEff
 
   const remove = (id: string) => {
     if (registrations.delete(id)) {
+
       controllers.invalidate(id);
+
       generations.delete(id);
 
       publish();
@@ -67,6 +76,7 @@ export const createVisualEffects = ({ definitions = [], pages }: CreateVisualEff
 
   const register = (registration: VisualEffectRegistration) => {
     assertOpen();
+
     const { id, definitionId } = registration.effect;
 
     if (!id || registrations.has(id)) {
@@ -94,6 +104,7 @@ export const createVisualEffects = ({ definitions = [], pages }: CreateVisualEff
 
   const update = (id: string, changes: VisualEffectChanges) => {
     assertOpen();
+
     const previous = registrations.get(id);
 
     if (!previous) {
@@ -127,32 +138,62 @@ export const createVisualEffects = ({ definitions = [], pages }: CreateVisualEff
 
   const setDefinitions = (definitions: readonly VisualEffectDefinition[]) => {
     assertOpen();
+
     const next = new Map<string, HostVisualEffectDefinition>();
-    for (const definitionCur of [...builtinVisualDefinitions, ...definitions]) {
-      if (!definitionCur.id || next.has(definitionCur.id)) {
-        throw new Error(`Duplicate or empty visual definition ID: ${definitionCur.id}`);
+    const allDefinitions = [...builtinVisualDefinitions, ...definitions];
+
+    for (const definitionCur of allDefinitions) {
+      const { id, defaultParams, Renderer } = definitionCur;
+
+      if (!id || next.has(id)) {
+        throw new Error(`Duplicate or empty visual definition ID: ${id}`);
       }
-      const previous = implementations.get(definitionCur.id);
-      const unchanged = previous?.Renderer === definitionCur.Renderer
-        && isEqual(previous.defaultParams, definitionCur.defaultParams);
-      const copied = unchanged ? previous : Object.freeze({
-        ...definitionCur,
-        defaultParams: copyVisualData(definitionCur.defaultParams),
-      });
-      next.set(definitionCur.id, copied);
+
+      const previous = implementations.get(id);
+
+      const renderersAreEqual = previous?.Renderer === Renderer;
+      const paramsAreEqual = isEqual(previous?.defaultParams, defaultParams);
+
+      const unchanged = renderersAreEqual && paramsAreEqual;
+
+      const copiedDefaultParams = copyVisualData(defaultParams);
+
+      let copied = previous;
+
+      if (!unchanged) {
+        copied = Object.freeze({
+          ...definitionCur,
+          defaultParams: copiedDefaultParams,
+        });
+      }
+
+      next.set(id, copied as HostVisualEffectDefinition);
     }
-    const changed = next.size !== implementations.size
-      || [...next].some(([id, definition]) => implementations.get(id) !== definition);
+
+    const sizesAreEqual = next.size !== implementations.size;
+
+    const definitionsAreEqual = [...next].some(([id, definition]) => {
+      return implementations.get(id) !== definition;
+    });
+
+    const changed = !sizesAreEqual || definitionsAreEqual;
+
     if (!changed) {
       return;
     }
+
     for (const registrationCur of registrations.values()) {
       if (!next.has(registrationCur.effect.definitionId)) {
         remove(registrationCur.effect.id);
       }
     }
+
     implementations.clear();
-    next.forEach((definition, id) => implementations.set(id, definition));
+
+    next.forEach((definition, id) => {
+      implementations.set(id, definition);
+    });
+
     publish();
   };
 
@@ -160,6 +201,7 @@ export const createVisualEffects = ({ definitions = [], pages }: CreateVisualEff
     if (destroyed) {
       return;
     }
+
     destroyed = true;
     registrations.clear();
     implementations.clear();
@@ -175,6 +217,7 @@ export const createVisualEffects = ({ definitions = [], pages }: CreateVisualEff
     if (destroyed) {
       return () => {};
     }
+
     listeners.add(listener);
 
     return () => {
@@ -186,6 +229,7 @@ export const createVisualEffects = ({ definitions = [], pages }: CreateVisualEff
 
   const setPageCount = (count: number) => {
     assertOpen();
+
     if (!Number.isInteger(count) || count < 1) {
       throw new Error('Visual effects require a positive integer book page count');
     }
@@ -193,8 +237,10 @@ export const createVisualEffects = ({ definitions = [], pages }: CreateVisualEff
     if (pages === count) {
       return;
     }
+
     // Existing authored ranges keep their positions, including endpoints beyond a shortened book.
     pages = count;
+
     listeners.forEach((cur) => cur());
   };
 
@@ -202,6 +248,7 @@ export const createVisualEffects = ({ definitions = [], pages }: CreateVisualEff
 
   const connectHost = () => {
     assertOpen();
+
     if (hasHost) {
       throw new Error('A visual effects session can only belong to one book root');
     }

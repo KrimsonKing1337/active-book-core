@@ -1,6 +1,4 @@
-import type { PropsWithChildren } from 'react';
-
-import { useEffect, useRef, useState } from 'react';
+import { type PropsWithChildren, useEffect, useRef, useState } from 'react';
 
 import { createVisualEffects, VisualEffectsContext } from '@controllers/visualEffects';
 
@@ -10,21 +8,30 @@ import { AppContent } from '../AppContent';
 
 export type { AppWrapperProps } from '../../@types';
 
-export const BookSession = (props: PropsWithChildren<AppWrapperProps>) => {
+export type BookSessionProps = PropsWithChildren<AppWrapperProps>;
+
+export const BookSession = (props: BookSessionProps) => {
   const [ownedSession] = useState(() => {
     if (props.visualEffects) {
       return null;
     }
 
-    return createVisualEffects({ pages: props.config.pages, definitions: props.definitions });
+    return createVisualEffects({
+      pages: props.config.pages,
+      definitions: props.definitions,
+    });
   });
 
   const session = props.visualEffects ?? ownedSession;
+
   const mountedRef = useRef(false);
+
   useEffect(() => {
     mountedRef.current = true;
+
     return () => {
       mountedRef.current = false;
+
       queueMicrotask(() => {
         if (!mountedRef.current) {
           ownedSession?.destroy();

@@ -39,6 +39,10 @@ import '@styles/common.scss';
 
 import * as styles from '../../AppWrapper.module.scss';
 
+export type AppContentProps = PropsWithChildren & AppWrapperProps & {
+  visualEffects: VisualEffects;
+};
+
 export const AppContent = ({
   children,
   config,
@@ -51,14 +55,18 @@ export const AppContent = ({
   registrations,
   definitions,
   hiddenVisualEffects,
-}: PropsWithChildren<AppWrapperProps & { visualEffects: VisualEffects }>) => {
+}: AppContentProps) => {
   const dispatch = useDispatch();
 
   useLayoutEffect(() => {
     visualEffects.setPageCount(config.pages);
   }, [config.pages, visualEffects]);
 
-  useVisualRegistrations({ session: visualEffects, registrations, definitions });
+  useVisualRegistrations({
+    session: visualEffects,
+    registrations,
+    definitions,
+  });
 
   const appMode = useAppMode();
 
