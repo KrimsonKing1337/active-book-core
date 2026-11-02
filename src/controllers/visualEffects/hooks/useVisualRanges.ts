@@ -1,10 +1,12 @@
+import type { VisualEffectLifetime } from '@active-book/types';
+
 import type { RangeEffects } from '@types';
 
 import type { BackgroundEffect } from '@hooks/effects/background/@types';
 import type { FrameEffect } from '@hooks/effects/frame/@types';
 
 import type { VisualEffects } from '../createVisualEffects';
-import type { BuiltinDeclaration } from '../utils/declarations';
+import type { BuiltinDeclaration } from '../utils';
 
 import { useBuiltinDeclarations } from './useBuiltinDeclarations';
 
@@ -22,13 +24,15 @@ export const useVisualRanges = (session: VisualEffects, ranges: RangeEffects) =>
       id: rangeCur.id,
     } as BackgroundEffect | FrameEffect;
 
+    const lifetime: VisualEffectLifetime = {
+      type: 'range',
+      range: rangeCur.range,
+    };
+
     declarations.push({
       type: rangeCur.type,
       options,
-      lifetime: {
-        type: 'range',
-        range: rangeCur.range,
-      },
+      lifetime,
     });
   }
 

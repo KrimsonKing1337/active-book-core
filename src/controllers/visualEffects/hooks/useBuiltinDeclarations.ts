@@ -6,11 +6,9 @@ import { isEqual } from 'lodash-es';
 
 import type { VisualEffectRegistration } from '@active-book/types';
 
-import type { VisualEffects } from '../createVisualEffects';
 import type { VisualEffectChanges } from '../@types';
-import type { BuiltinDeclaration } from '../utils/declarations';
-
-import { createBuiltinRegistration } from '../utils/declarations';
+import type { VisualEffects } from '../createVisualEffects';
+import { type BuiltinDeclaration, createBuiltinRegistration } from '../utils';
 
 type ActiveDeclaration = {
   registration: VisualEffectRegistration;
@@ -35,8 +33,11 @@ export const useBuiltinDeclarations = (session: VisualEffects | null, declaratio
 
       return;
     }
+
     const active = activeRef.current;
+
     const ids = new Set(declarations.map((cur) => cur.options.id));
+
     for (const [id, previous] of active) {
       if (!ids.has(id)) {
         previous.remove();
@@ -46,35 +47,57 @@ export const useBuiltinDeclarations = (session: VisualEffects | null, declaratio
 
     for (const declarationCur of declarations) {
       const registration = createBuiltinRegistration(declarationCur);
+
       const { id, definitionId } = registration.effect;
+
       const component = declarationCur.options.Component;
+
       let previous = active.get(id);
 
       if (previous && previous.registration.effect.definitionId !== definitionId) {
         previous.remove();
         active.delete(id);
+
         previous = undefined;
       }
 
-      const sameComponent = isValidElement(previous?.component) && isValidElement(component)
-        ? previous.component.type === component.type && isEqual(previous.component.props, component.props)
-        : previous?.component === component;
+      const previousComponent = previous?.component;
 
-      if (previous && isEqual(previous.registration, registration) && sameComponent) {
+      let sameComponent = previousComponent === component;
+
+      if (isValidElement(previousComponent) && isValidElement(component)) {
+        const sameType = previousComponent.type === component.type;
+        const sameProps = isEqual(previousComponent.props, component.props);
+
+        sameComponent = sameType && sameProps;
+      }
+
+      const sameRegistration = previous
+        ? isEqual(previous.registration, registration)
+        : false;
+
+      if (sameRegistration && sameComponent) {
         continue;
       }
 
       session.setRuntimeComponent(id, component);
+
       if (previous) {
-        const changes: VisualEffectChanges = { effect: registration.effect };
+        const changes: VisualEffectChanges = {
+          effect: registration.effect,
+        };
+
         if (!isEqual(previous.registration.lifetime, registration.lifetime)) {
           changes.lifetime = registration.lifetime;
         }
+
         session.update(id, changes);
+
         previous.registration = registration;
         previous.component = component;
       } else {
         const remove = session.register(registration);
+
         active.set(id, {
           registration,
           component,
@@ -84,7 +107,9 @@ export const useBuiltinDeclarations = (session: VisualEffects | null, declaratio
     }
   }, [session, declarations]);
 
-  useEffect(() => clear, [session, clear]);
+  useEffect(() => {
+    return clear;
+  }, [session, clear]);
 
   return clear;
 };
