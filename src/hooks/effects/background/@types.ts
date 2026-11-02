@@ -37,7 +37,6 @@ export type BackgroundEffectKind =
 export type BackgroundEffect = {
   id: string;
   kind: BackgroundEffectKind;
-  inRange?: boolean;
   style?: React.CSSProperties;
   image?: BackgroundEffectMediaOptions;
   video?: BackgroundEffectVideoOptions;

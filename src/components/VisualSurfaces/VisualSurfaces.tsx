@@ -1,12 +1,10 @@
-import type { VisualPlane } from '@active-book/types';
-
 import classNames from 'classnames';
 
 import type { BookGeometry } from '@components/BookVisualRoot/geometry';
 
 import type { VisualSurfaceItem } from './@types';
 
-import { VisualSurface } from './components/VisualSurface';
+import { VisualSurface } from './components';
 
 import { compareVisualSurfaces } from './utils/order';
 
@@ -17,7 +15,13 @@ type VisualSurfacesProps = {
   geometry: BookGeometry | null;
 };
 
-const planes: readonly VisualPlane[] = ['scene', 'aboveNarrative', 'aboveControls'];
+const planes: readonly VisualSurfaceItem['depth']['plane'][] = [
+  'background',
+  'scene',
+  'aboveNarrative',
+  'aboveControls',
+  'systemFeedback',
+];
 
 export const VisualSurfaces = ({ items, geometry }: VisualSurfacesProps) => {
   return (

@@ -4,11 +4,11 @@ import { useCallback, useRef } from 'react';
 
 import classNames from 'classnames';
 
+import { type VisualEffects, VisualEffectsContext } from '@controllers/visualEffects';
+
 import type { VisualSurfaceItem } from '@components/VisualSurfaces';
 
 import { VisualSurfaces } from '@components/VisualSurfaces';
-
-import type { VisualEffects } from '@@/visualEffects';
 
 import { useBookGeometry } from './geometry';
 import { useVisualEffectSurfaces } from './hooks/useVisualEffectSurfaces';
@@ -92,7 +92,9 @@ export const BookVisualRoot = ({
       {children}
 
       {hasSurfaces && (
-        <VisualSurfaces items={surfaces} geometry={geometry} />
+        <VisualEffectsContext value={visualEffects ?? null}>
+          <VisualSurfaces items={surfaces} geometry={geometry} />
+        </VisualEffectsContext>
       )}
     </div>
   );

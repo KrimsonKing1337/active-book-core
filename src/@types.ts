@@ -1,6 +1,7 @@
 import { Howl } from 'howler';
 
 import type { BackgroundEffect } from '@hooks/effects/background/@types';
+import type { FrameEffect } from '@hooks/effects/frame/@types';
 
 import type { ItemProps as TableOfContentsItem } from '@components/TableOfContents/Item';
 
@@ -61,7 +62,7 @@ export type Range = {
   to: number;
 };
 
-export type RangeType = 'audio' | 'background';
+export type RangeType = 'audio' | 'background' | 'frame';
 
 export type AudioEffectOptionsRange = Omit<AudioEffectOptions, 'id' | 'page'>;
 export type BackgroundEffectOptionsRange = Omit<BackgroundEffect, 'id'>;
@@ -70,7 +71,7 @@ export type RangeEffect = {
   id: string;
   type: RangeType;
   range: Range[];
-  options?: AudioEffectOptionsRange | BackgroundEffectOptionsRange;
+  options?: AudioEffectOptionsRange | BackgroundEffectOptionsRange | Omit<FrameEffect, 'id'>;
 };
 
 export type RangeEffects = RangeEffect[];

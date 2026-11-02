@@ -21,6 +21,7 @@
       "@assets/*": ["./src/assets/*"],
       "@components": ["./src/components"],
       "@components/*": ["./src/components/*"],
+      "@controllers/*": ["./src/controllers/*"],
       "@pages": ["./src/pages"],
       "@pages/*": ["./src/pages/*"],
       "@hooks": ["./src/hooks"],

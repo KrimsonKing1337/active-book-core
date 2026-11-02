@@ -1,48 +1,18 @@
-import { useCallback, useEffect, useRef } from 'react';
+import type { VisualEffectLifetime } from '@active-book/types';
 
-import { useDispatch } from '@store';
-import { backgroundEffectsActions } from '@store/effects/background';
+import { useBuiltinDeclarations, usePageLifetime, useVisualEffects } from '@controllers/visualEffects';
 
 import type { BackgroundEffect } from './@types';
 
-import { effectsAreEqual } from './utils';
+export const useBackground = (effect: BackgroundEffect, lifetime?: VisualEffectLifetime) => {
+  const session = useVisualEffects();
+  const pageLifetime = usePageLifetime(session);
+  const activeLifetime = lifetime ?? pageLifetime;
+  const declarations = activeLifetime ? [{
+    type: 'background' as const,
+    options: effect,
+    lifetime: activeLifetime,
+  }] : [];
 
-export const useBackground = (effect: BackgroundEffect) => {
-  const dispatch = useDispatch();
-
-  const registeredEffectRef = useRef<BackgroundEffect | null>(null);
-
-  const destroy = useCallback(() => {
-    const registeredEffect = registeredEffectRef.current;
-
-    if (!registeredEffect) {
-      return;
-    }
-
-    registeredEffectRef.current = null;
-
-    dispatch(backgroundEffectsActions.deleteEffect(registeredEffect.id));
-  }, [dispatch]);
-
-  useEffect(() => {
-    const registeredEffect = registeredEffectRef.current;
-
-    if (registeredEffect?.id !== effect.id && registeredEffect) {
-      dispatch(backgroundEffectsActions.deleteEffect(registeredEffect.id));
-    }
-
-    const isSameEffect = registeredEffect?.id === effect.id && effectsAreEqual(registeredEffect, effect);
-
-    if (!isSameEffect) {
-      registeredEffectRef.current = effect;
-
-      dispatch(backgroundEffectsActions.setEffect(effect));
-    }
-  }, [effect, dispatch]);
-
-  useEffect(() => {
-    return destroy;
-  }, [destroy]);
-
-  return destroy;
+  return useBuiltinDeclarations(session, declarations);
 };

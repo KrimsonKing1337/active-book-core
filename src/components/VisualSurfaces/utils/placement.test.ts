@@ -6,6 +6,7 @@ import { resolvePlacement } from './placement';
 
 const geometry: BookGeometry = {
   regions: {
+    bookViewport: null,
     book: { x: 0, y: 0, width: 1000, height: 800 },
     page: { x: 100, y: 10, width: 800, height: 700 },
     frame: { x: 100, y: 10, width: 800, height: 700 },

@@ -6,6 +6,7 @@ export type BookRegionRect = {
   y: number;
   width: number;
   height: number;
+  borderRadius?: string;
 };
 
 export type FrameInsets = {

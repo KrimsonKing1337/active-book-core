@@ -1,5 +1,8 @@
 # Visual placement surfaces (stage 3)
 
+Current Background/Frame registration, rendering and cleanup supersede the legacy
+paths described in this stage; see [stage 5](unified-background-frame.md).
+
 Book-owned registration and page/range activation are described in
 [visual lifecycle](visual-lifecycle.md).
 

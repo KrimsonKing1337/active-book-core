@@ -1,78 +1,24 @@
-import { useEffect, useRef } from 'react';
+import { useContext } from 'react';
 
-import { useDispatch } from '@store';
+import type { VisualEffectLifetime } from '@active-book/types';
 
-import { frameEffectsActions } from '@store/effects/frame';
+import {
+  VisualEffectsContext,
+  useBuiltinDeclarations,
+  usePageLifetime,
+} from '@controllers/visualEffects';
 
 import type { FrameEffect } from './@types';
 
-export const useFrameEffect = (effect: FrameEffect | null) => {
-  const dispatch = useDispatch();
+export const useFrameEffect = (effect: FrameEffect | null, lifetime?: VisualEffectLifetime) => {
+  const session = useContext(VisualEffectsContext);
+  const pageLifetime = usePageLifetime(session);
+  const activeLifetime = lifetime ?? pageLifetime;
+  const declarations = effect && activeLifetime ? [{
+    type: 'frame' as const,
+    options: effect,
+    lifetime: activeLifetime,
+  }] : [];
 
-  const registeredEffectRef = useRef<FrameEffect | null>(null);
-  const registeredOptionsKeyRef = useRef('');
-
-  useEffect(() => {
-    const registered = registeredEffectRef.current;
-
-    if (!effect) {
-      if (registered) {
-        dispatch(frameEffectsActions.deleteEffect(registered.id));
-      }
-
-      registeredEffectRef.current = null;
-      registeredOptionsKeyRef.current = '';
-
-      return;
-    }
-
-    const {
-      id,
-      kind,
-      layer,
-      shadow,
-      text,
-      frameMask,
-      style,
-    } = effect;
-
-    const options = {
-      id,
-      kind,
-      layer,
-      shadow,
-      text,
-      frameMask,
-      style,
-    };
-
-    const optionsKey = JSON.stringify(options);
-
-    if (registered && registered.id !== effect.id) {
-      dispatch(frameEffectsActions.deleteEffect(registered.id));
-    }
-
-    const optionsChanged = registeredOptionsKeyRef.current !== optionsKey;
-    const componentChanged = registered?.Component !== effect.Component;
-
-    if (optionsChanged || componentChanged) {
-      registeredEffectRef.current = effect;
-      registeredOptionsKeyRef.current = optionsKey;
-
-      dispatch(frameEffectsActions.setEffect(effect));
-    }
-  }, [dispatch, effect]);
-
-  useEffect(() => {
-    return () => {
-      const registered = registeredEffectRef.current;
-
-      if (registered) {
-        registeredEffectRef.current = null;
-        registeredOptionsKeyRef.current = '';
-
-        dispatch(frameEffectsActions.deleteEffect(registered.id));
-      }
-    };
-  }, [dispatch]);
+  useBuiltinDeclarations(session, declarations);
 };

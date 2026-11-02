@@ -6,10 +6,11 @@ editing the page array does not reset reader preferences or remount BookVisualRo
 The editor supplies pages.length from its canonical book and uses the existing
 Redux position/navigation; a built book supplies its fixed compiled page count.
 
-createVisualEffects and its fixed-count validation contract are unchanged. The
-editor's legacy renderers do not yet use that session. Its later integration must
-update session validation limits without recreating active effects or remapping
-authored positional ranges; no artificial dependency is added here.
+Stage 5 also calls visualEffects.setPageCount from AppWrapper. The same session
+and existing registrations/controllers remain alive; authored range endpoints are
+not shifted or clipped. The editor's current declaration adapters now use this
+session, while the direct editor/builder registration integration is deferred.
+See [Background/Frame integration](unified-background-frame.md).
 
 The existing Chromium root fixture changes the count to five while checking the
 updated navigation label, persistent root and unchanged font setting in reader
