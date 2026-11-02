@@ -7,12 +7,8 @@ import {
 
 import type { JsonObject, VisualEffectRegistration } from '@active-book/types';
 
-import {
-  FEEDBACK_DEFINITION,
-  FRAME_DEFINITION,
-  VisualEffectsContext,
-  createBuiltinRegistration,
-} from '@controllers/visualEffects';
+import { VisualEffectsContext, createBuiltinRegistration } from '@controllers/visualEffects';
+import { FEEDBACK_DEFINITION, FRAME_DEFINITION } from '@controllers/visualEffects/constants';
 
 import type { FrameEffect, FrameShadowItem, FrameTextItem } from './@types';
 
