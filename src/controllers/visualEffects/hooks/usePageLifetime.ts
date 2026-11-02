@@ -12,11 +12,15 @@ const readNoPages = () => 0;
 
 /** Navigation and editor structure can commit separately; never declare a transient invalid page. */
 export const usePageLifetime = (session: VisualEffects | null): VisualEffectLifetime | null => {
+  const pageSubscribe = session?.subscribe ?? subscribeEmpty;
+  const pageCount = session?.getPageCount ?? readNoPages;
+
   const pages = useSyncExternalStore(
-    session?.subscribe ?? subscribeEmpty,
-    session?.getPageCount ?? readNoPages,
-    session?.getPageCount ?? readNoPages,
+    pageSubscribe,
+    pageCount,
+    pageCount,
   );
+
   const page = useSelector(mainSelectors.page);
 
   if (page < 1 || page > pages) {

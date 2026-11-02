@@ -3,12 +3,8 @@ import type { ReactNode } from 'react';
 import type { VisualEffectRegistration } from '@active-book/types';
 
 import type { CreateVisualEffectsOptions, HostVisualEffectDefinition, VisualEffectChanges } from './@types';
-
 import { builtinVisualDefinitions } from './definitions';
-
-import { createVisualControllers } from './utils/controllers';
-import { copyVisualData } from './utils/serialization';
-import { validateVisualLifetime } from './utils/lifetime';
+import { createVisualControllers, copyVisualData, validateVisualLifetime } from './utils';
 
 export const createVisualEffects = ({ definitions = [], pages }: CreateVisualEffectsOptions) => {
   if (!Number.isInteger(pages) || pages < 1) {

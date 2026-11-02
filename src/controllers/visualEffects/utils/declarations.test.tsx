@@ -12,8 +12,8 @@ import { useFlashlight } from '@hooks/effects/flashlight';
 
 import { createVisualEffects } from '../createVisualEffects';
 import { VisualEffectsContext } from '../context';
-import { createBuiltinRegistration } from '../utils/declarations';
-import { useVisualRanges } from './useVisualRanges';
+import { createBuiltinRegistration } from './declarations';
+import { useVisualRanges } from '../hooks/useVisualRanges';
 
 const frame: FrameEffect = {
   id: 'frame',
