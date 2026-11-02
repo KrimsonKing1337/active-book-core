@@ -99,6 +99,7 @@ export default defineConfig([globIgnores, {
     '@stylistic/indent': ['error', 2],
     '@stylistic/quotes': ['error', 'single'],
     '@stylistic/object-curly-spacing': ['error', 'always'],
+    '@stylistic/curly-newline': ['error', 'always'],
 
     '@stylistic/max-len': ['error', {
       code: 120,
@@ -114,6 +115,7 @@ export default defineConfig([globIgnores, {
     'no-negated-in-lhs': 0,
     'no-native-reassign': 0,
     'jsx-a11y/anchor-is-valid': 0,
+    'curly': ['error', 'all'],
 
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'warn',
