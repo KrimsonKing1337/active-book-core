@@ -8,7 +8,7 @@ instance store and second rendering tree.
 ## Location and public API
 
 The former src/visualEffects directory now lives at src/controllers/visualEffects.
-The public entry is activeBook-core/controllers; createVisualEffects is no longer
+The public entry is activeBook-core/controllers/visualEffects; createVisualEffects is no longer
 exported from components. The session always includes builtin.background,
 builtin.frame and the host-owned builtin.frameFeedback definitions. The optional
 definitions argument supplies additional book definitions, with unique IDs.

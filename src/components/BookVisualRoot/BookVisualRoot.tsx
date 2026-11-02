@@ -4,14 +4,11 @@ import { useCallback, useRef } from 'react';
 
 import classNames from 'classnames';
 
-import type { VisualEffects } from '@@/controllers/visualEffects';
-
-import { VisualEffectsContext } from '@@/controllers/visualEffects/context';
+import { type VisualEffects, VisualEffectsContext } from '@controllers/visualEffects';
 
 import type { VisualSurfaceItem } from '@components/VisualSurfaces';
 
 import { VisualSurfaces } from '@components/VisualSurfaces';
-
 
 import { useBookGeometry } from './geometry';
 import { useVisualEffectSurfaces } from './hooks/useVisualEffectSurfaces';

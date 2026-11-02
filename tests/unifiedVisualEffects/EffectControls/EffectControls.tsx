@@ -1,5 +1,5 @@
 import { useGoToPage } from '../../../src/hooks/control/useGoToPage';
-import { useVisualEffects } from '../../../src/controllers/visualEffects/context';
+import { useVisualEffects } from '../../../src/controllers/visualEffects';
 import { TestControls } from '../../bookVisualRoot/TestControls';
 
 export const EffectControls = () => {

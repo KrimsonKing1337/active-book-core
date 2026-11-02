@@ -2,7 +2,7 @@ import type { ReactNode, Ref } from 'react';
 
 import type { Config, RangeEffects, TableOfContents } from '@types';
 
-import type { VisualEffects } from '@controllers';
+import type { VisualEffects } from '@controllers/visualEffects';
 
 import type { VisualSurfaceItem } from '@components/VisualSurfaces';
 

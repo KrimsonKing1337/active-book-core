@@ -2,12 +2,11 @@ import { useContext } from 'react';
 
 import type { VisualEffectLifetime } from '@active-book/types';
 
-import { VisualEffectsContext } from '@@/controllers/visualEffects/context';
-
-import { useBuiltinDeclarations } from '@@/controllers/visualEffects/useBuiltinDeclarations';
-import { usePageLifetime } from '@@/controllers/visualEffects/usePageLifetime';
-
-
+import {
+  VisualEffectsContext,
+  useBuiltinDeclarations,
+  usePageLifetime,
+} from '@controllers/visualEffects';
 
 import type { FrameEffect } from './@types';
 

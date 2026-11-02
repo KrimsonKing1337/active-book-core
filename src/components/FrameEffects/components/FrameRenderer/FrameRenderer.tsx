@@ -2,7 +2,7 @@ import type { CSSProperties } from 'react';
 
 import type { JsonObject, VisualRendererProps } from '@active-book/types';
 
-import { useVisualEffects } from '@controllers/visualEffects/context';
+import { useVisualEffects } from '@controllers/visualEffects';
 
 import type { FrameEffect } from '@hooks/effects/frame/@types';
 

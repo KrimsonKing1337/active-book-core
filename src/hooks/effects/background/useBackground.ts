@@ -1,11 +1,6 @@
 import type { VisualEffectLifetime } from '@active-book/types';
 
-import { useVisualEffects } from '@@/controllers/visualEffects/context';
-
-import { useBuiltinDeclarations } from '@@/controllers/visualEffects/useBuiltinDeclarations';
-import { usePageLifetime } from '@@/controllers/visualEffects/usePageLifetime';
-
-
+import { useBuiltinDeclarations, usePageLifetime, useVisualEffects } from '@controllers/visualEffects';
 
 import type { BackgroundEffect } from './@types';
 

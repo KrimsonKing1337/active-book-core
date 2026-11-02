@@ -5,7 +5,7 @@ import type {
 import type { BackgroundEffect } from '@hooks/effects/background/@types';
 import type { FrameEffect } from '@hooks/effects/frame/@types';
 
-import { BACKGROUND_DEFINITION, FEEDBACK_DEFINITION, FRAME_DEFINITION } from './definitions';
+import { BACKGROUND_DEFINITION, FEEDBACK_DEFINITION, FRAME_DEFINITION } from '../definitions';
 
 export type BuiltinDeclaration = {
   type: 'background' | 'frame';

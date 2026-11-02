@@ -3,8 +3,8 @@ import type { RangeEffects } from '@types';
 import type { BackgroundEffect } from '@hooks/effects/background/@types';
 import type { FrameEffect } from '@hooks/effects/frame/@types';
 
-import type { VisualEffects } from './createVisualEffects';
-import type { BuiltinDeclaration } from './declarations';
+import type { VisualEffects } from '../createVisualEffects';
+import type { BuiltinDeclaration } from '../utils/declarations';
 
 import { useBuiltinDeclarations } from './useBuiltinDeclarations';
 

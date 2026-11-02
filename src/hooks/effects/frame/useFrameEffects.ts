@@ -4,9 +4,12 @@ import {
 
 import type { JsonObject, VisualEffectRegistration } from '@active-book/types';
 
-import { VisualEffectsContext } from '@@/controllers/visualEffects/context';
-import { FEEDBACK_DEFINITION, FRAME_DEFINITION } from '@@/controllers/visualEffects/definitions';
-import { createBuiltinRegistration } from '@@/controllers/visualEffects/declarations';
+import {
+  VisualEffectsContext,
+  FEEDBACK_DEFINITION,
+  FRAME_DEFINITION,
+  createBuiltinRegistration,
+} from '@controllers/visualEffects';
 
 import type { FrameEffect, FrameShadowItem, FrameTextItem } from './@types';
 

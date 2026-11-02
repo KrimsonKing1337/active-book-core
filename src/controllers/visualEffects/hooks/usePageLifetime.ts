@@ -5,7 +5,7 @@ import type { VisualEffectLifetime } from '@active-book/types';
 import { useSelector } from '@store';
 import { mainSelectors } from '@store/main';
 
-import type { VisualEffects } from './createVisualEffects';
+import type { VisualEffects } from '../createVisualEffects';
 
 const subscribeEmpty = () => () => {};
 const readNoPages = () => 0;

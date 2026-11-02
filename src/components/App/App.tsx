@@ -11,7 +11,7 @@ import { StoreProvider } from '@store';
 import type { VisualSurfaceItem } from '@components/VisualSurfaces';
 import { AppWrapper } from '@components/AppWrapper';
 
-import type { VisualEffects } from '../../controllers/visualEffects';
+import type { VisualEffects } from '@controllers/visualEffects';
 
 import { AppModeContext } from './AppModeContext';
 import { Routes } from './Routes';

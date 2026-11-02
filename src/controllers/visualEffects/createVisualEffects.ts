@@ -6,9 +6,9 @@ import type { CreateVisualEffectsOptions, HostVisualEffectDefinition, VisualEffe
 
 import { builtinVisualDefinitions } from './definitions';
 
-import { createVisualControllers } from './controllers';
-import { copyVisualData } from './serialization';
-import { validateVisualLifetime } from './lifetime';
+import { createVisualControllers } from './utils/controllers';
+import { copyVisualData } from './utils/serialization';
+import { validateVisualLifetime } from './utils/lifetime';
 
 export const createVisualEffects = ({ definitions = [], pages }: CreateVisualEffectsOptions) => {
   if (!Number.isInteger(pages) || pages < 1) {

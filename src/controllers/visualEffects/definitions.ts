@@ -1,7 +1,7 @@
 import { BackgroundRenderer } from '@components/BackgroundEffects/components/BackgroundRenderer';
 import { FrameRenderer } from '@components/FrameEffects/components/FrameRenderer';
 
-import type { HostVisualEffectDefinition } from '../@types';
+import type { HostVisualEffectDefinition } from './@types';
 
 export const BACKGROUND_DEFINITION = 'builtin.background';
 export const FRAME_DEFINITION = 'builtin.frame';

@@ -10,9 +10,9 @@ import { useFrameEffect, useFrameEffects } from '@hooks/effects/frame';
 import { useVibration } from '@hooks/effects/vibration';
 import { useFlashlight } from '@hooks/effects/flashlight';
 
-import { createVisualEffects } from './createVisualEffects';
-import { VisualEffectsContext } from './context';
-import { createBuiltinRegistration } from './declarations';
+import { createVisualEffects } from '../createVisualEffects';
+import { VisualEffectsContext } from '../context';
+import { createBuiltinRegistration } from '../utils/declarations';
 import { useVisualRanges } from './useVisualRanges';
 
 const frame: FrameEffect = {

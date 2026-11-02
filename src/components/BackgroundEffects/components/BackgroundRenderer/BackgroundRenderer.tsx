@@ -1,6 +1,6 @@
 import type { JsonObject, VisualRendererProps } from '@active-book/types';
 
-import { useVisualEffects } from '@controllers/visualEffects/context';
+import { useVisualEffects } from '@controllers/visualEffects';
 
 import type { BackgroundEffect } from '@hooks/effects/background/@types';
 

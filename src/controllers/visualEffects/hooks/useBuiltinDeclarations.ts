@@ -6,11 +6,11 @@ import { isEqual } from 'lodash-es';
 
 import type { VisualEffectRegistration } from '@active-book/types';
 
-import type { VisualEffects } from './createVisualEffects';
-import type { VisualEffectChanges } from './@types';
-import type { BuiltinDeclaration } from './declarations';
+import type { VisualEffects } from '../createVisualEffects';
+import type { VisualEffectChanges } from '../@types';
+import type { BuiltinDeclaration } from '../utils/declarations';
 
-import { createBuiltinRegistration } from './declarations';
+import { createBuiltinRegistration } from '../utils/declarations';
 
 type ActiveDeclaration = {
   registration: VisualEffectRegistration;
