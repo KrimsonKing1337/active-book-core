@@ -156,27 +156,27 @@ export const createVisualEffects = ({ definitions = [], pages }: CreateVisualEff
 
       const unchanged = renderersAreEqual && paramsAreEqual;
 
-      const copiedDefaultParams = copyVisualData(defaultParams);
-
       let copied = previous;
 
-      if (!unchanged) {
+      if (!unchanged || !copied) {
+        const copiedDefaultParams = copyVisualData(defaultParams);
+
         copied = Object.freeze({
           ...definitionCur,
           defaultParams: copiedDefaultParams,
         });
       }
 
-      next.set(id, copied as HostVisualEffectDefinition);
+      next.set(id, copied);
     }
 
-    const sizesAreEqual = next.size !== implementations.size;
+    const hasChangedSize = next.size !== implementations.size;
 
-    const definitionsAreEqual = [...next].some(([id, definition]) => {
+    const hasChangedDefinitions = [...next].some(([id, definition]) => {
       return implementations.get(id) !== definition;
     });
 
-    const changed = !sizesAreEqual || definitionsAreEqual;
+    const changed = hasChangedSize || hasChangedDefinitions;
 
     if (!changed) {
       return;

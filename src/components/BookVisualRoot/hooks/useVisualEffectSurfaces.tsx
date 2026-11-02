@@ -4,7 +4,8 @@ import type { VisualEffectRegistration } from '@active-book/types';
 
 import { isVisualEffectActive, type VisualEffects } from '@controllers/visualEffects';
 
-import { type VisualSurfaceItem, RegisteredVisualEffect } from '@components';
+import type { VisualSurfaceItem } from '@components/VisualSurfaces';
+import { RegisteredVisualEffect } from '@components/RegisteredVisualEffect';
 
 import type { BookGeometry } from '../geometry';
 

@@ -102,6 +102,40 @@ test('restores ranges outside a shortened book without rewriting endpoints', () 
   expect(session.getSnapshot()[0].lifetime).toEqual(lifetime);
 });
 
+test('definition changes publish only when needed and keep existing registrations', () => {
+  const visualEffects = createVisualEffects(options);
+  visualEffects.register(registration);
+
+  const onChange = jest.fn();
+  visualEffects.subscribe(onChange);
+  const originalSnapshot = visualEffects.getSnapshot();
+  const originalDefinition = visualEffects.getDefinition('static');
+
+  visualEffects.setDefinitions(options.definitions);
+
+  expect(visualEffects.getSnapshot()).toBe(originalSnapshot);
+  expect(visualEffects.getDefinition('static')).toBe(originalDefinition);
+  expect(onChange).not.toHaveBeenCalled();
+
+  const additionalDefinition = {
+    id: 'additional',
+    defaultParams: {},
+    Renderer: () => null,
+  };
+
+  visualEffects.setDefinitions([...options.definitions, additionalDefinition]);
+
+  expect(visualEffects.hasDefinition('additional')).toBe(true);
+  expect(visualEffects.getSnapshot()).toEqual([registration]);
+  expect(onChange).toHaveBeenCalledTimes(1);
+
+  visualEffects.setDefinitions(options.definitions);
+
+  expect(visualEffects.hasDefinition('additional')).toBe(false);
+  expect(visualEffects.getSnapshot()).toEqual([registration]);
+  expect(onChange).toHaveBeenCalledTimes(2);
+});
+
 test('destroy releases registrations, definitions, controllers and listeners exactly once', () => {
   const session = createVisualEffects(options);
   session.register(registration);
