@@ -11,7 +11,7 @@ import { audioEffectsSelectors } from '@store/effects/audio/audio';
 import { audioBgEffectsSelectors } from '@store/effects/audio/audioBg';
 import { effectsSelectors } from '@store/effects/common';
 
-import { type VisualEffects, useVisualRanges } from '@controllers/visualEffects';
+import { type VisualEffects, useVisualRegistrations } from '@controllers/visualEffects';
 
 import { useEffectsInRange } from '@hooks/effects/range';
 import { useGoToPage } from '@hooks/control/useGoToPage';
@@ -48,6 +48,9 @@ export const AppContent = ({
   ref,
   visualSurfaces,
   visualEffects,
+  registrations,
+  definitions,
+  hiddenVisualEffects,
 }: PropsWithChildren<AppWrapperProps & { visualEffects: VisualEffects }>) => {
   const dispatch = useDispatch();
 
@@ -55,7 +58,7 @@ export const AppContent = ({
     visualEffects.setPageCount(config.pages);
   }, [config.pages, visualEffects]);
 
-  useVisualRanges(visualEffects, rangeEffects);
+  useVisualRegistrations({ session: visualEffects, registrations, definitions });
 
   const appMode = useAppMode();
 
@@ -170,6 +173,7 @@ export const AppContent = ({
           surfaces={visualSurfaces}
           visualEffects={visualEffects}
           page={page}
+          hiddenVisualEffects={hiddenVisualEffects}
           inverseColors={inverseColors}
         >
           {children}

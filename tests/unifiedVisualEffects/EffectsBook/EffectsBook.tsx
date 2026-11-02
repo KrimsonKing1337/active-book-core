@@ -2,7 +2,11 @@ import { useRef, useState } from 'react';
 
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 
-import type { RangeEffects } from '../../../src/@types';
+import type { VisualEffectDefinition, VisualEffectRegistration } from '@active-book/types';
+
+import { createBuiltinRegistration } from '../../../src/controllers/visualEffects/utils/declarations';
+import { BackgroundRenderer } from '../../../src/components/BackgroundEffects/components/BackgroundRenderer';
+import { FrameRenderer } from '../../../src/components/FrameEffects/components/FrameRenderer';
 import { AppModeContext } from '../../../src/components/App/AppModeContext';
 import { AppWrapper } from '../../../src/components/AppWrapper';
 import { useBookGeometry } from '../../../src/components/BookVisualRoot';
@@ -20,14 +24,13 @@ const ranges = [{
   from: 4,
   to: 4,
 }];
-const rangeEffects: RangeEffects = compatibility ? [] : [
+const declarations = compatibility ? [] : [
   {
     id: 'range-background',
     type: 'background',
     range: ranges,
     options: {
-      kind: 'component',
-      Component: <VisualCounter label="range-background-state" />,
+      kind: 'component' as const,
     },
   },
   {
@@ -35,7 +38,7 @@ const rangeEffects: RangeEffects = compatibility ? [] : [
     type: 'background',
     range: ranges,
     options: {
-      kind: 'image',
+      kind: 'image' as const,
       image: {
         id: 'range-picture',
         src: '/tests/unifiedVisualEffects/range-pattern.svg',
@@ -47,7 +50,7 @@ const rangeEffects: RangeEffects = compatibility ? [] : [
     type: 'background',
     range: ranges,
     options: {
-      kind: 'video',
+      kind: 'video' as const,
       video: {
         id: 'range-movie',
         src: '/tests/unifiedVisualEffects/movie.webm',
@@ -60,8 +63,7 @@ const rangeEffects: RangeEffects = compatibility ? [] : [
     type: 'frame',
     range: ranges,
     options: {
-      kind: 'component',
-      Component: <VisualCounter label="range-frame-state" />,
+      kind: 'component' as const,
     },
   },
   ...(['pulse', 'police', 'caramel'] as const).map((preset) => ({
@@ -82,6 +84,42 @@ const rangeEffects: RangeEffects = compatibility ? [] : [
     },
   })),
 ];
+
+const definitions: VisualEffectDefinition[] = [
+  {
+    id: 'custom.background',
+    defaultParams: {},
+    Renderer: (props) => (
+      <BackgroundRenderer {...props}>
+        <VisualCounter label="range-background-state" />
+      </BackgroundRenderer>
+    ),
+  },
+  {
+    id: 'custom.frame',
+    defaultParams: {},
+    Renderer: (props) => (
+      <FrameRenderer {...props}>
+        <VisualCounter label="range-frame-state" />
+      </FrameRenderer>
+    ),
+  },
+];
+const registrations: VisualEffectRegistration[] = declarations.map((cur) => {
+  const registration = createBuiltinRegistration({
+    type: cur.type as 'background' | 'frame',
+    options: { ...cur.options, id: cur.id },
+    lifetime: { type: 'range', range: cur.range },
+  });
+  if (cur.id === 'range-background') {
+    registration.effect.definitionId = 'custom.background';
+  }
+  if (cur.id === 'range-frame') {
+    registration.effect.definitionId = 'custom.frame';
+  }
+
+  return registration;
+});
 
 export const EffectsBook = () => {
   const bookRef = useRef<HTMLDivElement>(null);
@@ -108,7 +146,9 @@ export const EffectsBook = () => {
             pages: pageCount,
             defaultTheme: 'dark',
           }}
-          rangeEffects={rangeEffects}
+          rangeEffects={[]}
+          registrations={registrations}
+          definitions={definitions}
           tableOfContents={[]}
           editorTools={tools}
         >

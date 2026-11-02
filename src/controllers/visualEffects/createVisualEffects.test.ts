@@ -91,3 +91,30 @@ test('the same IDs are independent in different books and a session has one host
   disconnect();
   first.connectHost()();
 });
+
+test('restores ranges outside a shortened book without rewriting endpoints', () => {
+  const session = createVisualEffects({ ...options, pages: 2 });
+  const lifetime = { type: 'range' as const, range: [{ from: 3, to: 5 }] };
+  session.register({ ...registration, lifetime });
+  session.update('test', { lifetime });
+  session.setPageCount(1);
+  session.setPageCount(5);
+  expect(session.getSnapshot()[0].lifetime).toEqual(lifetime);
+});
+
+test('destroy releases registrations, definitions, controllers and listeners exactly once', () => {
+  const session = createVisualEffects(options);
+  session.register(registration);
+  const onChange = jest.fn();
+  session.subscribe(onChange);
+  session.attachController({ id: 'test', readPlayback: () => null });
+  const controller = session.getController('test');
+  session.destroy();
+  session.destroy();
+  expect(session.getSnapshot()).toEqual([]);
+  expect(session.hasDefinition('static')).toBe(false);
+  expect(session.getController('test')).toBeUndefined();
+  expect(onChange).toHaveBeenCalledTimes(1);
+  expect(() => controller?.destroy()).not.toThrow();
+  expect(() => session.update('test', {})).toThrow('destroyed');
+});

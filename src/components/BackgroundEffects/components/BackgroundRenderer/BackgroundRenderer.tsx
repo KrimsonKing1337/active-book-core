@@ -1,6 +1,7 @@
+import type { ReactNode } from 'react';
+
 import type { JsonObject, VisualRendererProps } from '@active-book/types';
 
-import { useVisualEffects } from '@controllers/visualEffects';
 
 import type { BackgroundEffect } from '@hooks/effects/background/@types';
 
@@ -13,23 +14,12 @@ import { useMediaReadiness } from './useMediaReadiness';
 
 import * as styles from '../../BackgroundEffects.module.scss';
 
-type BackgroundParams = JsonObject & Omit<BackgroundEffect, 'id' | 'Component'>;
+type BackgroundParams = JsonObject & Omit<BackgroundEffect, 'id'>;
 
-export const BackgroundRenderer = ({ id, params }: VisualRendererProps) => {
-  const session = useVisualEffects();
-  // Built-in parameters are the JSON copy of the typed Background declaration, without runtime nodes.
+export const BackgroundRenderer = ({ id, params, children }: VisualRendererProps & { children?: ReactNode }) => {
   const options = params as BackgroundParams;
-  const component = session.getRuntimeComponent(id);
-
-  const effectCur = {
-    ...options,
-    id,
-    Component: component,
-  };
-
   const imageSource = options.kind === 'image' ? options.image?.src : undefined;
   const imageLoad = useMediaReadiness<HTMLImageElement>('images', imageSource);
-
   const videoSource = options.kind === 'video' ? options.video?.src : undefined;
   const videoLoad = useMediaReadiness<HTMLVideoElement>('videos', videoSource);
 
@@ -39,8 +29,7 @@ export const BackgroundRenderer = ({ id, params }: VisualRendererProps) => {
     video,
     shadow,
     style = {},
-    Component,
-  } = effectCur;
+  } = options;
 
   const zIndex = style.zIndex
     ?? image?.style?.zIndex
@@ -52,7 +41,7 @@ export const BackgroundRenderer = ({ id, params }: VisualRendererProps) => {
   const showShadow = kind === 'shadow' && shadow;
   const showImage = kind === 'image' && image && image?.src.trim();
   const showVideo = kind === 'video' && video && video?.src.trim();
-  const componentContent = kind === 'component' ? Component : null;
+  const componentContent = kind === 'component' ? children : null;
 
   return (
     <div

@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from 'react';
+import type { CSSProperties } from 'react';
 
 export type FrameSide = 'top' | 'right' | 'bottom' | 'left';
 
@@ -64,7 +64,6 @@ export type FrameEffect = {
   layer?: FrameLayer;
   shadow?: FrameShadowItem;
   text?: FrameTextItem;
-  Component?: ReactNode;
   frameMask?: FrameMask;
   style?: CSSProperties;
 };

@@ -21,6 +21,7 @@ export type BookVisualRootProps = HTMLAttributes<HTMLDivElement> & {
   inverseColors?: boolean;
   visualEffects?: VisualEffects;
   page?: number;
+  hiddenVisualEffects?: readonly string[];
 };
 
 export const BookVisualRoot = ({
@@ -30,6 +31,7 @@ export const BookVisualRoot = ({
   surfaces: suppliedSurfaces = [],
   visualEffects,
   page = 0,
+  hiddenVisualEffects = [],
   inverseColors = false,
   ...etc
 }: BookVisualRootProps) => {
@@ -42,6 +44,7 @@ export const BookVisualRoot = ({
     visualEffects,
     page,
     geometry,
+    hiddenVisualEffects,
   });
 
   const surfaces = [...suppliedSurfaces, ...registeredSurfaces];

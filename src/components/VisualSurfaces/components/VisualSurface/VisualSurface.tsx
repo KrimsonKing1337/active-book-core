@@ -17,7 +17,7 @@ type VisualSurfaceProps = {
 export const VisualSurface = ({ item, geometry, order }: VisualSurfaceProps) => {
   const resolved = resolveVisualSurface({ item, geometry });
 
-  const visibility = resolved ? 'visible' : 'hidden';
+  const visibility = resolved && !item.hidden ? 'visible' : 'hidden';
   const display = resolved ? undefined : 'none';
 
   const visibilityStyle: CSSProperties = {

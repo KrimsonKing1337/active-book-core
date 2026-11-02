@@ -12,18 +12,21 @@ import type { BookGeometry } from '../geometry';
 export type VisualEffectSurfacesOptions = {
   visualEffects?: VisualEffects;
   page: number;
+  hiddenVisualEffects: readonly string[];
   geometry: BookGeometry | null;
 };
 
 const emptySnapshot: readonly VisualEffectRegistration[] = [];
 
 const readEmptySnapshot = () => emptySnapshot;
+const readNoPages = () => 0;
 const subscribeEmpty = () => () => {};
 
 export const useVisualEffectSurfaces = ({
   visualEffects,
   page,
   geometry,
+  hiddenVisualEffects,
 }: VisualEffectSurfacesOptions) => {
   const visualEffectsSubscribe = visualEffects?.subscribe ?? subscribeEmpty;
   const visualEffectsSnapshot = visualEffects?.getSnapshot ?? readEmptySnapshot;
@@ -34,12 +37,18 @@ export const useVisualEffectSurfaces = ({
     visualEffectsSnapshot,
   );
 
+  const pages = useSyncExternalStore(
+    visualEffectsSubscribe,
+    visualEffects?.getPageCount ?? readNoPages,
+    visualEffects?.getPageCount ?? readNoPages,
+  );
+
   useLayoutEffect(() => {
     return visualEffects?.connectHost();
   }, [visualEffects]);
 
   return useMemo<VisualSurfaceItem[]>(() => {
-    if (!visualEffects) {
+    if (!visualEffects || page < 1 || page > pages) {
       return [];
     }
 
@@ -66,6 +75,7 @@ export const useVisualEffectSurfaces = ({
         <RegisteredVisualEffect
           key={generation}
           effect={effect}
+          definition={definition}
           visualEffects={visualEffects}
           geometry={geometry}
         />
@@ -77,7 +87,8 @@ export const useVisualEffectSurfaces = ({
         visibility: visibility,
         depth,
         content,
+        hidden: hiddenVisualEffects.includes(id),
       };
     });
-  }, [registrations, page, geometry, visualEffects]);
+  }, [registrations, page, pages, geometry, visualEffects, hiddenVisualEffects]);
 };

@@ -1,6 +1,6 @@
-import type { ReactNode } from 'react';
+import { isEqual } from 'lodash-es';
 
-import type { VisualEffectRegistration } from '@active-book/types';
+import type { VisualEffectDefinition, VisualEffectRegistration } from '@active-book/types';
 
 import type { CreateVisualEffectsOptions, HostVisualEffectDefinition, VisualEffectChanges } from './@types';
 import { builtinVisualDefinitions } from './definitions';
@@ -13,13 +13,19 @@ export const createVisualEffects = ({ definitions = [], pages }: CreateVisualEff
 
   const implementations = new Map<string, HostVisualEffectDefinition>();
   const registrations = new Map<string, VisualEffectRegistration>();
-  const runtimeComponents = new Map<string, ReactNode>();
   const generations = new Map<string, number>();
   const listeners = new Set<() => void>();
 
   let snapshot: readonly VisualEffectRegistration[] = Object.freeze([]);
   let nextGeneration = 0;
   let hasHost = false;
+  let destroyed = false;
+
+  const assertOpen = () => {
+    if (destroyed) {
+      throw new Error('Visual effects session has been destroyed');
+    }
+  };
 
   for (const definitionCur of [...builtinVisualDefinitions, ...definitions]) {
     if (!definitionCur.id || implementations.has(definitionCur.id)) {
@@ -52,7 +58,6 @@ export const createVisualEffects = ({ definitions = [], pages }: CreateVisualEff
     if (registrations.delete(id)) {
       controllers.invalidate(id);
       generations.delete(id);
-      runtimeComponents.delete(id);
 
       publish();
     }
@@ -61,6 +66,7 @@ export const createVisualEffects = ({ definitions = [], pages }: CreateVisualEff
   const controllers = createVisualControllers({ remove });
 
   const register = (registration: VisualEffectRegistration) => {
+    assertOpen();
     const { id, definitionId } = registration.effect;
 
     if (!id || registrations.has(id)) {
@@ -87,6 +93,7 @@ export const createVisualEffects = ({ definitions = [], pages }: CreateVisualEff
   };
 
   const update = (id: string, changes: VisualEffectChanges) => {
+    assertOpen();
     const previous = registrations.get(id);
 
     if (!previous) {
@@ -116,9 +123,58 @@ export const createVisualEffects = ({ definitions = [], pages }: CreateVisualEff
     publish();
   };
 
+  const hasDefinition = (id: string) => implementations.has(id);
+
+  const setDefinitions = (definitions: readonly VisualEffectDefinition[]) => {
+    assertOpen();
+    const next = new Map<string, HostVisualEffectDefinition>();
+    for (const definitionCur of [...builtinVisualDefinitions, ...definitions]) {
+      if (!definitionCur.id || next.has(definitionCur.id)) {
+        throw new Error(`Duplicate or empty visual definition ID: ${definitionCur.id}`);
+      }
+      const previous = implementations.get(definitionCur.id);
+      const unchanged = previous?.Renderer === definitionCur.Renderer
+        && isEqual(previous.defaultParams, definitionCur.defaultParams);
+      const copied = unchanged ? previous : Object.freeze({
+        ...definitionCur,
+        defaultParams: copyVisualData(definitionCur.defaultParams),
+      });
+      next.set(definitionCur.id, copied);
+    }
+    const changed = next.size !== implementations.size
+      || [...next].some(([id, definition]) => implementations.get(id) !== definition);
+    if (!changed) {
+      return;
+    }
+    for (const registrationCur of registrations.values()) {
+      if (!next.has(registrationCur.effect.definitionId)) {
+        remove(registrationCur.effect.id);
+      }
+    }
+    implementations.clear();
+    next.forEach((definition, id) => implementations.set(id, definition));
+    publish();
+  };
+
+  const destroy = () => {
+    if (destroyed) {
+      return;
+    }
+    destroyed = true;
+    registrations.clear();
+    implementations.clear();
+    generations.clear();
+    controllers.clear();
+    publish();
+    listeners.clear();
+  };
+
   const getSnapshot = () => snapshot;
 
   const subscribe = (listener: () => void) => {
+    if (destroyed) {
+      return () => {};
+    }
     listeners.add(listener);
 
     return () => {
@@ -129,6 +185,7 @@ export const createVisualEffects = ({ definitions = [], pages }: CreateVisualEff
   const getGeneration = (id: string) => generations.get(id);
 
   const setPageCount = (count: number) => {
+    assertOpen();
     if (!Number.isInteger(count) || count < 1) {
       throw new Error('Visual effects require a positive integer book page count');
     }
@@ -143,13 +200,8 @@ export const createVisualEffects = ({ definitions = [], pages }: CreateVisualEff
 
   const getPageCount = () => pages;
 
-  // Temporary declaration bridge: React nodes never enter parameters or serialized snapshots.
-  const setRuntimeComponent = (id: string, component: ReactNode) => {
-    runtimeComponents.set(id, component);
-  };
-  const getRuntimeComponent = (id: string) => runtimeComponents.get(id);
-
   const connectHost = () => {
+    assertOpen();
     if (hasHost) {
       throw new Error('A visual effects session can only belong to one book root');
     }
@@ -170,11 +222,12 @@ export const createVisualEffects = ({ definitions = [], pages }: CreateVisualEff
     getSnapshot,
     subscribe,
     getDefinition,
+    hasDefinition,
+    setDefinitions,
+    destroy,
     getGeneration,
     setPageCount,
     getPageCount,
-    setRuntimeComponent,
-    getRuntimeComponent,
     connectHost,
     attachController: controllers.attach,
     getController: controllers.get,

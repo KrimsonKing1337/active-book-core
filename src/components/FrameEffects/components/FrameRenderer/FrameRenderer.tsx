@@ -1,8 +1,9 @@
 import type { CSSProperties } from 'react';
 
+import type { ReactNode } from 'react';
+
 import type { JsonObject, VisualRendererProps } from '@active-book/types';
 
-import { useVisualEffects } from '@controllers/visualEffects';
 
 import type { FrameEffect } from '@hooks/effects/frame/@types';
 
@@ -12,28 +13,17 @@ import { FrameText } from '../FrameText';
 
 import * as styles from '../../FrameEffects.module.scss';
 
-type FrameParams = JsonObject & Omit<FrameEffect, 'id' | 'Component'>;
+type FrameParams = JsonObject & Omit<FrameEffect, 'id'>;
 
-export const FrameRenderer = ({ id, params }: VisualRendererProps) => {
-  const session = useVisualEffects();
-
+export const FrameRenderer = ({ id, params, children }: VisualRendererProps & { children?: ReactNode }) => {
   const options = params as FrameParams;
-
-  const component = session.getRuntimeComponent(id);
-
-  const effectCur = {
-    ...options,
-    id,
-    Component: component,
-  };
 
   const {
     kind,
     shadow,
     text,
-    Component,
     style,
-  } = effectCur;
+  } = options;
 
   const zIndex = shadow?.style?.zIndex ?? text?.style?.zIndex;
 
@@ -51,7 +41,7 @@ export const FrameRenderer = ({ id, params }: VisualRendererProps) => {
 
   const showShadow = kind === 'shadow' && shadow;
   const showText = kind === 'text' && text;
-  const componentContent = kind === 'component' ? Component : null;
+  const componentContent = kind === 'component' ? children : null;
 
   return (
     <div

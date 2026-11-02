@@ -22,8 +22,10 @@ export const validateVisualLifetime = (lifetime: VisualEffectLifetime, pages: nu
   }
 
   for (const rangeCur of lifetime.range) {
-    validatePage(rangeCur.from);
-    validatePage(rangeCur.to);
+    const hasIntegerBounds = Number.isInteger(rangeCur.from) && Number.isInteger(rangeCur.to);
+    if (!hasIntegerBounds || rangeCur.from < 1 || rangeCur.to < 1) {
+      throw new Error('Visual effect range bounds must be positive integers');
+    }
 
     if (rangeCur.from > rangeCur.to) {
       throw new Error(`Visual effect range is reversed: ${rangeCur.from}..${rangeCur.to}`);

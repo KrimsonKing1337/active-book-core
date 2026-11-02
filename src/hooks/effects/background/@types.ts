@@ -40,6 +40,5 @@ export type BackgroundEffect = {
   style?: React.CSSProperties;
   image?: BackgroundEffectMediaOptions;
   video?: BackgroundEffectVideoOptions;
-  Component?: React.ReactNode;
   shadow?: BackgroundEffectShadowOptions;
 };

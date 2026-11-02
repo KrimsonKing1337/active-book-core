@@ -1,5 +1,8 @@
 # Background and Frame on the visual session
 
+Stage 6 supersedes the temporary declaration/ReactNode bridge described here.
+See [visual-effects.md](visual-effects.md) for the current book integration contract.
+
 Stage 5 uses the existing visual session for real Background and Frame rendering.
 It keeps the artistic implementations (Img, Video, Shadow, FrameElement,
 FrameShadow, Police, Caramelldansen and FrameText) and removes their second

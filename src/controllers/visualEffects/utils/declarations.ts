@@ -5,7 +5,7 @@ import type {
 import type { BackgroundEffect } from '@hooks/effects/background/@types';
 import type { FrameEffect } from '@hooks/effects/frame/@types';
 
-import { BACKGROUND_DEFINITION, FEEDBACK_DEFINITION, FRAME_DEFINITION } from '../definitions';
+import { BACKGROUND_DEFINITION, FEEDBACK_DEFINITION, FRAME_DEFINITION } from '../constants.js';
 
 export type BuiltinDeclaration = {
   type: 'background' | 'frame';
@@ -51,10 +51,9 @@ const readOrder = (value: unknown): number => {
 export const createBuiltinRegistration = ({ type,
   options,
   lifetime }: BuiltinDeclaration): VisualEffectRegistration => {
-  // CSS optional properties disappear in the JSON copy; the React node stays in the runtime bridge.
+  // Optional CSS properties disappear in the JSON copy.
   const data: Partial<BackgroundEffect | FrameEffect> = { ...options };
   delete data.id;
-  delete data.Component;
   const params: JsonObject = JSON.parse(JSON.stringify(data));
   const isBackground = type === 'background';
 

@@ -31,6 +31,17 @@ test('real Background and Frame renderers use the book session in Chromium', asy
         const video = document.querySelector('[data-effect-id="range-video"] video');
         return video?.readyState >= 2 && video.currentTime > 0.2;
       });
+      const playingVideo = await effect(page, 'range-video').locator('video').elementHandle();
+      const timeBeforeVolume = await playingVideo.evaluate((element) => element.currentTime);
+      await page.evaluate(() => window.realVisual.setVolume(50, 40));
+      await page.waitForFunction(() => Math.abs(document.querySelector('[data-effect-id="range-video"] video').volume - 0.2) < 0.001);
+      await page.evaluate(() => window.realVisual.effects.update('range-video', { effect: { params: {
+        kind: 'video', video: { id: 'range-movie', src: '/tests/unifiedVisualEffects/movie.webm', autoPlay: true, relativeVolume: 50 },
+      } } }));
+      await page.waitForFunction(() => Math.abs(document.querySelector('[data-effect-id="range-video"] video').volume - 0.1) < 0.001);
+      assert(await playingVideo.evaluate((element) => element === document.querySelector('[data-effect-id="range-video"] video')));
+      assert(await playingVideo.evaluate((element, before) => element.currentTime >= before && !element.paused, timeBeforeVolume));
+      await page.evaluate(() => window.realVisual.setVolume(100, 100));
       const book = await page.locator('[data-book-region="book"]').elementHandle();
       const counter = await page.getByTestId('range-frame-state').elementHandle();
       const firstToken = await counter.getAttribute('data-instance');
