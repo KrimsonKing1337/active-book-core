@@ -100,6 +100,21 @@ export default defineConfig([globIgnores, {
     '@stylistic/indent': ['error', 2],
     '@stylistic/quotes': ['error', 'single'],
     '@stylistic/object-curly-spacing': ['error', 'always'],
+    '@stylistic/object-property-newline': ['error'],
+
+    '@stylistic/object-curly-newline': ['error', {
+      ObjectExpression: {
+        minProperties: 3,
+        multiline: true,
+        consistent: true,
+      },
+      ObjectPattern: {
+        minProperties: 3,
+        multiline: true,
+        consistent: true,
+      },
+    }],
+
     '@stylistic/curly-newline': ['error', {
       'minElements': 1,
     }],
