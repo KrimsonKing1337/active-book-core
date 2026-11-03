@@ -115,6 +115,12 @@ export default defineConfig([globIgnores, {
       },
     }],
 
+    '@stylistic/padding-line-between-statements': ['error', {
+      blankLine: 'always',
+      prev: '*',
+      next: 'return',
+    }],
+
     '@stylistic/curly-newline': ['error', {
       'minElements': 1,
     }],
