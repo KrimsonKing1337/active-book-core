@@ -7,6 +7,7 @@ import { fixupPluginRules } from '@eslint/compat';
 import js from '@eslint/js';
 import { FlatCompat } from '@eslint/eslintrc';
 import stylistic from '@stylistic/eslint-plugin';
+import newlineDestructuring from 'eslint-plugin-newline-destructuring';
 
 import _import from 'eslint-plugin-import';
 import tsParser from '@typescript-eslint/parser';
@@ -41,6 +42,7 @@ export default defineConfig([globIgnores, {
     import: fixupPluginRules(_import),
     '@stylistic': stylistic,
     '@typescript-eslint': typescriptEslint,
+    'newline-destructuring': newlineDestructuring,
     react,
     'react-hooks': fixupPluginRules(reactHooks),
     jest,
@@ -185,6 +187,12 @@ export default defineConfig([globIgnores, {
 
     '@typescript-eslint/no-explicit-any': ['warn', {
       ignoreRestArgs: false,
+    }],
+
+    'newline-destructuring/newline': ['error', {
+      items: 2,
+      consistent: false,
+      allowAllPropertiesOnSameLine: false,
     }],
 
     'jest/no-disabled-tests': 'warn',
