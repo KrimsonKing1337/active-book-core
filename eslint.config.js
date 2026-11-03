@@ -113,6 +113,21 @@ export default defineConfig([globIgnores, {
         multiline: true,
         consistent: true,
       },
+      TSTypeLiteral: {
+        minProperties: 1,
+        multiline: true,
+        consistent: true,
+      },
+      TSInterfaceBody: {
+        minProperties: 1,
+        multiline: true,
+        consistent: true,
+      },
+      TSEnumBody: {
+        minProperties: 1,
+        multiline: true,
+        consistent: true,
+      }
     }],
 
     '@stylistic/padding-line-between-statements': ['error', {
