@@ -1,6 +1,6 @@
 import type { AnchorPoint, VisualLength, VisualPlacement } from '@active-book/types';
 
-import type { BookGeometry, BookRegionRect } from '@components/BookVisualRoot/geometry';
+import type { StoryGeometry, StoryRegionRect } from '@components/StoryVisualRoot/geometry';
 
 const anchorPoints: Record<AnchorPoint, readonly [number, number]> = {
   'top-left': [0, 0],
@@ -18,7 +18,7 @@ export const resolveVisualLength = (length: VisualLength, reference: number): nu
   return length.unit === '%' ? (reference * length.value / 100) : length.value;
 };
 
-export const resolvePlacement = (placement: VisualPlacement, geometry: BookGeometry): BookRegionRect | null => {
+export const resolvePlacement = (placement: VisualPlacement, geometry: StoryGeometry): StoryRegionRect | null => {
   const coordinates = geometry.regions[placement.coordinates];
   const anchor = geometry.regions[placement.anchor.region];
 

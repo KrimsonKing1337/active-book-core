@@ -4,14 +4,14 @@ import type { VisualEffectDefinition, VisualEffectInstance, VisualGeometry, Visu
 
 import type { VisualEffects } from '@controllers/visualEffects';
 
-import type { BookGeometry, BookRegionRect } from '@components/BookVisualRoot/geometry';
+import type { StoryGeometry, StoryRegionRect } from '@components/StoryVisualRoot/geometry';
 import { resolvePlacement } from '@components/VisualSurfaces/utils';
 
 type RegisteredVisualEffectProps = {
   effect: VisualEffectInstance;
   definition: VisualEffectDefinition;
   visualEffects: VisualEffects;
-  geometry: BookGeometry | null;
+  geometry: StoryGeometry | null;
 };
 
 export const RegisteredVisualEffect = memo(({
@@ -30,7 +30,7 @@ export const RegisteredVisualEffect = memo(({
     height: 0,
   });
 
-  let bounds: BookRegionRect | null = null;
+  let bounds: StoryRegionRect | null = null;
 
   if (geometry) {
     bounds = resolvePlacement(effect.placement, geometry);

@@ -13,7 +13,7 @@ const clip = {
   height: 700,
 };
 
-test('the page keeps the player top corners without rounding the edge above its toolbar', () => {
+test('the narrativeFrame keeps the player top corners without rounding the edge above its toolbar', () => {
   const region = {
     ...clip,
     height: 630,

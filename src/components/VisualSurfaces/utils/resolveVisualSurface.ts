@@ -1,4 +1,4 @@
-import type { BookGeometry } from '@components/BookVisualRoot/geometry';
+import type { StoryGeometry } from '@components/StoryVisualRoot/geometry';
 
 import { getFrameMaskImage } from '@components/FrameEffects/utils';
 
@@ -9,7 +9,7 @@ import { resolveShapeMask } from './masks';
 
 type ResolveVisualSurfaceParams = {
   item: VisualSurfaceItem;
-  geometry: BookGeometry | null;
+  geometry: StoryGeometry | null;
 };
 
 export const resolveVisualSurface = ({ item, geometry }: ResolveVisualSurfaceParams): ResolvedVisualSurface | null => {

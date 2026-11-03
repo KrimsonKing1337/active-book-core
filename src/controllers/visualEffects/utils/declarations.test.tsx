@@ -72,10 +72,12 @@ test('page declarations update the existing registration and release it on unmou
     type: 'page',
     page: 1,
   });
-  rerender({ effect: {
-    ...frame,
-    layer: 'above',
-  } });
+  rerender({
+    effect: {
+      ...frame,
+      layer: 'above',
+    },
+  });
   expect(session.getGeneration('frame')).toBe(generation);
   expect(session.getSnapshot()[0].effect.depth.plane).toBe('aboveNarrative');
   unmount();
@@ -95,7 +97,10 @@ test('implicit page declarations wait for synchronized book bounds and react to 
   const { unmount } = renderHook(() => useFrameEffect(frame), { wrapper });
   expect(session.getSnapshot()).toEqual([]);
   act(() => session.setPageCount(2));
-  expect(session.getSnapshot()[0].lifetime).toEqual({ type: 'page', page: 2 });
+  expect(session.getSnapshot()[0].lifetime).toEqual({
+    type: 'page',
+    page: 2,
+  });
   act(() => session.setPageCount(1));
   expect(session.getSnapshot()).toEqual([]);
   unmount();
@@ -174,7 +179,10 @@ test('range declarations reconcile equal input without replacing registration or
       },
     }));
 
-    return useVisualRegistrations({ session, registrations });
+    return useVisualRegistrations({
+      session,
+      registrations,
+    });
   });
   const snapshot = session.getSnapshot();
   rerender();
@@ -216,4 +224,47 @@ test('page count changes preserve registrations and authored endpoints while val
       page: 3,
     },
   }))).toThrow('between 1 and 2');
+});
+
+test.each(['background', 'frame'] as const)('%s fills the whole story viewport by default', (type) => {
+  const registration = createBuiltinRegistration({
+    type,
+    options: {
+      id: 'default-region',
+      kind: 'component',
+    },
+    lifetime: {
+      type: 'page',
+      page: 1,
+    },
+  });
+
+  expect(registration.effect.placement.coordinates).toBe('storyViewport');
+  expect(registration.effect.placement.anchor.region).toBe('storyViewport');
+  expect(registration.effect.visibility).toEqual({ region: 'storyViewport' });
+  expect(registration.effect.depth.plane).toBe(type === 'background' ? 'background' : 'belowNarrative');
+});
+
+test('a masked frame places its surface in storyViewport and clips to the narrative frame bands', () => {
+  const registration = createBuiltinRegistration({
+    type: 'frame',
+    options: {
+      id: 'masked',
+      kind: 'component',
+      frameMask: {
+        enabled: true,
+        sides: ['left', 'bottom'],
+      },
+    },
+    lifetime: {
+      type: 'page',
+      page: 1,
+    },
+  });
+
+  expect(registration.effect.placement.coordinates).toBe('storyViewport');
+  expect(registration.effect.visibility).toEqual({
+    region: 'frame',
+    sides: ['left', 'bottom'],
+  });
 });

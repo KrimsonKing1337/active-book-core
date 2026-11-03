@@ -1,0 +1,11 @@
+.Outline {
+  position: absolute;
+  z-index: 40;
+
+  box-sizing: border-box;
+
+  border: 2px solid white;
+  box-shadow: inset 0 0 0 2px black;
+
+  pointer-events: none;
+}

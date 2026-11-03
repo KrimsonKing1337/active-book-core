@@ -3,7 +3,11 @@ import { registration } from './testFixtures';
 
 const options = {
   pages: 5,
-  definitions: [{ id: 'static', defaultParams: { color: 'blue' }, Renderer: () => null }],
+  definitions: [{
+    id: 'static',
+    defaultParams: { color: 'blue' },
+    Renderer: () => null,
+  }],
 };
 
 test('stores copied serializable registrations, diagnoses IDs and unknown definitions', () => {
@@ -20,7 +24,11 @@ test('stores copied serializable registrations, diagnoses IDs and unknown defini
   expect(() => visualEffects.register(registration)).toThrow('Duplicate');
   expect(() => visualEffects.register({
     ...registration,
-    effect: { ...registration.effect, id: 'other', definitionId: 'missing' },
+    effect: {
+      ...registration.effect,
+      id: 'other',
+      definitionId: 'missing',
+    },
   })).toThrow('Unknown visual definition ID: missing');
   unsubscribe();
   visualEffects.remove('test');
@@ -30,9 +38,22 @@ test('stores copied serializable registrations, diagnoses IDs and unknown defini
 test('addressed updates preserve other registrations and unchanged parameter references', () => {
   const visualEffects = createVisualEffects(options);
   visualEffects.register(registration);
-  visualEffects.register({ ...registration, effect: { ...registration.effect, id: 'other' } });
+  visualEffects.register({
+    ...registration,
+    effect: {
+      ...registration.effect,
+      id: 'other',
+    },
+  });
   const before = visualEffects.getSnapshot();
-  visualEffects.update('test', { effect: { depth: { plane: 'scene', order: 2 } } });
+  visualEffects.update('test', {
+    effect: {
+      depth: {
+        plane: 'belowNarrative',
+        order: 2,
+      },
+    },
+  });
   const after = visualEffects.getSnapshot();
 
   expect(after[0].effect.params).toBe(before[0].effect.params);
@@ -64,13 +85,37 @@ test('rejects invalid ranges, duplicate definitions and nonserializable data wit
   visualEffects.register(registration);
   const before = visualEffects.getSnapshot();
 
-  expect(() => createVisualEffects({ ...options, definitions: [...options.definitions, ...options.definitions] }))
+  expect(() => createVisualEffects({
+    ...options,
+    definitions: [...options.definitions, ...options.definitions],
+  }))
     .toThrow('Duplicate');
-  expect(() => createVisualEffects({ ...options, pages: 0 })).toThrow('page count');
-  expect(() => visualEffects.update('test', { lifetime: { type: 'range', range: [{ from: 3, to: 2 }] } }))
+  expect(() => createVisualEffects({
+    ...options,
+    pages: 0,
+  })).toThrow('page count');
+  expect(() => visualEffects.update('test', {
+    lifetime: {
+      type: 'range',
+      range: [{
+        from: 3,
+        to: 2,
+      }],
+    },
+  }))
     .toThrow('reversed');
-  expect(() => visualEffects.update('test', { lifetime: { type: 'page', page: 6 } })).toThrow('between 1 and 5');
-  expect(() => visualEffects.update('test', { lifetime: { type: 'page', page: 1.5 } })).toThrow('integer');
+  expect(() => visualEffects.update('test', {
+    lifetime: {
+      type: 'page',
+      page: 6,
+    },
+  })).toThrow('between 1 and 5');
+  expect(() => visualEffects.update('test', {
+    lifetime: {
+      type: 'page',
+      page: 1.5,
+    },
+  })).toThrow('integer');
   expect(() => visualEffects.update('test', { effect: { params: { value: Infinity } } })).toThrow('JSON');
   expect(() => visualEffects.update('test', {
     // @ts-expect-error Runtime callers must not put functions in serialized parameters.
@@ -93,9 +138,21 @@ test('the same IDs are independent in different books and a session has one host
 });
 
 test('restores ranges outside a shortened book without rewriting endpoints', () => {
-  const session = createVisualEffects({ ...options, pages: 2 });
-  const lifetime = { type: 'range' as const, range: [{ from: 3, to: 5 }] };
-  session.register({ ...registration, lifetime });
+  const session = createVisualEffects({
+    ...options,
+    pages: 2,
+  });
+  const lifetime = {
+    type: 'range' as const,
+    range: [{
+      from: 3,
+      to: 5,
+    }],
+  };
+  session.register({
+    ...registration,
+    lifetime,
+  });
   session.update('test', { lifetime });
   session.setPageCount(1);
   session.setPageCount(5);
@@ -141,7 +198,10 @@ test('destroy releases registrations, definitions, controllers and listeners exa
   session.register(registration);
   const onChange = jest.fn();
   session.subscribe(onChange);
-  session.attachController({ id: 'test', readPlayback: () => null });
+  session.attachController({
+    id: 'test',
+    readPlayback: () => null,
+  });
   const controller = session.getController('test');
   session.destroy();
   session.destroy();

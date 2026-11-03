@@ -1,8 +1,8 @@
 @use "~styles/__variables" as vars;
 
 .Wrapper {
-  position: var(--book-toolbar-position, static);
-  z-index: var(--book-toolbar-layer, auto);
+  position: var(--story-toolbar-position, static);
+  z-index: var(--story-toolbar-layer, auto);
 
   width: 100%;
   padding: 0 clamp(12px, 1.5vw, 24px); // 0 20px;

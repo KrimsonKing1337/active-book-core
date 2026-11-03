@@ -17,7 +17,7 @@ builtin.frame and the host-owned builtin.frameFeedback definitions. The optional
 definitions argument supplies additional book definitions, with unique IDs.
 
 AppWrapper creates one session for its mounted book unless a session is supplied.
-It provides that session before running AppContent hooks and keeps BookVisualRoot
+It provides that session before running AppContent hooks and keeps StoryVisualRoot
 mounted during navigation. It calls setPageCount when config.pages changes;
 registrations, controllers and renderer identity are retained. getPageCount and
 the existing subscription notify implicit page declarations about bound changes.
@@ -68,16 +68,16 @@ visibility behavior remain specialized.
 
 ## Placement and visibility
 
-- Backgrounds fill bookViewport on the background plane. bookViewport is the
+- Backgrounds fill storyViewport on the background plane. storyViewport is the
   fixed inner player rectangle, including its controls. It preserves the old
   image/video fitting dimensions when the outer book root is wider or padded.
-- Ordinary frames fill page, below the narrative on scene or above it on
+- Ordinary frames fill storyViewport, below the narrative on belowNarrative or above it on
   aboveNarrative. Existing inner FrameElement positioning, sides and thickness
   remain renderer parameters.
 - Component frame masks use the shared frame visibility and measured insets.
-- Region clipping carries the inner player's rounded corners. A shorter page
+- Region clipping carries the inner player's rounded corners. A shorter narrativeFrame
   keeps the top corners without adding false rounded corners above the toolbar.
-- Author plane order is background / scene / aboveNarrative / aboveControls.
+- Author plane order is background / belowNarrative / aboveNarrative / aboveControls.
   Equal depth orders use the common instance-ID ordering. Numeric z-index options
   become depth.order; the planes remain separate stacking contexts.
 - Host definition metadata selects a systemFeedback surface layer above all author
@@ -130,10 +130,10 @@ presets, text, masks, CSS filters, geometry/scroll/resize updates and page-count
 changes. Existing placement tests cover actual painted priority, toolbar access,
 flashlight and vibration feedback.
 
-The static screenshot reference was captured from unmodified main at 13fda23
-using the same fixture before this refactor. It includes a filtered image,
-frame shadow/text/mask and the toolbar. It was visually reviewed; the new
-implementation passes the comparison without replacing that reference. The
+The static screenshot includes a filtered image, frame shadow/text/mask and
+the toolbar. Its Linux reference was visually reviewed and recaptured after
+changing default frame placement to storyViewport; see
+[story regions](story-visual-regions.md). The
 fixture movie is locally generated: a four-second 32x32 navy WebM, with no audio.
 
 Core checks: npm run typecheck, npm run typecheck:test, Jest, npm run test:browser,

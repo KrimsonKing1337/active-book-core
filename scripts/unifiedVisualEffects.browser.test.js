@@ -42,7 +42,7 @@ test('real Background and Frame renderers use the book session in Chromium', asy
       assert(await playingVideo.evaluate((element) => element === document.querySelector('[data-effect-id="range-video"] video')));
       assert(await playingVideo.evaluate((element, before) => element.currentTime >= before && !element.paused, timeBeforeVolume));
       await page.evaluate(() => window.realVisual.setVolume(100, 100));
-      const book = await page.locator('[data-book-region="book"]').elementHandle();
+      const book = await page.locator('[data-story-region="story"]').elementHandle();
       const counter = await page.getByTestId('range-frame-state').elementHandle();
       const firstToken = await counter.getAttribute('data-instance');
       const image = await effect(page, 'range-image').locator('img').elementHandle();
@@ -56,6 +56,16 @@ test('real Background and Frame renderers use the book session in Chromium', asy
       });
       const requestsAtStart = mediaRequests;
       const mountsAtStart = await page.evaluate(() => window.realVisualMetrics.mounts);
+      for (const selectedId of ['range-frame', 'range-pulse', null]) {
+        await page.evaluate((id) => window.setSelectedRealVisualEffect(id), selectedId);
+        await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(resolve)));
+        assert.equal(await page.locator('[data-visual-selection]').count(), mode === 'editor' && selectedId ? 1 : 0);
+        assert.equal(await page.getByTestId('range-frame-state').getAttribute('data-instance'), firstToken);
+        assert.equal(await page.evaluate(() => window.realVisualMetrics.mounts), mountsAtStart);
+        assert(await effect(page, 'range-pulse').evaluate((element) => {
+          return element.getAnimations({ subtree: true })[0] === window.heldRealAnimation;
+        }), 'selection preserves the running animation');
+      }
       await page.evaluate(() => window.dispatchEvent(new Event('increment-visual')));
       await page.getByTestId('range-frame-state').filter({ hasText: '1' }).waitFor();
 
@@ -76,7 +86,7 @@ test('real Background and Frame renderers use the book session in Chromium', asy
         assert.equal(await page.evaluate(() => window.realVisualMetrics.mounts), mountsAtStart);
       }
       assert.equal(await pageShadow.evaluate((element) => element.isConnected), false, 'page effect was destroyed');
-      assert(await book.evaluate((element) => element === document.querySelector('[data-book-region="book"]')));
+      assert(await book.evaluate((element) => element === document.querySelector('[data-story-region="story"]')));
 
       const frame = await effect(page, 'range-frame').elementHandle();
       await page.evaluate(() => {
@@ -84,7 +94,7 @@ test('real Background and Frame renderers use the book session in Chromium', asy
         session.update('range-frame', {
           effect: {
             visibility: { region: 'frame', sides: ['top', 'right'] },
-            depth: { plane: 'scene', order: 20 },
+            depth: { plane: 'belowNarrative', order: 20 },
             placement: {
               ...session.getSnapshot().find((cur) => cur.effect.id === 'range-frame').effect.placement,
               offset: { x: { value: 2, unit: 'px' }, y: { value: 1, unit: 'px' } },
@@ -134,7 +144,7 @@ test('real Background and Frame renderers use the book session in Chromium', asy
     });
   }
 
-  await context.test('real static effects preserve the reviewed pre-refactor screenshot', async (snapshotContext) => {
+  await context.test('real static effects match the reviewed storyViewport screenshot', async (snapshotContext) => {
     if (process.platform !== 'linux') {
       snapshotContext.skip('The reviewed static screenshot reference is Linux-specific');
       return;

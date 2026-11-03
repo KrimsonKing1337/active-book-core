@@ -7,13 +7,13 @@ import { isVisualEffectActive, type VisualEffects } from '@controllers/visualEff
 import type { VisualSurfaceItem } from '@components/VisualSurfaces';
 import { RegisteredVisualEffect } from '@components/RegisteredVisualEffect';
 
-import type { BookGeometry } from '../geometry';
+import type { StoryGeometry } from '../geometry';
 
 export type VisualEffectSurfacesOptions = {
   visualEffects?: VisualEffects;
   page: number;
   hiddenVisualEffects: readonly string[];
-  geometry: BookGeometry | null;
+  geometry: StoryGeometry | null;
 };
 
 const emptySnapshot: readonly VisualEffectRegistration[] = [];
@@ -58,7 +58,13 @@ export const useVisualEffectSurfaces = ({
     });
 
     return active.map(({ effect }) => {
-      const { definitionId, visibility, depth: effectDepth, id, placement } = effect;
+      const {
+        definitionId,
+        visibility,
+        depth: effectDepth,
+        id,
+        placement,
+      } = effect;
 
       const generation = visualEffects.getGeneration(id);
       const definition = visualEffects.getDefinition(definitionId);

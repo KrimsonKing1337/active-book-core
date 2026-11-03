@@ -6,13 +6,12 @@ paths described in this stage; see [stage 5](unified-background-frame.md).
 Book-owned registration and page/range activation are described in
 [visual lifecycle](visual-lifecycle.md).
 
-`BookVisualRoot` accepts a controlled `surfaces` list. `App` and `AppWrapper` forward
+`StoryVisualRoot` accepts a controlled `surfaces` list. `App` and `AppWrapper` forward
 it as `visualSurfaces`. A `VisualSurfaceItem` contains `id`, `placement`, `visibility`,
 `depth`, and `content: ReactNode`. This is a host rendering input, not an instance
 registry or a new book/builder schema. IDs must be unique within the list.
 
-The root measures all regions once through the existing `useBookGeometry`. It only
-starts its observer while the list is nonempty. Three persistent author plane
+The root measures all regions once through the existing `useStoryGeometry`. It observes while controlled surfaces or a visual session are supplied. Four persistent author plane
 containers share the resulting geometry. Each item has a visibility rectangle and
 one inner positioned surface containing its ordinary React element. A page-sized
 gradient therefore remains one continuous image across frame and narrative.
@@ -41,9 +40,9 @@ anchor. None of these choices implicitly clip to a narrative region.
 
 The outer rectangle is the selected visibility region in book coordinates. It
 clips overflow; the inner surface is translated relative to that rectangle.
-`book` includes controls, `page` excludes them, and viewport/content retain their
+`story` includes controls, `narrativeFrame` excludes them, and viewport/content retain their
 existing distinct measured rectangles. Root overflow also limits all painting to
-the book, including at rounded page edges when visibility is `book`.
+the book, including at rounded page edges when visibility is `story`.
 
 Frame visibility reuses `getFrameMaskImage` and the measured frame insets. Side
 masks are unioned, including an empty union for no selected sides. A circle or
@@ -66,14 +65,15 @@ legacy CSS defaults still apply outside this root. Actual layers within a book:
 | --- | ---: |
 | Existing background | 0 |
 | Existing frame behind | 1 |
-| Author scene | 2 |
+| Author belowNarrative | 2 |
 | Narrative | 3 |
 | Existing frame above | 4 |
 | Author aboveNarrative | 5 |
 | Toolbar | 10 |
 | Existing book menu/overflow | 15 |
 | Author aboveControls | 20 |
-| Existing frame overlay (flashlight/vibration preview) | 30 |
+| Host system feedback (flashlight/vibration preview) | 30 |
+| Editor selection outline | 40 |
 
 Items sort by numeric `depth.order`, then ascending string `id` using JavaScript
 string comparison (no locale-dependent sorting). The resulting rank is the local

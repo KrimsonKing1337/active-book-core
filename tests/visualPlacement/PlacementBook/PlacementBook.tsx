@@ -8,10 +8,10 @@ import type { SurfaceSpec } from '../@types';
 import { StoreProvider } from '@store';
 
 import { AppModeContext } from '@components/App/AppModeContext';
-import { AppWrapper, useBookGeometry } from '@components';
+import { AppWrapper, useStoryGeometry } from '@components';
 
-import { TestControls } from '../../bookVisualRoot/TestControls';
-import { TestPage } from '../../bookVisualRoot/TestPage';
+import { TestControls } from '../../storyVisualRoot/TestControls';
+import { TestPage } from '../../storyVisualRoot/TestPage';
 
 import { PlacementControls } from '../PlacementControls';
 import { Probe } from '../Probe';
@@ -24,11 +24,13 @@ const config: Config = {
 
 export const PlacementBook = () => {
   const bookRef = useRef<HTMLDivElement>(null);
-  const geometry = useBookGeometry(bookRef);
+  const geometry = useStoryGeometry(bookRef);
   const [specs, setSpecs] = useState<SurfaceSpec[]>([]);
+  const [selectedVisualEffectId, setSelectedVisualEffectId] = useState<string | null>(null);
 
   useEffect(() => {
     window.setVisualTestSurfaces = setSpecs;
+    window.setVisualTestSelection = setSelectedVisualEffectId;
   }, []);
 
   const surfaces = specs.map((specCur) => {
@@ -54,7 +56,7 @@ export const PlacementBook = () => {
   );
 
   return (
-    <AppModeContext value="editor">
+    <AppModeContext value={new URLSearchParams(location.search).get('mode') === 'reader' ? 'reader' : 'editor'}>
       <StoreProvider>
         <MemoryRouter initialEntries={['/page-1']}>
           <AppWrapper
@@ -63,6 +65,7 @@ export const PlacementBook = () => {
             tableOfContents={[]}
             rangeEffects={[]}
             visualSurfaces={surfaces}
+            selectedVisualEffectId={selectedVisualEffectId}
             editorTools={tools}
           >
             <Routes>

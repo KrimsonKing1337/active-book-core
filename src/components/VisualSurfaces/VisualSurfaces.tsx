@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 
-import type { BookGeometry } from '@components/BookVisualRoot/geometry';
+import type { StoryGeometry } from '@components/StoryVisualRoot/geometry';
 
 import type { VisualSurfaceItem } from './@types';
 
@@ -12,12 +12,12 @@ import * as styles from './VisualSurfaces.module.scss';
 
 type VisualSurfacesProps = {
   items: readonly VisualSurfaceItem[];
-  geometry: BookGeometry | null;
+  geometry: StoryGeometry | null;
 };
 
 const planes: readonly VisualSurfaceItem['depth']['plane'][] = [
   'background',
-  'scene',
+  'belowNarrative',
   'aboveNarrative',
   'aboveControls',
   'systemFeedback',
