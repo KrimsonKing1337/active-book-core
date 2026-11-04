@@ -2,6 +2,10 @@
 
 Экспериментальная ветка: `experiment/visual-effects-playground`. Основа — актуальный `main` `9d91625`, с изменениями и ручным рефакторингом PR #27. Согласованная ветка типов добавляет регион `application`; редактор принимает его в compiler и использует собранное ядро **0.0.45**. Демонстрационные renderers находятся в `tests/visualPlayground`, а не в production-каталоге.
 
+Ветки: [ядро](https://github.com/KrimsonKing1337/activeBook-react-core-next/tree/experiment/visual-effects-playground), [типы](https://github.com/KrimsonKing1337/activeBook-types/tree/experiment/visual-effects-playground), [редактор](https://github.com/KrimsonKing1337/activeBook-editor/tree/experiment/visual-effects-playground).
+
+Draft PR для ручного просмотра: [ядро #28](https://github.com/KrimsonKing1337/activeBook-react-core-next/pull/28), [типы #6](https://github.com/KrimsonKing1337/activeBook-types/pull/6), [редактор #51](https://github.com/KrimsonKing1337/activeBook-editor/pull/51). Merge не выполнялся.
+
 ## Запуск
 
 Репозитории `activeBook-types` и `activeBook-react-core-next` должны лежать рядом и быть на экспериментальных ветках. После обычной установки зависимостей (`npm ci` в обоих репозиториях) в каталоге ядра выполните:
