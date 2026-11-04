@@ -181,6 +181,10 @@ test('registered visual lifecycle in Chromium', async (context) => {
       await command(page, { id: 'range-b', action: 'stop' });
       assert.equal((await readCounter(page, 'range-b')).ticks, 0);
       assert.equal((await readCounter(page, 'range-b')).playing, false);
+      // Retain the exact reset assertion, then allow any old interval task to arrive.
+      await page.waitForTimeout(100);
+      assert.equal((await readCounter(page, 'range-b')).ticks, 0);
+      assert.equal((await metrics(page))['range-b'].activeTimers, 0);
       await page.evaluate(() => {
         const effects = window.visualLifecycle.effects;
         const controller = effects.getController('range-a');

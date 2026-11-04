@@ -1,4 +1,4 @@
-import { useEffect, useImperativeHandle, useLayoutEffect, useState } from 'react';
+import { useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
 
 import type { VisualRendererProps } from '@active-book/types';
 
@@ -9,6 +9,7 @@ export const CounterRenderer = ({ id, params, geometry, ref }: VisualRendererPro
   const [token] = useState(() => crypto.randomUUID());
   const [ticks, setTicks] = useState(0);
   const [isPlaying, setIsPlaying] = useState(params.autoPlay !== false);
+  const playingRef = useRef(isPlaying);
   const [loadDelay] = useState(() => typeof params.loadDelay === 'number' ? params.loadDelay : 50);
   const step = typeof params.step === 'number' ? params.step : 1;
   const label = typeof params.label === 'string' ? params.label : '';
@@ -43,7 +44,10 @@ export const CounterRenderer = ({ id, params, geometry, ref }: VisualRendererPro
 
     const metric = getMetrics(id);
     metric.activeTimers += 1;
-    const timer = setInterval(() => setTicks((previous) => previous + step), 25);
+    const timer = setInterval(() => {
+      // A queued interval can run before React commits the stop and its passive cleanup.
+      setTicks((previous) => playingRef.current ? previous + step : previous);
+    }, 25);
 
     return () => {
       clearInterval(timer);
@@ -54,10 +58,15 @@ export const CounterRenderer = ({ id, params, geometry, ref }: VisualRendererPro
   useImperativeHandle(ref, () => ({
     play: () => {
       getMetrics(id).playCalls += 1;
+      playingRef.current = true;
       setIsPlaying(true);
     },
-    pause: () => setIsPlaying(false),
+    pause: () => {
+      playingRef.current = false;
+      setIsPlaying(false);
+    },
     stop: () => {
+      playingRef.current = false;
       setIsPlaying(false);
       setTicks(0);
     },
