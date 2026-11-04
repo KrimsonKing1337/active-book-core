@@ -15,6 +15,40 @@ import { SingleScene } from './SingleScene';
 import { FeedbackProbe } from './FeedbackProbe';
 import { ViewportTelemetry } from './ViewportTelemetry';
 
+const createRegistration = (
+  settings: Settings,
+  id: string,
+  definitionId: string,
+  region: Exclude<VisualRegion, 'frame'>,
+): VisualEffectRegistration => {
+  const params = {
+    duration: settings.duration,
+    intensity: settings.intensity,
+    opacity: settings.opacity,
+    speed: settings.speed,
+    color: settings.color,
+    direction: settings.direction,
+    originX: settings.originX,
+    originY: settings.originY,
+    frameAnchor: settings.frameAnchor,
+    offsetX: settings.offsetX,
+    physicalMode: settings.physicalMode,
+  };
+  const effect: VisualEffectRegistration['effect'] = {
+    id,
+    definitionId,
+    params,
+    placement: fillRegion(region),
+    visibility: { region },
+    depth: { plane: 'aboveControls', order: 0 },
+  };
+
+  return {
+    effect,
+    lifetime: { type: 'range', range: [{ from: 1, to: 2 }, { from: 4, to: 4 }] },
+  };
+};
+
 export const definitionsFor = (settings: Settings): HostVisualEffectDefinition[] => {
   const effectHost = settings.region === 'application' ? 'aboveStory' : 'story';
 
@@ -53,37 +87,8 @@ export const definitionsFor = (settings: Settings): HostVisualEffectDefinition[]
 };
 
 export const registrationsFor = (settings: Settings): VisualEffectRegistration[] => {
-  const make = (id: string, definitionId: string, region: Exclude<VisualRegion, 'frame'>): VisualEffectRegistration => {
-    const params = {
-      duration: settings.duration,
-      intensity: settings.intensity,
-      opacity: settings.opacity,
-      speed: settings.speed,
-      color: settings.color,
-      direction: settings.direction,
-      originX: settings.originX,
-      originY: settings.originY,
-      frameAnchor: settings.frameAnchor,
-      offsetX: settings.offsetX,
-      physicalMode: settings.physicalMode,
-    };
-    const effect: VisualEffectRegistration['effect'] = {
-      id,
-      definitionId,
-      params,
-      placement: fillRegion(region),
-      visibility: { region },
-      depth: { plane: 'aboveControls', order: 0 },
-    };
-
-    return {
-      effect,
-      lifetime: { type: 'range', range: [{ from: 1, to: 2 }, { from: 4, to: 4 }] },
-    };
-  };
-
   if (settings.demo === 'frame') {
-    const frame = make('frame', 'lab.frame', settings.region);
+    const frame = createRegistration(settings, 'frame', 'lab.frame', settings.region);
     frame.effect.depth.plane = settings.plane;
 
     if (settings.mask) {
@@ -109,11 +114,11 @@ export const registrationsFor = (settings: Settings): VisualEffectRegistration[]
   }
 
   if (settings.demo === 'darkness') {
-    return [make('darkness', 'lab.dark', settings.region)];
+    return [createRegistration(settings, 'darkness', 'lab.dark', settings.region)];
   }
 
   if (settings.demo === 'edges') {
-    const edge = make('edges', 'lab.edges', 'application');
+    const edge = createRegistration(settings, 'edges', 'lab.edges', 'application');
     edge.effect.params = {
       ...edge.effect.params, edges: true, intensity: 1,
     };
@@ -122,7 +127,7 @@ export const registrationsFor = (settings: Settings): VisualEffectRegistration[]
   }
 
   if (settings.demo === 'smoke') {
-    const smoke = make('smoke', 'lab.smoke', settings.region);
+    const smoke = createRegistration(settings, 'smoke', 'lab.smoke', settings.region);
     smoke.effect.placement = fillRegion('narrativeFrame');
 
     return [smoke];
@@ -130,39 +135,39 @@ export const registrationsFor = (settings: Settings): VisualEffectRegistration[]
 
   if (settings.demo === 'through') {
     if (settings.composition === 'single') {
-      return [make('through', 'lab.through', settings.region)];
+      return [createRegistration(settings, 'through', 'lab.through', settings.region)];
     }
 
     return [
-      make('through-narrative', 'lab.through', 'narrativeFrame'),
-      make('through-viewport', 'lab.through', 'storyViewport'),
-      make('through-application', 'lab.through', settings.region),
+      createRegistration(settings, 'through-narrative', 'lab.through', 'narrativeFrame'),
+      createRegistration(settings, 'through-viewport', 'lab.through', 'storyViewport'),
+      createRegistration(settings, 'through-application', 'lab.through', settings.region),
     ];
   }
 
   if (settings.demo === 'single') {
-    return [make('single', 'lab.single', 'application'), make('telemetry', 'lab.telemetry', 'application')];
+    return [createRegistration(settings, 'single', 'lab.single', 'application'), createRegistration(settings, 'telemetry', 'lab.telemetry', 'application')];
   }
 
-  const curtain = make('curtain', 'lab.curtain', 'application');
+  const curtain = createRegistration(settings, 'curtain', 'lab.curtain', 'application');
   curtain.effect.params = {
     ...curtain.effect.params, direction: 'grow', intensity: 1,
   };
-  const collapse = make('collapse', 'lab.collapse', 'storyViewport');
-  const reveal = make('reveal', 'lab.curtain', 'application');
+  const collapse = createRegistration(settings, 'collapse', 'lab.collapse', 'storyViewport');
+  const reveal = createRegistration(settings, 'reveal', 'lab.curtain', 'application');
   reveal.effect.params = {
     ...reveal.effect.params, direction: 'reveal', intensity: 1,
   };
   reveal.effect.depth.order = 1;
 
   if (settings.demo === 'collapse') {
-    return [curtain, collapse, reveal, make('telemetry', 'lab.telemetry', 'application')];
+    return [curtain, collapse, reveal, createRegistration(settings, 'telemetry', 'lab.telemetry', 'application')];
   }
 
-  const narrative = make('narrative-dark', 'lab.dark', 'narrativeFrame');
+  const narrative = createRegistration(settings, 'narrative-dark', 'lab.dark', 'narrativeFrame');
   narrative.effect.params = {
     ...narrative.effect.params, direction: 'grow', intensity: 1,
   };
 
-  return [narrative, curtain, collapse, reveal, make('telemetry', 'lab.telemetry', 'application')];
+  return [narrative, curtain, collapse, reveal, createRegistration(settings, 'telemetry', 'lab.telemetry', 'application')];
 };
