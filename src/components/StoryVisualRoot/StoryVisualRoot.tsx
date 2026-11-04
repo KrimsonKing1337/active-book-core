@@ -1,6 +1,4 @@
-import type { HTMLAttributes, Ref } from 'react';
-
-import { useCallback, useRef } from 'react';
+import { type HTMLAttributes, type Ref, useCallback, useRef } from 'react';
 
 import classNames from 'classnames';
 

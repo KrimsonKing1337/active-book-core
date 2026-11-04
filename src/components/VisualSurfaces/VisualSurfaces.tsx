@@ -27,9 +27,11 @@ export const VisualSurfaces = ({ items, geometry }: VisualSurfacesProps) => {
   return (
     <>
       {planes.map((planeCur) => {
-        const planeItems = items
-          .filter((itemCur) => itemCur.depth.plane === planeCur)
-          .sort(compareVisualSurfaces);
+        const planeItems = items.filter((itemCur) => {
+          return itemCur.depth.plane === planeCur;
+        });
+
+        const planeItemsSorted = planeItems.sort(compareVisualSurfaces);
 
         const planeClassNames = classNames(styles.Plane, styles[planeCur]);
 
@@ -40,7 +42,7 @@ export const VisualSurfaces = ({ items, geometry }: VisualSurfacesProps) => {
             data-visual-plane={planeCur}
             inert
           >
-            {planeItems.map((itemCur, index) => {
+            {planeItemsSorted.map((itemCur, index) => {
               return (
                 <VisualSurface
                   key={itemCur.id}

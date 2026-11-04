@@ -10,7 +10,11 @@ type VisualSelectionOutlineProps = {
 
 /** Editor-only region bounds, independent of the effect's surface and masks. */
 export const VisualSelectionOutline = ({ item, geometry }: VisualSelectionOutlineProps) => {
-  const region = item && !item.hidden ? geometry?.regions[item.visibility.region] : null;
+  let region = null;
+
+  if (item && !item.hidden) {
+    region = geometry?.regions[item.visibility.region];
+  }
 
   if (!item || !region) {
     return null;
