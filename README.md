@@ -21,3 +21,9 @@ https://github.com/KrimsonKing1337/activeBook-fairytale-forest
 https://active-books.ru
 
 Текущая архитектура Background/Frame: [общая визуальная сессия](docs/unified-background-frame.md).
+
+
+## Экспериментальная лаборатория эффектов
+
+В ветке `experiment/visual-effects-playground` запустите `npm run dev:visual-lab`.
+[Результаты CSS/JS-сравнения, управление эффектами и визуальные материалы](docs/visual-playground.md).
