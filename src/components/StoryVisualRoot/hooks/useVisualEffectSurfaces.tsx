@@ -48,6 +48,14 @@ export const useVisualEffectSurfaces = ({
     return visualEffects?.connectHost();
   }, [visualEffects]);
 
+  useLayoutEffect(() => {
+    const activeIds = registrations.filter((registrationCur) => {
+      return page >= 1 && page <= pages && isVisualEffectActive(registrationCur.lifetime, page);
+    }).map((registrationCur) => registrationCur.effect.id);
+
+    visualEffects?.runs.retainActive(new Set(activeIds));
+  }, [registrations, page, pages, visualEffects]);
+
   return useMemo<VisualSurfaceItem[]>(() => {
     if (!visualEffects || page < 1 || page > pages) {
       return [];
@@ -97,6 +105,8 @@ export const useVisualEffectSurfaces = ({
         depth,
         content,
         hidden: isHidden,
+        host: definition.surfaceHost,
+        layout: definition.surfaceLayout,
       };
     });
   }, [registrations, page, pages, geometry, visualEffects, hiddenVisualEffects]);

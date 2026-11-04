@@ -5,6 +5,7 @@ import type { VisualEffectDefinition, VisualEffectRegistration } from '@active-b
 import type { CreateVisualEffectsOptions, HostVisualEffectDefinition, VisualEffectChanges } from './@types';
 
 import { builtinVisualDefinitions } from './definitions';
+import { createEffectRuns } from './runs';
 import { copyVisualData, createVisualControllers, validateVisualLifetime } from './utils';
 
 export const createVisualEffects = ({ definitions = [], pages }: CreateVisualEffectsOptions) => {
@@ -21,6 +22,7 @@ export const createVisualEffects = ({ definitions = [], pages }: CreateVisualEff
   let nextGeneration = 0;
   let hasHost = false;
   let destroyed = false;
+  const runs = createEffectRuns();
 
   const assertOpen = () => {
     if (destroyed) {
@@ -63,6 +65,7 @@ export const createVisualEffects = ({ definitions = [], pages }: CreateVisualEff
 
   const remove = (id: string) => {
     if (registrations.delete(id)) {
+      runs.forget(id);
 
       controllers.invalidate(id);
 
@@ -143,7 +146,11 @@ export const createVisualEffects = ({ definitions = [], pages }: CreateVisualEff
     const allDefinitions = [...builtinVisualDefinitions, ...definitions];
 
     for (const definitionCur of allDefinitions) {
-      const { id, defaultParams, Renderer } = definitionCur;
+      const {
+        id,
+        defaultParams,
+        Renderer,
+      } = definitionCur;
 
       if (!id || next.has(id)) {
         throw new Error(`Duplicate or empty visual definition ID: ${id}`);
@@ -154,7 +161,11 @@ export const createVisualEffects = ({ definitions = [], pages }: CreateVisualEff
       const renderersAreEqual = previous?.Renderer === Renderer;
       const paramsAreEqual = isEqual(previous?.defaultParams, defaultParams);
 
-      const unchanged = renderersAreEqual && paramsAreEqual;
+      const hostDefinition = definitionCur as HostVisualEffectDefinition;
+      const metadataIsEqual = previous?.surfaceHost === hostDefinition.surfaceHost
+        && previous?.surfaceLayout === hostDefinition.surfaceLayout
+        && previous?.systemFeedback === hostDefinition.systemFeedback;
+      const unchanged = renderersAreEqual && paramsAreEqual && metadataIsEqual;
 
       let copied = previous;
 
@@ -203,6 +214,7 @@ export const createVisualEffects = ({ definitions = [], pages }: CreateVisualEff
     }
 
     destroyed = true;
+    runs.destroy();
     registrations.clear();
     implementations.clear();
     generations.clear();
@@ -259,10 +271,16 @@ export const createVisualEffects = ({ definitions = [], pages }: CreateVisualEff
       hasHost = false;
 
       controllers.clear();
+      queueMicrotask(() => {
+        if (!hasHost) {
+          runs.cancelAll();
+        }
+      });
     };
   };
 
   return {
+    runs,
     register,
     update,
     remove,
