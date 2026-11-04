@@ -62,7 +62,12 @@ test('visual playground experiments in Chromium', async (context) => {
     await waitRun(page, 'darkness');
     const darkness = page.locator('[data-demo-effect="darkness"]');
     const token = await darkness.getAttribute('data-token');
-    await page.getByRole('slider', { name: 'Прозрачность эффекта' }).fill('65');
+    const transparencySlider = page.getByRole('slider', { name: 'Прозрачность эффекта' });
+    await transparencySlider.press('End');
+
+    for (let step = 0; step < 7; step += 1) {
+      await transparencySlider.press('ArrowLeft');
+    }
     await settle(page);
     const opacity = await darkness.evaluate((element) => Number(getComputedStyle(element).opacity));
     near(opacity, 0.35, 'opacity is independent from intensity');
