@@ -9,6 +9,7 @@ export type Settings = {
   region: Extract<VisualRegion, 'storyViewport' | 'narrativeFrame' | 'story' | 'application'>;
   duration: number;
   intensity: number;
+  opacity: number;
   speed: number;
   color: string;
   direction: 'grow' | 'shrink' | 'reveal';
@@ -36,6 +37,7 @@ export const initialSettings: Settings = {
   region: 'storyViewport',
   duration: 2000,
   intensity: 0.85,
+  opacity: 1,
   speed: 1,
   color: '#70d9c5',
   direction: 'grow',

@@ -18,7 +18,7 @@ export const Smoke = (props: VisualRendererProps) => {
   const particles = Array.from({ length: count }, (_, index) => index);
   const style: CSSProperties = {
     color: stringParam(props.params, 'color', '#c8d9e9'),
-    opacity: progress > 0 && progress < 1 ? 1 : 0,
+    opacity: progress > 0 && progress < 1 ? numberParam(props.params, 'opacity', 1) : 0,
   };
 
   return (

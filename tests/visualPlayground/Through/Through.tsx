@@ -21,7 +21,9 @@ export const Through = (props: VisualRendererProps) => {
   const style: CSSProperties = {
     background: `radial-gradient(circle at ${x}px ${y}px, ${stops})`,
     color: stringParam(props.params, 'color', '#75e1d5'),
-    opacity: numberParam(props.params, 'intensity', 0.85) * Math.sin(progress * Math.PI),
+    opacity: numberParam(props.params, 'intensity', 0.85)
+      * numberParam(props.params, 'opacity', 1)
+      * Math.sin(progress * Math.PI),
   };
 
   return (

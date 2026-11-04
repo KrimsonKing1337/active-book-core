@@ -56,6 +56,27 @@ test('visual playground experiments in Chromium', async (context) => {
     }
   });
 
+  await scenario('opacity control keeps demo renderers mounted and reveals darkened content', async (page) => {
+    await patch(page, { demo: 'darkness', duration: 350, intensity: 1 });
+    await play(page);
+    await waitRun(page, 'darkness');
+    const darkness = page.locator('[data-demo-effect="darkness"]');
+    const token = await darkness.getAttribute('data-token');
+    await page.getByRole('slider', { name: 'Прозрачность эффекта' }).fill('65');
+    await settle(page);
+    const opacity = await darkness.evaluate((element) => Number(getComputedStyle(element).opacity));
+    near(opacity, 0.35, 'opacity is independent from intensity');
+    assert.equal(await darkness.getAttribute('data-token'), token, 'opacity does not remount the renderer');
+
+    await patch(page, { demo: 'edges', duration: 350, opacity: 0.4 });
+    await play(page);
+    await waitRun(page, 'edges');
+    const underlay = await page.locator('[data-demo-effect="edges"]').evaluate((element) => {
+      return Number(getComputedStyle(element).opacity);
+    });
+    near(underlay, 0.4, 'edge darkness keeps diagnostic opacity despite its fixed intensity');
+  });
+
   await scenario('shared CSS layout matches real regions, toolbar variations and internal frame anchors', async (page) => {
     const original = await frameToken(page);
     for (const options of [

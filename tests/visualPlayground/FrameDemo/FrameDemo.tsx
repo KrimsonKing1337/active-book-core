@@ -52,6 +52,7 @@ export const FrameDemo = (props: VisualRendererProps) => {
   return (
     <div
       className={styles.Frame}
+      style={{ opacity: numberParam(props.params, 'opacity', 1) }}
       data-demo-effect={props.id}
       data-token={token}
       data-progress={progress.toFixed(3)}

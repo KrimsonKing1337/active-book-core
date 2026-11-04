@@ -47,7 +47,7 @@ export const Darkness = (props: VisualRendererProps) => {
 
   const style: CSSProperties = {
     backgroundColor: color,
-    opacity: intensity,
+    opacity: intensity * numberParam(params, 'opacity', 1),
     clipPath,
     maskImage,
     visibility: active ? 'visible' : 'hidden',

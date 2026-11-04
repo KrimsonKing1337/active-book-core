@@ -262,6 +262,22 @@ export const Controls = ({
           Параметры и рабочая поверхность
         </legend>
 
+        <label>
+          <span>
+            Прозрачность эффекта: {Math.round((1 - settings.opacity) * 100)}%
+          </span>
+
+          <input
+            type="range"
+            aria-label="Прозрачность эффекта"
+            min={0}
+            max={100}
+            step={5}
+            value={Math.round((1 - settings.opacity) * 100)}
+            onChange={(e) => onChange({ opacity: 1 - Number(e.target.value) / 100 })}
+          />
+        </label>
+
         {visibleSliders.map(([name, label, min, max, step]) => {
           return (
             <label key={name}>

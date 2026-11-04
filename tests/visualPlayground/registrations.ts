@@ -57,6 +57,7 @@ export const registrationsFor = (settings: Settings): VisualEffectRegistration[]
     const params = {
       duration: settings.duration,
       intensity: settings.intensity,
+      opacity: settings.opacity,
       speed: settings.speed,
       color: settings.color,
       direction: settings.direction,

@@ -11,7 +11,7 @@ import { useBookApplicationSurface } from '@components/BookApplicationSurface';
 import { useVisualRegionGeometry } from '@components/RegisteredVisualEffect/geometryContext';
 
 import { useTimeline } from '../hooks/useTimeline';
-import { stringParam } from '../utils';
+import { numberParam, stringParam } from '../utils';
 
 import * as styles from './SingleScene.module.scss';
 
@@ -46,11 +46,11 @@ export const SingleScene = (props: VisualRendererProps) => {
   const y = frame && surface ? frame.y - surface.y + frame.height / 2 : props.geometry.height / 2;
   const radius = Math.hypot(props.geometry.width, props.geometry.height);
   const spread = Math.min(1, progress / 0.5);
-  const opacity = progress > 0.85 ? (1 - progress) / 0.15 : 1;
+  const fadeOpacity = progress > 0.85 ? (1 - progress) / 0.15 : 1;
   const style: CSSProperties = {
     backgroundColor: stringParam(props.params, 'color', '#11131f'),
     clipPath: `circle(${spread * radius}px at ${x}px ${y}px)`,
-    opacity: active ? opacity : 0,
+    opacity: active ? fadeOpacity * numberParam(props.params, 'opacity', 1) : 0,
   };
 
   return (
