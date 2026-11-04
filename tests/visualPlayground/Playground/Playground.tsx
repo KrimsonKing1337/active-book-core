@@ -18,7 +18,7 @@ import { Controls } from '../Controls';
 import { PlaygroundPage } from '../PlaygroundPage';
 import { Navigation } from '../Navigation';
 import { definitionsFor, registrationsFor } from '../registrations';
-import { playSequence } from '../sequence';
+import { playDemoCycle } from '../playDemoCycle';
 
 import * as styles from './Playground.module.scss';
 
@@ -50,6 +50,7 @@ export const Playground = () => {
   const [page, setPage] = useState(1);
   const seenRef = useRef(new Set<string>());
   const abortRef = useRef<AbortController | null>(null);
+  const loopRef = useRef(initialSettings.loop);
   const mountedRef = useRef(false);
   const registrations = useMemo(() => registrationsFor(settings), [settings]);
   const definitions = useMemo(() => definitionsFor(settings), [settings]);
@@ -68,22 +69,30 @@ export const Playground = () => {
     const controller = new AbortController();
     abortRef.current = controller;
 
-    if (settings.demo === 'collapse' || settings.demo === 'sequence') {
-      void playSequence({
-        session, signal: controller.signal, narrative: settings.demo === 'sequence',
-      }).catch((reason) => {
-        if (!controller.signal.aborted) {
-          if (!(reason instanceof DOMException && reason.name === 'AbortError')) {
-            setError(String(reason));
-          }
-          stop();
-        }
-      });
+    const run = async () => {
+      let hasPlayed = false;
 
-      return;
-    }
+      do {
+        hasPlayed = await playDemoCycle({
+          session,
+          registrations,
+          demo: settings.demo,
+          signal: controller.signal,
+        });
+      } while (hasPlayed && !controller.signal.aborted && loopRef.current);
+    };
 
-    registrations.forEach(({ effect }) => session.getController(effect.id)?.playback?.play());
+    void run().catch((reason) => {
+      if (controller.signal.aborted) {
+        return;
+      }
+
+      if (!(reason instanceof DOMException && reason.name === 'AbortError')) {
+        setError(String(reason));
+      }
+
+      stop();
+    });
   }, [settings.demo, registrations, session, stop]);
 
   const pause = useCallback(() => {
@@ -99,6 +108,10 @@ export const Playground = () => {
   }, [registrations, session]);
 
   const change = useCallback((patch: Partial<Settings>) => {
+    if (patch.loop !== undefined) {
+      loopRef.current = patch.loop;
+    }
+
     const requiresPlaybackReset = patch.demo || patch.region || patch.physicalMode || patch.composition || patch.plane;
 
     if (requiresPlaybackReset) {

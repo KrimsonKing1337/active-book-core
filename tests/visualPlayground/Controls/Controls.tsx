@@ -102,6 +102,15 @@ export const Controls = ({
         </button>
       </div>
 
+      <label className={styles.Check}>
+        <input
+          type="checkbox"
+          checked={settings.loop}
+          onChange={(e) => onChange({ loop: e.target.checked })}
+        />
+        Зациклить
+      </label>
+
       <label>
         Область действия
         <select

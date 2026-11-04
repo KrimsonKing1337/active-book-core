@@ -29,6 +29,7 @@ export type Settings = {
   physicalMode: 'scale' | 'size';
   composition: 'single' | 'multiple';
   trigger: 'manual' | 'page';
+  loop: boolean;
 };
 
 export const initialSettings: Settings = {
@@ -57,4 +58,5 @@ export const initialSettings: Settings = {
   physicalMode: 'scale',
   composition: 'single',
   trigger: 'manual',
+  loop: false;
 };

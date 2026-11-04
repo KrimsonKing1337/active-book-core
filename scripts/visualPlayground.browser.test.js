@@ -82,6 +82,55 @@ test('visual playground experiments in Chromium', async (context) => {
     near(underlay, 0.4, 'edge darkness keeps diagnostic opacity despite its fixed intensity');
   });
 
+  await scenario('loop repeats one complete effect and obeys pause, toggle and stop', async (page) => {
+    await patch(page, { demo: 'darkness', duration: 300 });
+    const loop = page.getByRole('checkbox', { name: 'Зациклить' });
+    assert.equal(await loop.isChecked(), false);
+    await loop.check();
+    await play(page);
+
+    await page.waitForFunction(() => {
+      return (window.playground.session.runs.read('darkness')?.number ?? 0) >= 2;
+    });
+
+    await page.getByRole('button', { name: 'Пауза', exact: true }).click();
+    const pausedRun = await currentRun(page, 'darkness');
+    assert.equal(pausedRun.status, 'paused');
+    await page.waitForTimeout(400);
+    assert.equal((await currentRun(page, 'darkness')).number, pausedRun.number, 'pause prevents repeating');
+
+    await page.getByRole('button', { name: 'Продолжить', exact: true }).click();
+    await page.waitForFunction((previous) => {
+      return (window.playground.session.runs.read('darkness')?.number ?? 0) > previous;
+    }, pausedRun.number);
+
+    await loop.uncheck();
+    await page.waitForFunction(() => window.playground.session.runs.read('darkness')?.status === 'completed');
+    const finished = (await currentRun(page, 'darkness')).number;
+    await page.waitForTimeout(400);
+    assert.equal((await currentRun(page, 'darkness')).number, finished, 'disabling loop finishes the current run');
+
+    await loop.check();
+    await play(page);
+    await waitRun(page, 'darkness', 'running', finished);
+    await page.getByRole('button', { name: 'Стоп / сброс', exact: true }).click();
+    const stopped = (await currentRun(page, 'darkness')).number;
+    await page.waitForTimeout(400);
+    assert.equal((await currentRun(page, 'darkness')).number, stopped, 'stop cancels repeating');
+  });
+
+  await scenario('loop repeats a complete coordinated scene rather than its individual phases', async (page) => {
+    await patch(page, { demo: 'sequence', duration: 300, loop: true });
+    await play(page);
+
+    await page.waitForFunction(() => {
+      return (window.playground.session.runs.read('narrative-dark')?.number ?? 0) >= 2;
+    });
+
+    await page.getByRole('button', { name: 'Стоп / сброс', exact: true }).click();
+    assert.equal(await page.locator('[data-layout-mode]').count(), 0, 'stop releases the layout lease');
+  });
+
   await scenario('shared CSS layout matches real regions, toolbar variations and internal frame anchors', async (page) => {
     const original = await frameToken(page);
     for (const options of [
