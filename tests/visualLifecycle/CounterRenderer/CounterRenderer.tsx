@@ -5,7 +5,12 @@ import type { VisualRendererProps } from '@active-book/types';
 
 import { getMetrics } from '../metrics';
 
-export const CounterRenderer = ({ id, params, geometry, ref }: VisualRendererProps) => {
+export const CounterRenderer = ({
+  id,
+  params,
+  geometry,
+  ref,
+}: VisualRendererProps) => {
   const [token] = useState(() => crypto.randomUUID());
   const [ticks, setTicks] = useState(0);
   const [isPlaying, setIsPlaying] = useState(params.autoPlay !== false);
@@ -25,13 +30,17 @@ export const CounterRenderer = ({ id, params, geometry, ref }: VisualRendererPro
       isPending = false;
       metric.pendingLoads -= 1;
       metric.loads += 1;
-      if (!isAlive) metric.lateCallbacks += 1;
+      if (!isAlive) {
+        metric.lateCallbacks += 1;
+      }
     }, loadDelay);
 
     return () => {
       isAlive = false;
       clearTimeout(loadTimer);
-      if (isPending) metric.pendingLoads -= 1;
+      if (isPending) {
+        metric.pendingLoads -= 1;
+      }
       metric.liveResources -= 1;
       metric.unmounts += 1;
     };
@@ -81,7 +90,9 @@ export const CounterRenderer = ({ id, params, geometry, ref }: VisualRendererPro
       data-label={label}
       data-width={geometry.width}
       data-height={geometry.height}
-      style={{ width: '100%', height: '100%', background: 'linear-gradient(90deg, #4008, #0048)' }}
+      style={{
+        width: '100%', height: '100%', background: 'linear-gradient(90deg, #4008, #0048)',
+      }}
     >
       {ticks}
     </div>
