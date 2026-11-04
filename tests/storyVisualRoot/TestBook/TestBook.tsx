@@ -7,7 +7,7 @@ import type { AppMode, Config } from '../../../src/@types';
 import { StoreProvider } from '../../../src/store';
 import { AppWrapper } from '../../../src/components/AppWrapper';
 import { AppModeContext } from '../../../src/components/App/AppModeContext';
-import { useBookGeometry } from '../../../src/components/BookVisualRoot';
+import { useStoryGeometry } from '../../../src/components/StoryVisualRoot';
 import { Page0 } from '../../../src/pages/Page0';
 
 import { TestControls } from '../TestControls';
@@ -27,7 +27,7 @@ export const TestBook = () => {
   const [pages, setPages] = useState(config.pages);
   const currentConfig = { ...config, pages };
   const bookRef = useRef<HTMLDivElement>(null);
-  const geometry = useBookGeometry(bookRef);
+  const geometry = useStoryGeometry(bookRef);
 
   const tools = (
     <>

@@ -1,6 +1,4 @@
-import type { HTMLAttributes, Ref } from 'react';
-
-import { useCallback, useRef } from 'react';
+import { type HTMLAttributes, type Ref, useCallback, useRef } from 'react';
 
 import classNames from 'classnames';
 
@@ -9,22 +7,25 @@ import { type VisualEffects, VisualEffectsContext } from '@controllers/visualEff
 import type { VisualSurfaceItem } from '@components/VisualSurfaces';
 
 import { VisualSurfaces } from '@components/VisualSurfaces';
+import { VisualSelectionOutline } from '@components/VisualSelectionOutline';
+import { useAppMode } from '@components/App/AppModeContext';
 
-import { useBookGeometry } from './geometry';
+import { useStoryGeometry } from './geometry';
 import { useVisualEffectSurfaces } from './hooks/useVisualEffectSurfaces';
 
-import * as styles from './BookVisualRoot.module.scss';
+import * as styles from './StoryVisualRoot.module.scss';
 
-export type BookVisualRootProps = HTMLAttributes<HTMLDivElement> & {
+export type StoryVisualRootProps = HTMLAttributes<HTMLDivElement> & {
   ref?: Ref<HTMLDivElement>;
   surfaces?: readonly VisualSurfaceItem[];
   inverseColors?: boolean;
   visualEffects?: VisualEffects;
   page?: number;
   hiddenVisualEffects?: readonly string[];
+  selectedVisualEffectId?: string | null;
 };
 
-export const BookVisualRoot = ({
+export const StoryVisualRoot = ({
   children,
   className = '',
   ref,
@@ -33,12 +34,14 @@ export const BookVisualRoot = ({
   page = 0,
   hiddenVisualEffects = [],
   inverseColors = false,
+  selectedVisualEffectId,
   ...etc
-}: BookVisualRootProps) => {
-  const bookRef = useRef<HTMLDivElement>(null);
+}: StoryVisualRootProps) => {
+  const storyRef = useRef<HTMLDivElement>(null);
+  const appMode = useAppMode();
   const shouldMeasure = suppliedSurfaces.length > 0 || !!visualEffects;
 
-  const geometry = useBookGeometry(bookRef, shouldMeasure);
+  const geometry = useStoryGeometry(storyRef, shouldMeasure);
 
   const registeredSurfaces = useVisualEffectSurfaces({
     visualEffects,
@@ -50,32 +53,35 @@ export const BookVisualRoot = ({
   const surfaces = [...suppliedSurfaces, ...registeredSurfaces];
 
   const hasSurfaces = surfaces.length > 0;
+  const selectedSurface = appMode === 'editor'
+    ? surfaces.find((cur) => cur.id === selectedVisualEffectId)
+    : undefined;
 
   const ids = new Set<string>();
 
   for (const surfaceCur of surfaces) {
     if (ids.has(surfaceCur.id)) {
-      throw new Error(`Duplicate visual surface ID in book: ${surfaceCur.id}`);
+      throw new Error(`Duplicate visual surface ID in story: ${surfaceCur.id}`);
     }
 
     ids.add(surfaceCur.id);
   }
 
   const rootClassNames = classNames({
-    [styles.BookVisualRoot]: true,
+    [styles.StoryVisualRoot]: true,
     [className]: !!className,
     [styles.inverseColors]: inverseColors,
   });
 
   const attachRoot = useCallback((element: HTMLDivElement | null) => {
-    bookRef.current = element;
+    storyRef.current = element;
 
     if (typeof ref === 'function') {
       const cleanup = ref(element);
 
       if (cleanup) {
         return () => {
-          bookRef.current = null;
+          storyRef.current = null;
 
           cleanup();
         };
@@ -90,7 +96,7 @@ export const BookVisualRoot = ({
       {...etc}
       ref={attachRoot}
       className={rootClassNames}
-      data-book-region="book"
+      data-story-region="story"
     >
       {children}
 
@@ -99,6 +105,8 @@ export const BookVisualRoot = ({
           <VisualSurfaces items={surfaces} geometry={geometry} />
         </VisualEffectsContext>
       )}
+
+      <VisualSelectionOutline item={selectedSurface} geometry={geometry} />
     </div>
   );
 };

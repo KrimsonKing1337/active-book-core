@@ -65,7 +65,7 @@ export default defineConfig([globIgnores, {
     react: {
       version: 'detect',
     },
-    'import/internal-regex': '^(?:@types$|@(assets|components|pages|hooks|utils|store|styles)(/.*)?)$',
+    'import/internal-regex': '^(?:@types$|@(assets|components|pages|controllers|hooks|utils|store|styles)(/.*)?)$',
   },
 
   rules: {
@@ -102,7 +102,10 @@ export default defineConfig([globIgnores, {
     '@stylistic/indent': ['error', 2],
     '@stylistic/quotes': ['error', 'single'],
     '@stylistic/object-curly-spacing': ['error', 'always'],
-    '@stylistic/object-property-newline': ['error'],
+
+    '@stylistic/object-property-newline': ['error',  {
+      allowAllPropertiesOnSameLine: true,
+    }],
 
     '@stylistic/object-curly-newline': ['error', {
       ObjectExpression: {

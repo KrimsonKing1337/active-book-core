@@ -27,7 +27,7 @@
   --frame-left: var(--frame-base);
 
   position: relative;
-  z-index: var(--book-page-layer, 2);
+  z-index: var(--story-viewport-layer, 2);
 
   display: flex;
   flex-direction: column;
@@ -66,5 +66,5 @@
   width: 100%;
   min-height: 0;
 
-  isolation: var(--book-frame-isolation, isolate);
+  isolation: var(--story-frame-isolation, isolate);
 }

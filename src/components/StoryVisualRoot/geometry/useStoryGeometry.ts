@@ -2,18 +2,18 @@ import type { RefObject } from 'react';
 
 import { useLayoutEffect, useState } from 'react';
 
-import type { BookGeometry } from './@types';
+import type { StoryGeometry } from './@types';
 
-import { getBookGeometry } from './getBookGeometry';
+import { getStoryGeometry } from './getStoryGeometry';
 
 /** Observe a persistent root supplied by the host; no application-wide DOM registry is needed. */
-export const useBookGeometry = (bookRef: RefObject<HTMLElement | null>, enabled = true): BookGeometry | null => {
-  const [geometry, setGeometry] = useState<BookGeometry | null>(null);
+export const useStoryGeometry = (storyRef: RefObject<HTMLElement | null>, enabled = true): StoryGeometry | null => {
+  const [geometry, setGeometry] = useState<StoryGeometry | null>(null);
 
   useLayoutEffect(() => {
-    const book = bookRef.current;
+    const story = storyRef.current;
 
-    if (!book || !enabled) {
+    if (!story || !enabled) {
       return;
     }
 
@@ -22,7 +22,7 @@ export const useBookGeometry = (bookRef: RefObject<HTMLElement | null>, enabled 
     let observedRegions: Element[] = [];
 
     const measure = () => {
-      const next = getBookGeometry(book);
+      const next = getStoryGeometry(story);
       const nextKey = JSON.stringify(next);
 
       if (previousKey !== nextKey) {
@@ -45,7 +45,7 @@ export const useBookGeometry = (bookRef: RefObject<HTMLElement | null>, enabled 
     const resizeObserver = new ResizeObserver(scheduleMeasurement);
 
     const observeRegions = () => {
-      const regions = Array.from(book.querySelectorAll('[data-book-region]'));
+      const regions = Array.from(story.querySelectorAll('[data-story-region]'));
 
       const lengthIsSame = regions.length === observedRegions.length;
 
@@ -62,7 +62,7 @@ export const useBookGeometry = (bookRef: RefObject<HTMLElement | null>, enabled 
       observedRegions = regions;
 
       resizeObserver.disconnect();
-      resizeObserver.observe(book);
+      resizeObserver.observe(story);
 
       regions.forEach((regionCur) => resizeObserver.observe(regionCur));
 
@@ -72,13 +72,16 @@ export const useBookGeometry = (bookRef: RefObject<HTMLElement | null>, enabled 
     // Navigation replaces region elements; text/media size changes use ResizeObserver instead.
     const mutationObserver = new MutationObserver(observeRegions);
 
-    resizeObserver.observe(book);
+    resizeObserver.observe(story);
 
     observeRegions();
 
-    mutationObserver.observe(book, { childList: true, subtree: true });
+    mutationObserver.observe(story, {
+      childList: true,
+      subtree: true,
+    });
 
-    book.addEventListener('scroll', scheduleMeasurement, true);
+    story.addEventListener('scroll', scheduleMeasurement, true);
     window.addEventListener('resize', scheduleMeasurement);
 
     measure();
@@ -87,14 +90,14 @@ export const useBookGeometry = (bookRef: RefObject<HTMLElement | null>, enabled 
       resizeObserver.disconnect();
       mutationObserver.disconnect();
 
-      book.removeEventListener('scroll', scheduleMeasurement, true);
+      story.removeEventListener('scroll', scheduleMeasurement, true);
       window.removeEventListener('resize', scheduleMeasurement);
 
       if (pendingFrame !== null) {
         cancelAnimationFrame(pendingFrame);
       }
     };
-  }, [bookRef, enabled]);
+  }, [storyRef, enabled]);
 
   return enabled ? geometry : null;
 };

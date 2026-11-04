@@ -12,6 +12,8 @@ export type AppWrapperProps = {
   config: Config;
   bookKey?: string | number;
   hiddenVisualEffects?: readonly string[];
+  /** Preview selection only; ignored in reader mode. */
+  selectedVisualEffectId?: string | null;
   registrations?: readonly VisualEffectRegistration[];
   definitions?: readonly VisualEffectDefinition[];
   tableOfContents: TableOfContents;

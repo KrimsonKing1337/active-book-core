@@ -1,21 +1,24 @@
-# Persistent book visual root
+# Persistent story visual root
+
+Current region naming, defaults and preview selection are documented in
+[story regions](story-visual-regions.md).
 
 Current Background/Frame registration, rendering and cleanup supersede the legacy
 paths described in this stage; see [stage 5](unified-background-frame.md).
 
 `AppWrapper` is mounted above routing in both `App` (including editor preview) and
-the built reader. It now owns one `BookVisualRoot`, which remains mounted while
+the built reader. It now owns one `StoryVisualRoot`, which remains mounted while
 routes and loading states replace or hide page content. The root occupies the
 existing player area, including its outer page spacing and book controls. It does
 not use `document.body`, the application's mount node, or editor UI as its surface.
 
 ```text
 AppWrapper
-├─ BookVisualRoot                         persistent, positioned book surface
+├─ StoryVisualRoot                         persistent, positioned story surface
 │  └─ Routes / Suspense                   current route
 │     └─ PageWrapper                      existing page-owned structure
 │        └─ MainContent
-│           ├─ NarrativeFrame             page + outer frame rectangle
+│           ├─ NarrativeFrame             narrative + outer frame rectangle
 │           │  ├─ Narrative               scroll viewport
 │           │  │  └─ Narrative__Text       scrolling content
 │           │  └─ FrameEffects            behind / above / system overlay
@@ -27,7 +30,7 @@ AppWrapper
 └─ editorTools                            optional editor-owned UI, outside book
 ```
 
-Controls are included in `book` geometry and excluded from `page` geometry without
+Controls are included in `story` geometry and excluded from `narrativeFrame` geometry without
 being reparented. Stage 3 adds root-owned placement surfaces and an isolated,
 clipped book boundary. Page/frame stacking contexts release their layers into that
 root; see [visual placement](visual-placement.md) for the complete painting order.
@@ -36,22 +39,23 @@ The page overflow rules, loader and start-screen audio unlock retain their owner
 ## Geometry access
 
 `AppWrapper` accepts a React 19 `ref` to its book root. Pass that ref to
-`useBookGeometry(bookRef)` for reactive measurements, or call
-`getBookGeometry(bookElement)` when an on-demand snapshot is sufficient.
+`useStoryGeometry(storyRef)` for reactive measurements, or call
+`getStoryGeometry(storyElement)` when an on-demand snapshot is sufficient.
 These are host geometry APIs, not DOM access granted to effect renderers.
 
-`BookGeometry.regions` uses the shared `VisualRegion` type from `@active-book/types`,
+`StoryGeometry.regions` uses the shared `VisualRegion` type from `@active-book/types`,
 which is a type-only peer supplied by the host and a local development dependency.
 Rectangles contain `x`, `y`, `width`, and `height` in CSS pixels relative to the
 book root's top-left corner. Missing or `display: none` page regions return `null`;
-the persistent `book` rectangle remains available. This is axis-aligned DOM
+the persistent `story` rectangle remains available. This is axis-aligned DOM
 measurement, not a general coordinate-transform or mask API.
 
 | Region | Measurement |
 | --- | --- |
-| `book` | The persistent player container, including controls and outer spacing |
-| `page` | Existing `NarrativeFrame`, excluding Toolbar and other book controls |
-| `frame` | The same outer rectangle as page in the current layout |
+| `story` | The persistent player container, including controls and outer spacing |
+| `storyViewport` | Visible inner work surface, including Toolbar |
+| `narrativeFrame` | Existing `NarrativeFrame`, excluding Toolbar and other book controls |
+| `frame` | The same outer rectangle as narrativeFrame in the current layout |
 | `narrativeViewport` | Narrative's stationary client area, excluding borders and scrollbar |
 | `narrativeContent` | Text container's moving origin and full content dimensions |
 
@@ -75,7 +79,7 @@ when the hook unmounts. A ref supplied to the hook must refer to the persistent 
 
 Background/Frame renderers, hooks, Redux slices, and page-unmount cleanup are unchanged.
 `PageWrapper` still resets its page-owned segments and visual effect stores when it
-unmounts. That cleanup has not moved to `BookVisualRoot`.
+unmounts. That cleanup has not moved to `StoryVisualRoot`.
 
 Persistence of the root does not establish continuous range animation. Book-owned
 registration and page/range activation now use the [stage 4 session](visual-lifecycle.md).

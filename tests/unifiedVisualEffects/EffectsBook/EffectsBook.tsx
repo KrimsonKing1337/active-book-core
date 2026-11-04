@@ -9,7 +9,7 @@ import { BackgroundRenderer } from '../../../src/components/BackgroundEffects/co
 import { FrameRenderer } from '../../../src/components/FrameEffects/components/FrameRenderer';
 import { AppModeContext } from '../../../src/components/App/AppModeContext';
 import { AppWrapper } from '../../../src/components/AppWrapper';
-import { useBookGeometry } from '../../../src/components/BookVisualRoot';
+import { useStoryGeometry } from '../../../src/components/StoryVisualRoot';
 
 import { EffectControls } from '../EffectControls';
 import { EffectsPage } from '../EffectsPage';
@@ -123,10 +123,12 @@ const registrations: VisualEffectRegistration[] = declarations.map((cur) => {
 
 export const EffectsBook = () => {
   const bookRef = useRef<HTMLDivElement>(null);
-  const geometry = useBookGeometry(bookRef);
+  const geometry = useStoryGeometry(bookRef);
   const [pageCount, setPageCount] = useState(5);
+  const [selectedVisualEffectId, setSelectedVisualEffectId] = useState<string | null>(null);
   window.realVisualMetrics = metrics;
   window.setRealPageCount = setPageCount;
+  window.setSelectedRealVisualEffect = setSelectedVisualEffectId;
   const tools = (
     <>
       <EffectControls />
@@ -148,6 +150,7 @@ export const EffectsBook = () => {
           }}
           rangeEffects={[]}
           registrations={registrations}
+          selectedVisualEffectId={selectedVisualEffectId}
           definitions={definitions}
           tableOfContents={[]}
           editorTools={tools}
@@ -168,5 +171,6 @@ declare global {
   interface Window {
     realVisualMetrics: typeof metrics;
     setRealPageCount: (count: number) => void;
+    setSelectedRealVisualEffect: (id: string | null) => void;
   }
 }

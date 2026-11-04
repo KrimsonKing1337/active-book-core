@@ -16,7 +16,7 @@ import { type VisualEffects, useVisualRegistrations } from '@controllers/visualE
 import { useEffectsInRange } from '@hooks/effects/range';
 import { useGoToPage } from '@hooks/control/useGoToPage';
 
-import { BookVisualRoot } from '@components/BookVisualRoot';
+import { StoryVisualRoot } from '@components/StoryVisualRoot';
 import { useAppMode } from '@components/App/AppModeContext';
 
 import { removeCssHover } from '@utils/touch/removeCssHover';
@@ -55,6 +55,7 @@ export const AppContent = ({
   registrations,
   definitions,
   hiddenVisualEffects,
+  selectedVisualEffectId,
 }: AppContentProps) => {
   const dispatch = useDispatch();
 
@@ -176,16 +177,17 @@ export const AppContent = ({
   return (
     <>
       <div className={appWrapperClassNames}>
-        <BookVisualRoot
+        <StoryVisualRoot
           ref={ref}
           surfaces={visualSurfaces}
           visualEffects={visualEffects}
           page={page}
           hiddenVisualEffects={hiddenVisualEffects}
+          selectedVisualEffectId={selectedVisualEffectId}
           inverseColors={inverseColors}
         >
           {children}
-        </BookVisualRoot>
+        </StoryVisualRoot>
 
         {editorTools}
       </div>

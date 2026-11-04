@@ -48,8 +48,8 @@ export const PageWrapper = ({
 
   return (
     <div id="page-wrapper" className={pageWrapperClassNames} {...etc}>
-      <div id="main-content-wrapper" className={mainContendClassNames} data-book-region="bookViewport">
-        <div className={styles.NarrativeFrame} data-book-region="page frame">
+      <div id="main-content-wrapper" className={mainContendClassNames} data-story-region="storyViewport">
+        <div className={styles.NarrativeFrame} data-story-region="narrativeFrame">
           <Narrative>
             {children}
           </Narrative>

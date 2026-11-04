@@ -45,14 +45,14 @@ test('persistent book root and existing page rendering in Chromium', async (cont
       page.on('pageerror', (error) => errors.push(error.message));
 
       try {
-        await page.goto(`http://127.0.0.1:${address.port}/tests/bookVisualRoot/?mode=${mode}`);
+        await page.goto(`http://127.0.0.1:${address.port}/tests/storyVisualRoot/?mode=${mode}`);
         await page.getByText('Audio unlock', { exact: true }).waitFor();
         assert.equal(await page.getByTestId('audio-unlocked').textContent(), 'false');
 
-        const book = await page.locator('[data-book-region="book"]').elementHandle();
+        const book = await page.locator('[data-story-region="story"]').elementHandle();
         assert(book);
         assert.equal(await page.getByTestId('editor-tools').evaluate((tools) => {
-          return tools.closest('[data-book-region="book"]') === null;
+          return tools.closest('[data-story-region="story"]') === null;
         }), true);
 
         await page.getByTestId('first').click();
@@ -62,16 +62,21 @@ test('persistent book root and existing page rendering in Chromium', async (cont
         assert.equal(await page.getByTestId('audio-unlocked').textContent(), 'true');
 
         const before = await readGeometry(page);
-        const bounds = await page.locator('[data-book-region="book"]').boundingBox();
-        const pageBounds = await page.locator('[data-book-region~="page"]').boundingBox();
-        assert.equal(before.regions.book.width, bounds.width);
-        assert.equal(before.regions.book.height, bounds.height);
-        assert.equal(before.regions.page.x, pageBounds.x - bounds.x);
-        assert.equal(before.regions.page.y, pageBounds.y - bounds.y);
-        assert.equal(before.regions.page.width, pageBounds.width);
-        assert.equal(before.regions.page.height, pageBounds.height);
-        assert(before.regions.page.height < before.regions.book.height);
-        assert.deepEqual(before.regions.frame, before.regions.page);
+        const bounds = await page.locator('[data-story-region="story"]').boundingBox();
+        const pageBounds = await page.locator('[data-story-region~="narrativeFrame"]').boundingBox();
+        assert.equal(before.regions.story.width, bounds.width);
+        assert.equal(before.regions.story.height, bounds.height);
+        assert.equal(before.regions.narrativeFrame.x, pageBounds.x - bounds.x);
+        assert.equal(before.regions.narrativeFrame.y, pageBounds.y - bounds.y);
+        assert.equal(before.regions.narrativeFrame.width, pageBounds.width);
+        assert.equal(before.regions.narrativeFrame.height, pageBounds.height);
+        assert(before.regions.narrativeFrame.height < before.regions.story.height);
+        assert.deepEqual(before.regions.frame, before.regions.narrativeFrame);
+        const storyViewportBounds = await page.locator('[data-story-region="storyViewport"]').boundingBox();
+        assert.equal(before.regions.storyViewport.x, storyViewportBounds.x - bounds.x);
+        assert.equal(before.regions.storyViewport.y, storyViewportBounds.y - bounds.y);
+        assert.equal(before.regions.storyViewport.width, storyViewportBounds.width);
+        assert.equal(before.regions.storyViewport.height, storyViewportBounds.height);
         assert(before.frameInsets.left > 0);
 
         await page.locator('#narrative').evaluate((element) => { element.scrollTop = 200; });
@@ -88,12 +93,12 @@ test('persistent book root and existing page rendering in Chromium', async (cont
 
         await page.setViewportSize({ width: 360, height: 640 });
         await page.waitForFunction(() => JSON.parse(document.querySelector('[data-testid="geometry"]').textContent)
-          .regions.book.width === 312);
+          .regions.story.width === 312);
         const mobile = await readGeometry(page);
-        assert(mobile.regions.page.width <= 360);
-        assert(mobile.regions.page.height < mobile.regions.book.height);
+        assert(mobile.regions.narrativeFrame.width <= 360);
+        assert(mobile.regions.narrativeFrame.height < mobile.regions.story.height);
 
-        const layerInfo = await page.locator('[data-visual-plane="scene"]').evaluate((plane) => {
+        const layerInfo = await page.locator('[data-visual-plane="belowNarrative"]').evaluate((plane) => {
           const toolbar = document.querySelector('#Toolbar').getBoundingClientRect();
           const frame = document.querySelector('[data-visual-surface="behind-one"]').getBoundingClientRect();
           const hit = document.elementFromPoint(toolbar.x + toolbar.width / 2, toolbar.y + toolbar.height / 2);
@@ -101,15 +106,17 @@ test('persistent book root and existing page rendering in Chromium', async (cont
             inert: plane.inert,
             pointerEvents: getComputedStyle(plane).pointerEvents,
             bottom: frame.bottom,
+            viewportBottom: document.querySelector('[data-story-region="storyViewport"]').getBoundingClientRect().bottom,
             toolbarTop: toolbar.top,
             toolbarHit: document.querySelector('#Toolbar').contains(hit),
           };
         });
         assert.equal(layerInfo.inert, true);
         assert.equal(layerInfo.pointerEvents, 'none');
-        assert(layerInfo.bottom <= layerInfo.toolbarTop + 1);
+        assert.equal(layerInfo.bottom, layerInfo.viewportBottom);
+        assert(layerInfo.bottom > layerInfo.toolbarTop);
         assert.equal(layerInfo.toolbarHit, true);
-        for (const [id, plane] of [['behind', 'scene'], ['above', 'aboveNarrative'], ['overlay', 'systemFeedback']]) {
+        for (const [id, plane] of [['behind', 'belowNarrative'], ['above', 'aboveNarrative'], ['overlay', 'systemFeedback']]) {
           assert.equal(await page.locator(`[data-visual-plane="${plane}"] [data-effect-id="${id}-one"]`).count(), 1);
         }
         assert.equal(await page.locator('[data-visual-plane="background"]')
@@ -123,12 +130,12 @@ test('persistent book root and existing page rendering in Chromium', async (cont
         await page.getByText('1 из 5', { exact: true }).waitFor();
         assert.equal(await page.locator('html').evaluate((element) => getComputedStyle(element)
           .getPropertyValue('--font-scale')), fontScale, 'page count updates preserve reader settings');
-        assert.equal(await book.evaluate((element) => element === document.querySelector('[data-book-region="book"]')), true);
+        assert.equal(await book.evaluate((element) => element === document.querySelector('[data-story-region="story"]')), true);
 
         await page.getByTestId('loading').click();
         await page.waitForFunction(() => JSON.parse(document.querySelector('[data-testid="geometry"]').textContent)
-          .regions.page === null);
-        assert.equal(await book.evaluate((element) => element === document.querySelector('[data-book-region="book"]')), true);
+          .regions.narrativeFrame === null);
+        assert.equal(await book.evaluate((element) => element === document.querySelector('[data-story-region="story"]')), true);
         await page.getByTestId('loading').click();
         await page.getByTestId('page-one').waitFor();
 
@@ -140,14 +147,14 @@ test('persistent book root and existing page rendering in Chromium', async (cont
         assert.equal(await page.locator('[data-effect-id$="-one"]').count(), 0);
         await page.locator('[data-effect-id="background-two"]').waitFor();
         await page.locator('[data-effect-id="behind-two"]').waitFor();
-        assert.equal(await book.evaluate((element) => element === document.querySelector('[data-book-region="book"]')), true);
+        assert.equal(await book.evaluate((element) => element === document.querySelector('[data-story-region="story"]')), true);
 
         await page.getByTestId('empty').click();
         await page.waitForFunction(() => JSON.parse(document.querySelector('[data-testid="geometry"]').textContent)
-          .regions.page === null);
+          .regions.narrativeFrame === null);
         assert.equal(await page.locator('[data-visual-plane]:not([data-visual-plane="systemFeedback"]) [data-effect-id]')
           .count(), 0);
-        assert.equal(await book.evaluate((element) => element === document.querySelector('[data-book-region="book"]')), true);
+        assert.equal(await book.evaluate((element) => element === document.querySelector('[data-story-region="story"]')), true);
         assert.deepEqual(errors, []);
       } finally {
         await page.close();

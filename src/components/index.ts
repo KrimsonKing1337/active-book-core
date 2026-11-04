@@ -3,7 +3,7 @@ export * from './Counter';
 
 export * from './App';
 export * from './AppWrapper';
-export * from './BookVisualRoot';
+export * from './StoryVisualRoot';
 export * from './VisualSurfaces';
 export * from './Bookmarks';
 export * from './Button';

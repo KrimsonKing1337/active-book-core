@@ -48,9 +48,11 @@ const readOrder = (value: unknown): number => {
   return Number.isFinite(numeric) ? Math.trunc(numeric) : 0;
 };
 
-export const createBuiltinRegistration = ({ type,
+export const createBuiltinRegistration = ({
+  type,
   options,
-  lifetime }: BuiltinDeclaration): VisualEffectRegistration => {
+  lifetime,
+}: BuiltinDeclaration): VisualEffectRegistration => {
   // Optional CSS properties disappear in the JSON copy.
   const data: Partial<BackgroundEffect | FrameEffect> = { ...options };
   delete data.id;
@@ -58,8 +60,8 @@ export const createBuiltinRegistration = ({ type,
   const isBackground = type === 'background';
 
   let definitionId = BACKGROUND_DEFINITION;
-  let placement = fillRegion('bookViewport');
-  let visibility: VisualEffectRegistration['effect']['visibility'] = { region: 'bookViewport' };
+  const placement = fillRegion('storyViewport');
+  let visibility: VisualEffectRegistration['effect']['visibility'] = { region: 'storyViewport' };
   let plane: VisualEffectRegistration['effect']['depth']['plane'] = 'background';
   let order = 0;
 
@@ -72,9 +74,7 @@ export const createBuiltinRegistration = ({ type,
   } else {
     const frame = options as FrameEffect;
     definitionId = frame.layer === 'overlay' ? FEEDBACK_DEFINITION : FRAME_DEFINITION;
-    placement = fillRegion('page');
-    visibility = { region: 'page' };
-    plane = frame.layer === 'above' ? 'aboveNarrative' : 'scene';
+    plane = frame.layer === 'above' ? 'aboveNarrative' : 'belowNarrative';
     order = readOrder(frame.shadow?.style?.zIndex ?? frame.text?.style?.zIndex ?? frame.style?.zIndex);
 
     if (frame.kind === 'component' && frame.frameMask?.enabled) {

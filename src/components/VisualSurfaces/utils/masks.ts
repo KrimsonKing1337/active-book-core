@@ -1,10 +1,10 @@
 import type { VisualMask } from '@active-book/types';
 
-import type { BookRegionRect } from '@components/BookVisualRoot/geometry';
+import type { StoryRegionRect } from '@components/StoryVisualRoot/geometry';
 
 import { resolveVisualLength } from './placement';
 
-export const resolveShapeMask = (mask: VisualMask, region: BookRegionRect): string | null => {
+export const resolveShapeMask = (mask: VisualMask, region: StoryRegionRect): string | null => {
   if (mask.type === 'circle') {
     const x = resolveVisualLength(mask.center.x, region.width);
     const y = resolveVisualLength(mask.center.y, region.height);

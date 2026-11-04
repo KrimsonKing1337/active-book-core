@@ -5,7 +5,7 @@ import { useVisualEffects } from '@controllers/visualEffects';
 
 import { useGoToPage } from '@hooks/control/useGoToPage';
 
-import { TestControls } from '../../bookVisualRoot/TestControls';
+import { TestControls } from '../../storyVisualRoot/TestControls';
 
 export const EffectControls = () => {
   const { goToPage } = useGoToPage();

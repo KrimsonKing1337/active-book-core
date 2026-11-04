@@ -7,14 +7,41 @@ export const registration: VisualEffectRegistration = {
     definitionId: 'static',
     params: { label: 'first' },
     placement: {
-      coordinates: 'page',
-      anchor: { region: 'page', point: 'top-left' },
+      coordinates: 'narrativeFrame',
+      anchor: {
+        region: 'narrativeFrame',
+        point: 'top-left',
+      },
       origin: 'top-left',
-      offset: { x: { value: 0, unit: 'px' }, y: { value: 0, unit: 'px' } },
-      size: { width: { value: 100, unit: '%' }, height: { value: 100, unit: '%' } },
+      offset: {
+        x: {
+          value: 0,
+          unit: 'px',
+        },
+        y: {
+          value: 0,
+          unit: 'px',
+        },
+      },
+      size: {
+        width: {
+          value: 100,
+          unit: '%',
+        },
+        height: {
+          value: 100,
+          unit: '%',
+        },
+      },
     },
-    visibility: { region: 'page' },
-    depth: { plane: 'aboveNarrative', order: 0 },
+    visibility: { region: 'narrativeFrame' },
+    depth: {
+      plane: 'aboveNarrative',
+      order: 0,
+    },
   },
-  lifetime: { type: 'page', page: 1 },
+  lifetime: {
+    type: 'page',
+    page: 1,
+  },
 };

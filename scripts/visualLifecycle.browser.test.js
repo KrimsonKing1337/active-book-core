@@ -101,7 +101,7 @@ test('registered visual lifecycle in Chromium', async (context) => {
       const beforeLoading = await readCounter(page);
       await page.getByTestId('loading').click();
       await page.waitForFunction(() => JSON.parse(document.querySelector('[data-testid="geometry"]').textContent)
-        .regions.page === null);
+        .regions.narrativeFrame === null);
       await waitTicks(page, { above: beforeLoading.ticks });
       assert.equal((await readCounter(page)).token, before.token);
       await page.getByTestId('loading').click();
@@ -148,7 +148,7 @@ test('registered visual lifecycle in Chromium', async (context) => {
               size: { width: { value: 50, unit: '%' }, height: { value: 40, unit: 'px' } },
             },
             visibility: {
-              region: 'book',
+              region: 'story',
               mask: { type: 'circle', center: { x: { value: 50, unit: '%' }, y: { value: 50, unit: '%' } },
                 radius: { value: 50, unit: '%' } },
             },

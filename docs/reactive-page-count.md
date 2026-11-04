@@ -2,7 +2,7 @@
 
 AppWrapper now publishes config.pages whenever that numeric value changes. Initial
 book settings (theme, volume, fonts and body style) still initialize once, so
-editing the page array does not reset reader preferences or remount BookVisualRoot.
+editing the page array does not reset reader preferences or remount StoryVisualRoot.
 The editor supplies pages.length from its canonical book and uses the existing
 Redux position/navigation; a built book supplies its fixed compiled page count.
 

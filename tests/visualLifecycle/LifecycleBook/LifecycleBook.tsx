@@ -7,10 +7,10 @@ import type { AppMode, Config } from '../../../src/@types';
 import { StoreProvider } from '../../../src/store';
 import { AppWrapper } from '../../../src/components/AppWrapper';
 import { AppModeContext } from '../../../src/components/App/AppModeContext';
-import { useBookGeometry } from '../../../src/components/BookVisualRoot';
+import { useStoryGeometry } from '../../../src/components/StoryVisualRoot';
 
-import { TestControls } from '../../bookVisualRoot/TestControls';
-import { TestPage } from '../../bookVisualRoot/TestPage';
+import { TestControls } from '../../storyVisualRoot/TestControls';
+import { TestPage } from '../../storyVisualRoot/TestPage';
 
 import { LifecycleControls } from '../LifecycleControls';
 import { testApi, visualEffects } from '../testSession';
@@ -25,7 +25,7 @@ const mode: AppMode = query.get('mode') === 'editor' ? 'editor' : 'reader';
 
 export const LifecycleBook = () => {
   const bookRef = useRef<HTMLDivElement>(null);
-  const geometry = useBookGeometry(bookRef);
+  const geometry = useStoryGeometry(bookRef);
   const [isBookVisible, setIsBookVisible] = useState(true);
 
   useEffect(() => {

@@ -6,6 +6,7 @@ export type SurfaceSpec = Omit<VisualSurfaceItem, 'content'> & {
 
 declare global {
   interface Window {
+    setVisualTestSelection: (id: string | null) => void;
     setVisualTestSurfaces: (items: SurfaceSpec[]) => void;
   }
 }

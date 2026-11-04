@@ -1,7 +1,7 @@
 import type { VisualRegion } from '@active-book/types';
 
-/** Axis-aligned measurements in CSS pixels, relative to the book's top-left corner. */
-export type BookRegionRect = {
+/** Axis-aligned measurements in CSS pixels, relative to the story's top-left corner. */
+export type StoryRegionRect = {
   x: number;
   y: number;
   width: number;
@@ -16,7 +16,7 @@ export type FrameInsets = {
   left: number;
 };
 
-export type BookGeometry = {
-  regions: Record<VisualRegion, BookRegionRect | null>;
+export type StoryGeometry = {
+  regions: Record<VisualRegion, StoryRegionRect | null>;
   frameInsets: FrameInsets | null;
 };

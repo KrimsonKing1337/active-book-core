@@ -5,7 +5,7 @@ paths described in this stage; see [stage 5](unified-background-frame.md).
 
 `createVisualEffects({ definitions, pages })` creates a session for one book. Pass
 that stable object to `App.visualEffects` or `AppWrapper.visualEffects`. Direct
-`BookVisualRoot` hosts also supply their current `page` prop. The normal AppWrapper
+`StoryVisualRoot` hosts also supply their current `page` prop. The normal AppWrapper
 uses the existing Redux current-page selector; no second navigation state is added.
 Create the session when opening the book, not during each page render.
 
@@ -25,7 +25,7 @@ const visualEffects = createVisualEffects({ definitions, pages: config.pages });
 const unregister = visualEffects.register(registration);
 
 visualEffects.update('smoke', {
-  effect: { params: { opacity: 0.5 }, visibility: { region: 'book' } },
+  effect: { params: { opacity: 0.5 }, visibility: { region: 'story' } },
 });
 visualEffects.update('smoke', { lifetime: { type: 'page', page: 2 } });
 visualEffects.remove('smoke');
@@ -62,7 +62,7 @@ Redux. The existing legacy Redux store and PageWrapper cleanup are unchanged.
 
 ## React ownership and transitions
 
-`BookVisualRoot` remains above routes. Its `useVisualEffectSurfaces` subscription
+`StoryVisualRoot` remains above routes. Its `useVisualEffectSurfaces` subscription
 selects registrations whose lifetime includes the committed current page, then
 feeds the existing VisualSurfaces. A page lifetime selects one position; a range
 selects the union of its listed intervals. There is no traversal of skipped pages.
