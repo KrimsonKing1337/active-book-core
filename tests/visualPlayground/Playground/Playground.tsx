@@ -23,7 +23,22 @@ import { playSequence } from '../sequence';
 import * as styles from './Playground.module.scss';
 
 const config = {
-  id: 'visual-playground', pages: 4, defaultTheme: 'dark' as const,
+  id: 'visual-playground',
+  pages: 4,
+  defaultTheme: 'dark' as const,
+};
+
+const demoColors: Partial<Record<Settings['demo'], string>> = {
+  frame: '#70d9c5',
+  smoke: '#bdced4',
+  through: '#75e1d5',
+};
+
+const getDemoDefaults = (demo: Settings['demo']): Pick<Settings, 'color' | 'region'> => {
+  return {
+    color: demoColors[demo] ?? '#11131f',
+    region: demo === 'frame' ? 'storyViewport' : 'application',
+  };
 };
 
 export const Playground = () => {
@@ -42,7 +57,9 @@ export const Playground = () => {
   const stop = useCallback(() => {
     abortRef.current?.abort();
     abortRef.current = null;
-    session.getSnapshot().forEach(({ effect }) => session.getController(effect.id)?.playback?.stop());
+    for (const { effect } of session.getSnapshot()) {
+      session.getController(effect.id)?.playback?.stop();
+    }
   }, [session]);
 
   const play = useCallback(() => {
@@ -82,36 +99,31 @@ export const Playground = () => {
   }, [registrations, session]);
 
   const change = useCallback((patch: Partial<Settings>) => {
-    const changesIdentity = patch.demo || patch.region || patch.physicalMode || patch.composition || patch.plane;
+    const requiresPlaybackReset = patch.demo || patch.region || patch.physicalMode || patch.composition || patch.plane;
 
-    if (changesIdentity) {
+    if (requiresPlaybackReset) {
       stop();
     }
 
     setSettings((previous) => {
-      const next = { ...previous, ...patch };
+      const defaults = patch.demo ? getDemoDefaults(patch.demo) : {};
 
-      if (patch.demo) {
-        next.color = '#11131f';
-        next.region = 'application';
-
-        if (patch.demo === 'frame') {
-          next.color = '#70d9c5';
-          next.region = 'storyViewport';
-        } else if (patch.demo === 'smoke') {
-          next.color = '#bdced4';
-        } else if (patch.demo === 'through') {
-          next.color = '#75e1d5';
-        }
-      }
-
-      return { ...next, ...patch };
+      return {
+        ...previous,
+        ...defaults,
+        ...patch,
+      };
     });
   }, [stop]);
 
   const handleNavigate = useCallback((nextPage: number) => {
     setPage(nextPage);
   }, []);
+
+  const handleToggleBook = () => {
+    stop();
+    setVisible((previous) => !previous);
+  };
 
   const playRef = useRef(play);
 
@@ -228,10 +240,9 @@ export const Playground = () => {
                     <button type="button" onClick={() => change({ width: 390, height: 740 })}>Mobile</button>
                     <button
                       type="button"
-                      onClick={() => {
-                        stop(); setVisible(!visible);
-                      }}
-                    >Закрыть / открыть книгу
+                      onClick={handleToggleBook}
+                    >
+                      Закрыть / открыть книгу
                     </button>
                   </div>
                 </div>
