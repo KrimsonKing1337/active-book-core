@@ -1,0 +1,36 @@
+.Smoke {
+  position: absolute;
+  inset: 0;
+
+  overflow: visible;
+}
+
+.Puff {
+  position: absolute;
+  bottom: -30px;
+
+  width: 130px;
+  height: 100px;
+
+  background: radial-gradient(ellipse, currentColor 0, transparent 68%);
+  border-radius: 50%;
+  filter: blur(12px);
+
+  animation: rise 2s linear infinite;
+}
+
+@keyframes rise {
+  0% {
+    transform: translate(0, 0) scale(0.4);
+    opacity: 0;
+  }
+
+  15% {
+    opacity: 0.65;
+  }
+
+  100% {
+    transform: translate(var(--drift), calc(-1 * var(--rise))) scale(2.4);
+    opacity: 0;
+  }
+}

@@ -6,3 +6,5 @@ lib
 *.bak
 *.tgz
 test-report.xml
+
+/tests/visualPlayground/artifacts/
