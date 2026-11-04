@@ -55,8 +55,10 @@ export const Playground = () => {
       void playSequence({
         session, signal: controller.signal, narrative: settings.demo === 'sequence',
       }).catch((reason) => {
-        if (!controller.signal.aborted && !(reason instanceof DOMException && reason.name === 'AbortError')) {
-          setError(String(reason));
+        if (!controller.signal.aborted) {
+          if (!(reason instanceof DOMException && reason.name === 'AbortError')) {
+            setError(String(reason));
+          }
           stop();
         }
       });

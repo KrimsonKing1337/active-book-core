@@ -33,7 +33,9 @@ test('visual playground experiments in Chromium', async (context) => {
       window.liveGeometryObservers = new Set();
       window.ResizeObserver = class extends NativeResizeObserver {
         observe(element, options) {
-          window.liveGeometryObservers.add(this);
+          if (element.matches('[data-story-region], [data-book-application]')) {
+            window.liveGeometryObservers.add(this);
+          }
           super.observe(element, options);
         }
         disconnect() {
@@ -110,6 +112,7 @@ test('visual playground experiments in Chromium', async (context) => {
     await patch(page, { customPlacement: true, layout: 'css' });
     assert.equal(await page.getByTestId('layout-status').getAttribute('data-unsupported'), 'true');
     assert.equal(await page.locator('[data-surface-layout="css"]').count(), 1);
+    await page.screenshot({ path: new URL('03-css-unsupported.png', artifacts).pathname });
     const css = await bounds(page, '[data-visual-content="frame"]');
     await patch(page, { layout: 'geometry' });
     const js = await bounds(page, '[data-visual-content="frame"]');
@@ -123,6 +126,15 @@ test('visual playground experiments in Chromium', async (context) => {
     const hybrid = await bounds(page, '[data-visual-content="frame"]');
     near(hybrid.y, scrolled.y, 'explicit hybrid geometry path');
     assert.equal(await frameToken(page), original);
+    await patch(page, { independentAnchor: true, layout: 'geometry' });
+    const fixedAnchor = await bounds(page, '[data-visual-content="frame"]');
+    await page.locator('#narrative').evaluate((element) => { element.scrollTop += 100; });
+    await settle(page);
+    near((await bounds(page, '[data-visual-content="frame"]')).y, fixedAnchor.y, 'independent viewport anchor stays fixed');
+    await patch(page, { layout: 'css' });
+    assert.equal(await page.getByTestId('layout-status').getAttribute('data-unsupported'), 'true');
+    await patch(page, { layout: 'hybrid' });
+    near((await bounds(page, '[data-visual-content="frame"]')).y, fixedAnchor.y, 'hybrid independent anchor');
     await page.screenshot({ path: new URL('03-cross-region-hybrid.png', artifacts).pathname });
   });
 
@@ -258,6 +270,13 @@ test('visual playground experiments in Chromium', async (context) => {
       assert.equal(await page.locator('[data-layout-mode]').count(), 0);
       assert.equal((await currentRun(page, 'collapse')).status, 'cancelled');
       assert.equal(await page.evaluate(() => window.playground.session.runs.listenerCount()), 1, 'only UI diagnostics remain');
+
+      await play(page);
+      await page.waitForFunction(() => document.querySelector('[data-layout-mode]'));
+      await page.evaluate(() => window.playground.session.remove('collapse'));
+      await settle(page);
+      assert.equal(await page.locator('[data-layout-mode]').count(), 0, 'removing the effect releases its lease');
+      assert.equal(await currentRun(page, 'collapse'), undefined);
     }
   });
 

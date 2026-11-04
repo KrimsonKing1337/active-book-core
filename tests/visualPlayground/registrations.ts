@@ -57,6 +57,7 @@ export const registrationsFor = (settings: Settings): VisualEffectRegistration[]
     const params = {
       duration: settings.duration,
       intensity: settings.intensity,
+      speed: settings.speed,
       color: settings.color,
       direction: settings.direction,
       originX: settings.originX,
@@ -96,6 +97,11 @@ export const registrationsFor = (settings: Settings): VisualEffectRegistration[]
         size: { width: { value: 80, unit: '%' }, height: { value: 300, unit: 'px' } },
       };
       frame.effect.visibility = { region: 'storyViewport' };
+
+      if (settings.independentAnchor) {
+        frame.effect.placement.anchor = { region: 'storyViewport', point: 'center' };
+        frame.effect.placement.origin = 'center';
+      }
     }
 
     return [frame];

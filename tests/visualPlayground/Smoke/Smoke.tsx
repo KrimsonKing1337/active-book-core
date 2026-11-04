@@ -14,7 +14,7 @@ export const Smoke = (props: VisualRendererProps) => {
     playing,
   } = useTimeline(props);
   const count = Math.round(6 + numberParam(props.params, 'intensity', 0.8) * 20);
-  const duration = numberParam(props.params, 'duration', 2000);
+  const duration = 2500 / numberParam(props.params, 'speed', 1);
   const particles = Array.from({ length: count }, (_, index) => index);
   const style: CSSProperties = {
     color: stringParam(props.params, 'color', '#c8d9e9'),

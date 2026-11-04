@@ -9,6 +9,7 @@ export type Settings = {
   region: Extract<VisualRegion, 'storyViewport' | 'narrativeFrame' | 'story' | 'application'>;
   duration: number;
   intensity: number;
+  speed: number;
   color: string;
   direction: 'grow' | 'shrink' | 'reveal';
   originX: number;
@@ -23,6 +24,7 @@ export type Settings = {
   frameAnchor: 'top-left' | 'center' | 'bottom';
   offsetX: number;
   customPlacement: boolean;
+  independentAnchor: boolean;
   physicalMode: 'scale' | 'size';
   composition: 'single' | 'multiple';
   trigger: 'manual' | 'page';
@@ -34,6 +36,7 @@ export const initialSettings: Settings = {
   region: 'storyViewport',
   duration: 2000,
   intensity: 0.85,
+  speed: 1,
   color: '#70d9c5',
   direction: 'grow',
   originX: 50,
@@ -48,6 +51,7 @@ export const initialSettings: Settings = {
   frameAnchor: 'top-left',
   offsetX: 0,
   customPlacement: false,
+  independentAnchor: false,
   physicalMode: 'scale',
   composition: 'single',
   trigger: 'manual',

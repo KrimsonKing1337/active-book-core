@@ -32,9 +32,11 @@ export const Controls = ({
 }: ControlsProps) => {
   const isFrame = settings.demo === 'frame';
   const isPhysical = ['collapse', 'sequence', 'single'].includes(settings.demo);
+  const durationLabel = isPhysical && settings.demo !== 'single' ? 'Длительность этапа, мс' : 'Длительность, мс';
   const sliders: readonly [keyof Settings, string, number, number, number][] = [
-    ['duration', 'Длительность, мс', 300, 10000, 100],
+    ['duration', durationLabel, 300, 10000, 100],
     ['intensity', 'Интенсивность', 0.1, 1, 0.05],
+    ['speed', 'Скорость дыма', 0.3, 3, 0.1],
     ['originX', 'Точка возникновения X, %', 0, 100, 1],
     ['originY', 'Точка возникновения Y, %', 0, 100, 1],
     ['width', 'Ширина приложения, px', 320, 1400, 10],
@@ -42,6 +44,17 @@ export const Controls = ({
     ['storySize', 'Размер StoryVisualRoot, %', 45, 100, 1],
     ['toolbarHeight', 'Высота Toolbar, px', 32, 110, 1],
   ];
+  const visibleSliders = sliders.filter(([name]) => {
+    if (name === 'originX' || name === 'originY') {
+      return settings.demo === 'darkness';
+    }
+
+    if (name === 'speed') {
+      return settings.demo === 'smoke';
+    }
+
+    return name !== 'intensity' || !isPhysical;
+  });
 
   return (
     <aside className={styles.Controls} data-editor-tools>
@@ -91,7 +104,8 @@ export const Controls = ({
       <label>
         Область действия
         <select
-          value={settings.region}
+          value={isPhysical || settings.demo === 'edges' ? 'application' : settings.region}
+          disabled={isPhysical || settings.demo === 'edges'}
           onChange={(e) => onChange({ region: e.target.value as Settings['region'] })}
         >
           <option value="storyViewport">Вьюпорт с Toolbar</option>
@@ -101,17 +115,19 @@ export const Controls = ({
         </select>
       </label>
 
-      <label>
-        Направление
-        <select
-          value={settings.direction}
-          onChange={(e) => onChange({ direction: e.target.value as Settings['direction'] })}
-        >
-          <option value="grow">Из центра к краям</option>
-          <option value="shrink">Сужение в центр</option>
-          <option value="reveal">Исчезновение из центра</option>
-        </select>
-      </label>
+      {settings.demo === 'darkness' && (
+        <label>
+          Направление
+          <select
+            value={settings.direction}
+            onChange={(e) => onChange({ direction: e.target.value as Settings['direction'] })}
+          >
+            <option value="grow">Из центра к краям</option>
+            <option value="shrink">Сужение в центр</option>
+            <option value="reveal">Исчезновение из центра</option>
+          </select>
+        </label>
+      )}
 
       <label>
         Способ запуска
@@ -202,6 +218,16 @@ export const Controls = ({
             />
             Cross-region и прокрутка content
           </label>
+
+          <label className={styles.Check}>
+            <input
+              type="checkbox"
+              disabled={!settings.customPlacement}
+              checked={settings.independentAnchor}
+              onChange={(e) => onChange({ independentAnchor: e.target.checked })}
+            />
+            Независимый anchor в storyViewport
+          </label>
         </fieldset>
       )}
 
@@ -236,7 +262,7 @@ export const Controls = ({
           Параметры и рабочая поверхность
         </legend>
 
-        {sliders.map(([name, label, min, max, step]) => {
+        {visibleSliders.map(([name, label, min, max, step]) => {
           return (
             <label key={name}>
               <span>
