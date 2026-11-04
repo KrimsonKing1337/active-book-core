@@ -1,0 +1,201 @@
+:global(body) {
+  overflow: auto;
+}
+
+:global(#root) {
+  height: auto;
+  min-height: 100%;
+}
+
+.Lab {
+  min-height: 100vh;
+
+  color: #dee4ee;
+  font-family: Roboto, sans-serif;
+
+  background: #0c121e;
+
+  button {
+    cursor: pointer;
+  }
+}
+
+.Header {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  height: 92px;
+  padding: 0 32px;
+
+  border-bottom: 1px solid #ffffff12;
+
+  h1 {
+    font-size: 21px;
+    font-weight: 500;
+    letter-spacing: -0.03em;
+
+    span {
+      margin-left: 12px;
+
+      color: #91a1b7;
+      font-weight: 300;
+    }
+  }
+
+  p {
+    margin-top: 7px;
+
+    color: #74849b;
+    font-size: 12px;
+  }
+}
+
+.Logo {
+  display: grid;
+  place-items: center;
+
+  width: 44px;
+  height: 44px;
+
+  color: #142e27;
+  font-family: Georgia, serif;
+  font-size: 19px;
+
+  background: #8be4c4;
+  border-radius: 12px 4px;
+}
+
+.Badge {
+  margin-left: auto;
+  padding: 8px 12px;
+
+  color: #8be4c4;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+
+  border: 1px solid #8be4c433;
+  border-radius: 20px;
+}
+
+.Main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+}
+
+.Workspace {
+  min-width: 0;
+  padding: 24px;
+
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 18px 0;
+  }
+
+  button {
+    padding: 8px 10px;
+
+    color: #aebdce;
+    font-size: 11px;
+
+    background: #202a3a;
+    border: 1px solid #ffffff12;
+    border-radius: 4px;
+  }
+
+  [aria-pressed="true"] {
+    color: #8be4c4;
+
+    border-color: #8be4c4;
+  }
+}
+
+.WorkspaceBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+
+  color: #8191a8;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+
+.ScrollArea {
+  padding: 18px;
+  overflow: auto;
+
+  background: radial-gradient(#ffffff12 1px, transparent 1px) 0 0 / 15px 15px;
+  border: 1px solid #ffffff12;
+  border-radius: 8px;
+}
+
+.Stage {
+  position: relative;
+
+  margin: 0 auto;
+
+  background: radial-gradient(ellipse at 50% 30%, #4d6f6a, #263c43 45%, #17252e);
+  box-shadow: 0 18px 70px #0005;
+}
+
+.StorySize {
+  --bg: #162d30;
+  --secondary: #c3d1c8;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  transform: translate(-50%, -50%);
+}
+
+.Status {
+  margin-top: 14px;
+  padding: 12px;
+
+  color: #83cbb5;
+  font-size: 11px;
+
+  background: #8be4c408;
+  border: 1px solid #8be4c41a;
+  border-radius: 4px;
+
+  &[data-unsupported="true"] {
+    color: #f7c77f;
+
+    background: #f7c77f12;
+    border-color: #f7c77f44;
+  }
+}
+
+.Events {
+  padding: 14px;
+
+  color: #8e9cb0;
+  font-size: 11px;
+
+  background: #101925;
+  border-radius: 5px;
+
+  ol {
+    display: grid;
+    gap: 6px;
+    margin: 12px 0 0 20px;
+
+    font-family: monospace;
+  }
+}
+
+@media (width <= 760px) {
+  .Main {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .Badge {
+    display: none;
+  }
+}

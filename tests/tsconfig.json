@@ -12,6 +12,8 @@
     "visualPlacement/**/*.ts",
     "visualPlacement/**/*.tsx",
     "visualLifecycle/**/*.ts",
-    "visualLifecycle/**/*.tsx"
+    "visualLifecycle/**/*.tsx",
+    "visualPlayground/**/*.ts",
+    "visualPlayground/**/*.tsx"
   ]
 }

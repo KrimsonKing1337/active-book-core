@@ -1,0 +1,61 @@
+.Article {
+  padding: 35px 18px 70px;
+
+  color: #d6e0dc;
+  line-height: 1.85;
+
+  user-select: text;
+
+  h1 {
+    margin-bottom: 20px;
+
+    color: #f5ead4;
+    font-family: Georgia, serif;
+    font-size: 42px;
+    font-weight: 400;
+    line-height: 1.15;
+  }
+
+  p {
+    margin-bottom: 25px;
+  }
+}
+
+.Eyebrow {
+  color: #77c6b8;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+}
+
+.Lead {
+  color: #a2b8b0;
+  font-family: Georgia, serif;
+  font-size: 20px;
+}
+
+.Illustration {
+  position: relative;
+
+  height: 180px;
+  margin: 28px 0;
+  overflow: hidden;
+
+  background:
+    radial-gradient(ellipse at 50% 0, #97d2bd66, transparent 65%),
+    repeating-radial-gradient(ellipse at 50% 140%, transparent 0 25px, #97d2bd33 26px 27px);
+  border: 1px solid #ffffff12;
+  border-radius: 80px 80px 5px 5px;
+
+  span {
+    position: absolute;
+    top: 35px;
+    left: calc(50% - 22px);
+
+    width: 44px;
+    height: 44px;
+
+    background: #f7e4b3;
+    border-radius: 50%;
+    box-shadow: 0 0 50px #eddb9e88;
+  }
+}
