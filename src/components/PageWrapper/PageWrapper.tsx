@@ -11,6 +11,7 @@ import { Toolbar } from '@components/Toolbar';
 import { Menu } from '@components/Menu';
 import { TableOfContents } from '@components/TableOfContents';
 import { Bookmarks } from '@components/Bookmarks';
+import { useBookApplicationSurface } from '@components/BookApplicationSurface/context';
 
 import { Narrative } from './components/Narrative';
 
@@ -28,6 +29,7 @@ export const PageWrapper = ({
   ...etc
 }: PropsWithChildren<PageWrapperProps>) => {
   const dispatch = useDispatch();
+  const application = useBookApplicationSurface();
 
   const showLoader = useSelector(mainSelectors.showLoader);
 
@@ -48,7 +50,12 @@ export const PageWrapper = ({
 
   return (
     <div id="page-wrapper" className={pageWrapperClassNames} {...etc}>
-      <div id="main-content-wrapper" className={mainContendClassNames} data-story-region="storyViewport">
+      <div
+        ref={application?.layout.attach}
+        id="main-content-wrapper"
+        className={mainContendClassNames}
+        data-story-region="storyViewport"
+      >
         <div className={styles.NarrativeFrame} data-story-region="narrativeFrame">
           <Narrative>
             {children}

@@ -4,6 +4,8 @@
   --story-narrative-layer: 3;
   --story-toolbar-position: relative;
   --story-toolbar-layer: 10;
+  --story-toolbar-space: 0px;
+  --story-frame-bottom-radius: clamp(0px, 2vw, 16px);
 
   position: relative;
 
@@ -14,7 +16,22 @@
 
   isolation: isolate;
 
+  &:has([data-story-toolbar]) {
+    --story-frame-bottom-radius: 0px;
+    --story-toolbar-space: calc(
+      var(--story-toolbar-height, 48px) + var(--story-toolbar-margin, clamp(12px, 1.5vw, 24px))
+    );
+  }
+
   &.inverseColors {
     filter: invert(1);
+  }
+
+  @media screen and (width <= 500px) {
+    --story-frame-bottom-radius: 0px;
+  }
+
+  @container book-player (max-width: 500px) {
+    --story-frame-bottom-radius: 0px;
   }
 }

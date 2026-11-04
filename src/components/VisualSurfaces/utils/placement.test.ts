@@ -6,6 +6,7 @@ import { resolvePlacement } from './placement';
 
 const geometry: StoryGeometry = {
   regions: {
+    application: null,
     storyViewport: null,
     story: {
       x: 0,

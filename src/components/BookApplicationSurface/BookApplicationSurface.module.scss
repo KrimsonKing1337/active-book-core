@@ -1,0 +1,44 @@
+.Application {
+  position: relative;
+
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+
+  isolation: isolate;
+  container: book-player / size;
+
+  [data-story-region="story"] {
+    z-index: 1;
+  }
+}
+
+.UnderStory,
+.AboveStory,
+.Feedback,
+.Selection {
+  position: absolute;
+  inset: 0;
+
+  pointer-events: none;
+}
+
+.InverseColors {
+  filter: invert(1);
+}
+
+.UnderStory {
+  z-index: 0;
+}
+
+.AboveStory {
+  z-index: 2;
+}
+
+.Feedback {
+  z-index: 3;
+}
+
+.Selection {
+  z-index: 4;
+}

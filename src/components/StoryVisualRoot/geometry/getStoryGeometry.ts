@@ -24,13 +24,17 @@ const measureRegion = (
 };
 
 /** Reads only the fixed story regions; this does not apply clipping or coordinate transforms. */
-export const getStoryGeometry = (story: HTMLElement): StoryGeometry => {
+export const getStoryGeometry = (story: HTMLElement, application?: HTMLElement | null): StoryGeometry => {
   const storyRect = story.getBoundingClientRect();
 
   const narrativeFrame = story.querySelector<HTMLElement>('[data-story-region~="narrativeFrame"]');
   const storyViewport = story.querySelector<HTMLElement>('[data-story-region="storyViewport"]');
   const viewport = story.querySelector<HTMLElement>('[data-story-region="narrativeViewport"]');
   const content = story.querySelector<HTMLElement>('[data-story-region="narrativeContent"]');
+  const physicalScale = storyViewport?.dataset.layoutMode === 'scale'
+    ? Number.parseFloat(storyViewport.style.getPropertyValue('--visual-layout-factor'))
+    : 1;
+  const clientScale = Number.isFinite(physicalScale) ? physicalScale : 1;
 
   const narrativeFrameRect = measureRegion(narrativeFrame, storyRect);
   const storyViewportRect = measureRegion(storyViewport, storyRect);
@@ -55,32 +59,32 @@ export const getStoryGeometry = (story: HTMLElement): StoryGeometry => {
   let frameInsets: FrameInsets | null = null;
 
   if (viewport && viewportRect) {
-    const x = viewportRect.x + viewport.clientLeft;
-    const y = viewportRect.y + viewport.clientTop;
+    const x = viewportRect.x + viewport.clientLeft * clientScale;
+    const y = viewportRect.y + viewport.clientTop * clientScale;
 
     viewportRect = {
       x,
       y,
-      width: viewport.clientWidth,
-      height: viewport.clientHeight,
+      width: viewport.clientWidth * clientScale,
+      height: viewport.clientHeight * clientScale,
     };
 
     // Narrative already resolves --frame-* through its padding, including clamp().
     const style = getComputedStyle(viewport);
 
     frameInsets = {
-      top: Number.parseFloat(style.paddingTop),
-      right: Number.parseFloat(style.paddingRight),
-      bottom: Number.parseFloat(style.paddingBottom),
-      left: Number.parseFloat(style.paddingLeft),
+      top: Number.parseFloat(style.paddingTop) * clientScale,
+      right: Number.parseFloat(style.paddingRight) * clientScale,
+      bottom: Number.parseFloat(style.paddingBottom) * clientScale,
+      left: Number.parseFloat(style.paddingLeft) * clientScale,
     };
   }
 
   if (content && contentRect) {
     contentRect = {
       ...contentRect,
-      width: Math.max(contentRect.width, content.scrollWidth),
-      height: Math.max(contentRect.height, content.scrollHeight),
+      width: Math.max(contentRect.width, content.scrollWidth * clientScale),
+      height: Math.max(contentRect.height, content.scrollHeight * clientScale),
     };
   }
 
@@ -92,6 +96,7 @@ export const getStoryGeometry = (story: HTMLElement): StoryGeometry => {
   };
 
   const regions: StoryGeometry['regions'] = {
+    application: measureRegion(application ?? null, storyRect),
     story: storyRegion,
     storyViewport: storyViewportRect,
     narrativeFrame: narrativeFrameRect,

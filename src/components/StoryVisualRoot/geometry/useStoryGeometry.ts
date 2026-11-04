@@ -2,12 +2,18 @@ import type { RefObject } from 'react';
 
 import { useLayoutEffect, useState } from 'react';
 
+import { useBookApplicationSurface } from '@components/BookApplicationSurface/context';
+
 import type { StoryGeometry } from './@types';
+
 
 import { getStoryGeometry } from './getStoryGeometry';
 
 /** Observe a persistent root supplied by the host; no application-wide DOM registry is needed. */
 export const useStoryGeometry = (storyRef: RefObject<HTMLElement | null>, enabled = true): StoryGeometry | null => {
+  const application = useBookApplicationSurface();
+  const applicationRef = application?.root;
+  const applicationElement = application?.element;
   const [geometry, setGeometry] = useState<StoryGeometry | null>(null);
 
   useLayoutEffect(() => {
@@ -22,7 +28,7 @@ export const useStoryGeometry = (storyRef: RefObject<HTMLElement | null>, enable
     let observedRegions: Element[] = [];
 
     const measure = () => {
-      const next = getStoryGeometry(story);
+      const next = getStoryGeometry(story, applicationRef?.current);
       const nextKey = JSON.stringify(next);
 
       if (previousKey !== nextKey) {
@@ -63,6 +69,9 @@ export const useStoryGeometry = (storyRef: RefObject<HTMLElement | null>, enable
 
       resizeObserver.disconnect();
       resizeObserver.observe(story);
+      if (applicationRef?.current) {
+        resizeObserver.observe(applicationRef.current);
+      }
 
       regions.forEach((regionCur) => resizeObserver.observe(regionCur));
 
@@ -83,6 +92,7 @@ export const useStoryGeometry = (storyRef: RefObject<HTMLElement | null>, enable
 
     story.addEventListener('scroll', scheduleMeasurement, true);
     window.addEventListener('resize', scheduleMeasurement);
+    applicationElement?.addEventListener('visual-layout-change', scheduleMeasurement);
 
     measure();
 
@@ -92,12 +102,13 @@ export const useStoryGeometry = (storyRef: RefObject<HTMLElement | null>, enable
 
       story.removeEventListener('scroll', scheduleMeasurement, true);
       window.removeEventListener('resize', scheduleMeasurement);
+      applicationElement?.removeEventListener('visual-layout-change', scheduleMeasurement);
 
       if (pendingFrame !== null) {
         cancelAnimationFrame(pendingFrame);
       }
     };
-  }, [storyRef, enabled]);
+  }, [storyRef, enabled, applicationRef, applicationElement]);
 
   return enabled ? geometry : null;
 };

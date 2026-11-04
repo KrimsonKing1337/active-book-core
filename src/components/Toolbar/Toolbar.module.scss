@@ -1,4 +1,5 @@
 @use "~styles/__variables" as vars;
+@use "~styles/storyLayout" as layout;
 
 .Wrapper {
   position: var(--story-toolbar-position, static);
@@ -18,13 +19,12 @@
   justify-content: flex-start;
   width: 100%;
   max-width: vars.$appWidth;
-  height: clamp(44px, 48px, 52px); // 48px;
-  margin-top: clamp(12px, 1.5vw, 24px); // 20px;
 
   color: var(--secondary);
   font-size: vars.$fs-16;
 
   background: transparent;
+  @include layout.toolbar-metrics;
 }
 
 .FontSizeControlWrapper {

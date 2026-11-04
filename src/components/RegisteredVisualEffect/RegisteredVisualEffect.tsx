@@ -7,6 +7,8 @@ import type { VisualEffects } from '@controllers/visualEffects';
 import type { StoryGeometry, StoryRegionRect } from '@components/StoryVisualRoot/geometry';
 import { resolvePlacement } from '@components/VisualSurfaces/utils';
 
+import { VisualRegionGeometryContext } from './geometryContext';
+
 type RegisteredVisualEffectProps = {
   effect: VisualEffectInstance;
   definition: VisualEffectDefinition;
@@ -30,11 +32,9 @@ export const RegisteredVisualEffect = memo(({
     height: 0,
   });
 
-  let bounds: StoryRegionRect | null = null;
-
-  if (geometry) {
-    bounds = resolvePlacement(effect.placement, geometry);
-  }
+  const bounds = useMemo<StoryRegionRect | null>(() => {
+    return geometry ? resolvePlacement(effect.placement, geometry) : null;
+  }, [effect.placement, geometry]);
 
   const width = bounds?.width ?? previousGeometry.current.width;
   const height = bounds?.height ?? previousGeometry.current.height;
@@ -67,7 +67,7 @@ export const RegisteredVisualEffect = memo(({
   }, [id, visualEffects]);
 
   // Keep the renderer element stable on unrelated updates, mask changes and scrolling geometry.
-  return useMemo(() => (
+  const content = useMemo(() => (
     <Renderer
       id={id}
       params={resolvedParams}
@@ -75,4 +75,14 @@ export const RegisteredVisualEffect = memo(({
       ref={playbackRef}
     />
   ), [id, resolvedParams, rendererGeometry, Renderer]);
+
+  const regionContext = useMemo(() => {
+    return { geometry, surface: bounds };
+  }, [geometry, bounds]);
+
+  return (
+    <VisualRegionGeometryContext value={regionContext}>
+      {content}
+    </VisualRegionGeometryContext>
+  );
 });

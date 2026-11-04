@@ -50,7 +50,7 @@ export const Toolbar = ({ sbMode }: ToolbarProps) => {
   };
 
   return (
-    <div id="Toolbar" className={styles.Wrapper}>
+    <div id="Toolbar" className={styles.Wrapper} data-story-toolbar>
       <div className={styles.Toolbar}>
         {!sbMode && (
           <>

@@ -1,4 +1,8 @@
 import classNames from 'classnames';
+import { createPortal } from 'react-dom';
+
+import { useBookApplicationSurface } from '@components/BookApplicationSurface/context';
+import { geometryInApplication } from '@components/BookApplicationSurface/geometry';
 
 import type { StoryGeometry } from '@components/StoryVisualRoot/geometry';
 
@@ -24,20 +28,32 @@ const planes: readonly VisualSurfaceItem['depth']['plane'][] = [
 ];
 
 export const VisualSurfaces = ({ items, geometry }: VisualSurfacesProps) => {
+  const application = useBookApplicationSurface();
+  const applicationGeometry = geometryInApplication(geometry);
+  const hosts = ['story', 'underStory', 'aboveStory'] as const;
+
   return (
     <>
-      {planes.map((planeCur) => {
+      {hosts.flatMap((hostCur) => planes.map((planeCur) => {
         const planeItems = items.filter((itemCur) => {
-          return itemCur.depth.plane === planeCur;
+          return itemCur.depth.plane === planeCur && (itemCur.host ?? 'story') === hostCur;
         });
 
         const planeItemsSorted = planeItems.sort(compareVisualSurfaces);
 
         const planeClassNames = classNames(styles.Plane, styles[planeCur]);
 
-        return (
+        const isFeedback = planeCur === 'systemFeedback' && !!application;
+        const external = hostCur !== 'story' || isFeedback;
+        let target = application?.hosts.feedback;
+
+        if (!isFeedback && hostCur !== 'story') {
+          target = application?.hosts[hostCur];
+        }
+        const key = `${hostCur}/${planeCur}`;
+        const content = (
           <div
-            key={planeCur}
+            key={key}
             className={planeClassNames}
             data-visual-plane={planeCur}
             inert
@@ -47,14 +63,20 @@ export const VisualSurfaces = ({ items, geometry }: VisualSurfacesProps) => {
                 <VisualSurface
                   key={itemCur.id}
                   item={itemCur}
-                  geometry={geometry}
+                  geometry={external ? applicationGeometry : geometry}
                   order={index}
                 />
               );
             })}
           </div>
         );
-      })}
+
+        if (external) {
+          return target ? createPortal(content, target, key) : null;
+        }
+
+        return content;
+      }))}
     </>
   );
 };

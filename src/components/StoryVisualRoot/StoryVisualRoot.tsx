@@ -1,4 +1,4 @@
-import { type HTMLAttributes, type Ref, useCallback, useRef } from 'react';
+import { type HTMLAttributes, type Ref, useCallback, useLayoutEffect, useRef } from 'react';
 
 import classNames from 'classnames';
 
@@ -9,6 +9,7 @@ import type { VisualSurfaceItem } from '@components/VisualSurfaces';
 import { VisualSurfaces } from '@components/VisualSurfaces';
 import { VisualSelectionOutline } from '@components/VisualSelectionOutline';
 import { useAppMode } from '@components/App/AppModeContext';
+import { useBookApplicationSurface } from '@components/BookApplicationSurface/context';
 
 import { useStoryGeometry } from './geometry';
 import { useVisualEffectSurfaces } from './hooks/useVisualEffectSurfaces';
@@ -39,6 +40,14 @@ export const StoryVisualRoot = ({
 }: StoryVisualRootProps) => {
   const storyRef = useRef<HTMLDivElement>(null);
   const appMode = useAppMode();
+  const application = useBookApplicationSurface();
+  const setApplicationInverse = application?.setInverseColors;
+
+  useLayoutEffect(() => {
+    setApplicationInverse?.(inverseColors);
+
+    return () => setApplicationInverse?.(false);
+  }, [inverseColors, setApplicationInverse]);
   const shouldMeasure = suppliedSurfaces.length > 0 || !!visualEffects;
 
   const geometry = useStoryGeometry(storyRef, shouldMeasure);
@@ -70,7 +79,7 @@ export const StoryVisualRoot = ({
   const rootClassNames = classNames({
     [styles.StoryVisualRoot]: true,
     [className]: !!className,
-    [styles.inverseColors]: inverseColors,
+    [styles.inverseColors]: inverseColors && !application,
   });
 
   const attachRoot = useCallback((element: HTMLDivElement | null) => {

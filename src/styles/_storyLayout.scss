@@ -1,0 +1,46 @@
+@use "./__variables" as vars;
+
+// Both the actual page and the CSS experiment use these rules, without DOM measurements.
+@mixin page {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  padding-top: 5px;
+  padding-bottom: 10px;
+}
+
+@mixin page-mobile {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+@mixin viewport {
+  --frame-base: clamp(12px, 1.5vw, 24px);
+  --frame-top: var(--frame-base);
+  --frame-right: var(--frame-base);
+  --frame-bottom: var(--frame-base);
+  --frame-left: var(--frame-base);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  max-width: vars.$appWidth;
+  height: 100%;
+  min-height: 100%;
+}
+
+@mixin narrative-frame {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+}
+
+@mixin toolbar-metrics {
+  height: var(--story-toolbar-height, clamp(44px, 48px, 52px));
+  margin-top: var(--story-toolbar-margin, clamp(12px, 1.5vw, 24px));
+}
