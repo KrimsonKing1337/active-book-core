@@ -11,12 +11,16 @@ import { mainSelectors } from '@store/main';
 
 import { useGoToPage } from '@hooks/control/useGoToPage';
 
+import { useStoryRegions } from '@components/StoryRegionsProvider';
+import { VisualHost } from '@components/VisualHost';
+
 import { useAppMode } from '@components/App/AppModeContext';
 
 import * as styles from './Narrative.module.scss';
 
 export const Narrative = ({ children }: PropsWithChildren) => {
   const appMode = useAppMode();
+  const { refs } = useStoryRegions();
   const { goNextPage, goPrevPage } = useGoToPage();
 
   const currentPage = useSelector(mainSelectors.page);
@@ -100,25 +104,35 @@ export const Narrative = ({ children }: PropsWithChildren) => {
   }, [appMode, goNextPage, goPrevPage]);
 
   return (
-    <div
-      ref={ref}
-      id="narrative"
-      data-story-region="narrativeViewport"
-      className={styles.Narrative}
-      style={narrativeStyle}
-      tabIndex={0}
-      onFocusCapture={() => {
-        contentHadFocusRef.current = true;
-      }}
-      onBlurCapture={(e) => {
-        if (e.relatedTarget instanceof Node && !e.currentTarget.contains(e.relatedTarget)) {
-          contentHadFocusRef.current = false;
-        }
-      }}
-    >
-      <div className="Narrative__Text" style={textStyle} data-story-region="narrativeContent">
-        {children}
+    <div ref={refs.narrativeViewport} className={styles.Viewport} data-story-region="narrativeViewport">
+      <div
+        ref={ref}
+        id="narrative"
+        className={styles.Narrative}
+        style={narrativeStyle}
+        tabIndex={0}
+        onFocusCapture={() => {
+          contentHadFocusRef.current = true;
+        }}
+        onBlurCapture={(e) => {
+          if (e.relatedTarget instanceof Node && !e.currentTarget.contains(e.relatedTarget)) {
+            contentHadFocusRef.current = false;
+          }
+        }}
+      >
+        <div
+          ref={refs.narrativeContent}
+          className="Narrative__Text"
+          style={textStyle}
+          data-story-region="narrativeContent"
+        >
+          <div className={styles.Text}>
+            {children}
+          </div>
+          <VisualHost region="narrativeContent" />
+        </div>
       </div>
+      <VisualHost region="narrativeViewport" />
     </div>
   );
 };

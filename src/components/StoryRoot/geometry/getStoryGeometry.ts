@@ -29,7 +29,7 @@ export const getStoryGeometry = (story: HTMLElement, application?: HTMLElement |
 
   const narrativeFrame = story.querySelector<HTMLElement>('[data-story-region~="narrativeFrame"]');
   const storyViewport = story.querySelector<HTMLElement>('[data-story-region="storyViewport"]');
-  const viewport = story.querySelector<HTMLElement>('[data-story-region="narrativeViewport"]');
+  const viewport = story.querySelector<HTMLElement>('#narrative');
   const content = story.querySelector<HTMLElement>('[data-story-region="narrativeContent"]');
   const physicalScale = storyViewport?.dataset.layoutMode === 'scale'
     ? Number.parseFloat(storyViewport.style.getPropertyValue('--visual-layout-factor'))

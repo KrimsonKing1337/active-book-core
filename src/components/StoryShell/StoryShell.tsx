@@ -1,4 +1,4 @@
-import { type HTMLAttributes, type PropsWithChildren, useContext } from 'react';
+import { type HTMLAttributes, type PropsWithChildren, useCallback, useContext } from 'react';
 
 import classNames from 'classnames';
 
@@ -11,6 +11,9 @@ import { Menu } from '@components/Menu';
 import { TableOfContents } from '@components/TableOfContents';
 import { Bookmarks } from '@components/Bookmarks';
 import { useBookApplicationSurface } from '@components/BookApplicationSurface/context';
+
+import { useStoryRegions } from '@components/StoryRegionsProvider';
+import { VisualHost } from '@components/VisualHost';
 
 import { Narrative } from './components/Narrative';
 import { NarrativeFrameContext } from './NarrativeFrameContext';
@@ -35,6 +38,19 @@ export const StoryShell = ({
 
   useBookWindows(windowHistoryScope);
   const application = useBookApplicationSurface();
+  const { refs } = useStoryRegions();
+  const attachLayout = application?.layout.attach;
+  const attachFrame = frame?.attach;
+
+  const attachViewport = useCallback((element: HTMLDivElement | null) => {
+    refs.storyViewport(element);
+    attachLayout?.(element);
+  }, [refs, attachLayout]);
+
+  const attachNarrativeFrame = useCallback((element: HTMLDivElement | null) => {
+    refs.narrativeFrame(element);
+    attachFrame?.(element);
+  }, [refs, attachFrame]);
 
   const showLoader = useSelector(mainSelectors.showLoader);
 
@@ -51,22 +67,24 @@ export const StoryShell = ({
   return (
     <div id="story-shell" className={storyShellClassNames} {...etc}>
       <div
-        ref={application?.layout.attach}
+        ref={attachViewport}
         id="story-viewport"
         className={storyViewportClassNames}
         data-story-region="storyViewport"
       >
-        <div ref={frame?.attach} className={styles.NarrativeFrame} data-story-region="narrativeFrame">
+        <div ref={attachNarrativeFrame} className={styles.NarrativeFrame} data-story-region="narrativeFrame">
           <Narrative>
             {children}
           </Narrative>
-
+          <VisualHost region="narrativeFrame" />
         </div>
 
 
         {!withoutToolbar && (
           <Toolbar sbMode={sbMode} />
         )}
+
+        <VisualHost region="storyViewport" />
 
         <Menu />
         <TableOfContents />

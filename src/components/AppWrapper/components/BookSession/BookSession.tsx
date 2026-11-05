@@ -5,6 +5,8 @@ import { mainActions } from '@store/main';
 
 import { createVisualEffects, VisualEffectsContext } from '@controllers/visualEffects';
 
+import { StoryRegionsProvider } from '@components/StoryRegionsProvider';
+
 import { NarrativeFrameContext } from '@components/StoryShell/NarrativeFrameContext';
 
 
@@ -64,9 +66,11 @@ export const BookSession = (props: BookSessionProps) => {
 
   return (
     <VisualEffectsContext value={session}>
-      <NarrativeFrameContext value={frameTarget}>
-        <AppContent {...props} visualEffects={session} />
-      </NarrativeFrameContext>
+      <StoryRegionsProvider>
+        <NarrativeFrameContext value={frameTarget}>
+          <AppContent {...props} visualEffects={session} />
+        </NarrativeFrameContext>
+      </StoryRegionsProvider>
     </VisualEffectsContext>
   );
 };

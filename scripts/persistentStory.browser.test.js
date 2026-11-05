@@ -47,12 +47,14 @@ for (const mode of ['reader', 'editor']) {
       const pageBall = document.querySelector('[data-ball="page-ball"]');
       window.identityProbe = {
         viewport: query('storyViewport'), narrative: query('narrativeViewport'),
+        scroll: document.querySelector('#narrative'),
+        regionHosts: [...document.querySelectorAll('[data-visual-host]')],
         frame: query('narrativeFrame'), toolbar: document.querySelector('#Toolbar'),
         range, pageBall, localHost: range.parentElement,
         animation: range.getAnimations()[0], pageAnimation: pageBall.getAnimations()[0],
         time: range.getAnimations()[0].currentTime,
       };
-      query('narrativeViewport').scrollTop = 320;
+      document.querySelector('#narrative').scrollTop = 320;
     });
     await dispatch(page, '@segments/setSegmentsCount', 17);
     await go(page, 2);
@@ -71,6 +73,10 @@ for (const mode of ['reader', 'editor']) {
         const range = document.querySelector('[data-ball="range-ball"]');
         return {
           viewport: old.viewport === query('storyViewport'), narrative: old.narrative === query('narrativeViewport'),
+          scroll: old.scroll === document.querySelector('#narrative'),
+          regionHosts: old.regionHosts.length === 5 && old.regionHosts.every((host) => {
+            return host === document.querySelector(`[data-visual-host="${host.dataset.visualHost}"]`);
+          }),
           frame: old.frame === query('narrativeFrame'), toolbar: old.toolbar === document.querySelector('#Toolbar'),
           host: old.localHost === range.parentElement, ball: old.range === range,
           animation: old.animation === range.getAnimations()[0],

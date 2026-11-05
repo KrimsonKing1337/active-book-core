@@ -6,6 +6,9 @@ import { type VisualEffects, VisualEffectsContext } from '@controllers/visualEff
 
 import type { VisualSurfaceItem } from '@components/VisualSurfaces';
 
+import { useStoryRegions } from '@components/StoryRegionsProvider';
+import { VisualHost } from '@components/VisualHost';
+
 import { VisualSurfaces } from '@components/VisualSurfaces';
 import { VisualSelectionOutline } from '@components/VisualSelectionOutline';
 import { useAppMode } from '@components/App/AppModeContext';
@@ -39,6 +42,7 @@ export const StoryRoot = ({
   ...etc
 }: StoryRootProps) => {
   const storyRef = useRef<HTMLDivElement>(null);
+  const { refs } = useStoryRegions();
   const appMode = useAppMode();
   const application = useBookApplicationSurface();
   const setApplicationInverse = application?.setInverseColors;
@@ -84,6 +88,7 @@ export const StoryRoot = ({
 
   const attachRoot = useCallback((element: HTMLDivElement | null) => {
     storyRef.current = element;
+    refs.story(element);
 
     if (typeof ref === 'function') {
       const cleanup = ref(element);
@@ -98,7 +103,7 @@ export const StoryRoot = ({
     } else if (ref) {
       ref.current = element;
     }
-  }, [ref]);
+  }, [ref, refs]);
 
   return (
     <div
@@ -108,6 +113,7 @@ export const StoryRoot = ({
       data-story-region="story"
     >
       {children}
+      <VisualHost region="story" />
 
       {hasSurfaces && (
         <VisualEffectsContext value={visualEffects ?? null}>
