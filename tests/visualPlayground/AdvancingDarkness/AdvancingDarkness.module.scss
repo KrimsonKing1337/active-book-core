@@ -18,3 +18,11 @@
 .NarrativeInk {
   inset: var(--frame-top) var(--frame-right) var(--frame-bottom) var(--frame-left);
 }
+
+.FinalVeil {
+  position: absolute;
+  z-index: 5;
+
+  pointer-events: none;
+  inset: 0;
+}

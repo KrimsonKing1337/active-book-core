@@ -70,8 +70,22 @@ test('one advancing-darkness effect uses four phases, keeps completed phases pau
   for (const phase of ['outside-covered', 'frame-covered', 'controls-covered', 'narrative-covered']) assert(milestones.includes(phase));
   sample = await pixels(page);
   assert.deepEqual(sample(samplePoint.x, samplePoint.y), [0, 0, 0], 'narrative is dark at the end');
+  await page.locator('[data-darkness-final]').waitFor();
+  sample = await pixels(page);
+  assert.deepEqual(sample(viewport.x - 1, viewport.y + viewport.height / 2), [0, 0, 0], 'final veil includes viewport outline');
   const toolbar = await page.locator('#Toolbar').boundingBox();
   assert.deepEqual(sample(toolbar.x + 20, toolbar.y + toolbar.height / 2), [0, 0, 0], 'controls are dark at the end');
+  await page.evaluate(() => {
+    const registration = window.playground.session.getSnapshot()[0];
+    window.playground.session.register({
+      ...registration,
+      effect: { ...registration.effect, id: 'feedback', definitionId: 'lab.feedback', placement: { region: 'application' } },
+    });
+  });
+  const feedback = page.getByTestId('system-feedback-probe');
+  await feedback.waitFor();
+  const feedbackBox = await feedback.boundingBox();
+  assert.deepEqual((await pixels(page))(feedbackBox.x + 2, feedbackBox.y + 2), [240, 67, 135], 'feedback remains above the final darkness');
   await page.getByRole('button', { name: 'Выйти из диапазона', exact: true }).click();
   await page.locator('[data-darkness-phase]').waitFor({ state: 'detached' });
   assert(await page.evaluate(() => window.advancingProbe.every(({ node, animation }) => !node.isConnected && animation.playState === 'idle')));

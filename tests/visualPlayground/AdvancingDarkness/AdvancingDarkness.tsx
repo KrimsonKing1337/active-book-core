@@ -53,7 +53,7 @@ export const AdvancingDarkness = (props: VisualRendererProps) => {
   const toolbar = elements.storyViewport?.querySelector<HTMLElement>('[data-story-toolbar]');
   const targets = [application?.hosts.underStory, hosts.narrativeFrame, toolbar, hosts.narrativeViewport];
 
-  return names.map((nameCur, index) => {
+  const phases = names.map((nameCur, index) => {
     const target = targets[index];
 
     if (!target) {
@@ -91,4 +91,23 @@ export const AdvancingDarkness = (props: VisualRendererProps) => {
       nameCur,
     );
   });
+
+  // The final application veil also covers the viewport's outline and shadow.
+  // Region phases stay native; this is a single semantic completion update.
+  const finalHost = application?.hosts.aboveStory;
+  const finalStyle: CSSProperties = {
+    background: stringParam(props.params, 'color', '#03050b'),
+    opacity: numberParam(props.params, 'opacity', 1),
+  };
+
+  return (
+    <>
+      {phases}
+
+      {status === 'completed' && finalHost && createPortal(
+        <div className={styles.FinalVeil} style={finalStyle} data-darkness-final />,
+        finalHost,
+      )}
+    </>
+  );
 };
