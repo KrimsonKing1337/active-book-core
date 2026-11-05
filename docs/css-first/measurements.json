@@ -1,0 +1,36 @@
+{
+  "baseline": {
+    "commit": "c5cddd513c6e0e5c7d88e83d91cee2b68a008c44",
+    "scenario": "Chromium 1560x1100; 1000ms frame playback, then scroll+resize and 250ms settle",
+    "playback": {
+      "rectReads": 0,
+      "observers": 13,
+      "commits": 60
+    },
+    "resizeAndScroll": {
+      "rectReads": 12,
+      "observers": 13,
+      "commits": 77
+    }
+  },
+  "cssFirst": {
+    "commit": "c55080c",
+    "scenario": "Chromium 1560x1100; 1000ms frame playback, then scroll+resize and 250ms settle",
+    "playback": {
+      "rectReads": 0,
+      "observers": 10,
+      "commits": 1
+    },
+    "resizeAndScroll": {
+      "rectReads": 0,
+      "observers": 10,
+      "commits": 3
+    }
+  },
+  "notes": [
+    "Chromium, development React; counters are instrumentation, not FPS/CPU benchmarks.",
+    "observers counts every ResizeObserver construction since load, including third-party UI; it is not the number of live geometry observers.",
+    "resizeAndScroll.commits is cumulative since the playback reset.",
+    "A preceding baseline sample measured 61 playback commits; the matching script rerun measured 60."
+  ]
+}

@@ -27,3 +27,5 @@ https://active-books.ru
 
 В ветке `experiment/visual-effects-playground` запустите `npm run dev:visual-lab`.
 [Результаты CSS/JS-сравнения, управление эффектами и визуальные материалы](docs/visual-playground.md).
+
+Текущий эксперимент `experiment/css-first-story-surfaces`: [CSS-first DOM-регионы, карта коммитов, проверки и замеры](docs/css-first-story-surfaces.ru.md).

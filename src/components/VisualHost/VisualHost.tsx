@@ -6,7 +6,7 @@ import * as styles from './VisualHost.module.scss';
 
 /** A stable portal destination. Its children use the real region as containing block. */
 export const VisualHost = ({ region }: {
-  region: StoryRegion 
+  region: StoryRegion
 }) => {
   const { hostRefs } = useStoryRegions();
 

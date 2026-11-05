@@ -1,57 +1,24 @@
-# Visual Playground — карта кода
+# Visual Playground — CSS-first эксперимент
 
-Это **экспериментальная browser fixture**, а не production-редактор эффектов. Запуск из корня ядра: `npm run dev:visual-lab`. Подробные сценарии и ограничения описаны в [docs/visual-playground.md](../../docs/visual-playground.md).
+Запуск из корня ядра: `npm run dev:visual-lab`. Reader: `/tests/visualPlayground/?mode=reader`; editor: `?mode=editor`.
 
-## От панели до изображения
+[Финальная архитектура, проверки и замеры](../../docs/css-first-story-surfaces.ru.md). Старые отчёты описывают предыдущие эксперименты.
 
-```text
-.Controls → Playground.change(settings)
-          ↓
-registrationsFor(settings) → authored registrations
-definitionsFor(settings)   → React renderers + экспериментальные host/layout metadata
-          ↓
-AppWrapper → одна VisualEffects session → StoryRoot
-          ↓
-VisualSurfaces → VisualSurface → RegisteredVisualEffect
-          ↓
-Darkness / Smoke / FrameDemo / Through / Collapse / SingleScene
-```
+`Controls → Playground.change → registrationsFor/definitionsFor → AppWrapper/session → StoryRoot → VisualSurfaces → RegisteredVisualEffect`.
 
-- `Controls/Controls.tsx` — выбор демонстрации, воспроизведение и общие настройки.
-- `FrameControls/FrameControls.tsx` — только сравнение CSS/JS и настройки рамки.
-- `Playground/Playground.tsx` — состояние панели, команды playback, подключение сессии и визуальная рабочая область.
-- `registrations.ts` — раздельно создаёт **definitions** (какой React renderer использовать) и **registrations** (какой экземпляр/регион/параметры запустить). Отдельные функции формируют рамку и составную сцену.
-- `hooks/useTimeline.ts` — один animation clock для простых демонстрационных renderers; передаёт события milestone/completed в `session.runs`. Запуск происходит по команде, а не при монтировании.
-- `sequence.ts` — последовательный запуск независимых эффектов с ожиданием конкретных run/milestone.
-- `Collapse` и `SingleScene` — физическое воздействие через `BookApplicationSurface.layout.acquire()`, не через произвольные DOM-селекторы.
+Обычная поверхность заполняет настоящий выбранный DOM-регион через `inset: 0`. Общего geometry snapshot, CSS/JS переключателя, layout lease и React progress на каждом кадре нет.
 
-## Как проверить прозрачность
+- `Controls`, `FrameControls` — десять демонстраций, общие параметры, художественный frameAnchor.
+- `registrations.ts` — definitions и авторские регистрации с region/layer/lifetime.
+- `hooks/useAnimationPlayback` — native WAAPI clocks, pause/resume/stop и семантические события в `session.runs`.
+- `hooks/useRelativeOrigin` — адресное измерение двух элементов для художественного cross-region origin, без измерений на кадре.
+- `sequence.ts` — координация по run/milestone с отменой.
+- `Collapse`, `SingleScene` — visual transform настоящего viewport; исходный CSS восстанавливается снятием native animation.
+- `ContinuousBall` — собственный DOM/WAAPI в стабильном narrativeFrame; range identity проверяется на 1 → 2 → 4, выход — страница 3.
+- `AdvancingDarkness` — одна регистрация, четыре native фазы: outside → frame → Toolbar → narrative; финальный veil закрывает декор viewport, сохраняя feedback.
 
-`Settings.opacity` хранит **непрозрачность** (0–1). Панель показывает обратную величину — прозрачность в процентах. Значение передаётся в `registration.effect.params.opacity`.
+`params.opacity` — диагностическая непрозрачность, панель показывает обратную прозрачность в процентах. Это параметр лаборатории, не новый обязательный production-контракт.
 
-Демонстрационные renderers применяют его к итоговой видимости: например, `Darkness` умножает `opacity` на `intensity`, а `SingleScene` — на собственное анимационное затухание. Поэтому даже составное затемнение с `intensity: 1` можно сделать полупрозрачным для наблюдения границ областей.
+Смена параметров, размера, слоя, текущей активной страницы диапазона сохраняет renderer в том же регионе. Явная смена региона переносит portal в другой DOM-parent и может перемонтировать renderer. Выход из lifetime уничтожает его ресурсы.
 
-**Важно:** `opacity` — исключительно отладочный параметр этой лаборатории, он не вводит новый контракт production-эффектов. При 0% прозрачности сохраняется прежний внешний вид.
-
-## Где находится геометрия
-
-- `src/components/VisualSurfaces/utils/placement.ts` — преобразование якорей и смещений.
-- `src/components/VisualSurfaces/utils/cssLayout.ts` — ограниченный критерий, когда допустим CSS-layout вместо JS.
-- `src/components/VisualSurfaces/components/VisualSurface` — визуальный wrapper и выбор пути CSS/JS.
-- `src/components/BookApplicationSurface` — внешние under/above-слои и ограниченный layout host.
-- `src/controllers/visualEffects/runs.ts` — состояние запусков и контрольные точки.
-- `src/controllers/visualEffects/layout.ts` — владение физическим изменением размеров/scale.
-
-При обычном редактировании параметров не меняй `definitionId`, `plane` или host без необходимости: это может влиять на идентичность React-поддерева. Переходы между активными страницами диапазона должны сохранять renderer.
-
-## Проверки
-
-Браузерные сценарии находятся в `scripts/visualPlayground.browser.test.js`. Они проверяют сравнение CSS/JS, области видимости, маски, диапазоны, внешние слои, физические эффекты, события, отмену и очистку. Отдельный сценарий проверяет, что изменение диагностической прозрачности не перемонтирует тьму.
-
-```sh
-npm run typecheck
-npm run typecheck:test
-npm run test:visual-lab
-```
-
-Наличие контрольных браузерных тестов не означает поддержки всех произвольных CSS-anchor или производственных сцен: это границы экспериментального прототипа.
+Проверки: `npm run typecheck`, `npm run typecheck:test`, `npm run test:browser`. Снимки прогонов — ignored `artifacts/`; обзор четырёх фаз — [docs/css-first](../../docs/css-first/).
