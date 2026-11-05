@@ -1,50 +1,107 @@
+import { useLayoutEffect, useState } from 'react';
+
 import { createPortal } from 'react-dom';
 
 import type { StoryGeometry } from '@components/StoryRoot/geometry';
 import type { VisualSurfaceItem } from '@components/VisualSurfaces';
 
-
+import { useStoryRegions } from '@components/StoryRegionsProvider';
 import { useBookApplicationSurface } from '@components/BookApplicationSurface/context';
-import { geometryInApplication } from '@components/BookApplicationSurface/geometry';
 
 import * as styles from './VisualSelectionOutline.module.scss';
 
-type VisualSelectionOutlineProps = {
-  item?: VisualSurfaceItem;
-  geometry: StoryGeometry | null;
+type Outline = {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+  borderRadius: string;
 };
 
-/** Editor-only region bounds, independent of the effect's surface and masks. */
-export const VisualSelectionOutline = ({ item, geometry }: VisualSelectionOutlineProps) => {
+type VisualSelectionOutlineProps = {
+  item?: VisualSurfaceItem;
+  geometry?: StoryGeometry | null;
+};
+
+/** Only the selected DOM element and its clipping/positioning containers are measured. */
+export const VisualSelectionOutline = ({ item }: VisualSelectionOutlineProps) => {
   const application = useBookApplicationSurface();
-  const displayGeometry = application ? geometryInApplication(geometry) : geometry;
-  let region = null;
+  const { elements } = useStoryRegions();
+  const region = item?.visibility.region;
+  const localRegion = region === 'frame' ? 'narrativeFrame' : region;
+  const element = localRegion === 'application' ? application?.element : elements[localRegion ?? 'story'];
+  const root = application?.element ?? elements.story;
+  const selectionHost = application?.hosts.selection ?? elements.story;
+  const [outline, setOutline] = useState<Outline | null>(null);
+  const hidden = !item || item.hidden;
+  const scrollport = elements.narrativeViewport;
 
-  if (item && !item.hidden) {
-    region = displayGeometry?.regions[item.visibility.region];
-  }
+  useLayoutEffect(() => {
+    if (hidden || !element || !root) {
+      setOutline(null);
 
-  if (!item || !region) {
+      return;
+    }
+
+    let frame: number | null = null;
+    const measure = () => {
+      frame = null;
+      const bounds = element.getBoundingClientRect();
+      const rootBounds = root.getBoundingClientRect();
+      let left = bounds.left;
+      let top = bounds.top;
+      let right = bounds.right;
+      let bottom = bounds.bottom;
+
+      if (region === 'narrativeContent' && scrollport) {
+        const clip = scrollport.getBoundingClientRect();
+        left = Math.max(left, clip.left);
+        top = Math.max(top, clip.top);
+        right = Math.min(right, clip.right);
+        bottom = Math.min(bottom, clip.bottom);
+      }
+
+      setOutline({
+        left: left - rootBounds.left,
+        top: top - rootBounds.top,
+        width: Math.max(0, right - left),
+        height: Math.max(0, bottom - top),
+        borderRadius: getComputedStyle(element).borderRadius,
+      });
+    };
+    const schedule = () => {
+      frame ??= requestAnimationFrame(measure);
+    };
+    const observer = new ResizeObserver(schedule);
+    observer.observe(element);
+    observer.observe(root);
+    root.addEventListener('scroll', schedule, true);
+    window.addEventListener('resize', schedule);
+    measure();
+
+    return () => {
+      observer.disconnect();
+      root.removeEventListener('scroll', schedule, true);
+      window.removeEventListener('resize', schedule);
+
+      if (frame !== null) {
+        cancelAnimationFrame(frame);
+      }
+    };
+  }, [element, root, scrollport, region, hidden]);
+
+  if (hidden || !outline || !selectionHost || !item) {
     return null;
   }
 
-  const outlineStyle = {
-    left: region.x,
-    top: region.y,
-    width: region.width,
-    height: region.height,
-    borderRadius: region.borderRadius,
-  };
-
-  const content = (
+  return createPortal(
     <div
       className={styles.Outline}
-      style={outlineStyle}
+      style={outline}
       data-visual-selection={item.id}
       aria-hidden="true"
       inert
-    />
+    />,
+    selectionHost,
   );
-
-  return application ? application.hosts.selection && createPortal(content, application.hosts.selection) : content;
 };

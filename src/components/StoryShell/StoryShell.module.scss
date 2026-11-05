@@ -64,7 +64,14 @@
 .NarrativeFrame {
   position: relative;
 
+  border-radius: inherit;
+
   isolation: var(--story-frame-isolation, isolate);
+
+  :global(#story-viewport):has([data-story-toolbar]) & {
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+  }
 
   @include layout.narrative-frame;
 }

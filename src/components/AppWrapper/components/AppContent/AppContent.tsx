@@ -16,6 +16,8 @@ import { type VisualEffects, useVisualRegistrations } from '@controllers/visualE
 import { useEffectsInRange } from '@hooks/effects/range';
 import { useGoToPage } from '@hooks/control/useGoToPage';
 
+import { BookApplicationSurface, useBookApplicationSurface } from '@components/BookApplicationSurface';
+
 import { StoryRoot } from '@components/StoryRoot';
 import { StoryShell } from '@components/StoryShell';
 import { StoryContent } from '@components/StoryContent';
@@ -63,6 +65,7 @@ export const AppContent = ({
   selectedVisualEffectId,
 }: AppContentProps) => {
   const dispatch = useDispatch();
+  const application = useBookApplicationSurface();
   const pageId = useSelector(mainSelectors.pageId);
   const selectedPage = storyPages.find((cur) => cur.id === pageId);
   const pageIdsKey = JSON.stringify(storyPages.map((cur) => cur.id));
@@ -176,28 +179,36 @@ export const AppContent = ({
     [styles.isLoading]: showLoader,
   });
 
+  const story = (
+    <StoryRoot
+      ref={ref}
+      surfaces={visualSurfaces}
+      visualEffects={visualEffects}
+      page={page}
+      hiddenVisualEffects={hiddenVisualEffects}
+      selectedVisualEffectId={selectedVisualEffectId}
+      inverseColors={inverseColors}
+    >
+      <StoryShell
+        withoutToolbar={withoutToolbar}
+        windowHistoryScope={`book-windows:${config.id}:${bookKey ?? ''}`}
+        data-page-id={pageId ?? undefined}
+      >
+        <StoryContent key={pageId === null ? 'start' : `page:${pageId}`}>
+          {pageId === null ? children : selectedPage?.content}
+        </StoryContent>
+      </StoryShell>
+    </StoryRoot>
+  );
+
   return (
     <>
       <div className={appWrapperClassNames}>
-        <StoryRoot
-          ref={ref}
-          surfaces={visualSurfaces}
-          visualEffects={visualEffects}
-          page={page}
-          hiddenVisualEffects={hiddenVisualEffects}
-          selectedVisualEffectId={selectedVisualEffectId}
-          inverseColors={inverseColors}
-        >
-          <StoryShell
-            withoutToolbar={withoutToolbar}
-            windowHistoryScope={`book-windows:${config.id}:${bookKey ?? ''}`}
-            data-page-id={pageId ?? undefined}
-          >
-            <StoryContent key={pageId === null ? 'start' : `page:${pageId}`}>
-              {pageId === null ? children : selectedPage?.content}
-            </StoryContent>
-          </StoryShell>
-        </StoryRoot>
+        {application ? story : (
+          <BookApplicationSurface>
+            {story}
+          </BookApplicationSurface>
+        )}
 
         {editorTools}
       </div>

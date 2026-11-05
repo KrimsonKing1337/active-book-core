@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { near, openBrowserFixture, setSurfaces } from './browserFixture.js';
+import { near, openBrowserFixture, pixels, setSurfaces } from './browserFixture.js';
 
 const px = (value) => ({ value, unit: 'px' });
 const percent = (value) => ({ value, unit: '%' });
@@ -94,4 +94,30 @@ test('content surfaces scroll naturally while viewport overlays and hosts remain
   const actual = await fixed.boundingBox();
   near(actual.width, expected.width, 'native responsive width');
   near(actual.height, expected.height, 'native responsive height');
+});
+
+
+test('default book application has one boundary, external underlay/overlay and protected selection', async (context) => {
+  const page = await open(context);
+  assert.equal(await page.locator('[data-book-application]').count(), 1);
+  const app = await page.locator('[data-book-application]').boundingBox();
+  const viewport = await regionBox(page, 'storyViewport');
+  await setSurfaces(page, [item('application', { depth: { plane: 'background', order: 0 } })]);
+  let sample = await pixels(page);
+  assert.deepEqual(sample(app.x + 6, app.y + app.height / 2), [255, 0, 0], 'underlay outside the book');
+  assert.notDeepEqual(sample(viewport.x + 80, viewport.y + 50), [255, 0, 0], 'opaque viewport naturally occludes underlay');
+  await setSurfaces(page, [item('application', { depth: { plane: 'aboveControls', order: 0 } })]);
+  sample = await pixels(page);
+  const toolbar = await page.locator('#Toolbar').boundingBox();
+  assert.deepEqual(sample(toolbar.x + 10, toolbar.y + 10), [255, 0, 0], 'external overlay covers controls');
+  await page.evaluate(() => window.setVisualTestSelection('local'));
+  await page.locator('[data-visual-selection="local"]').waitFor();
+  const selection = await page.locator('[data-visual-selection="local"]').boundingBox();
+  near(selection.width, app.width, 'selection measures the actual chosen application');
+  near(selection.height, app.height, 'selection height');
+  assert.equal(await page.locator('[data-visual-selection="local"]').evaluate((element) => {
+    return element.parentElement.dataset.applicationHost;
+  }), 'selection');
+  await page.getByTestId('second').click();
+  await page.getByTestId('page-two').waitFor();
 });
