@@ -9,7 +9,6 @@ import { createVisualEffects } from '@controllers/visualEffects';
 import { AppModeContext } from '@components/App/AppModeContext';
 import { AppWrapper } from '@components/AppWrapper';
 import { BookApplicationSurface } from '@components/BookApplicationSurface';
-import { supportsCssLayout } from '@components/VisualSurfaces/utils/cssLayout';
 
 import { type Settings, initialSettings } from '../@types';
 import { Controls } from '../Controls';
@@ -30,6 +29,7 @@ const demoColors: Partial<Record<Settings['demo'], string>> = {
   frame: '#70d9c5',
   smoke: '#bdced4',
   through: '#75e1d5',
+  advancing: '#03050b',
 };
 
 const getDemoDefaults = (demo: Settings['demo']): Pick<Settings, 'color' | 'region'> => {
@@ -41,7 +41,7 @@ const getDemoDefaults = (demo: Settings['demo']): Pick<Settings, 'color' | 'regi
 
 export const Playground = () => {
   const [settings, setSettings] = useState(initialSettings);
-  const [session] = useState(() => createVisualEffects({ pages: 4, definitions: definitionsFor(initialSettings) }));
+  const [session] = useState(() => createVisualEffects({ pages: 4, definitions: definitionsFor() }));
   const [events, setEvents] = useState<string[]>([]);
   const [error, setError] = useState('');
   const [visible, setVisible] = useState(true);
@@ -51,7 +51,7 @@ export const Playground = () => {
   const loopRef = useRef(initialSettings.loop);
   const mountedRef = useRef(false);
   const registrations = useMemo(() => registrationsFor(settings), [settings]);
-  const definitions = useMemo(() => definitionsFor(settings), [settings]);
+  const definitions = useMemo(definitionsFor, []);
 
   const stop = useCallback(() => {
     abortRef.current?.abort();
@@ -110,7 +110,7 @@ export const Playground = () => {
       loopRef.current = patch.loop;
     }
 
-    const requiresPlaybackReset = patch.demo || patch.region || patch.physicalMode || patch.composition || patch.plane;
+    const requiresPlaybackReset = patch.demo || patch.region || patch.composition || patch.plane;
 
     if (requiresPlaybackReset) {
       stop();
@@ -200,13 +200,7 @@ export const Playground = () => {
     };
   }, [session, settings, change, play, pause, stop]);
 
-  const unsupported = settings.demo === 'frame' && settings.layout === 'css' && !supportsCssLayout({
-    ...registrations[0].effect,
-    content: null,
-  });
-  const status = unsupported
-    ? 'CSS не поддерживает этот placement: показано несовпадение без возврата к JS'
-    : 'Живая сессия · диапазон 1–2 и 4 · page 3 выключает эффекты';
+  const status = 'Локальные DOM-регионы · диапазон 1–2 и 4 · страница 3 выключает эффекты';
   const appStyle: CSSProperties = { width: settings.width, height: settings.height };
   const storyStyle: CSSProperties = {
     width: `${settings.storySize}%`,
@@ -282,7 +276,7 @@ export const Playground = () => {
                 </div>
               </div>
 
-              <div className={styles.Status} data-testid="layout-status" data-unsupported={unsupported}>
+              <div className={styles.Status} data-testid="surface-status">
                 {status}
               </div>
 

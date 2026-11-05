@@ -1,0 +1,20 @@
+.Phase,
+.Ink {
+  position: absolute;
+  inset: 0;
+
+  pointer-events: none;
+}
+
+.Phase {
+  z-index: calc(var(--visual-layer-step, 1) * 5);
+}
+
+.Ink {
+  background: currentColor;
+  opacity: 0;
+}
+
+.NarrativeInk {
+  inset: var(--frame-top) var(--frame-right) var(--frame-bottom) var(--frame-left);
+}

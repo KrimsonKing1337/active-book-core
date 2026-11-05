@@ -1,44 +1,40 @@
-import { useRef } from 'react';
-
 import type { VisualRendererProps } from '@active-book/types';
 
+import { useStoryRegions } from '@components/StoryRegionsProvider';
 
-import type { LayoutLease } from '@controllers/visualEffects';
+import { useAnimationPlayback } from '../hooks/useAnimationPlayback';
+import { numberParam } from '../utils';
 
-import { useBookApplicationSurface } from '@components/BookApplicationSurface';
-
-import { useTimeline } from '../hooks/useTimeline';
-
+/** Visual transform only. Cancelling the native animation exposes the original inline CSS. */
 export const Collapse = (props: VisualRendererProps) => {
-  const application = useBookApplicationSurface();
-  const leaseRef = useRef<LayoutLease | null>(null);
-  const mode = props.params.physicalMode === 'size' ? 'size' : 'scale';
-  const { progress, token } = useTimeline(props, {
-    frame: (next) => {
-      if (next === 0) {
-        return;
-      }
+  const { elements } = useStoryRegions();
+  const { token, status } = useAnimationPlayback(props, () => {
+    const viewport = elements.storyViewport;
 
-      leaseRef.current ??= application?.layout.acquire(mode) ?? null;
-      let factor = 0;
+    if (!viewport) {
+      throw new Error('StoryViewport is not attached');
+    }
 
-      if (next < 0.4) {
-        factor = 1 - next / 0.4;
-      } else if (next > 0.6) {
-        factor = (next - 0.6) / 0.4;
-      }
-      leaseRef.current?.update(factor);
-    },
-    finish: () => {
-      leaseRef.current?.release();
-      leaseRef.current = null;
-    },
+    const base = viewport.style.transform;
+    const animation = viewport.animate([
+      { transform: `${base} scale(1)` },
+      { transform: `${base} scale(0)`, offset: 0.4 },
+      { transform: `${base} scale(0)`, offset: 0.6 },
+      { transform: `${base} scale(1)` },
+    ], {
+      duration: numberParam(props.params, 'duration', 2000),
+      fill: 'none',
+    });
+
+    return { animations: [animation] };
   });
 
-  return <output
-    data-demo-effect={props.id}
-    data-token={token}
-    data-progress={progress.toFixed(3)}
-    hidden
-  />;
+  return (
+    <output
+      data-demo-effect={props.id}
+      data-token={token}
+      data-run-status={status}
+      hidden
+    />
+  );
 };

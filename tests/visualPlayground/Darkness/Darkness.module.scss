@@ -1,3 +1,15 @@
+@property --lab-hole {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0;
+}
+
+@property --lab-edge {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 100%;
+}
+
 .Darkness {
   position: absolute;
   inset: 0;

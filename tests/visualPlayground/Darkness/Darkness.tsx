@@ -1,65 +1,102 @@
 import type { CSSProperties } from 'react';
 
+import { useLayoutEffect, useMemo, useRef } from 'react';
+
 import type { VisualRendererProps } from '@active-book/types';
 
-import { useVisualRegionGeometry } from '@components/RegisteredVisualEffect/geometryContext';
 
-import { useTimeline } from '../hooks/useTimeline';
+import { useStoryRegions } from '@components/StoryRegionsProvider';
+
+import { useAnimationPlayback } from '../hooks/useAnimationPlayback';
+import { useRelativeOrigin } from '../hooks/useRelativeOrigin';
 import { numberParam, stringParam } from '../utils';
 
 import * as styles from './Darkness.module.scss';
 
 export const Darkness = (props: VisualRendererProps) => {
-  const {
-    progress,
-    token,
-    active,
-  } = useTimeline(props);
-  const { geometry, surface } = useVisualRegionGeometry();
+  const nodeRef = useRef<HTMLDivElement>(null);
+  const animationRef = useRef<Animation | null>(null);
+  const { elements } = useStoryRegions();
   const { params, id } = props;
   const direction = stringParam(params, 'direction', 'grow');
-  const region = geometry?.regions.storyViewport;
-  const originX = numberParam(params, 'originX', 50) / 100;
-  const originY = numberParam(params, 'originY', 50) / 100;
-  const width = props.geometry.width;
-  const height = props.geometry.height;
-  const x = region && surface ? region.x - surface.x + region.width * originX : width * originX;
-  const y = region && surface ? region.y - surface.y + region.height * originY : height * originY;
-  const radius = Math.hypot(Math.max(x, width - x), Math.max(y, height - y));
-  const amount = direction === 'shrink' ? 1 - progress : progress;
-  const color = stringParam(params, 'color', '#11131f');
-  const intensity = numberParam(params, 'intensity', 1);
+  const origin = useRelativeOrigin({
+    source: elements.narrativeFrame,
+    target: nodeRef,
+    x: numberParam(params, 'originX', 50) / 100,
+    y: numberParam(params, 'originY', 50) / 100,
+  });
   const edges = params.edges === true;
+  const center = `${origin.x}px ${origin.y}px`;
+  const full = `circle(${origin.radius}px at ${center})`;
+  const empty = `circle(0px at ${center})`;
+  const keyframes = useMemo<Keyframe[]>(() => {
+    if (direction === 'shrink') {
+      return [{ clipPath: full }, { clipPath: empty }];
+    }
+
+    if (direction === 'reveal') {
+      return [{ '--lab-hole': '0px' }, { '--lab-hole': `${origin.radius + 1}px` }];
+    }
+
+    if (edges) {
+      return [{ '--lab-edge': '100%' }, { '--lab-edge': '-60%' }];
+    }
+
+    return [{ clipPath: empty }, { clipPath: full }];
+  }, [full, empty, origin.radius, direction, edges]);
+
+  const {
+    token,
+    active,
+    status,
+  } = useAnimationPlayback(props, () => {
+    const node = nodeRef.current;
+
+    if (!node) {
+      throw new Error('Darkness surface is not attached');
+    }
+
+    const animation = node.animate(keyframes, {
+      duration: numberParam(params, 'duration', 2000),
+      fill: 'both',
+      easing: 'linear',
+    });
+    animationRef.current = animation;
+
+    return { animations: [animation] };
+  });
+
+  useLayoutEffect(() => {
+    const effect = animationRef.current?.effect;
+
+    if (effect instanceof KeyframeEffect) {
+      effect.setKeyframes(keyframes);
+    }
+  }, [keyframes]);
+
   let maskImage: string | undefined;
-  let clipPath: string | undefined;
 
   if (direction === 'reveal') {
-    const hole = progress * radius;
-    const center = `${x}px ${y}px`;
-    maskImage = `radial-gradient(circle at ${center}, transparent ${hole}px, black ${hole + 1}px)`;
+    maskImage = `radial-gradient(circle at ${center}, transparent var(--lab-hole), black calc(var(--lab-hole) + 1px))`;
   } else if (edges) {
-    const inside = Math.max(0, 100 - progress * 160);
-    const outside = Math.max(0, 101 - progress * 160);
-    maskImage = `radial-gradient(ellipse at center, transparent ${inside}%, black ${outside}%)`;
-  } else {
-    clipPath = `circle(${amount * radius}px at ${x}px ${y}px)`;
+    maskImage = 'radial-gradient(ellipse closest-side, transparent var(--lab-edge), black calc(var(--lab-edge) + 1%))';
   }
 
   const style: CSSProperties = {
-    backgroundColor: color,
-    opacity: intensity * numberParam(params, 'opacity', 1),
-    clipPath,
+    backgroundColor: stringParam(params, 'color', '#11131f'),
+    opacity: numberParam(params, 'intensity', 1) * numberParam(params, 'opacity', 1),
     maskImage,
     visibility: active ? 'visible' : 'hidden',
   };
 
   return (
     <div
+      ref={nodeRef}
       className={styles.Darkness}
       style={style}
       data-demo-effect={id}
       data-token={token}
-      data-progress={progress.toFixed(3)}
+      data-run-status={status}
     />
   );
 };

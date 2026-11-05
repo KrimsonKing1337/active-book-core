@@ -11,20 +11,8 @@ export const FrameControls = ({ settings, onChange }: FrameControlsProps) => {
   return (
     <fieldset className={styles.FrameControls}>
       <legend>
-        CSS / JS comparison
+        Размещение рамки
       </legend>
-
-      <label>
-        Размещение
-        <select
-          value={settings.layout}
-          onChange={(e) => onChange({ layout: e.target.value as Settings['layout'] })}
-        >
-          <option value="geometry">Текущий JS</option>
-          <option value="css">Чистый CSS-layout</option>
-          <option value="hybrid">Гибрид с явным JS для custom</option>
-        </select>
-      </label>
 
       <label>
         Плоскость рамки
@@ -44,7 +32,13 @@ export const FrameControls = ({ settings, onChange }: FrameControlsProps) => {
           onChange={(e) => onChange({ frameAnchor: e.target.value as Settings['frameAnchor'] })}
         >
           <option value="top-left">Слева сверху</option>
+          <option value="top">Сверху</option>
+          <option value="top-right">Справа сверху</option>
+          <option value="left">Слева</option>
           <option value="center">Центр</option>
+          <option value="right">Справа</option>
+          <option value="bottom-left">Слева снизу</option>
+          <option value="bottom-right">Справа снизу</option>
           <option value="bottom">Снизу</option>
         </select>
       </label>
@@ -69,24 +63,6 @@ export const FrameControls = ({ settings, onChange }: FrameControlsProps) => {
         Рамочная маска
       </label>
 
-      <label className={styles.Check}>
-        <input
-          type="checkbox"
-          checked={settings.customPlacement}
-          onChange={(e) => onChange({ customPlacement: e.target.checked })}
-        />
-        Cross-region и прокрутка content
-      </label>
-
-      <label className={styles.Check}>
-        <input
-          type="checkbox"
-          disabled={!settings.customPlacement}
-          checked={settings.independentAnchor}
-          onChange={(e) => onChange({ independentAnchor: e.target.checked })}
-        />
-        Независимый anchor в storyViewport
-      </label>
     </fieldset>
   );
 };

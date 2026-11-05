@@ -23,6 +23,7 @@ const demos: readonly [Settings['demo'], string][] = [
   ['sequence', '07 · Последовательность'],
   ['single', '08 · Одна сцена'],
   ['ball', '09 · Непрерывный шарик'],
+  ['advancing', '10 · Наступающая тьма'],
 ];
 
 export const Controls = ({
@@ -71,7 +72,7 @@ export const Controls = ({
         </span>
 
         <small>
-          9 экспериментов
+          10 экспериментов
         </small>
       </div>
 
@@ -133,6 +134,9 @@ export const Controls = ({
             >
               <option value="storyViewport">Вьюпорт с Toolbar</option>
               <option value="narrativeFrame">Нарратив и рамка</option>
+              <option value="frame">Только рамка</option>
+              <option value="narrativeViewport">Неподвижный overlay нарратива</option>
+              <option value="narrativeContent">Прокручиваемое содержимое</option>
               <option value="story">Весь StoryRoot</option>
               <option value="application">Приложение за границами story</option>
             </select>
@@ -188,19 +192,6 @@ export const Controls = ({
           >
             <option value="single">Один непрерывный renderer</option>
             <option value="multiple">Три отдельных эффекта</option>
-          </select>
-        </label>
-      )}
-
-      {isPhysical && (
-        <label>
-          Способ сжатия
-          <select
-            value={settings.physicalMode}
-            onChange={(e) => onChange({ physicalMode: e.target.value as Settings['physicalMode'] })}
-          >
-            <option value="scale">Визуальный transform: scale</option>
-            <option value="size">Реальные width / height</option>
           </select>
         </label>
       )}

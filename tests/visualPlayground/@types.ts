@@ -1,12 +1,12 @@
-import type { VisualRegion } from '@active-book/types';
+import type { AnchorPoint, VisualRegion } from '@active-book/types';
 
-export type Demo = 'frame' | 'darkness' | 'edges' | 'smoke' | 'through' | 'collapse' | 'sequence' | 'single' | 'ball';
-export type Layout = 'geometry' | 'css' | 'hybrid';
+export type Demo =
+  | 'frame' | 'darkness' | 'edges' | 'smoke' | 'through'
+  | 'collapse' | 'sequence' | 'single' | 'ball' | 'advancing';
 
 export type Settings = {
   demo: Demo;
-  layout: Layout;
-  region: Extract<VisualRegion, 'storyViewport' | 'narrativeFrame' | 'story' | 'application'>;
+  region: VisualRegion;
   duration: number;
   intensity: number;
   opacity: number;
@@ -22,11 +22,8 @@ export type Settings = {
   toolbarHeight: number;
   mask: boolean;
   plane: 'belowNarrative' | 'aboveNarrative';
-  frameAnchor: 'top-left' | 'center' | 'bottom';
+  frameAnchor: AnchorPoint;
   offsetX: number;
-  customPlacement: boolean;
-  independentAnchor: boolean;
-  physicalMode: 'scale' | 'size';
   composition: 'single' | 'multiple';
   trigger: 'manual' | 'page';
   loop: boolean;
@@ -34,7 +31,6 @@ export type Settings = {
 
 export const initialSettings: Settings = {
   demo: 'frame',
-  layout: 'geometry',
   region: 'storyViewport',
   duration: 2000,
   intensity: 0.85,
@@ -53,9 +49,6 @@ export const initialSettings: Settings = {
   plane: 'aboveNarrative',
   frameAnchor: 'top-left',
   offsetX: 0,
-  customPlacement: false,
-  independentAnchor: false,
-  physicalMode: 'scale',
   composition: 'single',
   trigger: 'manual',
   loop: false,

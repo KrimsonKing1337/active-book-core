@@ -1,28 +1,24 @@
-import { useVisualRegionGeometry } from '@components/RegisteredVisualEffect/geometryContext';
+import { createPortal } from 'react-dom';
+
+import { useStoryRegions } from '@components/StoryRegionsProvider';
 
 import * as styles from './ViewportTelemetry.module.scss';
 
-/** Host diagnostic overlay makes the otherwise fully occluded collapse visible to the experimenter. */
+/** A local diagnostic follows the real transformed viewport without measuring it each frame. */
 export const ViewportTelemetry = () => {
-  const { geometry, surface } = useVisualRegionGeometry();
-  const region = geometry?.regions.storyViewport;
+  const { elements } = useStoryRegions();
+  const viewport = elements.storyViewport;
 
-  if (!region || !surface) {
+  if (!viewport) {
     return null;
   }
 
-  const style = {
-    left: region.x - surface.x,
-    top: region.y - surface.y,
-    width: region.width,
-    height: region.height,
-  };
-
-  return (
-    <div className={styles.Telemetry} style={style} data-testid="viewport-telemetry">
+  return createPortal(
+    <div className={styles.Telemetry} data-testid="viewport-telemetry">
       <span>
-        VIEWPORT · {Math.round(region.width)} × {Math.round(region.height)}
+        VIEWPORT · CSS transform
       </span>
-    </div>
+    </div>,
+    viewport,
   );
 };

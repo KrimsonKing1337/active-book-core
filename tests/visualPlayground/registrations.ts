@@ -6,6 +6,8 @@ import { fillRegion } from '@controllers/visualEffects/utils/declarations';
 
 import type { Settings } from './@types';
 
+import { AdvancingDarkness } from './AdvancingDarkness';
+
 import { ContinuousBall } from './ContinuousBall';
 
 import { Darkness } from './Darkness';
@@ -21,7 +23,7 @@ const createRegistration = (
   settings: Settings,
   id: string,
   definitionId: string,
-  region: Exclude<VisualRegion, 'frame'>,
+  region: VisualRegion,
 ): VisualEffectRegistration => {
   const params = {
     duration: settings.duration,
@@ -34,14 +36,13 @@ const createRegistration = (
     originY: settings.originY,
     frameAnchor: settings.frameAnchor,
     offsetX: settings.offsetX,
-    physicalMode: settings.physicalMode,
   };
   const effect: VisualEffectRegistration['effect'] = {
     id,
     definitionId,
     params,
     placement: fillRegion(region),
-    visibility: { region },
+    visibility: region === 'frame' ? { region, sides: ['top', 'right', 'bottom', 'left'] } : { region },
     depth: { plane: 'aboveControls', order: 0 },
   };
 
@@ -51,12 +52,16 @@ const createRegistration = (
   };
 };
 
-export const definitionsFor = (settings: Settings): HostVisualEffectDefinition[] => {
-  const effectHost = settings.region === 'application' ? 'aboveStory' : 'story';
-
-  return [
+export const definitionsFor = (): HostVisualEffectDefinition[] => {
+  const definitions: HostVisualEffectDefinition[] = [
     {
       id: 'lab.ball', defaultParams: {}, Renderer: ContinuousBall,
+    },
+    {
+      id: 'lab.advancing', defaultParams: {}, Renderer: AdvancingDarkness,
+    },
+    {
+      id: 'lab.under-curtain', defaultParams: {}, Renderer: Darkness, surfaceHost: 'underStory',
     },
     {
       id: 'lab.telemetry', defaultParams: {}, Renderer: ViewportTelemetry, systemFeedback: true,
@@ -65,19 +70,19 @@ export const definitionsFor = (settings: Settings): HostVisualEffectDefinition[]
       id: 'lab.feedback', defaultParams: {}, Renderer: FeedbackProbe, systemFeedback: true,
     },
     {
-      id: 'lab.frame', defaultParams: {}, Renderer: FrameDemo, surfaceLayout: settings.layout,
+      id: 'lab.frame', defaultParams: {}, Renderer: FrameDemo,
     },
     {
-      id: 'lab.dark', defaultParams: {}, Renderer: Darkness, surfaceHost: effectHost,
+      id: 'lab.dark', defaultParams: {}, Renderer: Darkness, surfaceHost: 'story',
     },
     {
       id: 'lab.edges', defaultParams: {}, Renderer: Darkness, surfaceHost: 'underStory',
     },
     {
-      id: 'lab.smoke', defaultParams: {}, Renderer: Smoke, surfaceHost: effectHost,
+      id: 'lab.smoke', defaultParams: {}, Renderer: Smoke, surfaceHost: 'story',
     },
     {
-      id: 'lab.through', defaultParams: {}, Renderer: Through, surfaceHost: effectHost,
+      id: 'lab.through', defaultParams: {}, Renderer: Through, surfaceHost: 'story',
     },
     {
       id: 'lab.curtain', defaultParams: {}, Renderer: Darkness, surfaceHost: 'aboveStory',
@@ -86,9 +91,14 @@ export const definitionsFor = (settings: Settings): HostVisualEffectDefinition[]
       id: 'lab.collapse', defaultParams: {}, Renderer: Collapse, surfaceHost: 'aboveStory',
     },
     {
-      id: 'lab.single', defaultParams: {}, Renderer: SingleScene, surfaceHost: 'aboveStory',
+      id: 'lab.single', defaultParams: {}, Renderer: SingleScene, surfaceHost: 'underStory',
     },
   ];
+
+  return definitions.map((definitionCur) => ({
+    ...definitionCur,
+    surfaceLayout: 'local',
+  }));
 };
 
 const createFrameRegistration = (settings: Settings): VisualEffectRegistration => {
@@ -99,26 +109,11 @@ const createFrameRegistration = (settings: Settings): VisualEffectRegistration =
     frame.effect.visibility = { region: 'frame', sides: ['top', 'right', 'bottom', 'left'] };
   }
 
-  if (settings.customPlacement) {
-    frame.effect.placement = {
-      ...fillRegion('narrativeContent'),
-      anchor: { region: 'narrativeContent', point: 'top-left' },
-      offset: { x: { value: 20, unit: 'px' }, y: { value: 50, unit: 'px' } },
-      size: { width: { value: 80, unit: '%' }, height: { value: 300, unit: 'px' } },
-    };
-    frame.effect.visibility = { region: 'storyViewport' };
-
-    if (settings.independentAnchor) {
-      frame.effect.placement.anchor = { region: 'storyViewport', point: 'center' };
-      frame.effect.placement.origin = 'center';
-    }
-  }
-
   return frame;
 };
 
 const createSceneRegistrations = (settings: Settings): VisualEffectRegistration[] => {
-  const curtain = createRegistration(settings, 'curtain', 'lab.curtain', 'application');
+  const curtain = createRegistration(settings, 'curtain', 'lab.under-curtain', 'application');
   curtain.effect.params = {
     ...curtain.effect.params, direction: 'grow', intensity: 1,
   };
@@ -148,6 +143,10 @@ const createSceneRegistrations = (settings: Settings): VisualEffectRegistration[
 };
 
 export const registrationsFor = (settings: Settings): VisualEffectRegistration[] => {
+  if (settings.demo === 'advancing') {
+    return [createRegistration(settings, 'advancing', 'lab.advancing', 'application')];
+  }
+
   if (settings.demo === 'ball') {
     const rangeBall = createRegistration(settings, 'range-ball', 'lab.ball', 'narrativeFrame');
     const pageBall = createRegistration(settings, 'page-ball', 'lab.ball', 'narrativeFrame');
@@ -175,7 +174,6 @@ export const registrationsFor = (settings: Settings): VisualEffectRegistration[]
 
   if (settings.demo === 'smoke') {
     const smoke = createRegistration(settings, 'smoke', 'lab.smoke', settings.region);
-    smoke.effect.placement = fillRegion('narrativeFrame');
 
     return [smoke];
   }

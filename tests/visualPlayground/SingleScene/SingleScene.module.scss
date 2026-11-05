@@ -1,4 +1,10 @@
+.Wrapper,
 .Scene {
   position: absolute;
   inset: 0;
+}
+
+.Scene {
+  background: currentColor;
+  opacity: 0;
 }

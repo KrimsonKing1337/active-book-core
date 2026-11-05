@@ -4,3 +4,12 @@
 
   filter: blur(7px);
 }
+
+.Wave {
+  position: absolute;
+
+  border: 80px solid currentColor;
+  border-radius: 50%;
+  box-shadow: 0 0 40px currentColor;
+  opacity: 0;
+}

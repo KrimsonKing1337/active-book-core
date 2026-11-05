@@ -1,64 +1,84 @@
-import type { CSSProperties } from 'react';
-
-import { useRef } from 'react';
+import { useLayoutEffect, useMemo, useRef } from 'react';
 
 import type { VisualRendererProps } from '@active-book/types';
 
 
-import type { LayoutLease } from '@controllers/visualEffects';
+import { useStoryRegions } from '@components/StoryRegionsProvider';
 
-import { useBookApplicationSurface } from '@components/BookApplicationSurface';
-import { useVisualRegionGeometry } from '@components/RegisteredVisualEffect/geometryContext';
-
-import { useTimeline } from '../hooks/useTimeline';
+import { useAnimationPlayback } from '../hooks/useAnimationPlayback';
+import { useRelativeOrigin } from '../hooks/useRelativeOrigin';
 import { numberParam, stringParam } from '../utils';
 
 import * as styles from './SingleScene.module.scss';
 
-/** Same artistic scene with one renderer/clock instead of a sequence of registrations. */
 export const SingleScene = (props: VisualRendererProps) => {
-  const application = useBookApplicationSurface();
-  const leaseRef = useRef<LayoutLease | null>(null);
-  const mode = props.params.physicalMode === 'size' ? 'size' : 'scale';
-  const {
-    progress,
-    token,
-    active,
-  } = useTimeline(props, {
-    frame: (next) => {
-      if (next > 0.5 && next < 0.85) {
-        leaseRef.current ??= application?.layout.acquire(mode) ?? null;
-        const stage = (next - 0.5) / 0.35;
-        leaseRef.current?.update(Math.max(0, Math.abs(stage * 2 - 1) * 1.3 - 0.3));
-      } else {
-        leaseRef.current?.release();
-        leaseRef.current = null;
-      }
-    },
-    finish: () => {
-      leaseRef.current?.release();
-      leaseRef.current = null;
-    },
+  const nodeRef = useRef<HTMLDivElement>(null);
+  const shadeRef = useRef<Animation | null>(null);
+  const { elements } = useStoryRegions();
+  const origin = useRelativeOrigin({ source: elements.narrativeFrame, target: nodeRef });
+  const keyframes = useMemo<Keyframe[]>(() => {
+    const center = `${origin.x}px ${origin.y}px`;
+    const full = `circle(${origin.radius}px at ${center})`;
+
+    return [
+      { clipPath: `circle(0px at ${center})`, opacity: 1 },
+      {
+        clipPath: full, opacity: 1, offset: 0.5,
+      },
+      {
+        clipPath: full, opacity: 1, offset: 0.85,
+      },
+      { clipPath: full, opacity: 0 },
+    ];
+  }, [origin.x, origin.y, origin.radius]);
+
+  useLayoutEffect(() => {
+    const effect = shadeRef.current?.effect;
+
+    if (effect instanceof KeyframeEffect) {
+      effect.setKeyframes(keyframes);
+    }
+  }, [keyframes]);
+
+  const { token } = useAnimationPlayback(props, () => {
+    const node = nodeRef.current;
+    const viewport = elements.storyViewport;
+
+    if (!node || !viewport) {
+      throw new Error('Scene is not attached');
+    }
+
+    const duration = numberParam(props.params, 'duration', 2000);
+    const shade = node.animate(keyframes, {
+      duration,
+      fill: 'both',
+    });
+    shadeRef.current = shade;
+    const base = viewport.style.transform;
+    const shrink = viewport.animate([
+      { transform: `${base} scale(1)` },
+      { transform: `${base} scale(1)`, offset: 0.5 },
+      { transform: `${base} scale(0)`, offset: 0.65 },
+      { transform: `${base} scale(0)`, offset: 0.75 },
+      { transform: `${base} scale(1)`, offset: 0.85 },
+      { transform: `${base} scale(1)` },
+    ], { duration, fill: 'none' });
+
+    return { animations: [shade, shrink] };
   });
-  const { geometry, surface } = useVisualRegionGeometry();
-  const frame = geometry?.regions.narrativeFrame;
-  const x = frame && surface ? frame.x - surface.x + frame.width / 2 : props.geometry.width / 2;
-  const y = frame && surface ? frame.y - surface.y + frame.height / 2 : props.geometry.height / 2;
-  const radius = Math.hypot(props.geometry.width, props.geometry.height);
-  const spread = Math.min(1, progress / 0.5);
-  const fadeOpacity = progress > 0.85 ? (1 - progress) / 0.15 : 1;
-  const style: CSSProperties = {
-    backgroundColor: stringParam(props.params, 'color', '#11131f'),
-    clipPath: `circle(${spread * radius}px at ${x}px ${y}px)`,
-    opacity: active ? fadeOpacity * numberParam(props.params, 'opacity', 1) : 0,
+  const style = {
+    color: stringParam(props.params, 'color', '#11131f'),
+    opacity: numberParam(props.params, 'opacity', 1),
   };
 
   return (
     <div
-      className={styles.Scene}
+      className={styles.Wrapper}
       style={style}
       data-demo-effect={props.id}
       data-token={token}
-    />
+    >
+      <div ref={nodeRef} className={styles.Scene} />
+    </div>
   );
 };

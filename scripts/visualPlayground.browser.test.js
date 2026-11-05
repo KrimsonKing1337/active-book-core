@@ -131,86 +131,52 @@ test('visual playground experiments in Chromium', async (context) => {
     assert.equal(await page.locator('[data-layout-mode]').count(), 0, 'stop releases the layout lease');
   });
 
-  await scenario('shared CSS layout matches real regions, toolbar variations and internal frame anchors', async (page) => {
-    const original = await frameToken(page);
+  await scenario('local surfaces match real regions, toolbar variations and CSS frame anchors', async (page) => {
     for (const options of [
       { width: 1040, height: 690, toolbar: true, toolbarHeight: 48, region: 'storyViewport', mask: false },
       { width: 820, height: 560, toolbar: true, toolbarHeight: 92, region: 'narrativeFrame', mask: false },
       { width: 1040, height: 720, toolbar: false, toolbarHeight: 48, region: 'narrativeFrame', mask: true },
       { width: 390, height: 740, toolbar: true, toolbarHeight: 70, region: 'storyViewport', mask: true },
-      { width: 1040, height: 690, toolbar: true, toolbarHeight: 48, region: 'storyViewport', mask: true },
     ]) {
-      await patch(page, { ...options, layout: 'geometry' });
-      const geometry = await bounds(page, '[data-visual-content="frame"]');
-      const clipGeometry = await bounds(page, '[data-visual-surface="frame"]');
-      const jsCorners = await page.locator('[data-visual-surface="frame"]').evaluate((element) => {
-        const style = getComputedStyle(element);
-        return [style.borderTopLeftRadius, style.borderBottomLeftRadius];
-      });
-      const elementGeometry = await bounds(page, '[data-effect-id="frame-text"] [class*="FrameElement"]');
-      await patch(page, { layout: 'css' });
-      const css = await bounds(page, '[data-visual-content="frame"]');
-      const clipCss = await bounds(page, '[data-visual-surface="frame"]');
-      const cssCorners = await page.locator('[data-visual-surface="frame"]').evaluate((element) => {
-        const style = getComputedStyle(element);
-        return [style.borderTopLeftRadius, style.borderBottomLeftRadius];
-      });
-      assert.deepEqual(cssCorners, jsCorners, 'rounded region corners match');
-      const elementCss = await bounds(page, '[data-effect-id="frame-text"] [class*="FrameElement"]');
-      for (const key of ['x', 'y', 'width', 'height']) {
-        near(css[key], geometry[key], `surface ${key} ${JSON.stringify(options)}`);
-        near(clipCss[key], clipGeometry[key], `clip ${key}`);
-        near(elementCss[key], elementGeometry[key], `inner frame ${key}`);
-      }
-      assert.equal(await frameToken(page), original, 'switching layout does not reparent the renderer');
-      assert.equal(await page.evaluate(() => window.liveGeometryObservers.size), 1, 'CSS adds no second measurer');
-      measurements.push({ options, geometry, css, clipGeometry, clipCss });
+      await patch(page, options);
+      const region = options.mask ? 'narrativeFrame' : options.region;
+      const expected = await bounds(page, `[data-story-region="${region}"]`);
+      const actual = await bounds(page, '[data-visual-content="frame"]');
+      for (const key of ['x', 'y', 'width', 'height']) near(actual[key], expected[key], `native ${region} ${key}`);
+      const token = await frameToken(page);
+      await patch(page, { toolbarHeight: options.toolbarHeight + 8 });
+      assert.equal(await frameToken(page), token, 'resizing an actual region does not reparent its renderer');
+      measurements.push({ options, actual, expected });
     }
-
     await patch(page, { width: 1040, region: 'storyViewport', mask: false, frameAnchor: 'center', offsetX: 35 });
-    const cssAnchor = await bounds(page, '[data-effect-id="frame-text"] [class*="FrameElement"]');
-    await patch(page, { layout: 'geometry' });
-    const jsAnchor = await bounds(page, '[data-effect-id="frame-text"] [class*="FrameElement"]');
-    near(cssAnchor.x, jsAnchor.x, 'independent inner anchor');
-    await page.screenshot({ path: new URL('01-frame-js.png', artifacts).pathname });
-    await patch(page, { layout: 'css' });
-    await page.screenshot({ path: new URL('02-frame-css.png', artifacts).pathname });
+    const anchor = await bounds(page, '[data-effect-id="frame-text"] [class*="FrameElement"]');
+    const main = await bounds(page, '[data-story-region="storyViewport"]');
+    near(anchor.x + anchor.width / 2, main.x + main.width / 2 + 35, 'CSS anchor and offset');
+    await page.screenshot({ path: new URL('01-frame-local.png', artifacts).pathname });
     await page.setViewportSize({ width: 1100, height: 850 });
     await settle(page);
-    const afterWindowResize = await bounds(page, '[data-visual-content="frame"]');
-    const main = await bounds(page, '[data-story-region="storyViewport"]');
-    near(afterWindowResize.width, main.width, 'window resize width');
-    near(afterWindowResize.height, main.height, 'window resize height');
+    near((await bounds(page, '[data-visual-content="frame"]')).width, (await bounds(page, '[data-story-region="storyViewport"]')).width, 'native responsive width');
   });
 
-  await scenario('CSS limitation is visible; JS and explicit hybrid track scrolling custom anchors', async (page) => {
-    await patch(page, { customPlacement: true, layout: 'css' });
-    assert.equal(await page.getByTestId('layout-status').getAttribute('data-unsupported'), 'true');
-    assert.equal(await page.locator('[data-surface-layout="css"]').count(), 1);
-    await page.screenshot({ path: new URL('03-css-unsupported.png', artifacts).pathname });
-    const css = await bounds(page, '[data-visual-content="frame"]');
-    await patch(page, { layout: 'geometry' });
-    const js = await bounds(page, '[data-visual-content="frame"]');
-    assert(Math.abs(css.height - js.height) > 100, 'the unsupported CSS result is not secretly JS');
+  await scenario('native content surfaces scroll and fixed viewport overlays retain DOM and animation', async (page) => {
+    await patch(page, { region: 'narrativeContent' });
+    await play(page);
     const original = await frameToken(page);
+    const before = await bounds(page, '[data-visual-content="frame"]');
     await page.locator('#narrative').evaluate((element) => { element.scrollTop = 180; });
     await settle(page);
-    const scrolled = await bounds(page, '[data-visual-content="frame"]');
-    near(scrolled.y, js.y - 180, 'moving narrativeContent anchor');
-    await patch(page, { layout: 'hybrid' });
-    const hybrid = await bounds(page, '[data-visual-content="frame"]');
-    near(hybrid.y, scrolled.y, 'explicit hybrid geometry path');
+    near((await bounds(page, '[data-visual-content="frame"]')).y, before.y - 180, 'real content scroll');
     assert.equal(await frameToken(page), original);
-    await patch(page, { independentAnchor: true, layout: 'geometry' });
-    const fixedAnchor = await bounds(page, '[data-visual-content="frame"]');
+    await patch(page, { region: 'narrativeViewport' });
+    await play(page);
+    const fixedToken = await frameToken(page);
+    const fixed = await bounds(page, '[data-visual-content="frame"]');
     await page.locator('#narrative').evaluate((element) => { element.scrollTop += 100; });
     await settle(page);
-    near((await bounds(page, '[data-visual-content="frame"]')).y, fixedAnchor.y, 'independent viewport anchor stays fixed');
-    await patch(page, { layout: 'css' });
-    assert.equal(await page.getByTestId('layout-status').getAttribute('data-unsupported'), 'true');
-    await patch(page, { layout: 'hybrid' });
-    near((await bounds(page, '[data-visual-content="frame"]')).y, fixedAnchor.y, 'hybrid independent anchor');
-    await page.screenshot({ path: new URL('03-cross-region-hybrid.png', artifacts).pathname });
+    near((await bounds(page, '[data-visual-content="frame"]')).y, fixed.y, 'fixed viewport overlay');
+    assert.equal(await frameToken(page), fixedToken);
+    assert.equal(await page.locator('[data-surface-layout="geometry"], [data-surface-layout="css"]').count(), 0);
+    await page.screenshot({ path: new URL('02-native-scroll.png', artifacts).pathname });
   });
 
   await scenario('one session preserves animated frame identity across resize and disjoint active pages', async (page) => {
@@ -219,7 +185,7 @@ test('visual playground experiments in Chromium', async (context) => {
     await page.evaluate(() => {
       window.savedFrameAnimation = document.querySelector('[data-effect-id="frame"]')?.getAnimations({ subtree: true })[0];
     });
-    await patch(page, { width: 900, toolbarHeight: 85, layout: 'css' });
+    await patch(page, { width: 900, toolbarHeight: 85 });
     await page.getByRole('button', { name: 'Страница 4', exact: true }).click();
     await settle(page);
     assert.equal(await frameToken(page), token);
@@ -308,51 +274,41 @@ test('visual playground experiments in Chromium', async (context) => {
     assert.equal(await page.getByTestId('play').isEnabled(), true, 'tools remain outside decorative overlays');
   });
 
-  await scenario('scale and real layout collapse reach zero, restore, and cancel without style leaks', async (page) => {
-    for (const mode of ['scale', 'size']) {
-      await patch(page, { demo: 'collapse', duration: 700, physicalMode: mode });
-      const baseline = await page.locator('[data-story-region="storyViewport"]').evaluate((element) => ({
-        width: element.clientWidth,
-        height: element.clientHeight,
-      }));
-      const previousReveal = (await currentRun(page, 'reveal'))?.number ?? 0;
-      await play(page);
-      await page.waitForFunction(() => document.querySelector('[data-layout-mode]')
-        ?.style.getPropertyValue('--visual-layout-factor') === '0');
-      const collapsed = await page.locator('[data-story-region="storyViewport"]').evaluate((element) => ({
-        clientWidth: element.clientWidth,
-        clientHeight: element.clientHeight,
-        width: element.getBoundingClientRect().width,
-        height: element.getBoundingClientRect().height,
-      }));
-      assert.equal(collapsed.width, 0);
-      assert.equal(collapsed.height, 0);
-      assert.equal(collapsed.clientWidth, mode === 'scale' ? baseline.width : 0);
-      const curtain = await bounds(page, '[data-visual-surface="curtain"]');
-      near(curtain.width, (await bounds(page, '[data-book-application]')).width, 'curtain stays fixed');
-      await page.screenshot({ path: new URL(`09-collapse-${mode}.png`, artifacts).pathname });
-      await waitRun(page, 'reveal', 'completed', previousReveal);
-      assert.equal(await page.locator('[data-layout-mode]').count(), 0);
-      const restored = await bounds(page, '[data-story-region="storyViewport"]');
-      near(restored.width, baseline.width, 'restored width');
-      measurements.push({ mode, baseline, collapsed, restored });
-
-      await patch(page, { duration: 1000 });
-      await play(page);
-      await waitRun(page, 'collapse', 'running');
-      await page.waitForTimeout(100);
-      await page.getByRole('button', { name: 'Стоп / сброс', exact: true }).click();
-      assert.equal(await page.locator('[data-layout-mode]').count(), 0);
-      assert.equal((await currentRun(page, 'collapse')).status, 'cancelled');
-      assert.equal(await page.evaluate(() => window.playground.session.runs.listenerCount()), 1, 'only UI diagnostics remain');
-
-      await play(page);
-      await page.waitForFunction(() => document.querySelector('[data-layout-mode]'));
-      await page.evaluate(() => window.playground.session.remove('collapse'));
-      await settle(page);
-      assert.equal(await page.locator('[data-layout-mode]').count(), 0, 'removing the effect releases its lease');
-      assert.equal(await currentRun(page, 'collapse'), undefined);
-    }
+  await scenario('visual transform collapse reaches zero and restores without changing layout or leaking animations', async (page) => {
+    await patch(page, { demo: 'collapse', duration: 700 });
+    const baseline = await page.locator('[data-story-region="storyViewport"]').evaluate((element) => ({
+      width: element.clientWidth, height: element.clientHeight, transform: element.style.transform,
+    }));
+    await play(page);
+    await page.waitForFunction(() => document.querySelector('[data-story-region="storyViewport"]').getBoundingClientRect().width < 0.01);
+    const collapsed = await page.locator('[data-story-region="storyViewport"]').evaluate((element) => ({
+      clientWidth: element.clientWidth, clientHeight: element.clientHeight,
+      width: element.getBoundingClientRect().width, height: element.getBoundingClientRect().height,
+    }));
+    assert.equal(collapsed.width, 0);
+    assert.equal(collapsed.height, 0);
+    assert.equal(collapsed.clientWidth, baseline.width, 'layout width is constant');
+    assert.equal(collapsed.clientHeight, baseline.height, 'layout height is constant');
+    const curtain = await bounds(page, '[data-visual-surface="curtain"]');
+    near(curtain.width, (await bounds(page, '[data-book-application]')).width, 'external shade stays fixed');
+    await page.screenshot({ path: new URL('09-collapse-transform.png', artifacts).pathname });
+    await waitRun(page, 'reveal');
+    assert.equal(await page.locator('[data-layout-mode]').count(), 0);
+    near((await bounds(page, '[data-story-region="storyViewport"]')).width, baseline.width, 'restored width');
+    measurements.push({ baseline, collapsed });
+    await patch(page, { duration: 1000 });
+    await play(page);
+    await waitRun(page, 'collapse', 'running');
+    await page.getByRole('button', { name: 'Стоп / сброс', exact: true }).click();
+    assert.equal((await currentRun(page, 'collapse')).status, 'cancelled');
+    assert.equal(await page.locator('[data-story-region="storyViewport"]').evaluate((node) => node.getAnimations().length), 0);
+    assert.equal(await page.evaluate(() => window.playground.session.runs.listenerCount()), 1);
+    await play(page);
+    await waitRun(page, 'collapse', 'running');
+    await page.evaluate(() => window.playground.session.remove('collapse'));
+    await settle(page);
+    assert.equal(await page.locator('[data-story-region="storyViewport"]').evaluate((node) => node.getAnimations().length), 0);
+    assert.equal(await currentRun(page, 'collapse'), undefined);
   });
 
   await scenario('milestones, late subscriptions, replay, StrictMode and closing the book', async (page) => {
@@ -406,9 +362,9 @@ test('visual playground experiments in Chromium', async (context) => {
     const token = await page.locator('[data-demo-effect="darkness"]').getAttribute('data-token');
     await page.getByRole('button', { name: 'Пауза', exact: true }).click();
     assert.equal((await currentRun(page, 'darkness')).status, 'paused');
-    const paused = await page.locator('[data-demo-effect="darkness"]').getAttribute('data-progress');
+    const paused = await page.locator('[data-demo-effect="darkness"]').evaluate((node) => node.getAnimations()[0].currentTime);
     await page.waitForTimeout(100);
-    assert.equal(await page.locator('[data-demo-effect="darkness"]').getAttribute('data-progress'), paused);
+    assert.equal(await page.locator('[data-demo-effect="darkness"]').evaluate((node) => node.getAnimations()[0].currentTime), paused);
     await page.getByRole('button', { name: 'Продолжить', exact: true }).click();
     assert.equal((await currentRun(page, 'darkness')).number, run.number);
     await page.getByRole('button', { name: 'Страница 4', exact: true }).click();
