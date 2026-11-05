@@ -34,8 +34,8 @@ const frame: FrameEffect = {
 };
 
 beforeEach(() => {
+  store.dispatch(mainActions.setStoryPages(['one', 'two', 'three', 'four', 'five']));
   store.dispatch(mainActions.setPage(1));
-  store.dispatch(mainActions.setPages(5));
 });
 
 test('physical vibration and flashlight work without a host when no visual feedback is declared', () => {

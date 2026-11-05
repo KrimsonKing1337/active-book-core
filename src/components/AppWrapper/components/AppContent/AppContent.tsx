@@ -17,6 +17,8 @@ import { useEffectsInRange } from '@hooks/effects/range';
 import { useGoToPage } from '@hooks/control/useGoToPage';
 
 import { StoryVisualRoot } from '@components/StoryVisualRoot';
+import { PageWrapper } from '@components/PageWrapper';
+import { PageContent } from '@components/PageContent';
 import { useAppMode } from '@components/App/AppModeContext';
 
 import { removeCssHover } from '@utils/touch/removeCssHover';
@@ -45,6 +47,9 @@ export type AppContentProps = PropsWithChildren & AppWrapperProps & {
 
 export const AppContent = ({
   children,
+  bookKey,
+  storyPages,
+  withoutToolbar,
   config,
   tableOfContents,
   rangeEffects,
@@ -58,10 +63,23 @@ export const AppContent = ({
   selectedVisualEffectId,
 }: AppContentProps) => {
   const dispatch = useDispatch();
+  const pageId = useSelector(mainSelectors.pageId);
+  const selectedPage = storyPages.find((cur) => cur.id === pageId);
+  const pageIdsKey = JSON.stringify(storyPages.map((cur) => cur.id));
 
   useLayoutEffect(() => {
-    visualEffects.setPageCount(config.pages);
-  }, [config.pages, visualEffects]);
+    const ids: string[] = JSON.parse(pageIdsKey);
+
+    if (new Set(ids).size !== ids.length || ids.some((cur) => !cur)) {
+      throw new Error('Story pages require unique non-empty IDs');
+    }
+
+    dispatch(mainActions.setStoryPages(ids));
+  }, [dispatch, pageIdsKey]);
+
+  useLayoutEffect(() => {
+    visualEffects.setPageCount(storyPages.length);
+  }, [storyPages.length, visualEffects]);
 
   useVisualRegistrations({
     session: visualEffects,
@@ -90,11 +108,6 @@ export const AppContent = ({
 
   // приглушаю звук, отключаю вибрацию и вспышку, если приложение скрыто
   useVisibilityChangeHandler();
-
-  // Сбрасывать адресную строку теперь не нужно, т.к. мы используем memoryRouter. вместо этого очищаем историю
-  useEffect(() => {
-    window.history.pushState(null, '', window.location.href);
-  }, []);
 
   // если тач-устройство - убираю :hover
   useEffect(() => {
@@ -128,17 +141,6 @@ export const AppContent = ({
   // Удаляю id видео из списка currentTime, если видео с data-id на странице нет
   // todo: вспомнить зачем это вообще нужно
   useDeleteAllVideosWithoutDataIdOnThePage();
-
-  useEffect(() => {
-    if (appMode !== 'reader') {
-      return;
-    }
-
-    // Фокус для прокрутки в режиме чтения. Не переносим его при обновлении навигационных колбэков.
-    const narrativeElement = document.querySelector<HTMLElement>('#narrative');
-
-    narrativeElement?.focus({ preventScroll: true });
-  }, [appMode]);
 
   useEffect(() => {
     if (appMode !== 'reader') {
@@ -186,7 +188,15 @@ export const AppContent = ({
           selectedVisualEffectId={selectedVisualEffectId}
           inverseColors={inverseColors}
         >
-          {children}
+          <PageWrapper
+            withoutToolbar={withoutToolbar}
+            windowHistoryScope={`book-windows:${config.id}:${bookKey ?? ''}`}
+            data-page-id={pageId ?? undefined}
+          >
+            <PageContent key={pageId === null ? 'start' : `page:${pageId}`}>
+              {pageId === null ? children : selectedPage?.content}
+            </PageContent>
+          </PageWrapper>
         </StoryVisualRoot>
 
         {editorTools}

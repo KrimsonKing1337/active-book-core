@@ -2,8 +2,6 @@ import type { CSSProperties } from 'react';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
-
 import { StoreProvider } from '@store';
 
 import { createVisualEffects } from '@controllers/visualEffects';
@@ -219,112 +217,104 @@ export const Playground = () => {
   return (
     <AppModeContext value={new URLSearchParams(location.search).get('mode') === 'reader' ? 'reader' : 'editor'}>
       <StoreProvider>
-        <MemoryRouter initialEntries={['/page-1']}>
-          <div className={styles.Lab}>
-            <header className={styles.Header}>
-              <div className={styles.Logo}>
-                AB
+        <div className={styles.Lab}>
+          <header className={styles.Header}>
+            <div className={styles.Logo}>
+              AB
+            </div>
+
+            <div>
+              <h1>
+                ActiveBook <span>Visual Lab</span>
+              </h1>
+
+              <p>
+                Свет, движение и пространство истории
+              </p>
+            </div>
+
+            <span className={styles.Badge}>
+              EXPERIMENT / 01
+            </span>
+          </header>
+
+          <main className={styles.Main}>
+            <div className={styles.Workspace}>
+              <div className={styles.WorkspaceBar}>
+                <span>
+                  РАБОЧАЯ ПОВЕРХНОСТЬ · {settings.width} × {settings.height}
+                </span>
+
+                <div>
+                  <button type="button" onClick={() => change({ width: 1040, height: 690 })}>Desktop</button>
+                  <button type="button" onClick={() => change({ width: 390, height: 740 })}>Mobile</button>
+                  <button
+                    type="button"
+                    onClick={handleToggleBook}
+                  >
+                    Закрыть / открыть книгу
+                  </button>
+                </div>
               </div>
 
-              <div>
-                <h1>
-                  ActiveBook <span>Visual Lab</span>
-                </h1>
+              <div className={styles.ScrollArea}>
+                <div className={styles.Stage} style={appStyle} data-testid="application-stage">
+                  {visible && (
+                    <BookApplicationSurface>
+                      <div className={styles.StorySize} style={storyStyle}>
+                        <AppWrapper
+                          initialPageId="page-1"
+                          storyPages={[1, 2, 3, 4].map((pageCur) => ({
+                            id: `page-${pageCur}`,
+                            content: <PlaygroundPage page={pageCur} />,
+                          }))}
+                          withoutToolbar={!settings.toolbar}
+                          config={config}
+                          tableOfContents={[]}
+                          rangeEffects={[]}
+                          visualEffects={session}
+                          registrations={registrations}
+                          definitions={definitions}
+                        />
+                      </div>
+                    </BookApplicationSurface>
+                  )}
+                </div>
+              </div>
 
-                <p>
-                  Свет, движение и пространство истории
+              <div className={styles.Status} data-testid="layout-status" data-unsupported={unsupported}>
+                {status}
+              </div>
+
+              <Navigation onNavigate={handleNavigate} />
+
+              <details className={styles.Events} open>
+                <summary>
+                  События сессии · {events.length}
+                </summary>
+
+                <ol data-testid="run-events">
+                  {events.slice(0, 8).map((lineCur) => <li key={lineCur}>{lineCur}</li>)}
+                </ol>
+              </details>
+
+              {error && (
+                <p role="alert">
+                  {error}
                 </p>
-              </div>
+              )}
+            </div>
 
-              <span className={styles.Badge}>
-                EXPERIMENT / 01
-              </span>
-            </header>
-
-            <main className={styles.Main}>
-              <div className={styles.Workspace}>
-                <div className={styles.WorkspaceBar}>
-                  <span>
-                    РАБОЧАЯ ПОВЕРХНОСТЬ · {settings.width} × {settings.height}
-                  </span>
-
-                  <div>
-                    <button type="button" onClick={() => change({ width: 1040, height: 690 })}>Desktop</button>
-                    <button type="button" onClick={() => change({ width: 390, height: 740 })}>Mobile</button>
-                    <button
-                      type="button"
-                      onClick={handleToggleBook}
-                    >
-                      Закрыть / открыть книгу
-                    </button>
-                  </div>
-                </div>
-
-                <div className={styles.ScrollArea}>
-                  <div className={styles.Stage} style={appStyle} data-testid="application-stage">
-                    {visible && (
-                      <BookApplicationSurface>
-                        <div className={styles.StorySize} style={storyStyle}>
-                          <AppWrapper
-                            config={config}
-                            tableOfContents={[]}
-                            rangeEffects={[]}
-                            visualEffects={session}
-                            registrations={registrations}
-                            definitions={definitions}
-                          >
-                            <Routes>
-                              {[1, 2, 3, 4].map((pageCur) => {
-                                return (
-                                  <Route
-                                    key={pageCur}
-                                    path={`/page-${pageCur}`}
-                                    element={<PlaygroundPage key={pageCur} settings={settings} page={pageCur} />}
-                                  />
-                                );
-                              })}
-                            </Routes>
-                          </AppWrapper>
-                        </div>
-                      </BookApplicationSurface>
-                    )}
-                  </div>
-                </div>
-
-                <div className={styles.Status} data-testid="layout-status" data-unsupported={unsupported}>
-                  {status}
-                </div>
-
-                <Navigation onNavigate={handleNavigate} />
-
-                <details className={styles.Events} open>
-                  <summary>
-                    События сессии · {events.length}
-                  </summary>
-
-                  <ol data-testid="run-events">
-                    {events.slice(0, 8).map((lineCur) => <li key={lineCur}>{lineCur}</li>)}
-                  </ol>
-                </details>
-
-                {error && (
-                  <p role="alert">
-                    {error}
-                  </p>
-                )}
-              </div>
-
-              <Controls
-                settings={settings}
-                onChange={change}
-                onPlay={play}
-                onPause={pause}
-                onResume={resume}
-                onStop={stop}
-              />
-            </main>
-          </div>
-        </MemoryRouter>
+            <Controls
+              settings={settings}
+              onChange={change}
+              onPlay={play}
+              onPause={pause}
+              onResume={resume}
+              onStop={stop}
+            />
+          </main>
+        </div>
       </StoreProvider>
     </AppModeContext>
   );

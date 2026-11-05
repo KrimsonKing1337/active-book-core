@@ -1,7 +1,5 @@
 import { useRef, useState } from 'react';
 
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
-
 import type { AppMode, Config } from '../../../src/@types';
 
 import { StoreProvider } from '../../../src/store';
@@ -33,7 +31,13 @@ export const TestBook = () => {
     <>
       <TestControls />
 
-      <button data-testid="grow-book" style={{ position: 'fixed', top: 0, right: 0 }} onClick={() => setPages(5)}>
+      <button
+        data-testid="grow-book"
+        style={{
+          position: 'fixed', top: 0, right: 0,
+        }}
+        onClick={() => setPages(5)}
+      >
         Add pages
       </button>
 
@@ -46,22 +50,20 @@ export const TestBook = () => {
   return (
     <AppModeContext value={mode}>
       <StoreProvider>
-        <MemoryRouter>
-          <AppWrapper
-            ref={bookRef}
-            config={currentConfig}
-            tableOfContents={[]}
-            rangeEffects={[]}
-            editorTools={tools}
-          >
-            <Routes>
-              <Route path="/" element={<Page0 header="Audio unlock" audioSrcForInit={audio} showButton={false} />} />
-              <Route path="/page-1" element={<TestPage key="one" name="one" />} />
-              <Route path="/page-2" element={<TestPage key="two" name="two" />} />
-              <Route path="/page-3" element={null} />
-            </Routes>
-          </AppWrapper>
-        </MemoryRouter>
+        <AppWrapper
+          ref={bookRef}
+          config={currentConfig}
+          storyPages={Array.from({ length: pages }, (_, index) => ({
+            id: `page-${index + 1}`,
+            content: index < 2 ? <TestPage name={index === 0 ? 'one' : 'two'} /> : null,
+          }))}
+          tableOfContents={[]}
+          rangeEffects={[]}
+          editorTools={tools}
+        >
+
+          <Page0 header="Audio unlock" audioSrcForInit={audio} showButton={false} />
+        </AppWrapper>
       </StoreProvider>
     </AppModeContext>
   );

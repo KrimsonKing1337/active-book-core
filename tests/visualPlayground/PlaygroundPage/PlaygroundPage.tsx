@@ -1,21 +1,28 @@
-import { PageWrapper } from '@components/PageWrapper';
-
-import type { Settings } from '../@types';
+import { useGoToPage } from '@hooks/control/useGoToPage';
 
 import * as styles from './PlaygroundPage.module.scss';
 
-export const PlaygroundPage = ({ settings, page }: {
-  settings: Settings; page: number
+export const PlaygroundPage = ({ page }: {
+  page: number
 }) => {
+  const { goToPage } = useGoToPage();
+  const titles = ['Свет под водой', 'Город над облаками', 'Тишина пустыни', 'Лес после дождя'];
+  const paragraphs = [
+    'Море было тихим. На глубине просыпалось течение, и свет медленно растекался по стеклу подводной станции.',
+    'Трамвай пролетел над крышами. На площади воздушного города звенели колокола, собирая утреннюю толпу.',
+    'Песок скрыл следы каравана. Между красными скалами не было ни звука; только ветер шевелил карту.',
+    'Капли падали с ветвей на папоротник. Влажная тропа вела к лесному дому, где уже зажгли огонь.',
+  ];
+
   return (
-    <PageWrapper withoutToolbar={!settings.toolbar} data-playground-page={page}>
-      <article className={styles.Article}>
+    <>
+      <article className={styles.Article} data-playground-page={page}>
         <p className={styles.Eyebrow}>
           ГЛАВА {page} · МОРЕ ВНУТРИ
         </p>
 
         <h1>
-          Свет под водой
+          {titles[page - 1]}
         </h1>
 
         <p className={styles.Lead}>
@@ -26,17 +33,18 @@ export const PlaygroundPage = ({ settings, page }: {
           <span />
         </div>
 
+        <button data-testid="content-next" onClick={() => goToPage(page === 4 ? 1 : page + 1)}>
+          Продолжить историю
+        </button>
+
         {Array.from({ length: 12 }, (_, index) => {
           return (
             <p key={index}>
-              Море было тихим, но в глубине уже просыпалось течение. Она положила ладонь на холодную
-              раму окна и увидела, как свет медленно растекается по стеклу. За окном не было берега —
-              только дымка, далёкий маяк и обещание новой истории. Слова продолжались за краем страницы,
-              и стоило прокрутить её вниз, чтобы услышать следующую волну.
+              {paragraphs[page - 1]}
             </p>
           );
         })}
       </article>
-    </PageWrapper>
+    </>
   );
 };

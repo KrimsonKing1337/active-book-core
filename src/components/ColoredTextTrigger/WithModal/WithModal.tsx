@@ -82,6 +82,7 @@ export const WithModal = ({
     <span className={styles.Wrapper} ref={wrapperRef}>
       <ModalComponent
         isOpen={isActive}
+        onOpen={() => setIsActive(true)}
         onClose={() => setIsActive(false)}
         mode={mode}
         canCrop

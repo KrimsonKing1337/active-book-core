@@ -1,4 +1,4 @@
-import { PropsWithChildren, useEffect, useRef } from 'react';
+import { PropsWithChildren, useEffect, useLayoutEffect, useRef } from 'react';
 
 import Hammer from 'hammerjs';
 
@@ -20,6 +20,8 @@ export const Narrative = ({ children }: PropsWithChildren) => {
   const { goNextPage, goPrevPage } = useGoToPage();
 
   const currentPage = useSelector(mainSelectors.page);
+  const pageId = useSelector(mainSelectors.pageId);
+  const contentHadFocusRef = useRef(false);
 
   // const fontSize = useSelector(configSelectors.fontSize);
   const lineHeight = useSelector(configSelectors.lineHeight);
@@ -39,6 +41,20 @@ export const Narrative = ({ children }: PropsWithChildren) => {
 
   const ref = useRef<HTMLDivElement>(null);
   const currentPageRef = useRef(0);
+
+  useLayoutEffect(() => {
+    const element = ref.current;
+
+    if (element) {
+      element.scrollTop = 0;
+
+      if (appMode === 'reader' && contentHadFocusRef.current && document.activeElement === document.body) {
+        element.focus({ preventScroll: true });
+      }
+    }
+
+    contentHadFocusRef.current = false;
+  }, [pageId, appMode]);
 
   useEffect(() => {
     currentPageRef.current = currentPage;
@@ -91,6 +107,14 @@ export const Narrative = ({ children }: PropsWithChildren) => {
       className={styles.Narrative}
       style={narrativeStyle}
       tabIndex={0}
+      onFocusCapture={() => {
+        contentHadFocusRef.current = true;
+      }}
+      onBlurCapture={(e) => {
+        if (e.relatedTarget instanceof Node && !e.currentTarget.contains(e.relatedTarget)) {
+          contentHadFocusRef.current = false;
+        }
+      }}
     >
       <div className="Narrative__Text" style={textStyle} data-story-region="narrativeContent">
         {children}

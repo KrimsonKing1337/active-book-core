@@ -1,0 +1,49 @@
+.Host {
+  position: absolute;
+  z-index: 10;
+
+  overflow: hidden;
+
+  pointer-events: none;
+  inset: 0;
+}
+
+.Ball {
+  position: absolute;
+
+  width: 36px;
+  height: 36px;
+
+  background: radial-gradient(circle at 35% 30%, white, #88ffe6 30%, #168dbe 75%);
+  border-radius: 50%;
+  box-shadow: 0 0 20px 8px #64ffe9, 0 0 60px 12px #3885ff80;
+
+  &[data-page-only="true"] {
+    width: 20px;
+    height: 20px;
+
+    background: #ffba58;
+    box-shadow: 0 0 25px #ffb257;
+  }
+}
+
+.Diagnostics {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  left: 8px;
+
+  padding: 6px;
+
+  color: #b2ffed;
+  font: 10px/1.4 monospace;
+  overflow-wrap: anywhere;
+
+  background: #091522e6;
+
+  [data-local-effect-host="page-ball"] & {
+    bottom: 50px;
+
+    color: #ffd19b;
+  }
+}

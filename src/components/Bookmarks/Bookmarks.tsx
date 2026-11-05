@@ -1,5 +1,3 @@
-import { useEffect } from 'react';
-
 import classNames from 'classnames';
 
 
@@ -23,21 +21,6 @@ export const Bookmarks = () => {
   const page = useSelector(mainSelectors.page);
 
   const { bookmarks, setBookmarks } = useBookmarks();
-
-  // закрываю менюшки, если пользователь сделал navigator.goBack
-  useEffect(() => {
-    const listener = () => {
-      dispatch(bookmarksActions.setIsOpen(false));
-
-      window.history.pushState(null, '', window.location.href);
-    };
-
-    window.addEventListener('popstate', listener);
-
-    return () => {
-      window.removeEventListener('popstate', listener);
-    };
-  }, []);
 
   const closeButtonClickHandler = () => {
     dispatch(bookmarksActions.setIsOpen(false));

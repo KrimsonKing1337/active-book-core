@@ -22,6 +22,7 @@ const demos: readonly [Settings['demo'], string][] = [
   ['collapse', '06 · Сжатие'],
   ['sequence', '07 · Последовательность'],
   ['single', '08 · Одна сцена'],
+  ['ball', '09 · Непрерывный шарик'],
 ];
 
 export const Controls = ({
@@ -32,6 +33,7 @@ export const Controls = ({
   onResume,
   onStop,
 }: ControlsProps) => {
+  const isBall = settings.demo === 'ball';
   const isPhysical = ['collapse', 'sequence', 'single'].includes(settings.demo);
   const durationLabel = isPhysical && settings.demo !== 'single' ? 'Длительность этапа, мс' : 'Длительность, мс';
   const sliders: readonly [keyof Settings, string, number, number, number][] = [
@@ -46,6 +48,10 @@ export const Controls = ({
     ['toolbarHeight', 'Высота Toolbar, px', 32, 110, 1],
   ];
   const visibleSliders = sliders.filter(([name]) => {
+    if (isBall) {
+      return ['width', 'height', 'storySize', 'toolbarHeight'].includes(name);
+    }
+
     if (name === 'originX' || name === 'originY') {
       return settings.demo === 'darkness';
     }
@@ -65,7 +71,7 @@ export const Controls = ({
         </span>
 
         <small>
-          8 экспериментов
+          9 экспериментов
         </small>
       </div>
 
@@ -84,80 +90,90 @@ export const Controls = ({
         })}
       </div>
 
-      <div className={styles.Transport}>
-        <button type="button" data-testid="play" onClick={onPlay}>
-          ▶ Воспроизвести
-        </button>
+      {settings.demo === 'ball' ? (
+        <p>Автоматический диапазон: 1 → 2 → 4 сохраняет шарик; 3 выключает его, 1 создаёт новый.</p>
+      ) : (
+        <div className={styles.Transport}>
+          <button type="button" data-testid="play" onClick={onPlay}>
+            ▶ Воспроизвести
+          </button>
 
-        <button type="button" onClick={onPause}>
-          Пауза
-        </button>
+          <button type="button" onClick={onPause}>
+            Пауза
+          </button>
 
-        <button type="button" onClick={onResume}>
-          Продолжить
-        </button>
+          <button type="button" onClick={onResume}>
+            Продолжить
+          </button>
 
-        <button type="button" onClick={onStop}>
-          Стоп / сброс
-        </button>
-      </div>
-
-      <label className={styles.Check}>
-        <input
-          type="checkbox"
-          checked={settings.loop}
-          onChange={(e) => onChange({ loop: e.target.checked })}
-        />
-        Зациклить
-      </label>
-
-      <label>
-        Область действия
-        <select
-          value={isPhysical || settings.demo === 'edges' ? 'application' : settings.region}
-          disabled={isPhysical || settings.demo === 'edges'}
-          onChange={(e) => onChange({ region: e.target.value as Settings['region'] })}
-        >
-          <option value="storyViewport">Вьюпорт с Toolbar</option>
-          <option value="narrativeFrame">Нарратив и рамка</option>
-          <option value="story">Весь StoryVisualRoot</option>
-          <option value="application">Приложение за границами story</option>
-        </select>
-      </label>
-
-      {settings.demo === 'darkness' && (
-        <label>
-          Направление
-          <select
-            value={settings.direction}
-            onChange={(e) => onChange({ direction: e.target.value as Settings['direction'] })}
-          >
-            <option value="grow">Из центра к краям</option>
-            <option value="shrink">Сужение в центр</option>
-            <option value="reveal">Исчезновение из центра</option>
-          </select>
-        </label>
+          <button type="button" onClick={onStop}>
+            Стоп / сброс
+          </button>
+        </div>
       )}
 
-      <label>
-        Способ запуска
-        <select
-          value={settings.trigger}
-          onChange={(e) => onChange({ trigger: e.target.value as Settings['trigger'] })}
-        >
-          <option value="manual">Кнопкой</option>
-          <option value="page">При переходе страницы</option>
-        </select>
-      </label>
 
-      <label className={styles.Color}>
-        Цвет
-        <input
-          type="color"
-          value={settings.color}
-          onChange={(e) => onChange({ color: e.target.value })}
-        />
-      </label>
+      {!isBall && (
+        <>
+          <label className={styles.Check}>
+            <input
+              type="checkbox"
+              checked={settings.loop}
+              onChange={(e) => onChange({ loop: e.target.checked })}
+            />
+            Зациклить
+          </label>
+
+          <label>
+            Область действия
+            <select
+              value={isPhysical || settings.demo === 'edges' ? 'application' : settings.region}
+              disabled={isPhysical || settings.demo === 'edges'}
+              onChange={(e) => onChange({ region: e.target.value as Settings['region'] })}
+            >
+              <option value="storyViewport">Вьюпорт с Toolbar</option>
+              <option value="narrativeFrame">Нарратив и рамка</option>
+              <option value="story">Весь StoryVisualRoot</option>
+              <option value="application">Приложение за границами story</option>
+            </select>
+          </label>
+
+          {settings.demo === 'darkness' && (
+            <label>
+              Направление
+              <select
+                value={settings.direction}
+                onChange={(e) => onChange({ direction: e.target.value as Settings['direction'] })}
+              >
+                <option value="grow">Из центра к краям</option>
+                <option value="shrink">Сужение в центр</option>
+                <option value="reveal">Исчезновение из центра</option>
+              </select>
+            </label>
+          )}
+
+          <label>
+            Способ запуска
+            <select
+              value={settings.trigger}
+              onChange={(e) => onChange({ trigger: e.target.value as Settings['trigger'] })}
+            >
+              <option value="manual">Кнопкой</option>
+              <option value="page">При переходе страницы</option>
+            </select>
+          </label>
+
+          <label className={styles.Color}>
+            Цвет
+            <input
+              type="color"
+              value={settings.color}
+              onChange={(e) => onChange({ color: e.target.value })}
+            />
+          </label>
+
+        </>
+      )}
 
       {settings.demo === 'frame' && (
         <FrameControls settings={settings} onChange={onChange} />
@@ -194,21 +210,24 @@ export const Controls = ({
           Параметры и рабочая поверхность
         </legend>
 
-        <label>
-          <span>
-            Прозрачность эффекта: {Math.round((1 - settings.opacity) * 100)}%
-          </span>
+        {!isBall && (
+          <label>
+            <span>
+              Прозрачность эффекта: {Math.round((1 - settings.opacity) * 100)}%
+            </span>
 
-          <input
-            type="range"
-            aria-label="Прозрачность эффекта"
-            min={0}
-            max={100}
-            step={5}
-            value={Math.round((1 - settings.opacity) * 100)}
-            onChange={(e) => onChange({ opacity: 1 - Number(e.target.value) / 100 })}
-          />
-        </label>
+            <input
+              type="range"
+              aria-label="Прозрачность эффекта"
+              min={0}
+              max={100}
+              step={5}
+              value={Math.round((1 - settings.opacity) * 100)}
+              onChange={(e) => onChange({ opacity: 1 - Number(e.target.value) / 100 })}
+            />
+          </label>
+
+        )}
 
         {visibleSliders.map(([name, label, min, max, step]) => {
           return (

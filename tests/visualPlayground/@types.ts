@@ -1,6 +1,6 @@
 import type { VisualRegion } from '@active-book/types';
 
-export type Demo = 'frame' | 'darkness' | 'edges' | 'smoke' | 'through' | 'collapse' | 'sequence' | 'single';
+export type Demo = 'frame' | 'darkness' | 'edges' | 'smoke' | 'through' | 'collapse' | 'sequence' | 'single' | 'ball';
 export type Layout = 'geometry' | 'css' | 'hybrid';
 
 export type Settings = {
@@ -58,5 +58,5 @@ export const initialSettings: Settings = {
   physicalMode: 'scale',
   composition: 'single',
   trigger: 'manual',
-  loop: false;
+  loop: false,
 };

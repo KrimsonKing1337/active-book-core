@@ -5,8 +5,8 @@ import { State } from './@types';
 export const initialState: State = {
   showLoader: false,
   id: '',
-  page: 0,
-  pages: 0,
+  pageId: null,
+  pageIds: [],
   authorComments: 0,
   allPagesSeen: false,
   tableOfContents: [],
@@ -27,11 +27,22 @@ const slice = createSlice({
     setId(state, action: PayloadAction<State['id']>) {
       state.id = action.payload;
     },
-    setPage(state, action: PayloadAction<State['page']>) {
-      state.page = action.payload;
+    setPage(state, action: PayloadAction<number | string | null>) {
+      const target = action.payload;
+      const pageId = typeof target === 'number' ? state.pageIds[target - 1] : target;
+
+      if (target === 0 || target === null) {
+        state.pageId = null;
+      } else if (pageId && state.pageIds.includes(pageId)) {
+        state.pageId = pageId;
+      }
     },
-    setPages(state, action: PayloadAction<State['pages']>) {
-      state.pages = action.payload;
+    setStoryPages(state, action: PayloadAction<string[]>) {
+      state.pageIds = action.payload;
+
+      if (state.pageId && !state.pageIds.includes(state.pageId)) {
+        state.pageId = state.pageIds[0] ?? null;
+      }
     },
     setAuthorComments(state, action: PayloadAction<State['authorComments']>) {
       state.authorComments = action.payload;

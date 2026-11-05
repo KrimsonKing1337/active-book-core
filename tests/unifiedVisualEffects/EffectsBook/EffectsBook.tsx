@@ -1,7 +1,5 @@
 import { useRef, useState } from 'react';
 
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
-
 import type { VisualEffectDefinition, VisualEffectRegistration } from '@active-book/types';
 
 import { createBuiltinRegistration } from '../../../src/controllers/visualEffects/utils/declarations';
@@ -140,29 +138,24 @@ export const EffectsBook = () => {
 
   return (
     <AppModeContext value={query.get('mode') === 'editor' ? 'editor' : 'reader'}>
-      <MemoryRouter>
-        <AppWrapper
-          ref={bookRef}
-          config={{
-            id: 'real-visual-effects',
-            pages: pageCount,
-            defaultTheme: 'dark',
-          }}
-          rangeEffects={[]}
-          registrations={registrations}
-          selectedVisualEffectId={selectedVisualEffectId}
-          definitions={definitions}
-          tableOfContents={[]}
-          editorTools={tools}
-        >
-          <Routes>
-            <Route path="/" element={null} />
-            {[1, 2, 3, 4, 5].map((number) => (
-              <Route key={number} path={`/page-${number}`} element={<EffectsPage key={number} number={number} />} />
-            ))}
-          </Routes>
-        </AppWrapper>
-      </MemoryRouter>
+      <AppWrapper
+        ref={bookRef}
+        config={{
+          id: 'real-visual-effects',
+          pages: pageCount,
+          defaultTheme: 'dark',
+        }}
+        storyPages={Array.from({ length: pageCount }, (_, index) => ({
+          id: `page-${index + 1}`,
+          content: <EffectsPage number={index + 1} />,
+        }))}
+        rangeEffects={[]}
+        registrations={registrations}
+        selectedVisualEffectId={selectedVisualEffectId}
+        definitions={definitions}
+        tableOfContents={[]}
+        editorTools={tools}
+      />
     </AppModeContext>
   );
 };

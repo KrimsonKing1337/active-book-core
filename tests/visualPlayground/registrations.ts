@@ -6,6 +6,8 @@ import { fillRegion } from '@controllers/visualEffects/utils/declarations';
 
 import type { Settings } from './@types';
 
+import { ContinuousBall } from './ContinuousBall';
+
 import { Darkness } from './Darkness';
 import { Smoke } from './Smoke';
 import { FrameDemo } from './FrameDemo';
@@ -53,6 +55,9 @@ export const definitionsFor = (settings: Settings): HostVisualEffectDefinition[]
   const effectHost = settings.region === 'application' ? 'aboveStory' : 'story';
 
   return [
+    {
+      id: 'lab.ball', defaultParams: {}, Renderer: ContinuousBall,
+    },
     {
       id: 'lab.telemetry', defaultParams: {}, Renderer: ViewportTelemetry, systemFeedback: true,
     },
@@ -125,7 +130,10 @@ const createSceneRegistrations = (settings: Settings): VisualEffectRegistration[
   reveal.effect.depth.order = 1;
 
   if (settings.demo === 'collapse') {
-    return [curtain, collapse, reveal, createRegistration(settings, 'telemetry', 'lab.telemetry', 'application')];
+    return [
+      curtain, collapse, reveal,
+      createRegistration(settings, 'telemetry', 'lab.telemetry', 'application'),
+    ];
   }
 
   const narrative = createRegistration(settings, 'narrative-dark', 'lab.dark', 'narrativeFrame');
@@ -133,10 +141,21 @@ const createSceneRegistrations = (settings: Settings): VisualEffectRegistration[
     ...narrative.effect.params, direction: 'grow', intensity: 1,
   };
 
-  return [narrative, curtain, collapse, reveal, createRegistration(settings, 'telemetry', 'lab.telemetry', 'application')];
+  return [
+    narrative, curtain, collapse, reveal,
+    createRegistration(settings, 'telemetry', 'lab.telemetry', 'application'),
+  ];
 };
 
 export const registrationsFor = (settings: Settings): VisualEffectRegistration[] => {
+  if (settings.demo === 'ball') {
+    const rangeBall = createRegistration(settings, 'range-ball', 'lab.ball', 'narrativeFrame');
+    const pageBall = createRegistration(settings, 'page-ball', 'lab.ball', 'narrativeFrame');
+    pageBall.lifetime = { type: 'page', page: 1 };
+
+    return [rangeBall, pageBall];
+  }
+
   if (settings.demo === 'frame') {
     return [createFrameRegistration(settings)];
   }
@@ -174,7 +193,10 @@ export const registrationsFor = (settings: Settings): VisualEffectRegistration[]
   }
 
   if (settings.demo === 'single') {
-    return [createRegistration(settings, 'single', 'lab.single', 'application'), createRegistration(settings, 'telemetry', 'lab.telemetry', 'application')];
+    return [
+      createRegistration(settings, 'single', 'lab.single', 'application'),
+      createRegistration(settings, 'telemetry', 'lab.telemetry', 'application'),
+    ];
   }
 
   return createSceneRegistrations(settings);

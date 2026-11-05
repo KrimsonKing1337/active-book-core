@@ -1,6 +1,6 @@
-import { call, select, takeLatest } from 'redux-saga/effects';
+import { call, put, select, takeLatest } from 'redux-saga/effects';
 
-import { mainSelectors } from '@store/main';
+import { mainActions, mainSelectors } from '@store/main';
 
 import { set as localStorageSet } from '@utils/localStorage/localStorage';
 
@@ -15,17 +15,17 @@ function* saveInLocalStorage() {
   localStorageSet(id, { bookmarks });
 }
 
-export function* watchSetIsOpen() {
-  yield call(() => {
-    window.history.pushState(null, '', window.location.href);
-  });
-}
-
 export function* watchSetBookmarks() {
   yield call(saveInLocalStorage);
 }
 
+function* closeMenu(action: ReturnType<typeof actions.setIsOpen>) {
+  if (action.payload) {
+    yield put(mainActions.setMenuActiveState(null));
+  }
+}
+
 export function* watchActions() {
-  yield takeLatest(actions.setIsOpen, watchSetIsOpen);
+  yield takeLatest(actions.setIsOpen, closeMenu);
   yield takeLatest(actions.setBookmarks, watchSetBookmarks);
 }

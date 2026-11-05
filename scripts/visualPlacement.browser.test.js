@@ -200,8 +200,8 @@ test('visual placement in Chromium', async (context) => {
     assert.equal(await token(page), originalToken);
 
     await page.getByTestId('empty').click();
-    await page.waitForFunction(() => getComputedStyle(document.querySelector('[data-visual-surface="probe"]'))
-      .visibility === 'hidden');
+    await page.waitForFunction(() => document.querySelector('#page-wrapper').dataset.pageId === 'page-3');
+    await visibility(page).waitFor({ state: 'visible' });
     assert.equal(await token(page), originalToken);
     await setSurfaces(page, [item()]);
     await visibility(page).waitFor({ state: 'visible' });

@@ -31,7 +31,12 @@ const elementsIdsArray = [
   'config',
 ];
 
-export const WelcomeTour = ({ isActive, setIsActive, isModalActive, setIsModalActive }: WelcomeTourProps) => {
+export const WelcomeTour = ({
+  isActive,
+  setIsActive,
+  isModalActive,
+  setIsModalActive,
+}: WelcomeTourProps) => {
   const dispatch = useDispatch();
 
   const { vibrationOn } = useVibration();
@@ -94,7 +99,12 @@ export const WelcomeTour = ({ isActive, setIsActive, isModalActive, setIsModalAc
 
   return (
     <>
-      <Modal isActive={isModalActive} onConfirm={modalConfirmHandler} />
+      <Modal
+        isActive={isModalActive}
+        onConfirm={modalConfirmHandler}
+        onCancel={() => setIsModalActive(false)}
+        onOpen={() => setIsModalActive(true)}
+      />
 
       {isActive && (
         <div className={styles.Wrapper}>

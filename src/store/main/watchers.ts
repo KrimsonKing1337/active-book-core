@@ -1,16 +1,12 @@
 import type { Task } from 'redux-saga';
-import { call, put, takeLatest, delay, fork, select, take, cancel } from 'redux-saga/effects';
+import { put, takeLatest, delay, fork, select, take, cancel } from 'redux-saga/effects';
+
+import { bookmarksActions } from '@store/bookmarks';
 
 import { effectsActions } from '@store/effects/common';
 
 import { actions } from './slice';
 import { selectors } from './selectors';
-
-export function* watchSetMenuActiveState() {
-  yield call(() => {
-    window.history.pushState(null, '', window.location.href);
-  });
-}
 
 function* showAfterDelay(ms: number) {
   yield delay(ms);
@@ -37,8 +33,12 @@ export function* watchLoaderGate() {
   let hideTask: Task | null = null;
 
   while (true) {
-    if (showTask && !showTask.isRunning()) showTask = null;
-    if (hideTask && !hideTask.isRunning()) hideTask = null;
+    if (showTask && !showTask.isRunning()) {
+      showTask = null;
+    }
+    if (hideTask && !hideTask.isRunning()) {
+      hideTask = null;
+    }
 
     yield take([
       // список actions, влияющих на pending
@@ -90,8 +90,14 @@ function* watchSetPage() {
   yield put(effectsActions.setAudiosReadyAmount(0));
 }
 
+function* closeBookmarks(action: ReturnType<typeof actions.setMenuActiveState>) {
+  if (action.payload) {
+    yield put(bookmarksActions.setIsOpen(false));
+  }
+}
+
 export function* watchActions() {
-  yield takeLatest(actions.setMenuActiveState, watchSetMenuActiveState);
+  yield takeLatest(actions.setMenuActiveState, closeBookmarks);
   yield takeLatest(actions.setPage, watchSetPage);
 
   yield fork(watchLoaderGate);

@@ -9,9 +9,10 @@ import { mainSelectors } from '@store/main';
 
 import { useSelector } from '@store';
 
+import { useGoToPage } from '@hooks/control/useGoToPage';
+
 import { useAppMode } from '@components/App/AppModeContext';
 
-import { useGoToPage } from '@hooks/control/useGoToPage';
 
 import { Item } from '@components/Toolbar/components/Item';
 
@@ -23,7 +24,11 @@ import * as styles from './Nav.module.scss';
 
 export const Nav = () => {
   const appMode = useAppMode();
-  const { goToPage, goPrevPage, goNextPage } = useGoToPage();
+  const {
+    goToPage,
+    goPrevPage,
+    goNextPage,
+  } = useGoToPage();
 
   const id = useSelector(mainSelectors.id);
   const page = useSelector(mainSelectors.page);
@@ -121,10 +126,15 @@ export const Nav = () => {
    * */
   return (
     <>
-      <Modal isActive={isModalActive} onConfirm={modalConfirmHandler} />
+      <Modal
+        isActive={isModalActive}
+        onConfirm={modalConfirmHandler}
+        onCancel={() => setIsModalActive(false)}
+        onOpen={() => setIsModalActive(true)}
+      />
 
       <div className={goToWithArrowsClassNames}>
-        <Item onClick={prevClickHandler}>
+        <Item aria-label="Предыдущая страница" onClick={prevClickHandler}>
           <ArrowLeft />
         </Item>
 
@@ -132,7 +142,7 @@ export const Nav = () => {
           {page} из {pages}
         </div>
 
-        <Item onClick={nextClickHandler}>
+        <Item aria-label="Следующая страница" onClick={nextClickHandler}>
           <ArrowRight />
         </Item>
       </div>

@@ -155,10 +155,6 @@ export const useSetUpConfig = (passedConfig: Config) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(mainActions.setPages(passedConfig.pages));
-  }, [passedConfig.pages, dispatch]);
-
-  useEffect(() => {
     const {
       id,
       defaultTheme,

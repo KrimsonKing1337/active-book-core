@@ -5,8 +5,10 @@ import classNames from 'classnames';
 
 import { useDispatch } from '@store';
 
-import { useAppMode } from '@components/App/AppModeContext';
 import { mainActions } from '@store/main';
+import { bookmarksActions } from '@store/bookmarks';
+
+import { useAppMode } from '@components/App/AppModeContext';
 
 import { getNarrativeElement } from '@components/PageWrapper/components/Narrative/utils';
 
@@ -17,7 +19,12 @@ export type OverflowProps = React.HTMLAttributes<HTMLDivElement> & PropsWithChil
   className?: string;
 };
 
-export const Overflow = ({ children, isOpen, className = '', ...etc }: OverflowProps) => {
+export const Overflow = ({
+  children,
+  isOpen,
+  className = '',
+  ...etc
+}: OverflowProps) => {
   const appMode = useAppMode();
   const dispatch = useDispatch();
 
@@ -30,6 +37,7 @@ export const Overflow = ({ children, isOpen, className = '', ...etc }: OverflowP
 
       if (key === 'Escape') {
         dispatch(mainActions.setMenuActiveState(null));
+        dispatch(bookmarksActions.setIsOpen(false));
       }
     };
 
@@ -69,6 +77,7 @@ export const Overflow = ({ children, isOpen, className = '', ...etc }: OverflowP
       ref={overflowRef}
       className={overflowClassNames}
       tabIndex={0}
+      data-book-window-open={isOpen}
       {...etc}
     >
       {children}

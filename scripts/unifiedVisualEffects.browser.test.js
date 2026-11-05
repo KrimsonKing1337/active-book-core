@@ -134,9 +134,12 @@ test('real Background and Frame renderers use the book session in Chromium', asy
       await navigate(page, 1);
       await page.evaluate(() => window.setRealPageCount(1));
       await page.getByText('1 из 1', { exact: true }).waitFor();
-      await navigate(page, 2);
-      assert.equal(await effect(page, 'page-shadow-2').count(), 0);
+      await page.evaluate(() => window.realVisual.goToPage(2));
+      await page.getByText('1 из 1', { exact: true }).waitFor();
+      assert.equal(await effect(page, 'page-shadow-2').count(), 0, 'unknown page IDs are ignored');
       await page.evaluate(() => window.setRealPageCount(2));
+      await page.getByText('1 из 2', { exact: true }).waitFor();
+      await navigate(page, 2);
       await effect(page, 'page-shadow-2').waitFor();
       await page.getByText('2 из 2', { exact: true }).waitFor();
       assert.deepEqual(errors, []);

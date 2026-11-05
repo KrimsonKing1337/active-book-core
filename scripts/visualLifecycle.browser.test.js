@@ -88,9 +88,9 @@ test('registered visual lifecycle in Chromium', async (context) => {
       await page.locator('[data-effect-id="behind-five"]').waitFor();
 
       const withGeometry = await readCounter(page);
-      await goToPage(page, 3); // Active, but this route has no page DOM.
-      await page.waitForFunction(() => getComputedStyle(document.querySelector('[data-visual-surface="range-a"]'))
-        .display === 'none');
+      await goToPage(page, 3); // Empty page content keeps the real regions mounted.
+      await page.waitForFunction(() => document.querySelector('#page-wrapper').dataset.pageId === 'page-3');
+      await page.locator('[data-visual-surface="range-a"]').waitFor({ state: 'visible' });
       await waitTicks(page, { above: withGeometry.ticks });
       const missing = await readCounter(page);
       assert.equal(missing.token, before.token);

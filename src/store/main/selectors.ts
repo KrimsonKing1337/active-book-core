@@ -14,8 +14,9 @@ export const selectors = {
   showLoader: (state: RootState) => state.main.showLoader,
 
   id: (state: RootState) => state.main.id,
-  page: (state: RootState) => state.main.page,
-  pages: (state: RootState) => state.main.pages,
+  pageId: (state: RootState) => state.main.pageId,
+  page: (state: RootState) => state.main.pageIds.indexOf(state.main.pageId ?? '') + 1,
+  pages: (state: RootState) => state.main.pageIds.length,
   authorComments: (state: RootState) => state.main.authorComments,
   allPagesSeen: (state: RootState) => state.main.allPagesSeen,
   tableOfContents: (state: RootState) => state.main.tableOfContents,

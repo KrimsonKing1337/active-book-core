@@ -25,7 +25,7 @@ test('persistent book root and existing page rendering in Chromium', async (cont
     plugins: [svgr({ include: '**/*.svg' })],
     resolve: { alias },
     define: { 'process.env.mode': JSON.stringify('development') },
-    optimizeDeps: { include: ['react', 'react-dom/client', 'react/jsx-runtime', 'react/jsx-dev-runtime', 'react-router-dom'] },
+    optimizeDeps: { include: ['react', 'react-dom/client', 'react/jsx-runtime', 'react/jsx-dev-runtime'] },
     server: { host: '127.0.0.1', port: 0 },
   });
 
@@ -149,9 +149,11 @@ test('persistent book root and existing page rendering in Chromium', async (cont
         await page.locator('[data-effect-id="behind-two"]').waitFor();
         assert.equal(await book.evaluate((element) => element === document.querySelector('[data-story-region="story"]')), true);
 
+        const viewport = await page.locator('[data-story-region="storyViewport"]').elementHandle();
         await page.getByTestId('empty').click();
-        await page.waitForFunction(() => JSON.parse(document.querySelector('[data-testid="geometry"]').textContent)
-          .regions.narrativeFrame === null);
+        await page.waitForFunction(() => document.querySelector('#page-wrapper').dataset.pageId === 'page-3');
+        assert.equal(await viewport.evaluate((element) => element === document.querySelector('[data-story-region="storyViewport"]')), true);
+        assert(await page.locator('[data-story-region="narrativeFrame"]').isVisible(), 'empty content retains its shell');
         assert.equal(await page.locator('[data-visual-plane]:not([data-visual-plane="systemFeedback"]) [data-effect-id]')
           .count(), 0);
         assert.equal(await book.evaluate((element) => element === document.querySelector('[data-story-region="story"]')), true);

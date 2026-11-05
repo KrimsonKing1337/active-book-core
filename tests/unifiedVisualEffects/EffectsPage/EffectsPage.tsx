@@ -1,10 +1,10 @@
 import { useBackground } from '../../../src/hooks/effects/background';
 import { useFrameEffect } from '../../../src/hooks/effects/frame';
-import { PageWrapper } from '../../../src/components/PageWrapper';
-
 const image = '/tests/unifiedVisualEffects/pattern.svg';
 
-export const EffectsPage = ({ number }: { number: number }) => {
+export const EffectsPage = ({ number }: {
+  number: number
+}) => {
   useBackground({
     id: `page-bg-${number}`,
     kind: 'background',
@@ -63,7 +63,7 @@ export const EffectsPage = ({ number }: { number: number }) => {
   });
 
   return (
-    <PageWrapper>
+    <>
       <h2>
         Страница {number}
       </h2>
@@ -75,6 +75,6 @@ export const EffectsPage = ({ number }: { number: number }) => {
       >
         Самостоятельный текст страницы
       </article>
-    </PageWrapper>
+    </>
   );
 };

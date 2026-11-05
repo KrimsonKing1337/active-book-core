@@ -3,9 +3,16 @@ import { ModalDialog, Article, Header, P } from '@components';
 export type ModalProps = {
   isActive: boolean;
   onConfirm: () => void;
+  onCancel: () => void;
+  onOpen: () => void;
 };
 
-export const Modal = ({ isActive, onConfirm }: ModalProps) => {
+export const Modal = ({
+  isActive,
+  onConfirm,
+  onCancel,
+  onOpen,
+}: ModalProps) => {
   return (
     <ModalDialog
       isOpen={isActive}
@@ -14,6 +21,8 @@ export const Modal = ({ isActive, onConfirm }: ModalProps) => {
       showCancelButton={false}
       cantCloseIn={2000}
       onConfirm={onConfirm}
+      onCancel={onCancel}
+      onOpen={onOpen}
     >
       <div>
         <Header>

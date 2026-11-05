@@ -6,6 +6,15 @@ export const addKeyboardControl = (goPrevPage: Fn, goNextPage: Fn) => {
   const narrativeElement = document.querySelector('#narrative');
 
   const listener = (e: KeyboardEvent) => {
+    const target = e.target;
+    const isTextInput = target instanceof HTMLElement
+      && (target.isContentEditable || target.matches('input, textarea, select'));
+    const hasOpenWindow = document.querySelector('[data-book-window-open="true"]');
+
+    if (isTextInput || hasOpenWindow || e.ctrlKey || e.metaKey || e.altKey) {
+      return;
+    }
+
     const { code, repeat } = e;
 
     if (code === 'ArrowLeft' || code === 'KeyA') {

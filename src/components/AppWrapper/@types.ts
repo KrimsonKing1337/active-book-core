@@ -8,7 +8,15 @@ import type { VisualEffects } from '@controllers/visualEffects';
 
 import type { VisualSurfaceItem } from '@components/VisualSurfaces';
 
+export type StoryPage = {
+  id: string;
+  content: ReactNode;
+};
+
 export type AppWrapperProps = {
+  storyPages: readonly StoryPage[];
+  initialPageId?: string | null;
+  withoutToolbar?: boolean;
   config: Config;
   bookKey?: string | number;
   hiddenVisualEffects?: readonly string[];

@@ -7,8 +7,8 @@ export type FlashlightState = false | 'js' | 'cordova';
 export interface State {
   showLoader: boolean;
   id: string;
-  page: number;
-  pages: number;
+  pageId: string | null;
+  pageIds: string[];
   authorComments: number;
   allPagesSeen: boolean;
   tableOfContents: TableOfContents;

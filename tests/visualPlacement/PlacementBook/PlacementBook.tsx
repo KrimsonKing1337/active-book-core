@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
-
 import type { Config } from '@types';
-import type { SurfaceSpec } from '../@types';
+
 
 import { StoreProvider } from '@store';
 
 import { AppModeContext } from '@components/App/AppModeContext';
 import { AppWrapper, useStoryGeometry } from '@components';
+
+import type { SurfaceSpec } from '../@types';
 
 import { TestControls } from '../../storyVisualRoot/TestControls';
 import { TestPage } from '../../storyVisualRoot/TestPage';
@@ -34,7 +34,10 @@ export const PlacementBook = () => {
   }, []);
 
   const surfaces = specs.map((specCur) => {
-    const { background, ...item } = specCur;
+    const {
+      background,
+      ...item
+    } = specCur;
 
     const content = <Probe id={item.id} background={background} />;
 
@@ -58,23 +61,30 @@ export const PlacementBook = () => {
   return (
     <AppModeContext value={new URLSearchParams(location.search).get('mode') === 'reader' ? 'reader' : 'editor'}>
       <StoreProvider>
-        <MemoryRouter initialEntries={['/page-1']}>
-          <AppWrapper
-            ref={bookRef}
-            config={config}
-            tableOfContents={[]}
-            rangeEffects={[]}
-            visualSurfaces={surfaces}
-            selectedVisualEffectId={selectedVisualEffectId}
-            editorTools={tools}
-          >
-            <Routes>
-              <Route path="/page-1" element={<TestPage key="one" name="one" />} />
-              <Route path="/page-2" element={<TestPage key="two" name="two" />} />
-              <Route path="/page-3" element={null} />
-            </Routes>
-          </AppWrapper>
-        </MemoryRouter>
+        <AppWrapper
+          ref={bookRef}
+          config={config}
+          initialPageId="page-1"
+          storyPages={[
+            {
+              id: 'page-1',
+              content: <TestPage key="one" name="one" />,
+            },
+            {
+              id: 'page-2',
+              content: <TestPage key="two" name="two" />,
+            },
+            {
+              id: 'page-3',
+              content: null,
+            },
+          ]}
+          tableOfContents={[]}
+          rangeEffects={[]}
+          visualSurfaces={surfaces}
+          selectedVisualEffectId={selectedVisualEffectId}
+          editorTools={tools}
+        />
       </StoreProvider>
     </AppModeContext>
   );

@@ -8,7 +8,7 @@ import { mainActions, mainSelectors } from '@store/main';
 
 import { useGoToPage } from '@hooks/control/useGoToPage';
 
-import { PageWrapper, Action, WelcomeTour, Header, Article } from '@components';
+import { Action, WelcomeTour, Header, Article } from '@components';
 
 import { Flags, modalsWereShowed } from '@utils/localStorage/modalsWereShowed';
 import { flashlightInst } from '@utils/effects/flashlight';
@@ -49,7 +49,11 @@ export const Page0 = ({
   const [isWelcomeTourActive, setIsWelcomeTourActive] = useState(false);
   const [isWelcomeTourModalActive, setIsWelcomeTourModalActive] = useState(false);
 
-  const { modalIsActive, modalOnClose, setModalIsActive } = useModal();
+  const {
+    modalIsActive,
+    modalOnClose,
+    setModalIsActive,
+  } = useModal();
 
   // инициализируем аудио. свайп на айфоне не работает, нужен именно тап
   useEffect(() => {
@@ -142,8 +146,13 @@ export const Page0 = ({
   const actionLabel = lastPage > 0 ? 'Продолжить читать' : 'Начать читать';
 
   return (
-    <PageWrapper>
-      <Modal isActive={modalIsActive} onConfirm={modalConfirmHandler} />
+    <>
+      <Modal
+        isActive={modalIsActive}
+        onConfirm={modalConfirmHandler}
+        onCancel={() => setModalIsActive(false)}
+        onOpen={() => setModalIsActive(true)}
+      />
 
       {header && (
         <Header>
@@ -173,6 +182,6 @@ export const Page0 = ({
       {Footer && (
         <Footer />
       )}
-    </PageWrapper>
+    </>
   );
 };

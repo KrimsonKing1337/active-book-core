@@ -1,9 +1,11 @@
-import { PropsWithChildren, useCallback, useEffect, useRef, useState } from 'react';
+import { PropsWithChildren, useCallback, useEffect, useId, useRef, useState } from 'react';
 
 import Hammer from 'hammerjs';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCompress, faCrop, faExpand, faTimes } from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames';
+
+import { useWindowHistory } from '@hooks/control/useWindowHistory';
 
 import { useAppMode } from '@components/App/AppModeContext';
 
@@ -25,15 +27,10 @@ export type ModalProps = {
   cropDefault?: boolean;
 };
 
-/*
-* ниже я реализовал механику на window.location и window.history,
-* потому что при использовании хуков из react-router - location неактуальный,
-* из-за чего модалка открывается и сразу же закрывается.
-* мб дело в redux-first-history, что все действия с location нужно производить через стор и саги.
-*/
 export const Modal = ({
   children,
   onClose,
+  onOpen,
   isOpen,
   mode = 'text',
   canClose = true,
@@ -43,6 +40,7 @@ export const Modal = ({
   cropDefault = true,
 }: PropsWithChildren<ModalProps>) => {
   const appMode = useAppMode();
+  const historyId = useId();
   // здесь реф-версии нужны для хаммера, обычные для того чтобы ре-рендер срабатывал
   const isFullScreenRef = useRef(false);
   const isCropRef = useRef(true);
@@ -63,22 +61,16 @@ export const Modal = ({
       return;
     }
 
-    window.history.pushState(null, '', window.location.href);
-
     onClose?.();
   }, [canClose, onClose]);
 
-  useEffect(() => {
-    const listener = () => {
-      close();
-    };
-
-    window.addEventListener('popstate', listener);
-
-    return () => {
-      window.removeEventListener('popstate', listener);
-    };
-  }, [close]);
+  useWindowHistory(`content-modal:${historyId}`, isOpen ? 'modal' : null, (next) => {
+    if (next) {
+      onOpen?.();
+    } else {
+      onClose?.();
+    }
+  });
 
   useEffect(() => {
     if (!isOpen || appMode !== 'reader') {
@@ -271,7 +263,12 @@ export const Modal = ({
   });
 
   return (
-    <div ref={overflowRef} className={overflowClassNames} onClick={overflowClickHandler}>
+    <div
+      ref={overflowRef}
+      className={overflowClassNames}
+      data-book-window-open={isOpen}
+      onClick={overflowClickHandler}
+    >
       <div ref={wrapperRef} className={modalClassNames}>
         <div className={styles.Wrapper} onClick={(e) => e.stopPropagation()}>
           <div className="modalToolbar">

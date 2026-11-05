@@ -1,10 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
-
 import type { AppMode, Config } from '../../../src/@types';
 
-import { StoreProvider } from '../../../src/store';
+import { StoreProvider, store } from '../../../src/store';
 import { AppWrapper } from '../../../src/components/AppWrapper';
 import { AppModeContext } from '../../../src/components/App/AppModeContext';
 import { useStoryGeometry } from '../../../src/components/StoryVisualRoot';
@@ -47,27 +45,39 @@ export const LifecycleBook = () => {
   return (
     <AppModeContext value={mode}>
       <StoreProvider>
-        <MemoryRouter>
-          {isBookVisible && (
-            <AppWrapper
-              ref={bookRef}
-              config={config}
-              tableOfContents={[]}
-              rangeEffects={[]}
-              editorTools={tools}
-              visualEffects={visualEffects}
-            >
-              <Routes>
-                <Route path="/" element={null} />
-                <Route path="/page-1" element={<TestPage key="one" name="one" />} />
-                <Route path="/page-2" element={<TestPage key="two" name="two" />} />
-                <Route path="/page-3" element={null} />
-                <Route path="/page-4" element={<TestPage key="four" name="four" />} />
-                <Route path="/page-5" element={<TestPage key="five" name="five" />} />
-              </Routes>
-            </AppWrapper>
-          )}
-        </MemoryRouter>
+        {isBookVisible && (
+          <AppWrapper
+            ref={bookRef}
+            initialPageId={store.getState().main.pageId}
+            config={config}
+            storyPages={[
+              {
+                id: 'page-1',
+                content: <TestPage key="one" name="one" />,
+              },
+              {
+                id: 'page-2',
+                content: <TestPage key="two" name="two" />,
+              },
+              {
+                id: 'page-3',
+                content: null,
+              },
+              {
+                id: 'page-4',
+                content: <TestPage key="four" name="four" />,
+              },
+              {
+                id: 'page-5',
+                content: <TestPage key="five" name="five" />,
+              },
+            ]}
+            tableOfContents={[]}
+            rangeEffects={[]}
+            editorTools={tools}
+            visualEffects={visualEffects}
+          />
+        )}
       </StoreProvider>
     </AppModeContext>
   );

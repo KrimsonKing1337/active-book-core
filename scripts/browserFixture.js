@@ -22,7 +22,7 @@ export const openBrowserFixture = async (context) => {
     plugins: [svgr({ include: '**/*.svg' })],
     resolve: { alias },
     define: { 'process.env.mode': JSON.stringify('development') },
-    optimizeDeps: { include: ['react', 'react-dom/client', 'react/jsx-runtime', 'react/jsx-dev-runtime', 'react-router-dom'] },
+    optimizeDeps: { include: ['react', 'react-dom/client', 'react/jsx-runtime', 'react/jsx-dev-runtime'] },
     server: { host: '127.0.0.1', port: 0 },
   });
   context.after(() => server.close());

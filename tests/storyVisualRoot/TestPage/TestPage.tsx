@@ -1,6 +1,5 @@
 import { useState } from 'react';
 
-import { PageWrapper } from '../../../src/components/PageWrapper';
 import { useBackground } from '../../../src/hooks/effects/background';
 import { useFrameEffect } from '../../../src/hooks/effects/frame/useFrameEffect';
 
@@ -44,7 +43,7 @@ export const TestPage = ({ name }: TestPageProps) => {
   });
 
   return (
-    <PageWrapper>
+    <>
       <button data-testid="expand" onClick={handleExpand}>
         Expand {name}
       </button>
@@ -52,6 +51,6 @@ export const TestPage = ({ name }: TestPageProps) => {
       <article data-testid={`page-${name}`} style={{ height }}>
         Page {name}
       </article>
-    </PageWrapper>
+    </>
   );
 };

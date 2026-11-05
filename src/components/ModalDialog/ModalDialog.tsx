@@ -1,7 +1,5 @@
 import { type PropsWithChildren, useEffect, useRef, useState } from 'react';
 
-import type { Interval, Timer } from '@types';
-
 import { type ModalProps, Modal } from '@components/Modal';
 import { Button } from '@components/Button';
 
@@ -18,13 +16,9 @@ export type ModalDialogProps = ModalProps & {
 
   onConfirm?: Func;
   onCancel?: Func;
-}
-
-const defaultFunc = () => {
 };
 
-let timer: Timer = null;
-let interval: Interval = null;
+const defaultFunc = () => {};
 
 export const ModalDialog = ({
   isOpen,
@@ -47,14 +41,10 @@ export const ModalDialog = ({
 
   useEffect(() => {
     if (!isOpen) {
-      if (interval) {
-        clearInterval(interval);
-      }
-
       return;
     }
 
-    interval = setInterval(() => {
+    const interval = setInterval(() => {
       if (secondsLeftRef.current <= 0) {
         if (interval) {
           clearInterval(interval);
@@ -76,18 +66,16 @@ export const ModalDialog = ({
 
   useEffect(() => {
     if (!isOpen) {
-      if (timer) {
-        clearTimeout(timer);
-      }
-
       return;
     }
+
+    setCanClose(false);
 
     secondsLeftRef.current = cantCloseIn / 1000;
 
     setSecondsLeft(secondsLeftRef.current);
 
-    timer = setTimeout(() => {
+    const timer = setTimeout(() => {
       setCanClose(true);
     }, cantCloseIn);
 

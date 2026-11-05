@@ -1,6 +1,12 @@
-import { type PropsWithChildren, useEffect, useRef, useState } from 'react';
+import { type PropsWithChildren, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+
+import { useDispatch } from '@store';
+import { mainActions } from '@store/main';
 
 import { createVisualEffects, VisualEffectsContext } from '@controllers/visualEffects';
+
+import { NarrativeFrameContext } from '@components/PageWrapper/NarrativeFrameContext';
+
 
 import type { AppWrapperProps } from '../../@types';
 
@@ -11,13 +17,25 @@ export type { AppWrapperProps } from '../../@types';
 export type BookSessionProps = PropsWithChildren<AppWrapperProps>;
 
 export const BookSession = (props: BookSessionProps) => {
+  const dispatch = useDispatch();
+  const [frame, setFrame] = useState<HTMLDivElement | null>(null);
+  const frameTarget = useMemo(() => ({
+    element: frame,
+    attach: setFrame,
+  }), [frame]);
+  const initialPageIdRef = useRef(props.initialPageId ?? null);
+
+  useLayoutEffect(() => {
+    dispatch(mainActions.setPage(initialPageIdRef.current));
+  }, [dispatch]);
+
   const [ownedSession] = useState(() => {
     if (props.visualEffects) {
       return null;
     }
 
     return createVisualEffects({
-      pages: props.config.pages,
+      pages: props.storyPages.length,
       definitions: props.definitions,
     });
   });
@@ -46,7 +64,9 @@ export const BookSession = (props: BookSessionProps) => {
 
   return (
     <VisualEffectsContext value={session}>
-      <AppContent {...props} visualEffects={session} />
+      <NarrativeFrameContext value={frameTarget}>
+        <AppContent {...props} visualEffects={session} />
+      </NarrativeFrameContext>
     </VisualEffectsContext>
   );
 };
