@@ -2,18 +2,18 @@ import type { VisualRendererProps } from '@active-book/types';
 
 import { FrameRenderer } from '@components/FrameEffects/components/FrameRenderer';
 
-import { useTimeline } from '../hooks/useTimeline';
+import { useAnimationPlayback } from '../hooks/useAnimationPlayback';
 import { numberParam, stringParam } from '../utils';
 
 import * as styles from './FrameDemo.module.scss';
 
 export const FrameDemo = (props: VisualRendererProps) => {
   const {
-    progress,
+    status,
     token,
     playing,
     active,
-  } = useTimeline(props);
+  } = useAnimationPlayback(props, () => ({ animations: [] }));
   const duration = numberParam(props.params, 'duration', 2000);
   const color = stringParam(props.params, 'color', '#70d9c5');
   const position = stringParam(props.params, 'frameAnchor', 'top-left');
@@ -55,7 +55,7 @@ export const FrameDemo = (props: VisualRendererProps) => {
       style={{ opacity: numberParam(props.params, 'opacity', 1) }}
       data-demo-effect={props.id}
       data-token={token}
-      data-progress={progress.toFixed(3)}
+      data-run-status={status}
     >
       <FrameRenderer {...props} params={shadowParams} />
       <FrameRenderer {...props} id={`${props.id}-text`} params={textParams} />
