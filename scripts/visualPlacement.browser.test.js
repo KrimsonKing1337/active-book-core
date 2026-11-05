@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { near, openBrowserFixture, pixels, readGeometry, setSurfaces, surface, visibility } from './browserFixture.js';
+import { near, openBrowserFixture, pixels, readRegions, setSurfaces, surface, visibility } from './browserFixture.js';
 
 const px = (value) => ({ value, unit: 'px' });
 const percent = (value) => ({ value, unit: '%' });
@@ -39,7 +39,7 @@ test('visual placement in Chromium', async (context) => {
       await page.getByTestId('first').click();
       await page.getByTestId('page-one').waitFor();
       await page.waitForFunction(() => window.setVisualTestSurfaces
-        && JSON.parse(document.querySelector('[data-testid="geometry"]').textContent)?.regions.narrativeContent);
+        && document.querySelector('[data-story-region="narrativeContent"]'));
       await run(page);
       assert.deepEqual(errors, []);
     } finally {
@@ -48,7 +48,7 @@ test('visual placement in Chromium', async (context) => {
   });
 
   await scenario('all coordinate regions, mixed units, anchors and origins', async (page) => {
-    const geometry = await readGeometry(page);
+    const geometry = await readRegions(page);
     const book = await bookBounds(page);
     for (const region of ['story', 'storyViewport', 'narrativeFrame', 'frame', 'narrativeViewport', 'narrativeContent']) {
       const placement = {
@@ -90,7 +90,7 @@ test('visual placement in Chromium', async (context) => {
     const originalToken = await token(page);
     const before = await surface(page).boundingBox();
     const book = await bookBounds(page);
-    const geometry = await readGeometry(page);
+    const geometry = await readRegions(page);
     const viewport = geometry.regions.narrativeViewport;
     const outside = { x: before.x + 10, y: book.y + viewport.y - 3 };
     assert.deepEqual((await pixels(page))(outside.x, outside.y), [255, 0, 0]);
@@ -109,15 +109,14 @@ test('visual placement in Chromium', async (context) => {
 
     await setSurfaces(page, [item({ placement: fill('narrativeViewport') })]);
     const fixedBefore = await surface(page).boundingBox();
-    const contentBefore = (await readGeometry(page)).regions.narrativeContent.y;
+    const contentBefore = (await readRegions(page)).regions.narrativeContent.y;
     await page.locator('#narrative').evaluate((element) => { element.scrollTop = 120; });
-    await page.waitForFunction((y) => JSON.parse(document.querySelector('[data-testid="geometry"]').textContent)
-      .regions.narrativeContent.y < y - 59, contentBefore);
+    await page.waitForFunction((y) => (document.querySelector('[data-story-region="narrativeContent"]').getBoundingClientRect().y - document.querySelector('[data-story-region="story"]').getBoundingClientRect().y) < y - 59, contentBefore);
     assert.deepEqual(await surface(page).boundingBox(), fixedBefore);
   });
 
   await scenario('visibility rectangles and actual frame side masks', async (page) => {
-    const geometry = await readGeometry(page);
+    const geometry = await readRegions(page);
     const book = await bookBounds(page);
     for (const region of ['story', 'storyViewport', 'narrativeFrame', 'narrativeViewport', 'narrativeContent']) {
       await setSurfaces(page, [item({ visibility: { region } })]);
@@ -165,7 +164,7 @@ test('visual placement in Chromium', async (context) => {
     assert.notDeepEqual(color(book.x + book.width * 0.15, middle.y), [255, 0, 0]);
     assert.equal(await token(page), originalToken);
 
-    const geometry = await readGeometry(page);
+    const geometry = await readRegions(page);
     const frame = geometry.regions.frame;
     const frameMask = { type: 'polygon', points: [point(0, 0), point(50, 0), point(50, 100), point(0, 100)] };
     await setSurfaces(page, [item({ visibility: { region: 'frame', sides: ['top', 'left', 'right'], mask: frameMask } })]);
@@ -180,7 +179,7 @@ test('visual placement in Chromium', async (context) => {
     const probe = item({ placement: fill('narrativeFrame'), visibility: { region: 'narrativeFrame' }, background: gradient });
     await setSurfaces(page, [probe]);
     const originalToken = await token(page);
-    const geometry = await readGeometry(page);
+    const geometry = await readRegions(page);
     const book = await bookBounds(page);
     const frame = geometry.regions.frame;
     const color = await pixels(page);
@@ -194,9 +193,8 @@ test('visual placement in Chromium', async (context) => {
     assert.equal(await token(page), originalToken);
     await setSurfaces(page, [probe]);
     await page.setViewportSize({ width: 700, height: 650 });
-    await page.waitForFunction(() => JSON.parse(document.querySelector('[data-testid="geometry"]').textContent)
-      .regions.story.width === 652);
-    near((await surface(page).boundingBox()).width, (await readGeometry(page)).regions.narrativeFrame.width, 'resize');
+    await page.waitForFunction(() => document.querySelector('[data-story-region="story"]').getBoundingClientRect().width === 652);
+    near((await surface(page).boundingBox()).width, (await readRegions(page)).regions.narrativeFrame.width, 'resize');
     assert.equal(await token(page), originalToken);
 
     await page.getByTestId('empty').click();
@@ -218,7 +216,7 @@ test('visual placement in Chromium', async (context) => {
       element.style.background = '#00ff00';
     });
     await page.locator('#Toolbar').evaluate((element) => { element.style.background = '#0000ff'; });
-    const geometry = await readGeometry(page);
+    const geometry = await readRegions(page);
     const book = await bookBounds(page);
     const narrative = geometry.regions.narrativeContent;
     const narrativePoint = [book.x + narrative.x + narrative.width / 2, book.y + narrative.y + 150];
@@ -306,8 +304,7 @@ test('selection follows visibility bounds without restarting surfaces and stays 
       assert.equal(await outline.evaluate((element) => getComputedStyle(element).zIndex), '40');
       assert.equal(await token(page), originalToken);
       await page.setViewportSize({ width: 720, height: 650 });
-      await page.waitForFunction(() => JSON.parse(document.querySelector('[data-testid="geometry"]').textContent)
-        .regions.story.width === 672);
+      await page.waitForFunction(() => document.querySelector('[data-story-region="story"]').getBoundingClientRect().width === 672);
       assert.deepEqual(await outline.boundingBox(), await visibility(page).boundingBox());
       await setSurfaces(page, [item({ visibility: { region: 'narrativeContent' } })]);
       const before = await outline.boundingBox();

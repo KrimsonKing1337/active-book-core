@@ -1,10 +1,9 @@
 import type { HTMLAttributes } from 'react';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import classNames from 'classnames';
 
-import { createViewportLayoutHost } from '@controllers/visualEffects/layout';
 
 import { BookApplicationContext } from './context';
 
@@ -16,18 +15,8 @@ export const BookApplicationSurface = ({
   className,
   ...props
 }: HTMLAttributes<HTMLDivElement>) => {
-  const root = useRef<HTMLDivElement>(null);
   const [inverseColors, setInverseColors] = useState(false);
   const [element, setElement] = useState<HTMLDivElement | null>(null);
-  const attachRoot = useCallback((node: HTMLDivElement | null) => {
-    root.current = node;
-    setElement(node);
-  }, []);
-  const [layout] = useState(() => createViewportLayoutHost(() => {
-    root.current?.dispatchEvent(new Event('visual-layout-change'));
-  }));
-
-  useEffect(() => () => layout.reset(), [layout]);
   const [underStory, setUnderStory] = useState<HTMLDivElement | null>(null);
   const [aboveStory, setAboveStory] = useState<HTMLDivElement | null>(null);
   const [feedback, setFeedback] = useState<HTMLDivElement | null>(null);
@@ -42,13 +31,11 @@ export const BookApplicationSurface = ({
     };
 
     return {
-      root,
       element,
       hosts,
-      layout,
       setInverseColors,
     };
-  }, [element, underStory, aboveStory, feedback, selection, layout]);
+  }, [element, underStory, aboveStory, feedback, selection]);
 
   const rootClasses = classNames(styles.Application, className, {
     [styles.InverseColors]: inverseColors,
@@ -58,7 +45,7 @@ export const BookApplicationSurface = ({
     <BookApplicationContext value={context}>
       <div
         {...props}
-        ref={attachRoot}
+        ref={setElement}
         className={rootClasses}
         data-book-application
       >

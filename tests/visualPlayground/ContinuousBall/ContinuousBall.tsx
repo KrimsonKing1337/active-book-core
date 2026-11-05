@@ -7,7 +7,7 @@ import { createPortal } from 'react-dom';
 import { useSelector } from '@store';
 import { mainSelectors } from '@store/main';
 
-import { useNarrativeFrame } from '@components/StoryShell/NarrativeFrameContext';
+import { useStoryRegions } from '@components/StoryRegionsProvider';
 
 import * as styles from './ContinuousBall.module.scss';
 
@@ -16,7 +16,8 @@ const committedNodes = new WeakMap<Element, number>();
 
 /** No saved phase: this animation belongs to this DOM node for its entire activation. */
 export const ContinuousBall = ({ id }: VisualRendererProps) => {
-  const target = useNarrativeFrame();
+  const { elements } = useStoryRegions();
+  const target = elements.narrativeFrame ?? null;
   const nodeRef = useRef<HTMLDivElement>(null);
   const [token] = useState(() => crypto.randomUUID());
   const [mount, setMount] = useState(0);

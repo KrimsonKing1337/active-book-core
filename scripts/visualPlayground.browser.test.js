@@ -146,6 +146,7 @@ test('visual playground experiments in Chromium', async (context) => {
       const token = await frameToken(page);
       await patch(page, { toolbarHeight: options.toolbarHeight + 8 });
       assert.equal(await frameToken(page), token, 'resizing an actual region does not reparent its renderer');
+      assert.equal(await page.evaluate(() => window.liveGeometryObservers.size), 0, 'ordinary CSS effects install no region observers');
       measurements.push({ options, actual, expected });
     }
     await patch(page, { width: 1040, region: 'storyViewport', mask: false, frameAnchor: 'center', offsetX: 35 });

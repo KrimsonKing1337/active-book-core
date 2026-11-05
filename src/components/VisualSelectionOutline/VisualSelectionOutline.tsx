@@ -2,7 +2,6 @@ import { useLayoutEffect, useState } from 'react';
 
 import { createPortal } from 'react-dom';
 
-import type { StoryGeometry } from '@components/StoryRoot/geometry';
 import type { VisualSurfaceItem } from '@components/VisualSurfaces';
 
 import { useStoryRegions } from '@components/StoryRegionsProvider';
@@ -20,14 +19,13 @@ type Outline = {
 
 type VisualSelectionOutlineProps = {
   item?: VisualSurfaceItem;
-  geometry?: StoryGeometry | null;
 };
 
 /** Only the selected DOM element and its clipping/positioning containers are measured. */
 export const VisualSelectionOutline = ({ item }: VisualSelectionOutlineProps) => {
   const application = useBookApplicationSurface();
   const { elements } = useStoryRegions();
-  const region = item?.visibility.region;
+  const region = item?.placement.coordinates;
   const localRegion = region === 'frame' ? 'narrativeFrame' : region;
   const element = localRegion === 'application' ? application?.element : elements[localRegion ?? 'story'];
   const root = application?.element ?? elements.story;
@@ -46,6 +44,12 @@ export const VisualSelectionOutline = ({ item }: VisualSelectionOutlineProps) =>
     let frame: number | null = null;
     const measure = () => {
       frame = null;
+      if (element.getClientRects().length === 0) {
+        setOutline(null);
+
+        return;
+      }
+
       const bounds = element.getBoundingClientRect();
       const rootBounds = root.getBoundingClientRect();
       let left = bounds.left;

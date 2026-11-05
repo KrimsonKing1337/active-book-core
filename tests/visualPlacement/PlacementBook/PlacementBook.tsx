@@ -6,7 +6,7 @@ import type { Config } from '@types';
 import { StoreProvider } from '@store';
 
 import { AppModeContext } from '@components/App/AppModeContext';
-import { AppWrapper, useStoryGeometry } from '@components';
+import { AppWrapper } from '@components';
 
 import type { SurfaceSpec } from '../@types';
 
@@ -24,7 +24,6 @@ const config: Config = {
 
 export const PlacementBook = () => {
   const bookRef = useRef<HTMLDivElement>(null);
-  const geometry = useStoryGeometry(bookRef);
   const [specs, setSpecs] = useState<SurfaceSpec[]>([]);
   const [selectedVisualEffectId, setSelectedVisualEffectId] = useState<string | null>(null);
 
@@ -51,10 +50,6 @@ export const PlacementBook = () => {
     <>
       <TestControls />
       <PlacementControls />
-
-      <output data-testid="geometry" hidden>
-        {JSON.stringify(geometry)}
-      </output>
     </>
   );
 

@@ -100,8 +100,7 @@ test('registered visual lifecycle in Chromium', async (context) => {
       await page.locator('[data-visual-surface="range-a"]').waitFor({ state: 'visible' });
       const beforeLoading = await readCounter(page);
       await page.getByTestId('loading').click();
-      await page.waitForFunction(() => JSON.parse(document.querySelector('[data-testid="geometry"]').textContent)
-        .regions.narrativeFrame === null);
+      await page.waitForFunction(() => document.querySelector('[data-story-region="narrativeFrame"]').getClientRects().length === 0);
       await waitTicks(page, { above: beforeLoading.ticks });
       assert.equal((await readCounter(page)).token, before.token);
       await page.getByTestId('loading').click();

@@ -5,7 +5,6 @@ import type { AppMode, Config } from '../../../src/@types';
 import { StoreProvider, store } from '../../../src/store';
 import { AppWrapper } from '../../../src/components/AppWrapper';
 import { AppModeContext } from '../../../src/components/App/AppModeContext';
-import { useStoryGeometry } from '../../../src/components/StoryRoot';
 
 import { TestControls } from '../../storyRoot/TestControls';
 import { TestPage } from '../../storyRoot/TestPage';
@@ -23,7 +22,6 @@ const mode: AppMode = query.get('mode') === 'editor' ? 'editor' : 'reader';
 
 export const LifecycleBook = () => {
   const bookRef = useRef<HTMLDivElement>(null);
-  const geometry = useStoryGeometry(bookRef);
   const [isBookVisible, setIsBookVisible] = useState(true);
 
   useEffect(() => {
@@ -35,10 +33,6 @@ export const LifecycleBook = () => {
     <>
       <TestControls />
       <LifecycleControls />
-
-      <output data-testid="geometry" hidden>
-        {JSON.stringify(geometry)}
-      </output>
     </>
   );
 

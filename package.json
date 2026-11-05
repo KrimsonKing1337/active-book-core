@@ -61,7 +61,7 @@
     "util": "^0.12.5"
   },
   "peerDependencies": {
-    "@active-book/types": "^0.0.1"
+    "@active-book/types": "^0.0.2"
   },
   "devDependencies": {
     "@active-book/types": "file:../activeBook-types",

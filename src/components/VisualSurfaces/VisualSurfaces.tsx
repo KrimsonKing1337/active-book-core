@@ -1,87 +1,54 @@
-import classNames from 'classnames';
 import { createPortal } from 'react-dom';
 
-import { useBookApplicationSurface } from '@components/BookApplicationSurface/context';
-import { geometryInApplication } from '@components/BookApplicationSurface/geometry';
+import type { VisualSurfaceItem } from '@components/VisualSurfaces';
 
-import type { StoryGeometry } from '@components/StoryRoot/geometry';
+import { useStoryRegions } from '@components/StoryRegionsProvider';
+import { useBookApplicationSurface } from '@components/BookApplicationSurface';
 
-import { LocalVisualSurfaces } from '@components/LocalVisualSurfaces';
-
-import type { VisualSurfaceItem } from './@types';
-
+import { compareVisualSurfaces } from '@components/VisualSurfaces/utils/order';
 
 import { VisualSurface } from './components';
 
-import { compareVisualSurfaces } from './utils/order';
 
-import * as styles from './VisualSurfaces.module.scss';
+const layers: Record<VisualSurfaceItem['depth']['plane'], number> = {
+  background: 0,
+  belowNarrative: 1,
+  aboveNarrative: 3,
+  aboveControls: 5,
+  systemFeedback: 6,
+};
 
 type VisualSurfacesProps = {
   items: readonly VisualSurfaceItem[];
-  geometry: StoryGeometry | null;
+  stride: number;
 };
 
-const planes: readonly VisualSurfaceItem['depth']['plane'][] = [
-  'background',
-  'belowNarrative',
-  'aboveNarrative',
-  'aboveControls',
-  'systemFeedback',
-];
-
-export const VisualSurfaces = ({ items, geometry }: VisualSurfacesProps) => {
+export const VisualSurfaces = ({ items, stride }: VisualSurfacesProps) => {
+  const { hosts } = useStoryRegions();
   const application = useBookApplicationSurface();
-  const applicationGeometry = geometryInApplication(geometry);
-  const hosts = ['story', 'underStory', 'aboveStory'] as const;
+  const sorted = [...items].sort(compareVisualSurfaces);
 
-  return (
-    <>
-      <LocalVisualSurfaces items={items.filter((cur) => cur.layout === 'local')} stride={items.length + 1} />
-      {hosts.flatMap((hostCur) => planes.map((planeCur) => {
-        const planeItems = items.filter((itemCur) => {
-          return itemCur.layout !== 'local' && itemCur.depth.plane === planeCur
-            && (itemCur.host ?? 'story') === hostCur;
-        });
+  return sorted.map((itemCur, index) => {
+    const region = itemCur.placement.coordinates;
+    const localRegion = region === 'frame' ? 'narrativeFrame' : region;
+    const external = region === 'application';
+    let target = localRegion === 'application' ? null : hosts[localRegion];
 
-        const planeItemsSorted = planeItems.sort(compareVisualSurfaces);
+    if (external) {
+      const underStory = itemCur.depth.plane === 'background';
+      target = underStory ? application?.hosts.underStory : application?.hosts.aboveStory;
+    }
 
-        const planeClassNames = classNames(styles.Plane, styles[planeCur]);
+    if (itemCur.depth.plane === 'systemFeedback') {
+      target = application?.hosts.feedback ?? hosts.story;
+    }
 
-        const isFeedback = planeCur === 'systemFeedback' && !!application;
-        const external = hostCur !== 'story' || isFeedback;
-        let target = application?.hosts.feedback;
+    if (!target) {
+      return null;
+    }
 
-        if (!isFeedback && hostCur !== 'story') {
-          target = application?.hosts[hostCur];
-        }
-        const key = `${hostCur}/${planeCur}`;
-        const content = (
-          <div
-            key={key}
-            className={planeClassNames}
-            data-visual-plane={planeCur}
-            inert
-          >
-            {planeItemsSorted.map((itemCur, index) => {
-              return (
-                <VisualSurface
-                  key={itemCur.id}
-                  item={itemCur}
-                  geometry={external ? applicationGeometry : geometry}
-                  order={index}
-                />
-              );
-            })}
-          </div>
-        );
+    const zIndex = layers[itemCur.depth.plane] * stride + index;
 
-        if (external) {
-          return target ? createPortal(content, target, key) : null;
-        }
-
-        return content;
-      }))}
-    </>
-  );
+    return createPortal(<VisualSurface item={itemCur} zIndex={zIndex} />, target, itemCur.id);
+  });
 };

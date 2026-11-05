@@ -245,7 +245,7 @@ test.each(['background', 'frame'] as const)('%s fills the whole story viewport b
   expect(registration.effect.depth.plane).toBe(type === 'background' ? 'background' : 'belowNarrative');
 });
 
-test('a masked frame places its surface in storyViewport and clips to the narrative frame bands', () => {
+test('a masked frame uses its real narrative frame host and native side masks', () => {
   const registration = createBuiltinRegistration({
     type: 'frame',
     options: {
@@ -262,7 +262,7 @@ test('a masked frame places its surface in storyViewport and clips to the narrat
     },
   });
 
-  expect(registration.effect.placement.coordinates).toBe('storyViewport');
+  expect(registration.effect.placement.coordinates).toBe('frame');
   expect(registration.effect.visibility).toEqual({
     region: 'frame',
     sides: ['left', 'bottom'],

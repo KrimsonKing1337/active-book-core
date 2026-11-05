@@ -1,3 +1,4 @@
+import { readRegions } from './browserFixture.js';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
@@ -16,7 +17,7 @@ alias['@types'] = sourcePath('@types.ts');
 alias['~styles'] = sourcePath('styles');
 alias['~assets'] = sourcePath('assets');
 
-const readGeometry = async (page) => JSON.parse(await page.getByTestId('geometry').textContent());
+
 
 test('persistent book root and existing page rendering in Chromium', async (context) => {
   const server = await createServer({
@@ -57,11 +58,10 @@ test('persistent book root and existing page rendering in Chromium', async (cont
 
         await page.getByTestId('first').click();
         await page.getByTestId('page-one').waitFor();
-        await page.waitForFunction(() => JSON.parse(document.querySelector('[data-testid="geometry"]').textContent)
-          ?.regions.narrativeContent?.height > 1500);
+        await page.waitForFunction(() => document.querySelector('[data-story-region="narrativeContent"]').getBoundingClientRect().height > 1500);
         assert.equal(await page.getByTestId('audio-unlocked').textContent(), 'true');
 
-        const before = await readGeometry(page);
+        const before = await readRegions(page);
         const bounds = await page.locator('[data-story-region="story"]').boundingBox();
         const pageBounds = await page.locator('[data-story-region~="narrativeFrame"]').boundingBox();
         assert.equal(before.regions.story.width, bounds.width);
@@ -80,21 +80,18 @@ test('persistent book root and existing page rendering in Chromium', async (cont
         assert(before.frameInsets.left > 0);
 
         await page.locator('#narrative').evaluate((element) => { element.scrollTop = 200; });
-        await page.waitForFunction((previousY) => JSON.parse(document.querySelector('[data-testid="geometry"]')
-          .textContent).regions.narrativeContent.y < previousY - 190, before.regions.narrativeContent.y);
-        const scrolled = await readGeometry(page);
+        await page.waitForFunction((previousY) => (document.querySelector('[data-story-region="narrativeContent"]').getBoundingClientRect().y - document.querySelector('[data-story-region="story"]').getBoundingClientRect().y) < previousY - 190, before.regions.narrativeContent.y);
+        const scrolled = await readRegions(page);
         assert.equal(scrolled.regions.narrativeViewport.y, before.regions.narrativeViewport.y);
         assert.equal(scrolled.regions.narrativeContent.height, before.regions.narrativeContent.height);
 
         await page.locator('#narrative').evaluate((element) => { element.scrollTop = 0; });
         await page.getByTestId('expand').click();
-        await page.waitForFunction(() => JSON.parse(document.querySelector('[data-testid="geometry"]').textContent)
-          .regions.narrativeContent.height > 2300);
+        await page.waitForFunction(() => document.querySelector('[data-story-region="narrativeContent"]').getBoundingClientRect().height > 2300);
 
         await page.setViewportSize({ width: 360, height: 640 });
-        await page.waitForFunction(() => JSON.parse(document.querySelector('[data-testid="geometry"]').textContent)
-          .regions.story.width === 312);
-        const mobile = await readGeometry(page);
+        await page.waitForFunction(() => document.querySelector('[data-story-region="story"]').getBoundingClientRect().width === 312);
+        const mobile = await readRegions(page);
         assert(mobile.regions.narrativeFrame.width <= 360);
         assert(mobile.regions.narrativeFrame.height < mobile.regions.story.height);
 
@@ -103,7 +100,7 @@ test('persistent book root and existing page rendering in Chromium', async (cont
           const frame = document.querySelector('[data-visual-surface="behind-one"]').getBoundingClientRect();
           const hit = document.elementFromPoint(toolbar.x + toolbar.width / 2, toolbar.y + toolbar.height / 2);
           return {
-            inert: plane.inert,
+            inert: !!plane.closest('[inert]'),
             pointerEvents: getComputedStyle(plane).pointerEvents,
             bottom: frame.bottom,
             viewportBottom: document.querySelector('[data-story-region="storyViewport"]').getBoundingClientRect().bottom,
@@ -119,8 +116,9 @@ test('persistent book root and existing page rendering in Chromium', async (cont
         for (const [id, plane] of [['behind', 'belowNarrative'], ['above', 'aboveNarrative'], ['overlay', 'systemFeedback']]) {
           assert.equal(await page.locator(`[data-visual-plane="${plane}"] [data-effect-id="${id}-one"]`).count(), 1);
         }
-        assert.equal(await page.locator('[data-visual-plane="background"]')
-          .evaluate((element) => getComputedStyle(element).zIndex), '0');
+        const backgroundLayer = await page.locator('[data-visual-plane="background"]').evaluate((element) => Number(getComputedStyle(element).zIndex));
+        const textLayer = await page.locator('#narrative').evaluate((element) => Number(getComputedStyle(element).zIndex));
+        assert(backgroundLayer < textLayer, 'background is below the actual narrative');
 
         const fontButton = page.locator('[data-welcome-tour-id="font"] > div').last();
         await fontButton.click();
@@ -133,8 +131,7 @@ test('persistent book root and existing page rendering in Chromium', async (cont
         assert.equal(await book.evaluate((element) => element === document.querySelector('[data-story-region="story"]')), true);
 
         await page.getByTestId('loading').click();
-        await page.waitForFunction(() => JSON.parse(document.querySelector('[data-testid="geometry"]').textContent)
-          .regions.narrativeFrame === null);
+        await page.waitForFunction(() => document.querySelector('[data-story-region="narrativeFrame"]').getClientRects().length === 0);
         assert.equal(await book.evaluate((element) => element === document.querySelector('[data-story-region="story"]')), true);
         await page.getByTestId('loading').click();
         await page.getByTestId('page-one').waitFor();

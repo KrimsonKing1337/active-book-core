@@ -20,7 +20,7 @@
 
 .StoryViewport {
   position: relative;
-  z-index: var(--story-viewport-layer, 2);
+  z-index: auto;
 
   overflow: hidden;
 
@@ -29,17 +29,6 @@
   outline: 1px solid rgb(1 1 1 / 33.3%);
   // box-shadow: inset 0 0 0 1px rgb(255 255 255 / 60%), 0 10px 30px rgb(0 0 0 / 18%);
   box-shadow: inset 0 0 0 1px rgb(255 255 255 / 60%), 0 clamp(6px, 1.2vh, 12px) clamp(18px, 3vh, 36px) rgb(0 0 0 / 18%);
-
-  &[data-layout-mode="scale"] {
-    transform: scale(var(--visual-layout-factor, 1));
-  }
-
-  &[data-layout-mode="size"] {
-    width: calc(100% * var(--visual-layout-factor, 1));
-    max-width: calc(#{vars.$appWidth} * var(--visual-layout-factor, 1));
-    height: calc(100% * var(--visual-layout-factor, 1));
-    min-height: 0;
-  }
 
   &.isLoading {
     height: calc(100vh - 5px - 10px); // padding-top + padding-bottom from .StoryShell
@@ -66,7 +55,7 @@
 
   border-radius: inherit;
 
-  isolation: var(--story-frame-isolation, isolate);
+  isolation: auto;
 
   :global(#story-viewport):has([data-story-toolbar]) & {
     border-bottom-right-radius: 0;

@@ -1,6 +1,6 @@
 @use "./__variables" as vars;
 
-// Both the actual page and the CSS experiment use these rules, without DOM measurements.
+// Spacing shared by the actual story shell, viewport and controls.
 @mixin page {
   display: flex;
   align-items: flex-start;

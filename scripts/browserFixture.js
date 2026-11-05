@@ -35,7 +35,32 @@ export const openBrowserFixture = async (context) => {
   return { browser, origin: `http://127.0.0.1:${address.port}` };
 };
 
-export const readGeometry = async (page) => JSON.parse(await page.getByTestId('geometry').textContent());
+/** Test-only expected boxes read directly from the browser, independent of player implementation. */
+export const readRegions = (page) => page.evaluate(() => {
+  const story = document.querySelector('[data-story-region="story"]');
+  const storyBox = story.getBoundingClientRect();
+  const regions = {};
+
+  for (const name of ['application', 'story', 'storyViewport', 'narrativeFrame', 'narrativeViewport', 'narrativeContent']) {
+    const element = name === 'application' ? document.querySelector('[data-book-application]')
+      : document.querySelector(`[data-story-region="${name}"]`);
+    let bounds = null;
+
+    if (element?.getClientRects().length) {
+      const box = element.getBoundingClientRect();
+      bounds = { x: box.x - storyBox.x, y: box.y - storyBox.y, width: box.width, height: box.height,
+        borderRadius: getComputedStyle(element).borderRadius };
+    }
+
+    regions[name] = bounds;
+  }
+
+  regions.frame = regions.narrativeFrame;
+  const style = getComputedStyle(document.querySelector('#narrative'));
+  const frameInsets = { top: parseFloat(style.paddingTop), right: parseFloat(style.paddingRight),
+    bottom: parseFloat(style.paddingBottom), left: parseFloat(style.paddingLeft) };
+  return { regions, frameInsets };
+});
 export const surface = (page, id = 'probe') => page.locator(`[data-visual-content="${id}"]`);
 export const visibility = (page, id = 'probe') => page.locator(`[data-visual-surface="${id}"]`);
 

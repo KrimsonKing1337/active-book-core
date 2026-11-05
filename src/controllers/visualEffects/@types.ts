@@ -12,8 +12,6 @@ export type CreateVisualEffectsOptions = {
 /** Host metadata is separate from the author-controlled depth contract. */
 export type HostVisualEffectDefinition = VisualEffectDefinition & {
   systemFeedback?: boolean;
-  surfaceHost?: 'story' | 'underStory' | 'aboveStory';
-  surfaceLayout?: 'geometry' | 'css' | 'hybrid' | 'local';
 };
 
 export type VisualEffectChanges = {

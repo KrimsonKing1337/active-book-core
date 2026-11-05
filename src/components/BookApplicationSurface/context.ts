@@ -1,8 +1,5 @@
-import type { RefObject } from 'react';
-
 import { createContext, useContext } from 'react';
 
-import type { createViewportLayoutHost } from '@controllers/visualEffects/layout';
 
 export type ApplicationHosts = {
   underStory: HTMLDivElement | null;
@@ -12,10 +9,8 @@ export type ApplicationHosts = {
 };
 
 export type ApplicationSurfaceContext = {
-  root: RefObject<HTMLDivElement | null>;
   element: HTMLDivElement | null;
   hosts: ApplicationHosts;
-  layout: ReturnType<typeof createViewportLayoutHost>;
   setInverseColors: (inverse: boolean) => void;
 };
 

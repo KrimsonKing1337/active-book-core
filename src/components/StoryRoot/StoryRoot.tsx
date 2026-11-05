@@ -14,7 +14,6 @@ import { VisualSelectionOutline } from '@components/VisualSelectionOutline';
 import { useAppMode } from '@components/App/AppModeContext';
 import { useBookApplicationSurface } from '@components/BookApplicationSurface/context';
 
-import { useStoryGeometry } from './geometry';
 import { useVisualEffectSurfaces } from './hooks/useVisualEffectSurfaces';
 
 import * as styles from './StoryRoot.module.scss';
@@ -52,14 +51,9 @@ export const StoryRoot = ({
 
     return () => setApplicationInverse?.(false);
   }, [inverseColors, setApplicationInverse]);
-  const shouldMeasure = suppliedSurfaces.length > 0 || !!visualEffects;
-
-  const geometry = useStoryGeometry(storyRef, shouldMeasure);
-
   const registeredSurfaces = useVisualEffectSurfaces({
     visualEffects,
     page,
-    geometry,
     hiddenVisualEffects,
   });
 
@@ -123,11 +117,11 @@ export const StoryRoot = ({
 
       {hasSurfaces && (
         <VisualEffectsContext value={visualEffects ?? null}>
-          <VisualSurfaces items={surfaces} geometry={geometry} />
+          <VisualSurfaces items={surfaces} stride={surfaces.length + 1} />
         </VisualEffectsContext>
       )}
 
-      <VisualSelectionOutline item={selectedSurface} geometry={geometry} />
+      <VisualSelectionOutline item={selectedSurface} />
     </div>
   );
 };

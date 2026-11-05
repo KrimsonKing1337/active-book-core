@@ -7,13 +7,11 @@ import { isVisualEffectActive, type VisualEffects } from '@controllers/visualEff
 import type { VisualSurfaceItem } from '@components/VisualSurfaces';
 import { RegisteredVisualEffect } from '@components/RegisteredVisualEffect';
 
-import type { StoryGeometry } from '../geometry';
 
 export type VisualEffectSurfacesOptions = {
   visualEffects?: VisualEffects;
   page: number;
   hiddenVisualEffects: readonly string[];
-  geometry: StoryGeometry | null;
 };
 
 const emptySnapshot: readonly VisualEffectRegistration[] = [];
@@ -25,7 +23,6 @@ const subscribeEmpty = () => () => {};
 export const useVisualEffectSurfaces = ({
   visualEffects,
   page,
-  geometry,
   hiddenVisualEffects,
 }: VisualEffectSurfacesOptions) => {
   const visualEffectsSubscribe = visualEffects?.subscribe ?? subscribeEmpty;
@@ -92,7 +89,6 @@ export const useVisualEffectSurfaces = ({
           effect={effect}
           definition={definition}
           visualEffects={visualEffects}
-          geometry={geometry}
         />
       );
 
@@ -105,9 +101,7 @@ export const useVisualEffectSurfaces = ({
         depth,
         content,
         hidden: isHidden,
-        host: definition.surfaceHost,
-        layout: definition.surfaceLayout,
       };
     });
-  }, [registrations, page, pages, geometry, visualEffects, hiddenVisualEffects]);
+  }, [registrations, page, pages, visualEffects, hiddenVisualEffects]);
 };

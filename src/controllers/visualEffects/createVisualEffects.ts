@@ -162,9 +162,7 @@ export const createVisualEffects = ({ definitions = [], pages }: CreateVisualEff
       const paramsAreEqual = isEqual(previous?.defaultParams, defaultParams);
 
       const hostDefinition = definitionCur as HostVisualEffectDefinition;
-      const metadataIsEqual = previous?.surfaceHost === hostDefinition.surfaceHost
-        && previous?.surfaceLayout === hostDefinition.surfaceLayout
-        && previous?.systemFeedback === hostDefinition.systemFeedback;
+      const metadataIsEqual = previous?.systemFeedback === hostDefinition.systemFeedback;
       const unchanged = renderersAreEqual && paramsAreEqual && metadataIsEqual;
 
       let copied = previous;

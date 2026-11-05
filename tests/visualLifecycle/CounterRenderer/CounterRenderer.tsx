@@ -8,9 +8,32 @@ import { getMetrics } from '../metrics';
 export const CounterRenderer = ({
   id,
   params,
-  geometry,
   ref,
 }: VisualRendererProps) => {
+  const nodeRef = useRef<HTMLDivElement>(null);
+  const [size, setSize] = useState({ width: 0, height: 0 });
+
+  // Optional custom-renderer measurement; the core no longer supplies dimensions.
+  useLayoutEffect(() => {
+    const node = nodeRef.current;
+
+    if (!node) {
+      return;
+    }
+
+    const measure = () => {
+      if (node.getClientRects().length) {
+        const { width, height } = node.getBoundingClientRect();
+        setSize({ width, height });
+      }
+    };
+    const observer = new ResizeObserver(measure);
+    observer.observe(node);
+    measure();
+
+    return () => observer.disconnect();
+  }, []);
+
   const [token] = useState(() => crypto.randomUUID());
   const [ticks, setTicks] = useState(0);
   const [isPlaying, setIsPlaying] = useState(params.autoPlay !== false);
@@ -83,13 +106,14 @@ export const CounterRenderer = ({
 
   return (
     <div
+      ref={nodeRef}
       data-counter={id}
       data-token={token}
       data-ticks={ticks}
       data-playing={String(isPlaying)}
       data-label={label}
-      data-width={geometry.width}
-      data-height={geometry.height}
+      data-width={size.width}
+      data-height={size.height}
       style={{
         width: '100%', height: '100%', background: 'linear-gradient(90deg, #4008, #0048)',
       }}

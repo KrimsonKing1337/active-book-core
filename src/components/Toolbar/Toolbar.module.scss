@@ -2,7 +2,7 @@
 @use "~styles/storyLayout" as layout;
 
 .Wrapper {
-  position: var(--story-toolbar-position, static);
+  position: relative;
   z-index: var(--story-toolbar-layer, auto);
 
   width: 100%;

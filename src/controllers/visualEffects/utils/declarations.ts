@@ -60,7 +60,7 @@ export const createBuiltinRegistration = ({
   const isBackground = type === 'background';
 
   let definitionId = BACKGROUND_DEFINITION;
-  const placement = fillRegion('storyViewport');
+  let placement = fillRegion('storyViewport');
   let visibility: VisualEffectRegistration['effect']['visibility'] = { region: 'storyViewport' };
   let plane: VisualEffectRegistration['effect']['depth']['plane'] = 'background';
   let order = 0;
@@ -78,6 +78,7 @@ export const createBuiltinRegistration = ({
     order = readOrder(frame.shadow?.style?.zIndex ?? frame.text?.style?.zIndex ?? frame.style?.zIndex);
 
     if (frame.kind === 'component' && frame.frameMask?.enabled) {
+      placement = fillRegion('frame');
       visibility = {
         region: 'frame',
         sides: frame.frameMask.sides,

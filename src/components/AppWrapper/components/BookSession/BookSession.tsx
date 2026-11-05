@@ -1,4 +1,4 @@
-import { type PropsWithChildren, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { type PropsWithChildren, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import { useDispatch } from '@store';
 import { mainActions } from '@store/main';
@@ -7,7 +7,6 @@ import { createVisualEffects, VisualEffectsContext } from '@controllers/visualEf
 
 import { StoryRegionsProvider } from '@components/StoryRegionsProvider';
 
-import { NarrativeFrameContext } from '@components/StoryShell/NarrativeFrameContext';
 
 
 import type { AppWrapperProps } from '../../@types';
@@ -20,11 +19,6 @@ export type BookSessionProps = PropsWithChildren<AppWrapperProps>;
 
 export const BookSession = (props: BookSessionProps) => {
   const dispatch = useDispatch();
-  const [frame, setFrame] = useState<HTMLDivElement | null>(null);
-  const frameTarget = useMemo(() => ({
-    element: frame,
-    attach: setFrame,
-  }), [frame]);
   const initialPageIdRef = useRef(props.initialPageId ?? null);
 
   useLayoutEffect(() => {
@@ -67,9 +61,7 @@ export const BookSession = (props: BookSessionProps) => {
   return (
     <VisualEffectsContext value={session}>
       <StoryRegionsProvider>
-        <NarrativeFrameContext value={frameTarget}>
-          <AppContent {...props} visualEffects={session} />
-        </NarrativeFrameContext>
+        <AppContent {...props} visualEffects={session} />
       </StoryRegionsProvider>
     </VisualEffectsContext>
   );

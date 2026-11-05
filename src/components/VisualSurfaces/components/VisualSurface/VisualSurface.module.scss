@@ -1,93 +1,16 @@
-@use "~styles/storyLayout" as layout;
-@use "~styles/__variables" as vars;
-
-.Layout,
-.LayoutViewport,
-.LayoutFrame {
-  display: contents;
-}
-
-.ToolbarSpace {
-  display: none;
-}
-
-.Visibility {
+.Surface {
   position: absolute;
 
   overflow: hidden;
 
-  pointer-events: none;
-}
-
-.Surface {
-  position: absolute;
+  border-radius: inherit;
 
   pointer-events: none;
-}
-
-.Css {
-  position: absolute;
   inset: 0;
+}
 
-  .LayoutViewport {
-    position: relative;
-    @include layout.viewport;
-  }
+.Content {
+  position: absolute;
 
-  .Visibility {
-    inset: 0;
-
-    border-radius: clamp(0px, 2vw, 16px);
-  }
-
-  .Surface {
-    inset: 0;
-  }
-
-  &.ClipFrame {
-    .LayoutFrame {
-      position: relative;
-
-      display: block;
-      @include layout.narrative-frame;
-    }
-
-    .ToolbarSpace {
-      display: block;
-      flex-shrink: 0;
-      height: var(--story-toolbar-space);
-    }
-
-    .Visibility {
-      border-bottom-right-radius: var(--story-frame-bottom-radius);
-      border-bottom-left-radius: var(--story-frame-bottom-radius);
-    }
-
-    &:not(.PlaceFrame) .Surface {
-      bottom: auto;
-
-      height: calc(100% + var(--story-toolbar-space));
-    }
-  }
-
-  &.PlaceFrame:not(.ClipFrame) .Surface {
-    bottom: auto;
-
-    height: calc(100% - var(--story-toolbar-space));
-  }
-  @include layout.page;
-
-  @media screen and (max-width: vars.$appWidth) {
-    .Visibility {
-      border-radius: 0;
-    }
-    @include layout.page-mobile;
-  }
-
-  @container book-player (max-width: 500px) {
-    .Visibility {
-      border-radius: 0;
-    }
-    @include layout.page-mobile;
-  }
+  pointer-events: none;
 }

@@ -43,7 +43,10 @@ const createRegistration = (
     params,
     placement: fillRegion(region),
     visibility: region === 'frame' ? { region, sides: ['top', 'right', 'bottom', 'left'] } : { region },
-    depth: { plane: 'aboveControls', order: 0 },
+    depth: {
+      plane: ['lab.edges', 'lab.under-curtain', 'lab.single'].includes(definitionId) ? 'background' : 'aboveControls',
+      order: 0,
+    },
   };
 
   return {
@@ -61,7 +64,7 @@ export const definitionsFor = (): HostVisualEffectDefinition[] => {
       id: 'lab.advancing', defaultParams: {}, Renderer: AdvancingDarkness,
     },
     {
-      id: 'lab.under-curtain', defaultParams: {}, Renderer: Darkness, surfaceHost: 'underStory',
+      id: 'lab.under-curtain', defaultParams: {}, Renderer: Darkness,
     },
     {
       id: 'lab.telemetry', defaultParams: {}, Renderer: ViewportTelemetry, systemFeedback: true,
@@ -73,32 +76,29 @@ export const definitionsFor = (): HostVisualEffectDefinition[] => {
       id: 'lab.frame', defaultParams: {}, Renderer: FrameDemo,
     },
     {
-      id: 'lab.dark', defaultParams: {}, Renderer: Darkness, surfaceHost: 'story',
+      id: 'lab.dark', defaultParams: {}, Renderer: Darkness,
     },
     {
-      id: 'lab.edges', defaultParams: {}, Renderer: Darkness, surfaceHost: 'underStory',
+      id: 'lab.edges', defaultParams: {}, Renderer: Darkness,
     },
     {
-      id: 'lab.smoke', defaultParams: {}, Renderer: Smoke, surfaceHost: 'story',
+      id: 'lab.smoke', defaultParams: {}, Renderer: Smoke,
     },
     {
-      id: 'lab.through', defaultParams: {}, Renderer: Through, surfaceHost: 'story',
+      id: 'lab.through', defaultParams: {}, Renderer: Through,
     },
     {
-      id: 'lab.curtain', defaultParams: {}, Renderer: Darkness, surfaceHost: 'aboveStory',
+      id: 'lab.curtain', defaultParams: {}, Renderer: Darkness,
     },
     {
-      id: 'lab.collapse', defaultParams: {}, Renderer: Collapse, surfaceHost: 'aboveStory',
+      id: 'lab.collapse', defaultParams: {}, Renderer: Collapse,
     },
     {
-      id: 'lab.single', defaultParams: {}, Renderer: SingleScene, surfaceHost: 'underStory',
+      id: 'lab.single', defaultParams: {}, Renderer: SingleScene,
     },
   ];
 
-  return definitions.map((definitionCur) => ({
-    ...definitionCur,
-    surfaceLayout: 'local',
-  }));
+  return definitions;
 };
 
 const createFrameRegistration = (settings: Settings): VisualEffectRegistration => {
@@ -106,6 +106,7 @@ const createFrameRegistration = (settings: Settings): VisualEffectRegistration =
   frame.effect.depth.plane = settings.plane;
 
   if (settings.mask) {
+    frame.effect.placement = fillRegion('frame');
     frame.effect.visibility = { region: 'frame', sides: ['top', 'right', 'bottom', 'left'] };
   }
 
