@@ -5,17 +5,11 @@ import { near, openBrowserFixture, pixels, setSurfaces } from './browserFixture.
 
 const px = (value) => ({ value, unit: 'px' });
 const percent = (value) => ({ value, unit: '%' });
-const fill = (region) => ({
-  coordinates: region,
-  anchor: { region, point: 'top-left' },
-  origin: 'top-left',
-  offset: { x: px(0), y: px(0) },
-  size: { width: percent(100), height: percent(100) },
-});
+const fill = (region) => ({ region });
 const item = (region, extra = {}) => ({
-  id: 'local', layout: 'local', background: '#ff0000',
+  id: 'local', background: '#ff0000',
   placement: fill(region),
-  visibility: region === 'frame' ? { region, sides: ['left', 'right'] } : { region },
+  visibility: region === 'frame' ? { sides: ['left', 'right'] } : {},
   depth: { plane: 'aboveNarrative', order: 0 },
   ...extra,
 });
@@ -45,7 +39,7 @@ test('native surfaces fill actual region boxes and preserve portal identity on l
   }
   await setSurfaces(page, [item('storyViewport')]);
   const node = await page.locator('[data-probe="local"]').elementHandle();
-  for (const plane of ['background', 'belowNarrative', 'aboveNarrative', 'aboveControls']) {
+  for (const plane of ['background', 'belowNarrative', 'aboveNarrative', 'aboveStoryControls']) {
     await setSurfaces(page, [item('storyViewport', { depth: { plane, order: 20 } })]);
     assert(await node.evaluate((element) => element === document.querySelector('[data-probe="local"]')));
   }
@@ -60,7 +54,7 @@ test('all nine CSS anchors resolve mixed offsets and local sizes without a place
   };
   for (const [point, [x, y]] of Object.entries(anchors)) {
     const placement = {
-      ...fill('storyViewport'), anchor: { region: 'storyViewport', point }, origin: point,
+      ...fill('storyViewport'), anchor: point, origin: point,
       offset: { x: percent(5), y: px(-7) }, size: { width: px(60), height: px(40) },
     };
     await setSurfaces(page, [item('storyViewport', { placement })]);
@@ -106,7 +100,7 @@ test('default book application has one boundary, external underlay/overlay and p
   let sample = await pixels(page);
   assert.deepEqual(sample(app.x + 6, app.y + app.height / 2), [255, 0, 0], 'underlay outside the book');
   assert.notDeepEqual(sample(viewport.x + 80, viewport.y + 50), [255, 0, 0], 'opaque viewport naturally occludes underlay');
-  await setSurfaces(page, [item('application', { depth: { plane: 'aboveControls', order: 0 } })]);
+  await setSurfaces(page, [item('application', { depth: { plane: 'aboveStoryControls', order: 0 } })]);
   sample = await pixels(page);
   const toolbar = await page.locator('#Toolbar').boundingBox();
   assert.deepEqual(sample(toolbar.x + 10, toolbar.y + 10), [255, 0, 0], 'external overlay covers controls');
@@ -120,4 +114,23 @@ test('default book application has one boundary, external underlay/overlay and p
   }), 'selection');
   await page.getByTestId('second').click();
   await page.getByTestId('page-two').waitFor();
+});
+
+
+test('CSS transforms use the surface origin without changing its layout or host', async (context) => {
+  const page = await open(context);
+  const placement = {
+    region: 'storyViewport', anchor: 'center',
+    size: { width: px(80), height: px(40) }, scale: 2, rotate: 90,
+  };
+  await setSurfaces(page, [item('storyViewport', { placement })]);
+  const expected = await regionBox(page, 'storyViewport');
+  const actual = await surface(page).boundingBox();
+  near(actual.width, 80, 'rotated scaled width');
+  near(actual.height, 160, 'rotated scaled height');
+  near(actual.x + actual.width / 2, expected.x + expected.width / 2, 'center x');
+  near(actual.y + actual.height / 2, expected.y + expected.height / 2, 'center y');
+  assert.equal(await surface(page).evaluate((node) => node.offsetWidth), 80);
+  const after = await regionBox(page, 'storyViewport');
+  assert.deepEqual(after, expected, 'transform does not change region layout');
 });

@@ -12,13 +12,14 @@ type VisualSurfaceProps = {
 };
 
 export const VisualSurface = ({ item, zIndex }: VisualSurfaceProps) => {
-  const frameSides = item.visibility.region === 'frame' ? item.visibility.sides : null;
+  const frameSides = item.visibility?.sides
+    ?? (item.placement.region === 'frame' ? ['top', 'right', 'bottom', 'left'] as const : undefined);
   const style = {
     zIndex,
     visibility: item.hidden ? 'hidden' as const : undefined,
     maskImage: frameSides ? getFrameMaskImage([...frameSides]) : undefined,
     maskComposite: frameSides ? 'add' : undefined,
-    clipPath: localClipPath(item.visibility.mask),
+    clipPath: localClipPath(item.visibility?.mask),
   };
 
   return (

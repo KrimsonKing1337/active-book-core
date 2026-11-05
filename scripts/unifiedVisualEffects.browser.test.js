@@ -93,7 +93,7 @@ test('real Background and Frame renderers use the book session in Chromium', asy
         const session = window.realVisual.effects;
         session.update('range-frame', {
           effect: {
-            visibility: { region: 'frame', sides: ['top', 'right'] },
+            visibility: { sides: ['top', 'right'] },
             depth: { plane: 'belowNarrative', order: 20 },
             placement: {
               ...session.getSnapshot().find((cur) => cur.effect.id === 'range-frame').effect.placement,

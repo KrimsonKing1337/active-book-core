@@ -18,15 +18,32 @@ const length = (value: VisualLength) => `${value.value}${value.unit}`;
 
 /** CSS values only: the containing DOM region supplies all dimensions. */
 export const localPlacementStyle = (placement: VisualPlacement): CSSProperties => {
-  const [x, y] = anchors[placement.anchor.point];
-  const [originX, originY] = anchors[placement.origin];
+  const {
+    anchor,
+    origin,
+    offset,
+    size,
+    scale,
+    rotate,
+  } = placement;
+
+  if (!anchor && !origin && !offset && !size && scale === undefined && rotate === undefined) {
+    return {};
+  }
+
+  const [x, y] = anchors[anchor ?? 'top-left'];
+  const [originX, originY] = anchors[origin ?? anchor ?? 'top-left'];
 
   return {
-    left: `calc(${x}% + ${length(placement.offset.x)})`,
-    top: `calc(${y}% + ${length(placement.offset.y)})`,
-    width: length(placement.size.width),
-    height: length(placement.size.height),
+    inset: 'auto',
+    left: `calc(${x}% + ${offset ? length(offset.x) : '0px'})`,
+    top: `calc(${y}% + ${offset ? length(offset.y) : '0px'})`,
+    width: size ? length(size.width) : '100%',
+    height: size ? length(size.height) : '100%',
     translate: `${-originX}% ${-originY}%`,
+    transformOrigin: `${originX}% ${originY}%`,
+    scale,
+    rotate: rotate === undefined ? undefined : `${rotate}deg`,
   };
 };
 

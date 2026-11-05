@@ -7,7 +7,7 @@
   position: absolute;
   top: -100%;
   left: 0;
-  z-index: 15;
+  z-index: calc(var(--visual-layer-step, 2) * 7 + 1);
 
   width: 100%;
   max-width: vars.$appWidth;

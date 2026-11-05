@@ -6,16 +6,16 @@
   overflow: hidden;
 
   isolation: isolate;
-  container: book-player / size;
+  container: book-player / inline-size;
 
   [data-story-region="story"] {
-    z-index: 1;
+    z-index: auto;
+
+    isolation: auto;
   }
 }
 
 .UnderStory,
-.AboveStory,
-.Feedback,
 .Selection {
   position: absolute;
   inset: 0;
@@ -28,17 +28,14 @@
 }
 
 .UnderStory {
-  z-index: 0;
+  z-index: -1;
 }
 
-.AboveStory {
-  z-index: 2;
-}
-
+.AboveStory,
 .Feedback {
-  z-index: 3;
+  display: contents;
 }
 
 .Selection {
-  z-index: 4;
+  z-index: 2147483647;
 }

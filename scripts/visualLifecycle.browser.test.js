@@ -146,11 +146,8 @@ test('registered visual lifecycle in Chromium', async (context) => {
               offset: { x: { value: 11, unit: 'px' }, y: { value: 7, unit: 'px' } },
               size: { width: { value: 50, unit: '%' }, height: { value: 40, unit: 'px' } },
             },
-            visibility: {
-              region: 'story',
-              mask: { type: 'circle', center: { x: { value: 50, unit: '%' }, y: { value: 50, unit: '%' } },
-                radius: { value: 50, unit: '%' } },
-            },
+            visibility: { mask: { type: 'circle', center: { x: { value: 50, unit: '%' }, y: { value: 50, unit: '%' } },
+                radius: { value: 50, unit: '%' } } },
             depth: { plane: 'aboveNarrative', order: 9 },
           },
         });

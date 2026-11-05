@@ -13,34 +13,7 @@ export type BuiltinDeclaration = {
   lifetime: VisualEffectLifetime;
 };
 
-export const fillRegion = (region: VisualPlacement['coordinates']): VisualPlacement => ({
-  coordinates: region,
-  anchor: {
-    region,
-    point: 'top-left',
-  },
-  origin: 'top-left',
-  offset: {
-    x: {
-      value: 0,
-      unit: 'px',
-    },
-    y: {
-      value: 0,
-      unit: 'px',
-    },
-  },
-  size: {
-    width: {
-      value: 100,
-      unit: '%',
-    },
-    height: {
-      value: 100,
-      unit: '%',
-    },
-  },
-});
+export const fillRegion = (region: VisualPlacement['region']): VisualPlacement => ({ region });
 
 const readOrder = (value: unknown): number => {
   const numeric = Number(value);
@@ -61,7 +34,7 @@ export const createBuiltinRegistration = ({
 
   let definitionId = BACKGROUND_DEFINITION;
   let placement = fillRegion('storyViewport');
-  let visibility: VisualEffectRegistration['effect']['visibility'] = { region: 'storyViewport' };
+  let visibility: VisualEffectRegistration['effect']['visibility'] = {};
   let plane: VisualEffectRegistration['effect']['depth']['plane'] = 'background';
   let order = 0;
 
@@ -80,7 +53,6 @@ export const createBuiltinRegistration = ({
     if (frame.kind === 'component' && frame.frameMask?.enabled) {
       placement = fillRegion('frame');
       visibility = {
-        region: 'frame',
         sides: frame.frameMask.sides,
       };
     }

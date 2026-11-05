@@ -14,7 +14,7 @@ const layers: Record<VisualSurfaceItem['depth']['plane'], number> = {
   background: 0,
   belowNarrative: 1,
   aboveNarrative: 3,
-  aboveControls: 5,
+  aboveStoryControls: 5,
   systemFeedback: 6,
 };
 
@@ -29,7 +29,7 @@ export const VisualSurfaces = ({ items, stride }: VisualSurfacesProps) => {
   const sorted = [...items].sort(compareVisualSurfaces);
 
   return sorted.map((itemCur, index) => {
-    const region = itemCur.placement.coordinates;
+    const region = itemCur.placement.region;
     const localRegion = region === 'frame' ? 'narrativeFrame' : region;
     const external = region === 'application';
     let target = localRegion === 'application' ? null : hosts[localRegion];
@@ -39,7 +39,7 @@ export const VisualSurfaces = ({ items, stride }: VisualSurfacesProps) => {
       target = underStory ? application?.hosts.underStory : application?.hosts.aboveStory;
     }
 
-    if (itemCur.depth.plane === 'systemFeedback') {
+    if (external && itemCur.depth.plane === 'systemFeedback') {
       target = application?.hosts.feedback ?? hosts.story;
     }
 

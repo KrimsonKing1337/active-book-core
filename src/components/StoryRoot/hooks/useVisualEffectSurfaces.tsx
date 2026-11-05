@@ -79,7 +79,7 @@ export const useVisualEffectSurfaces = ({
       if (definition.systemFeedback) {
         depth = {
           plane: 'systemFeedback',
-          order: effectDepth.order,
+          order: effectDepth.order ?? 0,
         };
       }
 

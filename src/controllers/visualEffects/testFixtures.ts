@@ -7,11 +7,8 @@ export const registration: VisualEffectRegistration = {
     definitionId: 'static',
     params: { label: 'first' },
     placement: {
-      coordinates: 'narrativeFrame',
-      anchor: {
-        region: 'narrativeFrame',
-        point: 'top-left',
-      },
+      region: 'narrativeFrame',
+      anchor: 'top-left',
       origin: 'top-left',
       offset: {
         x: {
@@ -34,7 +31,7 @@ export const registration: VisualEffectRegistration = {
         },
       },
     },
-    visibility: { region: 'narrativeFrame' },
+    visibility: {},
     depth: {
       plane: 'aboveNarrative',
       order: 0,

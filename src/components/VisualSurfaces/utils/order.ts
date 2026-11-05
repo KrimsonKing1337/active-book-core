@@ -1,8 +1,11 @@
 import type { VisualSurfaceItem } from '../@types';
 
 export const compareVisualSurfaces = (first: VisualSurfaceItem, second: VisualSurfaceItem): number => {
-  if (first.depth.order !== second.depth.order) {
-    return first.depth.order - second.depth.order;
+  const firstOrder = first.depth.order ?? 0;
+  const secondOrder = second.depth.order ?? 0;
+
+  if (firstOrder !== secondOrder) {
+    return firstOrder - secondOrder;
   }
 
   if (first.id === second.id) {

@@ -239,9 +239,8 @@ test.each(['background', 'frame'] as const)('%s fills the whole story viewport b
     },
   });
 
-  expect(registration.effect.placement.coordinates).toBe('storyViewport');
-  expect(registration.effect.placement.anchor.region).toBe('storyViewport');
-  expect(registration.effect.visibility).toEqual({ region: 'storyViewport' });
+  expect(registration.effect.placement.region).toBe('storyViewport');
+  expect(registration.effect.visibility).toEqual({});
   expect(registration.effect.depth.plane).toBe(type === 'background' ? 'background' : 'belowNarrative');
 });
 
@@ -262,9 +261,8 @@ test('a masked frame uses its real narrative frame host and native side masks', 
     },
   });
 
-  expect(registration.effect.placement.coordinates).toBe('frame');
+  expect(registration.effect.placement.region).toBe('frame');
   expect(registration.effect.visibility).toEqual({
-    region: 'frame',
     sides: ['left', 'bottom'],
   });
 });

@@ -25,7 +25,7 @@ type VisualSelectionOutlineProps = {
 export const VisualSelectionOutline = ({ item }: VisualSelectionOutlineProps) => {
   const application = useBookApplicationSurface();
   const { elements } = useStoryRegions();
-  const region = item?.placement.coordinates;
+  const region = item?.placement.region;
   const localRegion = region === 'frame' ? 'narrativeFrame' : region;
   const element = localRegion === 'application' ? application?.element : elements[localRegion ?? 'story'];
   const root = application?.element ?? elements.story;

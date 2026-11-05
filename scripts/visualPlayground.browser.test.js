@@ -57,7 +57,7 @@ test('visual playground experiments in Chromium', async (context) => {
   });
 
   await scenario('opacity control keeps demo renderers mounted and reveals darkened content', async (page) => {
-    await patch(page, { demo: 'darkness', duration: 350, intensity: 1 });
+    await patch(page, { demo: 'darkness', region: 'application', duration: 350, intensity: 1 });
     await play(page);
     await waitRun(page, 'darkness');
     const darkness = page.locator('[data-demo-effect="darkness"]');
@@ -254,7 +254,7 @@ test('visual playground experiments in Chromium', async (context) => {
     await page.waitForTimeout(800);
     await page.screenshot({ path: new URL('08-composed-wave.png', artifacts).pathname });
 
-    await patch(page, { demo: 'darkness', duration: 350, intensity: 1 });
+    await patch(page, { demo: 'darkness', region: 'application', duration: 350, intensity: 1 });
     await play(page);
     await waitRun(page, 'darkness');
     await page.evaluate(() => {
@@ -262,7 +262,7 @@ test('visual playground experiments in Chromium', async (context) => {
       const registration = session.getSnapshot()[0];
       session.register({
         ...registration,
-        effect: { ...registration.effect, id: 'feedback', definitionId: 'lab.feedback' },
+        effect: { ...registration.effect, id: 'feedback', definitionId: 'lab.feedback', placement: { region: 'application' } },
       });
     });
     await page.getByTestId('system-feedback-probe').waitFor();
