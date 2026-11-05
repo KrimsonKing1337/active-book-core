@@ -3,7 +3,7 @@ export * from './Counter';
 
 export * from './App';
 export * from './AppWrapper';
-export * from './StoryVisualRoot';
+export * from './StoryRoot';
 export * from './BookApplicationSurface';
 export * from './VisualSurfaces';
 export * from './Bookmarks';
@@ -18,7 +18,7 @@ export * from './Menu';
 export * from './Modal';
 export * from './ModalDialog';
 export * from './Overflow';
-export * from './PageWrapper';
+export * from './StoryShell';
 export * from './SlideShow';
 export * from './Spoiler';
 export * from './TableOfContents';

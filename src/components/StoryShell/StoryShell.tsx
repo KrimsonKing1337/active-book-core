@@ -16,21 +16,21 @@ import { Narrative } from './components/Narrative';
 import { NarrativeFrameContext } from './NarrativeFrameContext';
 import { useBookWindows } from './useBookWindows';
 
-import * as styles from './PageWrapper.module.scss';
+import * as styles from './StoryShell.module.scss';
 
-export type PageWrapperProps = HTMLAttributes<HTMLDivElement> & {
+export type StoryShellProps = HTMLAttributes<HTMLDivElement> & {
   withoutToolbar?: boolean;
   windowHistoryScope?: string;
   sbMode?: boolean;
 };
 
-export const PageWrapper = ({
+export const StoryShell = ({
   children,
   withoutToolbar,
   windowHistoryScope = 'book-windows',
   sbMode,
   ...etc
-}: PropsWithChildren<PageWrapperProps>) => {
+}: PropsWithChildren<StoryShellProps>) => {
   const frame = useContext(NarrativeFrameContext);
 
   useBookWindows(windowHistoryScope);
@@ -39,21 +39,21 @@ export const PageWrapper = ({
   const showLoader = useSelector(mainSelectors.showLoader);
 
 
-  const pageWrapperClassNames = classNames({
-    [styles.PageWrapper]: true,
+  const storyShellClassNames = classNames({
+    [styles.StoryShell]: true,
   });
 
-  const mainContendClassNames = classNames({
-    [styles.MainContent]: true,
+  const storyViewportClassNames = classNames({
+    [styles.StoryViewport]: true,
     [styles.isLoading]: showLoader,
   });
 
   return (
-    <div id="page-wrapper" className={pageWrapperClassNames} {...etc}>
+    <div id="story-shell" className={storyShellClassNames} {...etc}>
       <div
         ref={application?.layout.attach}
-        id="main-content-wrapper"
-        className={mainContendClassNames}
+        id="story-viewport"
+        className={storyViewportClassNames}
         data-story-region="storyViewport"
       >
         <div ref={frame?.attach} className={styles.NarrativeFrame} data-story-region="narrativeFrame">

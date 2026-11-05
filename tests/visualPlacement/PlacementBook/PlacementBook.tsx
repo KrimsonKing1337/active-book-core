@@ -10,8 +10,8 @@ import { AppWrapper, useStoryGeometry } from '@components';
 
 import type { SurfaceSpec } from '../@types';
 
-import { TestControls } from '../../storyVisualRoot/TestControls';
-import { TestPage } from '../../storyVisualRoot/TestPage';
+import { TestControls } from '../../storyRoot/TestControls';
+import { TestPage } from '../../storyRoot/TestPage';
 
 import { PlacementControls } from '../PlacementControls';
 import { Probe } from '../Probe';

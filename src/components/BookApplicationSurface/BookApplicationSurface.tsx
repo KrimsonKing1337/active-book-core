@@ -10,7 +10,7 @@ import { BookApplicationContext } from './context';
 
 import * as styles from './BookApplicationSurface.module.scss';
 
-/** Optional embed boundary. A single StoryVisualRoot still owns activation and controllers. */
+/** Optional embed boundary. A single StoryRoot still owns activation and controllers. */
 export const BookApplicationSurface = ({
   children,
   className,

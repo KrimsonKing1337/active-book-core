@@ -4,7 +4,7 @@ import type { VisualEffectDefinition, VisualEffectInstance, VisualGeometry, Visu
 
 import type { VisualEffects } from '@controllers/visualEffects';
 
-import type { StoryGeometry, StoryRegionRect } from '@components/StoryVisualRoot/geometry';
+import type { StoryGeometry, StoryRegionRect } from '@components/StoryRoot/geometry';
 import { resolvePlacement } from '@components/VisualSurfaces/utils';
 
 import { VisualRegionGeometryContext } from './geometryContext';

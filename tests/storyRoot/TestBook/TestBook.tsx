@@ -5,7 +5,7 @@ import type { AppMode, Config } from '../../../src/@types';
 import { StoreProvider } from '../../../src/store';
 import { AppWrapper } from '../../../src/components/AppWrapper';
 import { AppModeContext } from '../../../src/components/App/AppModeContext';
-import { useStoryGeometry } from '../../../src/components/StoryVisualRoot';
+import { useStoryGeometry } from '../../../src/components/StoryRoot';
 import { Page0 } from '../../../src/pages/Page0';
 
 import { TestControls } from '../TestControls';

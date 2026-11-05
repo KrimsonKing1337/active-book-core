@@ -1,7 +1,7 @@
 @use "~styles/__variables" as vars;
 @use "~styles/storyLayout" as layout;
 
-.PageWrapper {
+.StoryShell {
   position: relative;
 
   overflow: hidden;
@@ -18,7 +18,7 @@
 
 }
 
-.MainContent {
+.StoryViewport {
   position: relative;
   z-index: var(--story-viewport-layer, 2);
 
@@ -42,7 +42,7 @@
   }
 
   &.isLoading {
-    height: calc(100vh - 5px - 10px); // padding-top + padding-bottom from .PageWrapper
+    height: calc(100vh - 5px - 10px); // padding-top + padding-bottom from .StoryShell
 
     > * {
       display: none;

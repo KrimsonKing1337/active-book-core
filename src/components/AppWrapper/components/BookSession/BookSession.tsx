@@ -5,7 +5,7 @@ import { mainActions } from '@store/main';
 
 import { createVisualEffects, VisualEffectsContext } from '@controllers/visualEffects';
 
-import { NarrativeFrameContext } from '@components/PageWrapper/NarrativeFrameContext';
+import { NarrativeFrameContext } from '@components/StoryShell/NarrativeFrameContext';
 
 
 import type { AppWrapperProps } from '../../@types';

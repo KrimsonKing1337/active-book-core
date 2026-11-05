@@ -1,8 +1,8 @@
-import { PageWrapper } from '@components/PageWrapper';
+import { StoryShell } from '@components/StoryShell';
 
 export const Page = () => {
   return (
-    <PageWrapper>
+    <StoryShell>
       <h1>
         Глава.
       </h1>
@@ -18,6 +18,6 @@ export const Page = () => {
       <p>
         Текст.
       </p>
-    </PageWrapper>
+    </StoryShell>
   );
 };

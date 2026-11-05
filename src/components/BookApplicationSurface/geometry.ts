@@ -1,4 +1,4 @@
-import type { StoryGeometry } from '@components/StoryVisualRoot/geometry';
+import type { StoryGeometry } from '@components/StoryRoot/geometry';
 
 /** Both measured roots are untransformed; translation changes the host coordinate origin. */
 export const geometryInApplication = (geometry: StoryGeometry | null): StoryGeometry | null => {

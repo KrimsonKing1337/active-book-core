@@ -89,7 +89,7 @@ test('registered visual lifecycle in Chromium', async (context) => {
 
       const withGeometry = await readCounter(page);
       await goToPage(page, 3); // Empty page content keeps the real regions mounted.
-      await page.waitForFunction(() => document.querySelector('#page-wrapper').dataset.pageId === 'page-3');
+      await page.waitForFunction(() => document.querySelector('#story-shell').dataset.pageId === 'page-3');
       await page.locator('[data-visual-surface="range-a"]').waitFor({ state: 'visible' });
       await waitTicks(page, { above: withGeometry.ticks });
       const missing = await readCounter(page);

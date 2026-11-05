@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react';
 
-import type { StoryGeometry, StoryRegionRect } from '@components/StoryVisualRoot/geometry';
+import type { StoryGeometry, StoryRegionRect } from '@components/StoryRoot/geometry';
 
 export const VisualRegionGeometryContext = createContext<{
   geometry: StoryGeometry | null;

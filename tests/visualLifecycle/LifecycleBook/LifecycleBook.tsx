@@ -5,10 +5,10 @@ import type { AppMode, Config } from '../../../src/@types';
 import { StoreProvider, store } from '../../../src/store';
 import { AppWrapper } from '../../../src/components/AppWrapper';
 import { AppModeContext } from '../../../src/components/App/AppModeContext';
-import { useStoryGeometry } from '../../../src/components/StoryVisualRoot';
+import { useStoryGeometry } from '../../../src/components/StoryRoot';
 
-import { TestControls } from '../../storyVisualRoot/TestControls';
-import { TestPage } from '../../storyVisualRoot/TestPage';
+import { TestControls } from '../../storyRoot/TestControls';
+import { TestPage } from '../../storyRoot/TestPage';
 
 import { LifecycleControls } from '../LifecycleControls';
 import { testApi, visualEffects } from '../testSession';

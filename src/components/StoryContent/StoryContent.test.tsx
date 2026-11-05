@@ -5,7 +5,7 @@ import { act, render } from '@testing-library/react';
 import { StoreProvider, store } from '@store';
 import { segmentsActions } from '@store/segments';
 
-import { PageContent } from './PageContent';
+import { StoryContent } from './StoryContent';
 
 test('keyed content cancels its own pending work, timers and listeners while the shell survives', async () => {
   jest.useFakeTimers();
@@ -44,9 +44,9 @@ test('keyed content cancels its own pending work, timers and listeners while the
   }) => (
     <StoreProvider>
       <main data-testid="shell">
-        <PageContent key={pageId}>
+        <StoryContent key={pageId}>
           <Resources />
-        </PageContent>
+        </StoryContent>
       </main>
     </StoreProvider>
   );

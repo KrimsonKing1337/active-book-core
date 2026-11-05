@@ -44,7 +44,7 @@ export const Controls = ({
     ['originY', 'Точка возникновения Y, %', 0, 100, 1],
     ['width', 'Ширина приложения, px', 320, 1400, 10],
     ['height', 'Высота приложения, px', 360, 900, 10],
-    ['storySize', 'Размер StoryVisualRoot, %', 45, 100, 1],
+    ['storySize', 'Размер StoryRoot, %', 45, 100, 1],
     ['toolbarHeight', 'Высота Toolbar, px', 32, 110, 1],
   ];
   const visibleSliders = sliders.filter(([name]) => {
@@ -133,7 +133,7 @@ export const Controls = ({
             >
               <option value="storyViewport">Вьюпорт с Toolbar</option>
               <option value="narrativeFrame">Нарратив и рамка</option>
-              <option value="story">Весь StoryVisualRoot</option>
+              <option value="story">Весь StoryRoot</option>
               <option value="application">Приложение за границами story</option>
             </select>
           </label>

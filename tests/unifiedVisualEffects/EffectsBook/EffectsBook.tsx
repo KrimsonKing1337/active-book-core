@@ -7,7 +7,7 @@ import { BackgroundRenderer } from '../../../src/components/BackgroundEffects/co
 import { FrameRenderer } from '../../../src/components/FrameEffects/components/FrameRenderer';
 import { AppModeContext } from '../../../src/components/App/AppModeContext';
 import { AppWrapper } from '../../../src/components/AppWrapper';
-import { useStoryGeometry } from '../../../src/components/StoryVisualRoot';
+import { useStoryGeometry } from '../../../src/components/StoryRoot';
 
 import { EffectControls } from '../EffectControls';
 import { EffectsPage } from '../EffectsPage';

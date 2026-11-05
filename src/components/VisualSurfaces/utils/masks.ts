@@ -1,6 +1,6 @@
 import type { VisualMask } from '@active-book/types';
 
-import type { StoryRegionRect } from '@components/StoryVisualRoot/geometry';
+import type { StoryRegionRect } from '@components/StoryRoot/geometry';
 
 import { resolveVisualLength } from './placement';
 

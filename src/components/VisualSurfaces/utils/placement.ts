@@ -1,6 +1,6 @@
 import type { AnchorPoint, VisualLength, VisualPlacement } from '@active-book/types';
 
-import type { StoryGeometry, StoryRegionRect } from '@components/StoryVisualRoot/geometry';
+import type { StoryGeometry, StoryRegionRect } from '@components/StoryRoot/geometry';
 
 const anchorPoints: Record<AnchorPoint, readonly [number, number]> = {
   'top-left': [0, 0],

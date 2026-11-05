@@ -7,7 +7,7 @@ import { createPortal } from 'react-dom';
 import { useSelector } from '@store';
 import { mainSelectors } from '@store/main';
 
-import { useNarrativeFrame } from '@components/PageWrapper/NarrativeFrameContext';
+import { useNarrativeFrame } from '@components/StoryShell/NarrativeFrameContext';
 
 import * as styles from './ContinuousBall.module.scss';
 

@@ -14,9 +14,9 @@ import { useBookApplicationSurface } from '@components/BookApplicationSurface/co
 import { useStoryGeometry } from './geometry';
 import { useVisualEffectSurfaces } from './hooks/useVisualEffectSurfaces';
 
-import * as styles from './StoryVisualRoot.module.scss';
+import * as styles from './StoryRoot.module.scss';
 
-export type StoryVisualRootProps = HTMLAttributes<HTMLDivElement> & {
+export type StoryRootProps = HTMLAttributes<HTMLDivElement> & {
   ref?: Ref<HTMLDivElement>;
   surfaces?: readonly VisualSurfaceItem[];
   inverseColors?: boolean;
@@ -26,7 +26,7 @@ export type StoryVisualRootProps = HTMLAttributes<HTMLDivElement> & {
   selectedVisualEffectId?: string | null;
 };
 
-export const StoryVisualRoot = ({
+export const StoryRoot = ({
   children,
   className = '',
   ref,
@@ -37,7 +37,7 @@ export const StoryVisualRoot = ({
   inverseColors = false,
   selectedVisualEffectId,
   ...etc
-}: StoryVisualRootProps) => {
+}: StoryRootProps) => {
   const storyRef = useRef<HTMLDivElement>(null);
   const appMode = useAppMode();
   const application = useBookApplicationSurface();
@@ -77,7 +77,7 @@ export const StoryVisualRoot = ({
   }
 
   const rootClassNames = classNames({
-    [styles.StoryVisualRoot]: true,
+    [styles.StoryRoot]: true,
     [className]: !!className,
     [styles.inverseColors]: inverseColors && !application,
   });

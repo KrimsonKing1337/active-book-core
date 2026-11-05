@@ -10,7 +10,7 @@ import { bookmarksActions } from '@store/bookmarks';
 
 import { useAppMode } from '@components/App/AppModeContext';
 
-import { getNarrativeElement } from '@components/PageWrapper/components/Narrative/utils';
+import { getNarrativeElement } from '@components/StoryShell/components/Narrative/utils';
 
 import * as styles from './Overflow.module.scss';
 

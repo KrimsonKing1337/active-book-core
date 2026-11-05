@@ -4,7 +4,7 @@ import { createPortal } from 'react-dom';
 import { useBookApplicationSurface } from '@components/BookApplicationSurface/context';
 import { geometryInApplication } from '@components/BookApplicationSurface/geometry';
 
-import type { StoryGeometry } from '@components/StoryVisualRoot/geometry';
+import type { StoryGeometry } from '@components/StoryRoot/geometry';
 
 import type { VisualSurfaceItem } from './@types';
 

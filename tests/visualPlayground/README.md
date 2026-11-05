@@ -10,7 +10,7 @@
 registrationsFor(settings) → authored registrations
 definitionsFor(settings)   → React renderers + экспериментальные host/layout metadata
           ↓
-AppWrapper → одна VisualEffects session → StoryVisualRoot
+AppWrapper → одна VisualEffects session → StoryRoot
           ↓
 VisualSurfaces → VisualSurface → RegisteredVisualEffect
           ↓

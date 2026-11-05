@@ -1,4 +1,4 @@
-import type { StoryGeometry } from '@components/StoryVisualRoot/geometry';
+import type { StoryGeometry } from '@components/StoryRoot/geometry';
 
 import type { VisualSurfaceItem } from '../@types';
 

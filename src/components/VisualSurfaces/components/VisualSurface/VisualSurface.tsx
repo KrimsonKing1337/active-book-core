@@ -2,7 +2,7 @@ import type { CSSProperties } from 'react';
 
 import classNames from 'classnames';
 
-import type { StoryGeometry } from '@components/StoryVisualRoot/geometry';
+import type { StoryGeometry } from '@components/StoryRoot/geometry';
 
 import type { VisualSurfaceItem } from '@components/VisualSurfaces';
 import { resolveVisualSurface } from '@components/VisualSurfaces/utils';

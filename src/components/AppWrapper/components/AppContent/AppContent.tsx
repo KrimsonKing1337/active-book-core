@@ -16,9 +16,9 @@ import { type VisualEffects, useVisualRegistrations } from '@controllers/visualE
 import { useEffectsInRange } from '@hooks/effects/range';
 import { useGoToPage } from '@hooks/control/useGoToPage';
 
-import { StoryVisualRoot } from '@components/StoryVisualRoot';
-import { PageWrapper } from '@components/PageWrapper';
-import { PageContent } from '@components/PageContent';
+import { StoryRoot } from '@components/StoryRoot';
+import { StoryShell } from '@components/StoryShell';
+import { StoryContent } from '@components/StoryContent';
 import { useAppMode } from '@components/App/AppModeContext';
 
 import { removeCssHover } from '@utils/touch/removeCssHover';
@@ -179,7 +179,7 @@ export const AppContent = ({
   return (
     <>
       <div className={appWrapperClassNames}>
-        <StoryVisualRoot
+        <StoryRoot
           ref={ref}
           surfaces={visualSurfaces}
           visualEffects={visualEffects}
@@ -188,16 +188,16 @@ export const AppContent = ({
           selectedVisualEffectId={selectedVisualEffectId}
           inverseColors={inverseColors}
         >
-          <PageWrapper
+          <StoryShell
             withoutToolbar={withoutToolbar}
             windowHistoryScope={`book-windows:${config.id}:${bookKey ?? ''}`}
             data-page-id={pageId ?? undefined}
           >
-            <PageContent key={pageId === null ? 'start' : `page:${pageId}`}>
+            <StoryContent key={pageId === null ? 'start' : `page:${pageId}`}>
               {pageId === null ? children : selectedPage?.content}
-            </PageContent>
-          </PageWrapper>
-        </StoryVisualRoot>
+            </StoryContent>
+          </StoryShell>
+        </StoryRoot>
 
         {editorTools}
       </div>

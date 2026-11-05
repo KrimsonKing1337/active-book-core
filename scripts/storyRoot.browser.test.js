@@ -45,7 +45,7 @@ test('persistent book root and existing page rendering in Chromium', async (cont
       page.on('pageerror', (error) => errors.push(error.message));
 
       try {
-        await page.goto(`http://127.0.0.1:${address.port}/tests/storyVisualRoot/?mode=${mode}`);
+        await page.goto(`http://127.0.0.1:${address.port}/tests/storyRoot/?mode=${mode}`);
         await page.getByText('Audio unlock', { exact: true }).waitFor();
         assert.equal(await page.getByTestId('audio-unlocked').textContent(), 'false');
 
@@ -151,7 +151,7 @@ test('persistent book root and existing page rendering in Chromium', async (cont
 
         const viewport = await page.locator('[data-story-region="storyViewport"]').elementHandle();
         await page.getByTestId('empty').click();
-        await page.waitForFunction(() => document.querySelector('#page-wrapper').dataset.pageId === 'page-3');
+        await page.waitForFunction(() => document.querySelector('#story-shell').dataset.pageId === 'page-3');
         assert.equal(await viewport.evaluate((element) => element === document.querySelector('[data-story-region="storyViewport"]')), true);
         assert(await page.locator('[data-story-region="narrativeFrame"]').isVisible(), 'empty content retains its shell');
         assert.equal(await page.locator('[data-visual-plane]:not([data-visual-plane="systemFeedback"]) [data-effect-id]')
