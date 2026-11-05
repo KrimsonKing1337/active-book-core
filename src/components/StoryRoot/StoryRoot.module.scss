@@ -1,9 +1,9 @@
 .StoryRoot {
   --story-viewport-layer: auto;
   --story-frame-isolation: auto;
-  --story-narrative-layer: 3;
+  --story-narrative-layer: calc(var(--visual-layer-step, 1) * 2);
   --story-toolbar-position: relative;
-  --story-toolbar-layer: 10;
+  --story-toolbar-layer: calc(var(--visual-layer-step, 1) * 4);
   --story-toolbar-space: 0px;
   --story-frame-bottom-radius: clamp(0px, 2vw, 16px);
 

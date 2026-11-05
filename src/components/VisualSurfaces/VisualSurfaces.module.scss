@@ -6,7 +6,7 @@
 }
 
 .belowNarrative {
-  z-index: 2;
+  z-index: var(--visual-layer-step, 1);
 }
 
 .background {
@@ -14,13 +14,13 @@
 }
 
 .systemFeedback {
-  z-index: 30;
+  z-index: calc(var(--visual-layer-step, 1) * 6);
 }
 
 .aboveNarrative {
-  z-index: 5;
+  z-index: calc(var(--visual-layer-step, 1) * 3);
 }
 
 .aboveControls {
-  z-index: 20;
+  z-index: calc(var(--visual-layer-step, 1) * 5);
 }

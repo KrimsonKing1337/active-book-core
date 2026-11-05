@@ -42,5 +42,5 @@
 
 .Text {
   position: relative;
-  z-index: 3;
+  z-index: calc(var(--visual-layer-step, 1) * 2);
 }

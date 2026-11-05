@@ -1,0 +1,16 @@
+.Surface {
+  position: absolute;
+
+  overflow: hidden;
+
+  border-radius: inherit;
+
+  pointer-events: none;
+  inset: 0;
+}
+
+.Content {
+  position: absolute;
+
+  pointer-events: none;
+}

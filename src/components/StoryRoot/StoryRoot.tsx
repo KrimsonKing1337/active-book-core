@@ -1,4 +1,4 @@
-import { type HTMLAttributes, type Ref, useCallback, useLayoutEffect, useRef } from 'react';
+import { type CSSProperties, type HTMLAttributes, type Ref, useCallback, useLayoutEffect, useRef } from 'react';
 
 import classNames from 'classnames';
 
@@ -105,11 +105,17 @@ export const StoryRoot = ({
     }
   }, [ref, refs]);
 
+  const rootStyle = {
+    ...etc.style,
+    '--visual-layer-step': surfaces.length + 1,
+  } as CSSProperties;
+
   return (
     <div
       {...etc}
       ref={attachRoot}
       className={rootClassNames}
+      style={rootStyle}
       data-story-region="story"
     >
       {children}

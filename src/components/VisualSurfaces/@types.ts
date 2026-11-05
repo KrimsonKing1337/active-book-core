@@ -16,7 +16,7 @@ export type VisualSurfaceItem = Pick<VisualEffectInstance, 'id' | 'placement' | 
   hidden?: boolean;
   /** Experimental host metadata, never inferred from an author's layer order. */
   host?: 'story' | 'underStory' | 'aboveStory';
-  layout?: 'geometry' | 'css' | 'hybrid';
+  layout?: 'geometry' | 'css' | 'hybrid' | 'local';
 };
 
 export type VisibilityStyle = CSSProperties & {

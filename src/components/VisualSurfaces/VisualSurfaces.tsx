@@ -6,7 +6,10 @@ import { geometryInApplication } from '@components/BookApplicationSurface/geomet
 
 import type { StoryGeometry } from '@components/StoryRoot/geometry';
 
+import { LocalVisualSurfaces } from '@components/LocalVisualSurfaces';
+
 import type { VisualSurfaceItem } from './@types';
+
 
 import { VisualSurface } from './components';
 
@@ -34,9 +37,11 @@ export const VisualSurfaces = ({ items, geometry }: VisualSurfacesProps) => {
 
   return (
     <>
+      <LocalVisualSurfaces items={items.filter((cur) => cur.layout === 'local')} stride={items.length + 1} />
       {hosts.flatMap((hostCur) => planes.map((planeCur) => {
         const planeItems = items.filter((itemCur) => {
-          return itemCur.depth.plane === planeCur && (itemCur.host ?? 'story') === hostCur;
+          return itemCur.layout !== 'local' && itemCur.depth.plane === planeCur
+            && (itemCur.host ?? 'story') === hostCur;
         });
 
         const planeItemsSorted = planeItems.sort(compareVisualSurfaces);

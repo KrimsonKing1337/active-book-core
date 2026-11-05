@@ -13,7 +13,7 @@ export type CreateVisualEffectsOptions = {
 export type HostVisualEffectDefinition = VisualEffectDefinition & {
   systemFeedback?: boolean;
   surfaceHost?: 'story' | 'underStory' | 'aboveStory';
-  surfaceLayout?: 'geometry' | 'css' | 'hybrid';
+  surfaceLayout?: 'geometry' | 'css' | 'hybrid' | 'local';
 };
 
 export type VisualEffectChanges = {
