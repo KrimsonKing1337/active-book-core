@@ -46,6 +46,8 @@ for (const mode of ['reader', 'editor']) {
       const range = document.querySelector('[data-ball="range-ball"]');
       const pageBall = document.querySelector('[data-ball="page-ball"]');
       window.identityProbe = {
+        root: query('story'), shell: document.querySelector('#story-shell'), content: query('narrativeContent'),
+        viewportFrame: query('storyViewportFrame'), toolbarFrame: query('toolbarFrame'),
         viewport: query('storyViewport'), narrative: query('narrativeViewport'),
         scroll: document.querySelector('#narrative'),
         regionHosts: [...document.querySelectorAll('[data-visual-host]')],
@@ -72,9 +74,12 @@ for (const mode of ['reader', 'editor']) {
         const query = (region) => document.querySelector(`[data-story-region="${region}"]`);
         const range = document.querySelector('[data-ball="range-ball"]');
         return {
+          root: old.root === query('story'), shell: old.shell === document.querySelector('#story-shell'),
+          content: old.content === query('narrativeContent'), viewportFrame: old.viewportFrame === query('storyViewportFrame'),
+          toolbarFrame: old.toolbarFrame === query('toolbarFrame'),
           viewport: old.viewport === query('storyViewport'), narrative: old.narrative === query('narrativeViewport'),
           scroll: old.scroll === document.querySelector('#narrative'),
-          regionHosts: old.regionHosts.length === 5 && old.regionHosts.every((host) => {
+          regionHosts: old.regionHosts.length === 8 && old.regionHosts.every((host) => {
             return host === document.querySelector(`[data-visual-host="${host.dataset.visualHost}"]`);
           }),
           frame: old.frame === query('narrativeFrame'), toolbar: old.toolbar === document.querySelector('#Toolbar'),
