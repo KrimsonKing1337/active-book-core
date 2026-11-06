@@ -23,6 +23,7 @@ const demos: readonly [Settings['demo'], string][] = [
   ['sequence', '07 · Последовательность'],
   ['single', '08 · Одна сцена'],
   ['ball', '09 · Непрерывный шарик'],
+  ['toolbar', '11 · Toolbar и его рамка'],
   ['advancing', '10 · Наступающая тьма'],
 ];
 
@@ -46,11 +47,10 @@ export const Controls = ({
     ['width', 'Ширина приложения, px', 320, 1400, 10],
     ['height', 'Высота приложения, px', 360, 900, 10],
     ['storySize', 'Размер StoryRoot, %', 45, 100, 1],
-    ['toolbarHeight', 'Высота Toolbar, px', 32, 110, 1],
   ];
   const visibleSliders = sliders.filter(([name]) => {
     if (isBall) {
-      return ['width', 'height', 'storySize', 'toolbarHeight'].includes(name);
+      return ['width', 'height', 'storySize'].includes(name);
     }
 
     if (name === 'originX' || name === 'originY') {
@@ -132,9 +132,11 @@ export const Controls = ({
               disabled={isPhysical || settings.demo === 'edges'}
               onChange={(e) => onChange({ region: e.target.value as Settings['region'] })}
             >
-              <option value="storyViewport">Вьюпорт с Toolbar</option>
-              <option value="narrativeFrame">Нарратив и рамка</option>
-              <option value="storyViewportFrame">Только рамка</option>
+              <option value="storyViewport">Весь вьюпорт</option>
+              <option value="narrativeFrame">Только нарратив</option>
+              <option value="toolbar">Toolbar</option>
+              <option value="toolbarFrame">Рамка Toolbar</option>
+              <option value="storyViewportFrame">Рамка всего вьюпорта</option>
               <option value="narrativeViewport">Неподвижный overlay нарратива</option>
               <option value="narrativeContent">Прокручиваемое содержимое</option>
               <option value="story">Весь StoryRoot</option>
@@ -179,8 +181,26 @@ export const Controls = ({
         </>
       )}
 
-      {settings.demo === 'frame' && (
+      {(settings.demo === 'frame' || settings.demo === 'toolbar') && (
         <FrameControls settings={settings} onChange={onChange} />
+      )}
+
+      {settings.demo === 'advancing' && (
+        <label>
+          Композиция тьмы
+          <select
+            value={settings.composition}
+            onChange={(event) => onChange({ composition: event.target.value as Settings['composition'] })}
+          >
+            <option value="single">
+              Общая рамка вьюпорта → внутри произведения
+            </option>
+
+            <option value="multiple">
+              Рамка нарратива и Toolbar раздельно
+            </option>
+          </select>
+        </label>
       )}
 
       {settings.demo === 'through' && (

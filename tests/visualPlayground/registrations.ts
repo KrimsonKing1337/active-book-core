@@ -6,6 +6,8 @@ import { fillRegion } from '@controllers/visualEffects/utils/declarations';
 
 import type { Settings } from './@types';
 
+import { ToolbarDemo } from './ToolbarDemo';
+
 import { AdvancingDarkness } from './AdvancingDarkness';
 
 import { ContinuousBall } from './ContinuousBall';
@@ -32,9 +34,11 @@ const createRegistration = (
     speed: settings.speed,
     color: settings.color,
     direction: settings.direction,
+    composition: settings.composition,
     originX: settings.originX,
     originY: settings.originY,
     frameAnchor: settings.frameAnchor,
+    framePreset: settings.framePreset,
     offsetX: settings.offsetX,
   };
   const effect: VisualEffectRegistration['effect'] = {
@@ -42,7 +46,7 @@ const createRegistration = (
     definitionId,
     params,
     placement: fillRegion(region),
-    visibility: region === 'storyViewportFrame' ? { sides: ['top', 'right', 'bottom', 'left'] } : {},
+    visibility: ['storyViewportFrame', 'toolbarFrame'].includes(region) ? { sides: ['top', 'right', 'bottom', 'left'] } : {},
     depth: {
       plane: ['lab.edges', 'lab.under-curtain', 'lab.single'].includes(definitionId)
         ? 'background' : 'aboveStoryControls',
@@ -58,6 +62,9 @@ const createRegistration = (
 
 export const definitionsFor = (): HostVisualEffectDefinition[] => {
   const definitions: HostVisualEffectDefinition[] = [
+    {
+      id: 'lab.toolbar', defaultParams: {}, Renderer: ToolbarDemo, 
+    },
     {
       id: 'lab.ball', defaultParams: {}, Renderer: ContinuousBall,
     },
@@ -106,10 +113,9 @@ const createFrameRegistration = (settings: Settings): VisualEffectRegistration =
   const frame = createRegistration(settings, 'frame', 'lab.frame', settings.region);
   frame.effect.depth.plane = settings.plane;
 
-  if (settings.mask) {
-    frame.effect.placement = fillRegion(settings.region);
-    frame.effect.visibility = { sides: ['top', 'right', 'bottom', 'left'] };
-  }
+  frame.effect.visibility = settings.mask ? {
+    sides: ['top', 'right', 'bottom', 'left'], frameWidth: { value: 45, unit: 'px' },
+  } : {};
 
   return frame;
 };
@@ -145,6 +151,16 @@ const createSceneRegistrations = (settings: Settings): VisualEffectRegistration[
 };
 
 export const registrationsFor = (settings: Settings): VisualEffectRegistration[] => {
+  if (settings.demo === 'toolbar') {
+    const frame = createRegistration(settings, 'toolbar-frame', 'lab.toolbar', 'toolbarFrame');
+    const content = createRegistration(settings, 'toolbar-content', 'lab.toolbar', 'toolbar');
+    frame.effect.depth.plane = 'aboveNarrative';
+    content.effect.depth.plane = settings.plane;
+    content.effect.visibility = {};
+
+    return [frame, content];
+  }
+
   if (settings.demo === 'advancing') {
     return [createRegistration(settings, 'advancing', 'lab.advancing', 'application')];
   }

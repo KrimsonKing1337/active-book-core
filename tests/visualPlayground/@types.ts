@@ -2,7 +2,7 @@ import type { AnchorPoint, VisualRegion } from '@active-book/types';
 
 export type Demo =
   | 'frame' | 'darkness' | 'edges' | 'smoke' | 'through'
-  | 'collapse' | 'sequence' | 'single' | 'ball' | 'advancing';
+  | 'collapse' | 'sequence' | 'single' | 'ball' | 'advancing' | 'toolbar';
 
 export type Settings = {
   demo: Demo;
@@ -19,10 +19,10 @@ export type Settings = {
   height: number;
   storySize: number;
   toolbar: boolean;
-  toolbarHeight: number;
   mask: boolean;
-  plane: 'belowNarrative' | 'aboveNarrative';
+  plane: 'background' | 'belowNarrative' | 'aboveNarrative' | 'aboveStoryControls';
   frameAnchor: AnchorPoint;
+  framePreset: 'pulse' | 'police' | 'caramel';
   offsetX: number;
   composition: 'single' | 'multiple';
   trigger: 'manual' | 'page';
@@ -31,7 +31,7 @@ export type Settings = {
 
 export const initialSettings: Settings = {
   demo: 'frame',
-  region: 'storyViewport',
+  region: 'storyViewportFrame',
   duration: 2000,
   intensity: 0.85,
   opacity: 1,
@@ -44,10 +44,10 @@ export const initialSettings: Settings = {
   height: 690,
   storySize: 100,
   toolbar: true,
-  toolbarHeight: 48,
   mask: false,
   plane: 'aboveNarrative',
   frameAnchor: 'top-left',
+  framePreset: 'pulse',
   offsetX: 0,
   composition: 'single',
   trigger: 'manual',

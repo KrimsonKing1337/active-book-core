@@ -71,7 +71,7 @@ test('persistent book root and existing page rendering in Chromium', async (cont
         assert.equal(before.regions.narrativeFrame.width, pageBounds.width);
         assert.equal(before.regions.narrativeFrame.height, pageBounds.height);
         assert(before.regions.narrativeFrame.height < before.regions.story.height);
-        assert.deepEqual(before.regions.frame, before.regions.narrativeFrame);
+        assert.deepEqual(before.regions.storyViewportFrame, before.regions.storyViewport);
         const storyViewportBounds = await page.locator('[data-story-region="storyViewport"]').boundingBox();
         assert.equal(before.regions.storyViewport.x, storyViewportBounds.x - bounds.x);
         assert.equal(before.regions.storyViewport.y, storyViewportBounds.y - bounds.y);

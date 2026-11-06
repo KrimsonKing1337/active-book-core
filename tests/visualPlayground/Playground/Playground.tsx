@@ -30,12 +30,14 @@ const demoColors: Partial<Record<Settings['demo'], string>> = {
   smoke: '#bdced4',
   through: '#75e1d5',
   advancing: '#03050b',
+  toolbar: '#b59cff',
 };
 
-const getDemoDefaults = (demo: Settings['demo']): Pick<Settings, 'color' | 'region'> => {
+const getDemoDefaults = (demo: Settings['demo']): Pick<Settings, 'color' | 'region' | 'composition'> => {
   return {
     color: demoColors[demo] ?? '#11131f',
-    region: demo === 'frame' ? 'storyViewport' : 'application',
+    composition: 'single',
+    region: demo === 'frame' ? 'storyViewportFrame' : 'application',
   };
 };
 
@@ -205,7 +207,6 @@ export const Playground = () => {
   const storyStyle: CSSProperties = {
     width: `${settings.storySize}%`,
     height: `${settings.storySize}%`,
-    '--story-toolbar-height': `${settings.toolbarHeight}px`,
   } as CSSProperties;
 
   return (

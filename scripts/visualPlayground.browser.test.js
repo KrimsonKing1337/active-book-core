@@ -133,18 +133,18 @@ test('visual playground experiments in Chromium', async (context) => {
 
   await scenario('local surfaces match real regions, toolbar variations and CSS frame anchors', async (page) => {
     for (const options of [
-      { width: 1040, height: 690, toolbar: true, toolbarHeight: 48, region: 'storyViewport', mask: false },
-      { width: 820, height: 560, toolbar: true, toolbarHeight: 92, region: 'narrativeFrame', mask: false },
-      { width: 1040, height: 720, toolbar: false, toolbarHeight: 48, region: 'narrativeFrame', mask: true },
-      { width: 390, height: 740, toolbar: true, toolbarHeight: 70, region: 'storyViewport', mask: true },
+      { width: 1040, height: 690, toolbar: true, region: 'storyViewport', mask: false },
+      { width: 820, height: 560, toolbar: true, region: 'narrativeFrame', mask: false },
+      { width: 1040, height: 720, toolbar: false, region: 'narrativeFrame', mask: true },
+      { width: 390, height: 740, toolbar: true, region: 'storyViewport', mask: true },
     ]) {
       await patch(page, options);
-      const region = options.mask ? 'narrativeFrame' : options.region;
+      const region = options.region;
       const expected = await bounds(page, `[data-story-region="${region}"]`);
       const actual = await bounds(page, '[data-visual-content="frame"]');
       for (const key of ['x', 'y', 'width', 'height']) near(actual[key], expected[key], `native ${region} ${key}`);
       const token = await frameToken(page);
-      await patch(page, { toolbarHeight: options.toolbarHeight + 8 });
+      await patch(page, { width: options.width - 8 });
       assert.equal(await frameToken(page), token, 'resizing an actual region does not reparent its renderer');
       assert.equal(await page.evaluate(() => window.liveGeometryObservers.size), 0, 'ordinary CSS effects install no region observers');
       measurements.push({ options, actual, expected });
@@ -186,7 +186,7 @@ test('visual playground experiments in Chromium', async (context) => {
     await page.evaluate(() => {
       window.savedFrameAnimation = document.querySelector('[data-effect-id="frame"]')?.getAnimations({ subtree: true })[0];
     });
-    await patch(page, { width: 900, toolbarHeight: 85 });
+    await patch(page, { width: 900 });
     await page.getByRole('button', { name: 'Страница 4', exact: true }).click();
     await settle(page);
     assert.equal(await frameToken(page), token);

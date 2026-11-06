@@ -5,7 +5,6 @@ import { useRef } from 'react';
 import type { VisualRendererProps } from '@active-book/types';
 
 import { createPortal } from 'react-dom';
-import classNames from 'classnames';
 
 import { useStoryRegions } from '@components/StoryRegionsProvider';
 import { useBookApplicationSurface } from '@components/BookApplicationSurface';
@@ -23,7 +22,7 @@ const milestones = ['outside-covered', 'frame-covered', 'controls-covered', 'nar
 
 /** One author registration and run; four native phase animations in actual local/external hosts. */
 export const AdvancingDarkness = (props: VisualRendererProps) => {
-  const { elements, hosts } = useStoryRegions();
+  const { hosts } = useStoryRegions();
   const application = useBookApplicationSurface();
   const nodesRef = useRef<(HTMLDivElement | null)[]>([]);
   const { token, status } = useAnimationPlayback(props, () => {
@@ -51,8 +50,9 @@ export const AdvancingDarkness = (props: VisualRendererProps) => {
       milestones: phaseMilestones,
     };
   });
-  const toolbar = elements.storyViewport?.querySelector<HTMLElement>('[data-story-toolbar]');
-  const targets = [application?.hosts.underStory, hosts.narrativeFrame, toolbar, hosts.narrativeViewport];
+  const split = stringParam(props.params, 'composition', 'single') === 'multiple';
+  const targets = [application?.hosts.underStory, split ? hosts.narrativeFrame : hosts.storyViewportFrame,
+    split ? hosts.toolbarFrame : hosts.toolbar, hosts.narrativeViewport];
 
   const phases = names.map((nameCur, index) => {
     const target = targets[index];
@@ -67,9 +67,6 @@ export const AdvancingDarkness = (props: VisualRendererProps) => {
       maskImage: index === 1 ? getFrameMaskImage(['top', 'right', 'bottom', 'left']) : undefined,
       maskComposite: index === 1 ? 'add' : undefined,
     };
-    const inkClassNames = classNames(styles.Ink, {
-      [styles.NarrativeInk]: index === 3,
-    });
 
     return createPortal(
       <div
@@ -84,7 +81,7 @@ export const AdvancingDarkness = (props: VisualRendererProps) => {
           ref={(node) => {
             nodesRef.current[index] = node;
           }}
-          className={inkClassNames}
+          className={styles.Ink}
           data-phase-ink={nameCur}
         />
       </div>,

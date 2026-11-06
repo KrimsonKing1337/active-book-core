@@ -15,11 +15,25 @@ export const FrameControls = ({ settings, onChange }: FrameControlsProps) => {
       </legend>
 
       <label>
+        Пресет тени
+        <select
+          value={settings.framePreset}
+          onChange={(event) => onChange({ framePreset: event.target.value as Settings['framePreset'] })}
+        >
+          <option value="pulse">Пульсация</option>
+          <option value="police">Police</option>
+          <option value="caramel">Caramel</option>
+        </select>
+      </label>
+
+      <label>
         Плоскость рамки
         <select
           value={settings.plane}
           onChange={(e) => onChange({ plane: e.target.value as Settings['plane'] })}
         >
+          <option value="aboveStoryControls">Над кнопками</option>
+          <option value="background">Фон</option>
           <option value="aboveNarrative">Над текстом</option>
           <option value="belowNarrative">Под текстом</option>
         </select>

@@ -20,7 +20,7 @@ export const FrameDemo = (props: VisualRendererProps) => {
   const offsetX = `${numberParam(props.params, 'offsetX', 0)}px`;
   const playState = playing ? 'running' : 'paused';
   const animation = {
-    preset: active ? 'pulse' : 'none', duration, playState,
+    preset: active ? stringParam(props.params, 'framePreset', 'pulse') : 'none', duration, playState,
   };
   const shadowParams = {
     kind: 'shadow',
