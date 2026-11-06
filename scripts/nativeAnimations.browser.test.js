@@ -118,3 +118,19 @@ test('visual collapse keeps layout sizes and restores existing CSS on stop, rang
   await page.evaluate(() => window.playground.setVisible(false));
   assert.equal(await page.locator('[data-demo-effect]').count(), 0);
 });
+
+
+test('named CSS playback starts a fresh completed run without replacing its renderer', async (context) => {
+  const page = await open(context);
+  await patch(page, { demo: 'smoke', duration: 300 });
+  const node = await page.locator('[data-demo-effect="smoke"]').elementHandle();
+  await page.getByTestId('play').click();
+  await run(page, 'smoke');
+  const previous = await page.evaluate(() => window.playground.session.runs.read('smoke').number);
+  await page.getByTestId('play').click();
+  await page.waitForFunction((number) => {
+    const current = window.playground.session.runs.read('smoke');
+    return current?.number > number && current.status === 'completed';
+  }, previous);
+  assert(await node.evaluate((element) => element === document.querySelector('[data-demo-effect="smoke"]')));
+});

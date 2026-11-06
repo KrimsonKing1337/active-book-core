@@ -35,6 +35,8 @@ export const startCssAnimation = ({
     else {
       node.style.removeProperty('--lab-delay');
     }
+    // Flush class removal before replaying in the same task; no box measurement is needed.
+    node.getAnimations();
   };
 
   if (!animation || name.includes(',')) {
