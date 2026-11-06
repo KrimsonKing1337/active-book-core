@@ -18,11 +18,11 @@
 }
 
 @mixin viewport {
-  --frame-base: clamp(12px, 1.5vw, 24px);
-  --frame-top: var(--frame-base);
-  --frame-right: var(--frame-base);
-  --frame-bottom: var(--frame-base);
-  --frame-left: var(--frame-base);
+  --narrative-inset: clamp(12px, 1.5vw, 24px);
+  --narrative-top: var(--narrative-inset);
+  --narrative-right: var(--narrative-inset);
+  --narrative-bottom: var(--narrative-inset);
+  --narrative-left: var(--narrative-inset);
 
   display: flex;
   flex-direction: column;
