@@ -5,6 +5,8 @@ import type { VisualRendererProps } from '@active-book/types';
 
 import { useStoryRegions } from '@components/StoryRegionsProvider';
 
+import { startCssAnimation } from '../hooks/startCssAnimation';
+
 import { useAnimationPlayback } from '../hooks/useAnimationPlayback';
 import { useRelativeOrigin } from '../hooks/useRelativeOrigin';
 import { numberParam, stringParam } from '../utils';
@@ -54,17 +56,11 @@ export const SingleScene = (props: VisualRendererProps) => {
       fill: 'both',
     });
     shadeRef.current = shade;
-    const base = viewport.style.transform;
-    const shrink = viewport.animate([
-      { transform: `${base} scale(1)` },
-      { transform: `${base} scale(1)`, offset: 0.5 },
-      { transform: `${base} scale(0)`, offset: 0.65 },
-      { transform: `${base} scale(0)`, offset: 0.75 },
-      { transform: `${base} scale(1)`, offset: 0.85 },
-      { transform: `${base} scale(1)` },
-    ], { duration, fill: 'none' });
+    const shrink = startCssAnimation({
+      node: viewport, className: styles.Shrink, duration, 
+    });
 
-    return { animations: [shade, shrink] };
+    return { animations: [shade, shrink.animation], cleanup: shrink.cleanup };
   });
   const style = {
     color: stringParam(props.params, 'color', '#11131f'),

@@ -1,0 +1,8 @@
+.Collapse {
+  animation: collapse var(--lab-duration) linear;
+}
+
+@keyframes collapse {
+  0%, 100% { scale: 1; }
+  40%, 60% { scale: 0; }
+}

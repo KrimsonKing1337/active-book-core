@@ -26,3 +26,12 @@
   pointer-events: none;
   inset: 0;
 }
+
+.Fade {
+  animation: phase-darkness var(--lab-duration) ease-in var(--lab-delay) both;
+}
+
+@keyframes phase-darkness {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

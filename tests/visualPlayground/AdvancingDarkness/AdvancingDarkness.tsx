@@ -11,6 +11,8 @@ import { useStoryRegions } from '@components/StoryRegionsProvider';
 import { useBookApplicationSurface } from '@components/BookApplicationSurface';
 import { getFrameMaskImage } from '@components/FrameEffects/utils';
 
+import { startCssAnimation } from '../hooks/startCssAnimation';
+
 import { useAnimationPlayback } from '../hooks/useAnimationPlayback';
 import { numberParam, stringParam } from '../utils';
 
@@ -26,20 +28,18 @@ export const AdvancingDarkness = (props: VisualRendererProps) => {
   const nodesRef = useRef<(HTMLDivElement | null)[]>([]);
   const { token, status } = useAnimationPlayback(props, () => {
     const duration = numberParam(props.params, 'duration', 2000) / 4;
-    const animations = names.map((nameCur, index) => {
+    const effects = names.map((nameCur, index) => {
       const node = nodesRef.current[index];
 
       if (!node) {
         throw new Error(`Darkness phase is not attached: ${nameCur}`);
       }
 
-      return node.animate([{ opacity: 0 }, { opacity: 1 }], {
-        duration,
-        delay: duration * index,
-        fill: 'both',
-        easing: 'ease-in',
+      return startCssAnimation({
+        node, className: styles.Fade, duration, delay: duration * index, 
       });
     });
+    const animations = effects.map((cur) => cur.animation);
     const phaseMilestones = animations.map((animationCur, index) => ({
       animation: animationCur,
       name: milestones[index],
@@ -47,6 +47,7 @@ export const AdvancingDarkness = (props: VisualRendererProps) => {
 
     return {
       animations,
+      cleanup: () => effects.forEach((cur) => cur.cleanup()),
       milestones: phaseMilestones,
     };
   });

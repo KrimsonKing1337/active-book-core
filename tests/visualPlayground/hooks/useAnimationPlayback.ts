@@ -15,10 +15,12 @@ type Milestone = {
 export type DemoAnimations = {
   animations: Animation[];
   milestones?: Milestone[];
+  cleanup?: () => void;
 };
 
 type Activation = {
   animations: Animation[];
+  cleanup?: () => void;
   reporter: ReturnType<ReturnType<typeof useVisualEffects>['runs']['start']>;
 };
 
@@ -46,6 +48,7 @@ export const useAnimationPlayback = (props: VisualRendererProps, build: () => De
     activationRef.current = null;
     activation?.reporter.cancel();
     activation?.animations.forEach((cur) => cur.cancel());
+    activation?.cleanup?.();
   }, []);
 
   const stop = useCallback(() => {
@@ -87,6 +90,7 @@ export const useAnimationPlayback = (props: VisualRendererProps, build: () => De
       const activation = {
         animations: [...animations, boundary],
         reporter,
+        cleanup: bundle.cleanup,
       };
       activationRef.current = activation;
       setStatus('running');

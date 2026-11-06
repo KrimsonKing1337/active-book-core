@@ -2,6 +2,8 @@ import { type CSSProperties, useRef } from 'react';
 
 import type { VisualRendererProps } from '@active-book/types';
 
+import { startCssAnimation } from '../hooks/startCssAnimation';
+
 import { useAnimationPlayback } from '../hooks/useAnimationPlayback';
 import { numberParam, stringParam } from '../utils';
 
@@ -16,17 +18,11 @@ export const Smoke = (props: VisualRendererProps) => {
       throw new Error('Smoke cloud is not attached');
     }
 
-    const animation = cloud.animate([
-      { opacity: 0 },
-      { opacity: 1, offset: 0.08 },
-      { opacity: 1, offset: 0.92 },
-      { opacity: 0 },
-    ], {
-      duration: numberParam(props.params, 'duration', 2000),
-      fill: 'both',
+    const effect = startCssAnimation({
+      node: cloud, className: styles.Fade, duration: numberParam(props.params, 'duration', 2000),
     });
 
-    return { animations: [animation] };
+    return { animations: [effect.animation], cleanup: effect.cleanup };
   });
   const count = Math.round(6 + numberParam(props.params, 'intensity', 0.8) * 20);
   const duration = 2500 / numberParam(props.params, 'speed', 1);

@@ -41,3 +41,12 @@
 
   opacity: 0;
 }
+
+.Fade {
+  animation: cloud-opacity var(--lab-duration) linear both;
+}
+
+@keyframes cloud-opacity {
+  0%, 100% { opacity: 0; }
+  8%, 92% { opacity: 1; }
+}
