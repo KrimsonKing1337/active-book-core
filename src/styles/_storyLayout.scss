@@ -40,7 +40,3 @@
   min-height: 0;
 }
 
-@mixin toolbar-metrics {
-  height: var(--story-toolbar-height, clamp(44px, 48px, 52px));
-  margin-top: var(--story-toolbar-margin, clamp(12px, 1.5vw, 24px));
-}

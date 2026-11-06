@@ -56,6 +56,10 @@ export const StoryShell = ({
         className={storyViewportClassNames}
         data-story-region="storyViewport"
       >
+        <div ref={refs.storyViewportFrame} className={styles.StoryViewportFrame} data-story-region="storyViewportFrame">
+          <VisualHost region="storyViewportFrame" />
+        </div>
+
         <div ref={refs.narrativeFrame} className={styles.NarrativeFrame} data-story-region="narrativeFrame">
           <Narrative>
             {children}

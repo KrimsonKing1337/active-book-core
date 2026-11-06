@@ -8,6 +8,10 @@ import { mainActions } from '@store/main';
 import { configActions, configSelectors } from '@store/config';
 import { bookmarksActions } from '@store/bookmarks';
 
+
+import { useStoryRegions } from '@components/StoryRegionsProvider';
+import { VisualHost } from '@components/VisualHost';
+
 import { getNewValueForNarrativeTextStyle } from '@utils/styles/getNewValueForNarrativeTextStyle';
 
 import { Item } from './components/Item';
@@ -21,6 +25,7 @@ export type ToolbarProps = {
 
 export const Toolbar = ({ sbMode }: ToolbarProps) => {
   const dispatch = useDispatch();
+  const { refs } = useStoryRegions();
   const fontSize = useSelector(configSelectors.fontSize);
 
   const dispatchSetFontSize = (isMoreAction: boolean) => {
@@ -50,8 +55,14 @@ export const Toolbar = ({ sbMode }: ToolbarProps) => {
   };
 
   return (
-    <div id="Toolbar" className={styles.Wrapper} data-story-toolbar>
-      <div className={styles.Toolbar}>
+    <div ref={refs.toolbarFrame} className={styles.ToolbarFrame} data-story-region="toolbarFrame">
+      <div
+        ref={refs.toolbar}
+        id="Toolbar"
+        className={styles.Toolbar}
+        data-story-region="toolbar"
+        data-story-toolbar
+      >
         {!sbMode && (
           <>
             <Item data-welcome-tour-id="bookmarks" onClick={bookmarkClickHandler}>
@@ -77,7 +88,10 @@ export const Toolbar = ({ sbMode }: ToolbarProps) => {
         <Item data-welcome-tour-id="config" onClick={etcIconClickHandler}>
           <EtcIcon />
         </Item>
+        <VisualHost region="toolbar" />
       </div>
+
+      <VisualHost region="toolbarFrame" />
     </div>
   );
 };

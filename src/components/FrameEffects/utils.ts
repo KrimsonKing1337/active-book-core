@@ -1,10 +1,12 @@
 import type { FrameSide } from '@hooks/effects/frame/@types';
 
+const frameWidth = 'var(--visual-frame-width, 12px)';
+
 const frameMaskGradients: Record<FrameSide, string> = {
-  top: 'linear-gradient(to bottom, black 0 var(--frame-top), transparent var(--frame-top))',
-  right: 'linear-gradient(to left, black 0 var(--frame-right), transparent var(--frame-right))',
-  bottom: 'linear-gradient(to top, black 0 var(--frame-bottom), transparent var(--frame-bottom))',
-  left: 'linear-gradient(to right, black 0 var(--frame-left), transparent var(--frame-left))',
+  top: `linear-gradient(to bottom, black 0 ${frameWidth}, transparent ${frameWidth})`,
+  right: `linear-gradient(to left, black 0 ${frameWidth}, transparent ${frameWidth})`,
+  bottom: `linear-gradient(to top, black 0 ${frameWidth}, transparent ${frameWidth})`,
+  left: `linear-gradient(to right, black 0 ${frameWidth}, transparent ${frameWidth})`,
 };
 
 export const getFrameMaskImage = (sides: FrameSide[]): string => {

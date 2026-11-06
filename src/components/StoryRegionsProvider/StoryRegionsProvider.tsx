@@ -5,7 +5,8 @@ import { useMemo, useState } from 'react';
 import { StoryRegionsContext, type RegionElements, type RegionRefs, type StoryRegion } from './context';
 
 const regions: readonly StoryRegion[] = [
-  'story', 'storyViewport', 'narrativeFrame', 'narrativeViewport', 'narrativeContent',
+  'story', 'storyViewport', 'storyViewportFrame', 'narrativeFrame', 'narrativeViewport', 'narrativeContent',
+  'toolbarFrame', 'toolbar',
 ];
 
 export const StoryRegionsProvider = ({ children }: PropsWithChildren) => {

@@ -46,12 +46,12 @@ export const createBuiltinRegistration = ({
       ?? background.shadow?.style?.zIndex);
   } else {
     const frame = options as FrameEffect;
+    placement = fillRegion('storyViewportFrame');
     definitionId = frame.layer === 'overlay' ? FEEDBACK_DEFINITION : FRAME_DEFINITION;
     plane = frame.layer === 'above' ? 'aboveNarrative' : 'belowNarrative';
     order = readOrder(frame.shadow?.style?.zIndex ?? frame.text?.style?.zIndex ?? frame.style?.zIndex);
 
     if (frame.kind === 'component' && frame.frameMask?.enabled) {
-      placement = fillRegion('frame');
       visibility = {
         sides: frame.frameMask.sides,
       };

@@ -9,11 +9,11 @@ const fill = (region) => ({ region });
 const item = (region, extra = {}) => ({
   id: 'local', background: '#ff0000',
   placement: fill(region),
-  visibility: region === 'frame' ? { sides: ['left', 'right'] } : {},
+  visibility: region === 'storyViewportFrame' ? { sides: ['left', 'right'] } : {},
   depth: { plane: 'aboveNarrative', order: 0 },
   ...extra,
 });
-const regionBox = (page, region) => page.locator(`[data-story-region="${region === 'frame' ? 'narrativeFrame' : region}"]`).boundingBox();
+const regionBox = (page, region) => page.locator(`[data-story-region="${region}"]`).boundingBox();
 const surface = (page) => page.locator('[data-visual-content="local"]');
 
 const open = async (context) => {
@@ -28,14 +28,14 @@ const open = async (context) => {
 
 test('native surfaces fill actual region boxes and preserve portal identity on layer changes', async (context) => {
   const page = await open(context);
-  for (const region of ['story', 'storyViewport', 'narrativeFrame', 'frame', 'narrativeViewport', 'narrativeContent']) {
+  for (const region of ['story', 'storyViewport', 'narrativeFrame', 'storyViewportFrame', 'narrativeViewport', 'narrativeContent']) {
     await setSurfaces(page, [item(region)]);
     const expected = await regionBox(page, region);
     const actual = await surface(page).boundingBox();
     for (const key of ['x', 'y', 'width', 'height']) near(actual[key], expected[key], `${region} ${key}`);
     assert.equal(await page.locator('[data-visual-surface="local"]').evaluate((node) => {
       return node.parentElement.dataset.visualHost;
-    }), region === 'frame' ? 'narrativeFrame' : region);
+    }), region);
   }
   await setSurfaces(page, [item('storyViewport')]);
   const node = await page.locator('[data-probe="local"]').elementHandle();

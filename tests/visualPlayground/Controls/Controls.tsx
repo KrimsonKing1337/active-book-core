@@ -134,7 +134,7 @@ export const Controls = ({
             >
               <option value="storyViewport">Вьюпорт с Toolbar</option>
               <option value="narrativeFrame">Нарратив и рамка</option>
-              <option value="frame">Только рамка</option>
+              <option value="storyViewportFrame">Только рамка</option>
               <option value="narrativeViewport">Неподвижный overlay нарратива</option>
               <option value="narrativeContent">Прокручиваемое содержимое</option>
               <option value="story">Весь StoryRoot</option>

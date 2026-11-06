@@ -1,0 +1,107 @@
+import assert from 'node:assert/strict';
+import { test } from 'node:test';
+
+import { near, openBrowserFixture, pixels, setSurfaces } from './browserFixture.js';
+
+const regions = ['story', 'storyViewport', 'storyViewportFrame', 'narrativeFrame',
+  'narrativeViewport', 'narrativeContent', 'toolbar', 'toolbarFrame'];
+const box = (page, name) => page.locator(`[data-story-region="${name}"]`).boundingBox();
+const open = async (context) => {
+  const { browser, origin } = await openBrowserFixture(context);
+  const page = await browser.newPage({ viewport: { width: 1100, height: 800 } });
+  context.after(() => page.close());
+  await page.goto(`${origin}/tests/visualPlacement/`);
+  await page.getByTestId('first').click();
+  await page.getByTestId('page-one').waitFor();
+  return page;
+};
+const effect = (region, visibility = undefined, plane = 'aboveStoryControls') => ({
+  id: 'final-region', background: '#ff0000', placement: { region }, visibility,
+  depth: { plane },
+});
+
+test('all final regions have persistent native hosts and viewport frame includes the whole Toolbar', async (context) => {
+  const page = await open(context);
+  const nodes = await Promise.all(regions.map((region) => page.locator(`[data-story-region="${region}"]`).elementHandle()));
+  const hosts = await page.locator('[data-visual-host]').elementHandles();
+  assert.equal(hosts.length, regions.length);
+  assert.deepEqual(await box(page, 'storyViewportFrame'), await box(page, 'storyViewport'));
+  const frame = await box(page, 'toolbarFrame');
+  const toolbar = await box(page, 'toolbar');
+  assert(frame.height > toolbar.height);
+  assert(toolbar.y > frame.y);
+  for (const region of regions) {
+    await setSurfaces(page, [effect(region)]);
+    const actual = await page.locator('[data-visual-content="final-region"]').boundingBox();
+    assert.deepEqual(actual, await box(page, region), region);
+  }
+  await page.getByTestId('second').click();
+  await page.getByTestId('page-two').waitFor();
+  for (let i = 0; i < regions.length; i++) {
+    assert(await nodes[i].evaluate((node, region) => node === document.querySelector(`[data-story-region="${region}"]`), regions[i]));
+  }
+  assert(await Promise.all(hosts.map((host) => host.evaluate((node) => node.isConnected))).then((values) => values.every(Boolean)));
+});
+
+test('side masks are explicit, include the lower viewport edge and never alter layout padding', async (context) => {
+  const page = await open(context);
+  const bounds = await box(page, 'storyViewportFrame');
+  const baseline = await page.locator('#narrative').evaluate((node) => getComputedStyle(node).padding);
+  const toolbar = await box(page, 'toolbarFrame');
+  for (const side of ['top', 'right', 'bottom', 'left']) {
+    await setSurfaces(page, [effect('storyViewportFrame', { sides: [side], frameWidth: { value: 7, unit: 'px' } })]);
+    const sample = await pixels(page);
+    const points = {
+      top: [bounds.x + bounds.width / 2, bounds.y + 3],
+      right: [bounds.x + bounds.width - 3, bounds.y + bounds.height / 2],
+      bottom: [bounds.x + bounds.width / 2, bounds.y + bounds.height - 3],
+      left: [bounds.x + 3, bounds.y + bounds.height / 2],
+    };
+    for (const [name, point] of Object.entries(points)) {
+      assert.equal(sample(...point).join(',') === '255,0,0', name === side, `${side}: ${name}`);
+    }
+  }
+  await setSurfaces(page, [effect('storyViewportFrame', { sides: ['left'], frameWidth: { value: 25, unit: 'px' } })]);
+  assert.deepEqual((await pixels(page))(bounds.x + 20, bounds.y + bounds.height / 2), [255, 0, 0]);
+  assert.equal(await page.locator('#narrative').evaluate((node) => getComputedStyle(node).padding), baseline);
+  assert.deepEqual(await box(page, 'toolbarFrame'), toolbar);
+  await setSurfaces(page, [effect('storyViewportFrame')]);
+  assert.deepEqual((await pixels(page))(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2), [255, 0, 0], 'no implicit frame mask');
+});
+
+test('Toolbar has natural wrapping height and local planes preserve control interaction', async (context) => {
+  const page = await open(context);
+  const button = page.locator('[data-welcome-tour-id="bookmarks"]');
+  await button.evaluate((node) => { node.style.background = '#0000ff'; });
+  const buttonBox = await button.boundingBox();
+  const baseline = (await pixels(page))(buttonBox.x + 1, buttonBox.y + 1);
+  for (const plane of ['belowNarrative', 'aboveNarrative', 'aboveStoryControls']) {
+    await setSurfaces(page, [effect('toolbar', undefined, plane)]);
+    const sample = await pixels(page);
+    assert.deepEqual(sample(buttonBox.x + 1, buttonBox.y + 1), plane === 'aboveStoryControls' ? [255, 0, 0] : baseline, plane);
+  }
+  await button.click();
+  await page.getByText('Закладки', { exact: true }).first().waitFor();
+  await page.getByText('Закладки', { exact: true }).first().locator('..').getByRole('button', { name: 'Закрыть', exact: true }).click();
+  await setSurfaces(page, []);
+  const before = await box(page, 'toolbarFrame');
+  const narrative = await box(page, 'narrativeFrame');
+  await page.locator('#Toolbar').evaluate((node) => {
+    for (let index = 0; index < 20; index++) {
+      const button = document.createElement('button');
+      button.textContent = `Extra ${index}`;
+      button.style.padding = '12px';
+      node.insertBefore(button, node.querySelector('[data-visual-host]'));
+    }
+  });
+  const after = await box(page, 'toolbarFrame');
+  assert(after.height > before.height);
+  near((await box(page, 'narrativeFrame')).height, narrative.height - (after.height - before.height), 'remaining flex height');
+  for (const width of [390, 320]) {
+    await page.setViewportSize({ width, height: 740 });
+    const viewport = await box(page, 'storyViewport');
+    const toolbar = await box(page, 'toolbarFrame');
+    assert(toolbar.y + toolbar.height <= viewport.y + viewport.height + 1);
+    assert((await box(page, 'narrativeFrame')).height >= 0);
+  }
+});

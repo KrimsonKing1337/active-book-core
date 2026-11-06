@@ -41,7 +41,7 @@ export const readRegions = (page) => page.evaluate(() => {
   const storyBox = story.getBoundingClientRect();
   const regions = {};
 
-  for (const name of ['application', 'story', 'storyViewport', 'narrativeFrame', 'narrativeViewport', 'narrativeContent']) {
+  for (const name of ['application', 'story', 'storyViewport', 'storyViewportFrame', 'narrativeFrame', 'narrativeViewport', 'narrativeContent', 'toolbar', 'toolbarFrame']) {
     const element = name === 'application' ? document.querySelector('[data-book-application]')
       : document.querySelector(`[data-story-region="${name}"]`);
     let bounds = null;
@@ -55,7 +55,7 @@ export const readRegions = (page) => page.evaluate(() => {
     regions[name] = bounds;
   }
 
-  regions.frame = regions.narrativeFrame;
+
   const style = getComputedStyle(document.querySelector('#narrative'));
   const frameInsets = { top: parseFloat(style.paddingTop), right: parseFloat(style.paddingRight),
     bottom: parseFloat(style.paddingBottom), left: parseFloat(style.paddingLeft) };

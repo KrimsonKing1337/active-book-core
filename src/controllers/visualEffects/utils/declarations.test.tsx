@@ -239,12 +239,12 @@ test.each(['background', 'frame'] as const)('%s fills the whole story viewport b
     },
   });
 
-  expect(registration.effect.placement.region).toBe('storyViewport');
+  expect(registration.effect.placement.region).toBe(type === 'frame' ? 'storyViewportFrame' : 'storyViewport');
   expect(registration.effect.visibility).toEqual({});
   expect(registration.effect.depth.plane).toBe(type === 'background' ? 'background' : 'belowNarrative');
 });
 
-test('a masked frame uses its real narrative frame host and native side masks', () => {
+test('a masked frame uses its real viewport frame host and native side masks', () => {
   const registration = createBuiltinRegistration({
     type: 'frame',
     options: {
@@ -261,7 +261,7 @@ test('a masked frame uses its real narrative frame host and native side masks', 
     },
   });
 
-  expect(registration.effect.placement.region).toBe('frame');
+  expect(registration.effect.placement.region).toBe('storyViewportFrame');
   expect(registration.effect.visibility).toEqual({
     sides: ['left', 'bottom'],
   });

@@ -31,7 +31,9 @@ export const RegisteredVisualEffect = memo(({
     story: elements.story ?? null,
     storyViewport: elements.storyViewport ?? null,
     narrativeFrame: elements.narrativeFrame ?? null,
-    frame: elements.narrativeFrame ?? null,
+    storyViewportFrame: elements.storyViewportFrame ?? null,
+    toolbar: elements.toolbar ?? null,
+    toolbarFrame: elements.toolbarFrame ?? null,
     narrativeViewport: elements.narrativeViewport ?? null,
     narrativeContent: elements.narrativeContent ?? null,
   }), [elements, applicationElement]);

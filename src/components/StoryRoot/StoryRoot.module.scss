@@ -1,6 +1,7 @@
 .StoryRoot {
   --story-narrative-layer: calc(var(--visual-layer-step, 1) * 2);
   --story-toolbar-layer: calc(var(--visual-layer-step, 1) * 4);
+  --visual-frame-width: 12px;
 
   position: relative;
 

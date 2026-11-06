@@ -50,7 +50,7 @@ test('visual placement in Chromium', async (context) => {
   await scenario('all coordinate regions, mixed units, anchors and origins', async (page) => {
     const geometry = await readRegions(page);
     const book = await bookBounds(page);
-    for (const region of ['story', 'storyViewport', 'narrativeFrame', 'frame', 'narrativeViewport', 'narrativeContent']) {
+    for (const region of ['story', 'storyViewport', 'narrativeFrame', 'storyViewportFrame', 'narrativeViewport', 'narrativeContent']) {
       const placement = {
         ...fill(region),
         anchor: 'bottom-right',
@@ -95,7 +95,7 @@ test('visual placement in Chromium', async (context) => {
       near(clip.width, rect.width, `${region} clip width`);
       near(clip.height, rect.height, `${region} clip height`);
     }
-    const frame = geometry.regions.frame;
+    const frame = geometry.regions.storyViewportFrame;
     const positions = {
       left: [book.x + frame.x + 2, book.y + frame.y + frame.height / 2],
       right: [book.x + frame.x + frame.width - 3, book.y + frame.y + frame.height / 2],
@@ -103,7 +103,7 @@ test('visual placement in Chromium', async (context) => {
       bottom: [book.x + frame.x + frame.width / 2, book.y + frame.y + frame.height - 3],
     };
     for (const sides of [[], ['left'], ['top', 'right'], ['bottom'], ['top', 'right', 'bottom', 'left']]) {
-      await setSurfaces(page, [item({ placement: fill('frame'), visibility: { sides } })]);
+      await setSurfaces(page, [item({ placement: fill('storyViewportFrame'), visibility: { sides } })]);
       const color = await pixels(page);
       for (const [side, position] of Object.entries(positions)) {
         assert.equal(color(...position).join(',') === '255,0,0', sides.includes(side), `${sides}: ${side}`);
@@ -133,9 +133,9 @@ test('visual placement in Chromium', async (context) => {
     assert.equal(await token(page), originalToken);
 
     const geometry = await readRegions(page);
-    const frame = geometry.regions.frame;
+    const frame = geometry.regions.storyViewportFrame;
     const frameMask = { type: 'polygon', points: [point(0, 0), point(50, 0), point(50, 100), point(0, 100)] };
-    await setSurfaces(page, [item({ placement: fill('frame'), visibility: { sides: ['top', 'left', 'right'], mask: frameMask } })]);
+    await setSurfaces(page, [item({ placement: fill('storyViewportFrame'), visibility: { sides: ['top', 'left', 'right'], mask: frameMask } })]);
     color = await pixels(page);
     assert.deepEqual(color(book.x + frame.x + 2, book.y + frame.y + frame.height / 2), [255, 0, 0]);
     assert.notDeepEqual(color(book.x + frame.x + frame.width - 3, book.y + frame.y + frame.height / 2), [255, 0, 0]);
@@ -149,7 +149,7 @@ test('visual placement in Chromium', async (context) => {
     const originalToken = await token(page);
     const geometry = await readRegions(page);
     const book = await bookBounds(page);
-    const frame = geometry.regions.frame;
+    const frame = geometry.regions.storyViewportFrame;
     const color = await pixels(page);
     for (const localX of [geometry.frameInsets.left - 2, geometry.frameInsets.left + 2, frame.width / 2]) {
       const actual = color(book.x + frame.x + localX, book.y + frame.y + frame.height / 2)[0];
@@ -216,7 +216,7 @@ test('visual placement in Chromium', async (context) => {
     await page.waitForFunction((header) => header.getBoundingClientRect().bottom < 0, menuHeader);
 
     await setSurfaces(page, [item({ background: '#000000' })]);
-    const frame = geometry.regions.frame;
+    const frame = geometry.regions.storyViewportFrame;
     const feedbackPoint = [book.x + frame.x + 1, book.y + frame.y + frame.height / 2];
     assert.deepEqual((await pixels(page))(...feedbackPoint), [0, 0, 0]);
     await page.getByTestId('preview').click();

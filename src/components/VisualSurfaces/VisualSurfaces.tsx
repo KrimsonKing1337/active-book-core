@@ -30,9 +30,8 @@ export const VisualSurfaces = ({ items, stride }: VisualSurfacesProps) => {
 
   return sorted.map((itemCur, index) => {
     const region = itemCur.placement.region;
-    const localRegion = region === 'frame' ? 'narrativeFrame' : region;
     const external = region === 'application';
-    let target = localRegion === 'application' ? null : hosts[localRegion];
+    let target = region === 'application' ? null : hosts[region];
 
     if (external) {
       const underStory = itemCur.depth.plane === 'background';

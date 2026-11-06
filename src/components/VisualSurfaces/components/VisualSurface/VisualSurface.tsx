@@ -1,3 +1,5 @@
+import type { CSSProperties } from 'react';
+
 import type { VisualSurfaceItem } from '@components/VisualSurfaces';
 
 import { getFrameMaskImage } from '@components/FrameEffects/utils';
@@ -12,15 +14,16 @@ type VisualSurfaceProps = {
 };
 
 export const VisualSurface = ({ item, zIndex }: VisualSurfaceProps) => {
-  const frameSides = item.visibility?.sides
-    ?? (item.placement.region === 'frame' ? ['top', 'right', 'bottom', 'left'] as const : undefined);
+  const frameSides = item.visibility?.sides;
+  const frameWidth = item.visibility?.frameWidth;
   const style = {
+    '--visual-frame-width': frameWidth ? `${frameWidth.value}${frameWidth.unit}` : undefined,
     zIndex,
     visibility: item.hidden ? 'hidden' as const : undefined,
     maskImage: frameSides ? getFrameMaskImage([...frameSides]) : undefined,
     maskComposite: frameSides ? 'add' : undefined,
     clipPath: localClipPath(item.visibility?.mask),
-  };
+  } as CSSProperties;
 
   return (
     <div

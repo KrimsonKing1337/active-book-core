@@ -64,3 +64,12 @@
 
   @include layout.narrative-frame;
 }
+
+.StoryViewportFrame {
+  position: absolute;
+  inset: 0;
+
+  border-radius: inherit;
+
+  pointer-events: none;
+}

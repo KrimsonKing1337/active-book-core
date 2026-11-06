@@ -42,7 +42,7 @@ const createRegistration = (
     definitionId,
     params,
     placement: fillRegion(region),
-    visibility: region === 'frame' ? { sides: ['top', 'right', 'bottom', 'left'] } : {},
+    visibility: region === 'storyViewportFrame' ? { sides: ['top', 'right', 'bottom', 'left'] } : {},
     depth: {
       plane: ['lab.edges', 'lab.under-curtain', 'lab.single'].includes(definitionId)
         ? 'background' : 'aboveStoryControls',
@@ -107,7 +107,7 @@ const createFrameRegistration = (settings: Settings): VisualEffectRegistration =
   frame.effect.depth.plane = settings.plane;
 
   if (settings.mask) {
-    frame.effect.placement = fillRegion('frame');
+    frame.effect.placement = fillRegion(settings.region);
     frame.effect.visibility = { sides: ['top', 'right', 'bottom', 'left'] };
   }
 
