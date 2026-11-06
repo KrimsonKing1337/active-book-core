@@ -133,6 +133,26 @@ test('persistent book root and existing page rendering in Chromium', async (cont
         await page.getByTestId('loading').click();
         await page.locator('[data-story-content][aria-busy="true"]').waitFor({ state: 'attached' });
         assert(await page.locator('[data-story-region="narrativeFrame"]').isVisible(), 'loader keeps permanent regions in layout');
+        const spinner = await page.locator('[data-story-content]').evaluate((content) => {
+          const wrapper = content.closest('[class*="AppWrapper"]');
+          const style = getComputedStyle(wrapper, '::before');
+          const bounds = wrapper.getBoundingClientRect();
+          return {
+            position: getComputedStyle(wrapper).position,
+            display: style.display,
+            horizontalSpace: parseFloat(style.marginLeft) + parseFloat(style.width) + parseFloat(style.marginRight),
+            verticalSpace: parseFloat(style.marginTop) + parseFloat(style.height) + parseFloat(style.marginBottom),
+            horizontalMargins: Math.abs(parseFloat(style.marginLeft) - parseFloat(style.marginRight)),
+            verticalMargins: Math.abs(parseFloat(style.marginTop) - parseFloat(style.marginBottom)),
+            width: bounds.width,
+            height: bounds.height,
+          };
+        });
+        assert.equal(spinner.position, 'relative', 'spinner has an embedded containing block');
+        assert.equal(spinner.display, 'block');
+        assert(Math.abs(spinner.horizontalSpace - spinner.width) < 1, 'spinner uses wrapper width');
+        assert(Math.abs(spinner.verticalSpace - spinner.height) < 1, 'spinner uses wrapper height');
+        assert(spinner.horizontalMargins < 1 && spinner.verticalMargins < 1, 'spinner is centered within wrapper');
         assert.equal(await book.evaluate((element) => element === document.querySelector('[data-story-region="story"]')), true);
         await page.getByTestId('loading').click();
         await page.getByTestId('page-one').waitFor();

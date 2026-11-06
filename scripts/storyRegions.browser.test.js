@@ -142,3 +142,59 @@ test('Toolbar has natural wrapping height and local planes preserve control inte
     assert((await box(page, 'narrativeFrame')).height >= 0);
   }
 });
+
+
+test('percentage mask widths follow each gradient axis when Toolbar wraps, independently of padding', async (context) => {
+  const page = await open(context);
+  const initial = await box(page, 'toolbarFrame');
+  const sides = ['top', 'right', 'bottom', 'left'];
+  const uniform = { value: 20, unit: '%' };
+  const perSide = {
+    top: { value: 10, unit: '%' },
+    right: { value: 20, unit: '%' },
+    bottom: { value: 30, unit: '%' },
+    left: { value: 15, unit: '%' },
+  };
+
+  for (const wrapped of [false, true]) {
+    if (wrapped) {
+      await page.locator('#Toolbar').evaluate((node) => {
+        for (let index = 0; index < 12; index++) {
+          const button = document.createElement('button');
+          button.textContent = `Extra ${index}`;
+          button.style.width = '70px';
+          node.insertBefore(button, node.querySelector('[data-visual-host]'));
+        }
+      });
+      await page.setViewportSize({ width: 390, height: 740 });
+      assert((await box(page, 'toolbarFrame')).height > initial.height);
+    }
+
+    const padding = await page.locator('#narrative').evaluate((node) => getComputedStyle(node).padding);
+    const bounds = await box(page, 'toolbarFrame');
+    for (const frameWidth of [uniform, perSide]) {
+      await setSurfaces(page, [effect('toolbarFrame', { sides, frameWidth })]);
+      const region = await box(page, 'toolbarFrame');
+      assert.deepEqual(region, bounds, 'mask changes do not resize Toolbar');
+      const sample = await pixels(page);
+      const isRed = (x, y) => sample(x, y).join(',') === '255,0,0';
+      const middleX = region.x + region.width / 2;
+      const middleY = region.y + region.height / 2;
+      const axes = {
+        top: (distance) => [middleX, region.y + distance],
+        right: (distance) => [region.x + region.width - distance, middleY],
+        bottom: (distance) => [middleX, region.y + region.height - distance],
+        left: (distance) => [region.x + distance, middleY],
+      };
+      for (const side of sides) {
+        const percentage = 'value' in frameWidth ? frameWidth.value : frameWidth[side].value;
+        const axisLength = side === 'top' || side === 'bottom' ? region.height : region.width;
+        const thickness = axisLength * percentage / 100;
+        assert(isRed(...axes[side](thickness / 2)), `${side}: inside ${percentage}% band`);
+        assert(!isRed(...axes[side](thickness + 3)), `${side}: outside ${percentage}% band`);
+      }
+      assert(!isRed(middleX, middleY), 'add-composed side masks leave the center transparent');
+      assert.equal(await page.locator('#narrative').evaluate((node) => getComputedStyle(node).padding), padding);
+    }
+  }
+});
