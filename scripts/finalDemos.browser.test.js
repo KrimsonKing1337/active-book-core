@@ -52,6 +52,10 @@ test('frame and through effects select viewport, narrative or Toolbar without co
   for (const region of ['storyViewportFrame', 'narrativeFrame', 'toolbarFrame']) {
     await patch(page, { demo: 'frame', region, plane: 'belowNarrative' });
     assert.deepEqual(await page.locator('[data-visual-content="frame"]').boundingBox(), await page.locator(`[data-story-region="${region}"]`).boundingBox());
+    const expected = await page.locator(`[data-story-region="${region}"]`).boundingBox();
+    for (const element of await page.locator('[data-demo-effect="frame"] [class*="FrameElement"]').elementHandles()) {
+      assert.deepEqual(await element.boundingBox(), expected, 'frame artwork ends at the actual lower region edge');
+    }
     for (const framePreset of ['pulse', 'police', 'caramel']) {
       await patch(page, { framePreset });
       await page.getByTestId('play').click();
