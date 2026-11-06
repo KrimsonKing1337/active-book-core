@@ -131,7 +131,8 @@ test('persistent book root and existing page rendering in Chromium', async (cont
         assert.equal(await book.evaluate((element) => element === document.querySelector('[data-story-region="story"]')), true);
 
         await page.getByTestId('loading').click();
-        await page.waitForFunction(() => document.querySelector('[data-story-region="narrativeFrame"]').getClientRects().length === 0);
+        await page.locator('[data-story-content][aria-busy="true"]').waitFor({ state: 'attached' });
+        assert(await page.locator('[data-story-region="narrativeFrame"]').isVisible(), 'loader keeps permanent regions in layout');
         assert.equal(await book.evaluate((element) => element === document.querySelector('[data-story-region="story"]')), true);
         await page.getByTestId('loading').click();
         await page.getByTestId('page-one').waitFor();

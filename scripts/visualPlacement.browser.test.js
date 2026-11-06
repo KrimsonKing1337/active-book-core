@@ -188,8 +188,10 @@ test('visual placement in Chromium', async (context) => {
     const book = await bookBounds(page);
     const narrative = geometry.regions.narrativeContent;
     const narrativePoint = [book.x + narrative.x + narrative.width / 2, book.y + narrative.y + 150];
-    const toolbar = await page.locator('#Toolbar').boundingBox();
-    const toolbarPoint = [toolbar.x + toolbar.width / 2, toolbar.y + toolbar.height - 5];
+    const control = page.locator('[data-welcome-tour-id="font"]');
+    await control.evaluate((element) => { element.style.background = '#0000ff'; });
+    const toolbar = await control.boundingBox();
+    const toolbarPoint = [toolbar.x + 1, toolbar.y + toolbar.height - 1];
 
     let previousToken;
     for (const plane of ['belowNarrative', 'aboveNarrative', 'aboveStoryControls']) {
