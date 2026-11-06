@@ -1,0 +1,42 @@
+
+> activebook-editor@0.0.1 test
+> vitest run --configLoader runner
+
+
+ RUN  v4.1.12 /workspace/activeBook-editor
+
+ ❯ |browser (chromium)| apps/editor/src/components/EditorScreen/EditorScreen.browser.test.tsx (5 tests | 1 failed) 27917ms
+   × shared placement controls save transforms, layer and mixed units while focused 11827ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |browser (chromium)| apps/editor/src/components/EditorScreen/EditorScreen.browser.test.tsx > shared placement controls save transforms, layer and mixed units while focused
+TimeoutError: locator.click: Timeout 10000ms exceeded.
+Call log:
+  - waiting for locator('[data-vitest="true"]').contentFrame().getByRole('button', { name: 'Заполнить область', exact: true })
+
+
+Failure screenshot:
+  - apps/editor/src/components/EditorScreen/__screenshots__/EditorScreen.browser.test.tsx/shared-placement-controls-save-transforms--layer-and-mixed-units-while-focused-1.png
+
+ ❯ apps/editor/src/components/EditorScreen/EditorScreen.browser.test.tsx:305:5
+    303|     name: 'Заполнить область',
+    304|     exact: true,
+    305|   }).click();
+       |     ^
+    306|   const reset = await project.save();
+    307|   expect(reset.background?.at(-1)?.placement).toEqual({ region: 'narra…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 23 passed (24)
+      Tests  1 failed | 79 passed (80)
+   Start at  13:17:04
+   Duration  58.73s (transform 1.88s, setup 1.57s, import 6.67s, tests 51.09s, environment 4.40s)
+
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice

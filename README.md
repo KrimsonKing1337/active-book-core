@@ -31,3 +31,5 @@ https://active-books.ru
 Текущий эксперимент `experiment/css-first-story-surfaces`: [CSS-first DOM-регионы, карта коммитов, проверки и замеры](docs/css-first-story-surfaces.ru.md).
 
 Финализация: [DOM-регионы, Toolbar, маски, анимации и готовность к интеграции](docs/story-regions-finalization.ru.md).
+
+Regression follow-up: [Windows test paths, portal readiness, masks and package validation](docs/story-regions-test-regressions.ru.md).

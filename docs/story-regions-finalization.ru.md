@@ -71,7 +71,7 @@ depth: { plane: 'aboveNarrative', order: 2 },
 
 VisualRegion и renderer regions содержат application, story, storyViewport, storyViewportFrame, narrativeFrame, narrativeViewport, narrativeContent, toolbar, toolbarFrame. У отсутствующего Toolbar handles равны null. Frame alias удалён без миграции или fallback.
 
-Панель Background/Frame переиспользуется: девять областей, mask sides/width, anchor/origin, offsets, size, scale/rotate, plane/order. Выбор готовых storyViewportFrame/toolbarFrame в UI включает стороны как удобный preset; маску можно отдельно снять без изменения региона. Нарратив с рамочной маской выражается сочетанием narrativeFrame + sides, без нового значения enum.
+Панель Background/Frame переиспользуется: девять областей, mask sides/width, anchor/origin, offsets, size, scale/rotate, plane/order. После [исправления регрессий](story-regions-test-regressions.ru.md) смена региона сохраняет существующую маску; её включение, стороны и толщины редактируются независимо. Нарратив с рамочной маской выражается сочетанием narrativeFrame + sides, без нового значения enum.
 
 Временный VisualLayout draft содержит placement/depth/visibility. Удалены скрытые FrameOptions.layer/frameMask и вывод маски из имени региона. Builder валидирует новые регионы и неотрицательную конечную толщину; старый frame отвергается. Custom JSON и внутренние CSS-слои пользовательского renderer остаются свободными.
 

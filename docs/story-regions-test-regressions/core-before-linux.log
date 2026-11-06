@@ -1,0 +1,84 @@
+
+> activebook-react-core-next@0.0.52 test:browser
+> node --test --test-concurrency=1 ./scripts/storyRoot.browser.test.js ./scripts/visualPlacement.browser.test.js ./scripts/visualLifecycle.browser.test.js ./scripts/unifiedVisualEffects.browser.test.js ./scripts/visualPlayground.browser.test.js ./scripts/persistentStory.browser.test.js ./scripts/localSurfaces.browser.test.js ./scripts/nativeAnimations.browser.test.js ./scripts/storyRegions.browser.test.js ./scripts/mediaContinuity.browser.test.js ./scripts/finalDemos.browser.test.js
+
+✔ advancing darkness defaults to the whole viewport frame and supports a split composition (12825.141418ms)
+✔ frame and through effects select viewport, narrative or Toolbar without coupling their plane (5554.859749ms)
+✔ Toolbar demonstration exposes two real scopes and changes depth without replacing either renderer (2451.148929ms)
+✔ native surfaces fill actual region boxes and preserve portal identity on layer changes (3108.39941ms)
+✔ all nine CSS anchors resolve mixed offsets and local sizes without a placement measurement (2527.653462ms)
+✔ content surfaces scroll naturally while viewport overlays and hosts remain fixed (1806.214965ms)
+✔ default book application has one boundary, external underlay/overlay and protected selection (2426.716265ms)
+✔ CSS transforms use the surface origin without changing its layout or host (2304.985735ms)
+✔ delayed media preserves CSS Animation and Canvas identity through the loader in reader (3417.908711ms)
+✔ delayed media preserves CSS Animation and Canvas identity through the loader in editor (3142.223185ms)
+✔ all artistic demos complete native runs and preserve late milestone waits (6730.566407ms)
+✔ one advancing-darkness effect uses four phases, keeps completed phases paused and preserves identity (5909.774423ms)
+✔ visual collapse keeps layout sizes and restores existing CSS on stop, range exit and book destroy (4045.738435ms)
+✔ named CSS playback starts a fresh completed run without replacing its renderer (2520.573267ms)
+✔ persistent real regions, local WAAPI and page cleanup in reader (3843.556853ms)
+✔ persistent real regions, local WAAPI and page cleanup in editor (2475.717094ms)
+✔ book windows use one same-URL history entry and release browser Back (2182.381267ms)
+✔ new tab, reload and actual book unmount keep window state and history aligned (2324.006084ms)
+✔ TOC, bookmarks and informational Modal navigate and consume the same-URL history (5313.490319ms)
+✔ all final regions have persistent native hosts and viewport frame includes the whole Toolbar (2340.996591ms)
+✔ side masks are explicit, include the lower viewport edge and never alter layout padding (2204.593812ms)
+✔ toolbarFrame supports different mask widths on all four sides without changing padding (1583.994499ms)
+✔ Toolbar has natural wrapping height and local planes preserve control interaction (2200.07132ms)
+▶ persistent book root and existing page rendering in Chromium
+  ✔ reader (2155.609813ms)
+  ✔ editor (1350.276518ms)
+✔ persistent book root and existing page rendering in Chromium (3861.002892ms)
+▶ real Background and Frame renderers use the book session in Chromium
+  ✔ page/range continuity and resources (reader) (2589.12163ms)
+  ✔ page/range continuity and resources (editor) (1989.085131ms)
+  ✔ real static effects match the reviewed storyViewport screenshot (1340.774367ms)
+✔ real Background and Frame renderers use the book session in Chromium (6296.384148ms)
+▶ registered visual lifecycle in Chromium
+  ✔ reader: page lifetime and continuous state across disjoint ranges and missing geometry (2293.561252ms)
+  ✔ reader: addressed updates, optional playback, independent instances and stale handles (1696.486544ms)
+  ✔ reader: rapid navigation, pending resource cleanup and legacy coexistence (1491.542711ms)
+  ✔ reader: StrictMode host/ref cleanup can reconnect safely (1073.28046ms)
+  ✔ editor: page lifetime and continuous state across disjoint ranges and missing geometry (1425.37091ms)
+  ✔ editor: addressed updates, optional playback, independent instances and stale handles (1654.362337ms)
+  ✔ editor: rapid navigation, pending resource cleanup and legacy coexistence (1548.059007ms)
+  ✔ editor: StrictMode host/ref cleanup can reconnect safely (1187.737648ms)
+✔ registered visual lifecycle in Chromium (12757.743097ms)
+▶ visual placement in Chromium
+  ✔ all coordinate regions, mixed units, anchors and origins (2100.846656ms)
+  ✔ content uses its native scrollport and viewport surfaces remain fixed (1081.259491ms)
+  ✔ visibility rectangles and actual frame side masks (1450.032115ms)
+  ✔ circle, polygon and intersection with the frame mask (1132.3119ms)
+  ✔ one continuous gradient crosses logical boundaries and survives edits (1231.605727ms)
+  ✔ painted depth, lexical ties, controls interaction and legacy feedback priority (2093.285285ms)
+✔ visual placement in Chromium (9480.783916ms)
+▶ selection follows visibility bounds without restarting surfaces and stays out of reader mode
+  ✔ editor (1690.969697ms)
+  ✔ reader (918.087169ms)
+✔ selection follows visibility bounds without restarting surfaces and stays out of reader mode (2930.004519ms)
+▶ visual playground experiments in Chromium
+  ✔ opacity control keeps demo renderers mounted and reveals darkened content (3020.648035ms)
+  ✔ loop repeats one complete effect and obeys pause, toggle and stop (3461.874651ms)
+  ✔ loop repeats a complete coordinated scene rather than its individual phases (2414.599029ms)
+  ✔ local surfaces match real regions, toolbar variations and CSS frame anchors (1656.714682ms)
+  ✔ native content surfaces scroll and fixed viewport overlays retain DOM and animation (1433.090315ms)
+  ✔ one session preserves animated frame identity across resize and disjoint active pages (1398.594945ms)
+  ✔ external overlay covers a smaller story; underlay is occluded including rounded viewport corners (3120.556447ms)
+  ✔ smoke and a single wave cross regions without renderer replacement; feedback stays above overlays (4541.788053ms)
+  ✔ visual transform collapse reaches zero and restores without changing layout or leaking animations (5518.600839ms)
+  ✔ milestones, late subscriptions, replay, StrictMode and closing the book (3442.67031ms)
+  ✔ reader: external range continuity, pause/resume, cancellation and resource teardown (1693.833365ms)
+✔ visual playground experiments in Chromium (32043.983871ms)
+ℹ tests 61
+ℹ suites 0
+ℹ pass 61
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 155147.713013
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice

@@ -1,0 +1,19 @@
+
+> activebook-editor@0.0.1 test
+> vitest run --configLoader runner
+
+
+ RUN  v4.1.12 /workspace/activeBook-editor
+
+1:26:24 PM [vite] (client) Re-optimizing dependencies because lockfile has changed
+
+ Test Files  25 passed (25)
+      Tests  83 passed (83)
+   Start at  13:26:23
+   Duration  63.50s (transform 5.14s, setup 1.63s, import 10.14s, tests 56.28s, environment 3.74s)
+
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice
