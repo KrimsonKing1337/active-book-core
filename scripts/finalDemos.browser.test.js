@@ -12,16 +12,22 @@ const open = async (context) => {
 };
 const patch = async (page, options) => {
   await page.evaluate((options) => window.playground.change(options), options);
+  await page.waitForFunction((options) => Object.entries(options).every(([key, value]) => {
+    return window.playground.settings[key] === value;
+  }), options);
   await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
 };
-const host = (page, selector) => page.locator(selector).evaluate((node) => node.parentElement.dataset.visualHost ?? node.parentElement.dataset.applicationHost);
+const expectHost = (page, selector, region) => page.waitForFunction(({ selector, region }) => {
+  const parent = document.querySelector(selector)?.parentElement;
+  return (parent?.dataset.visualHost ?? parent?.dataset.applicationHost) === region;
+}, { selector, region });
 
 test('advancing darkness defaults to the whole viewport frame and supports a split composition', async (context) => {
   const page = await open(context);
   await patch(page, { demo: 'advancing', duration: 4000, color: '#000000' });
   assert.equal(await page.evaluate(() => window.playground.session.getSnapshot().length), 1);
-  assert.equal(await host(page, '[data-darkness-phase="frame"]'), 'storyViewportFrame');
-  assert.equal(await host(page, '[data-darkness-phase="controls"]'), 'toolbarFrame');
+  await expectHost(page, '[data-darkness-phase="frame"]', 'storyViewportFrame');
+  await expectHost(page, '[data-darkness-phase="controls"]', 'toolbarFrame');
   await page.getByTestId('play').click();
   await page.waitForFunction(() => window.playground.session.runs.read('advancing')?.milestones.includes('frame-covered'));
   await page.getByRole('button', { name: 'Пауза', exact: true }).click();
@@ -37,8 +43,8 @@ test('advancing darkness defaults to the whole viewport frame and supports a spl
   assert.deepEqual((await pixels(page))(toolbar.x - 2, toolbarFrame.y + toolbarFrame.height / 2), [0, 0, 0], 'control phase also covers its layout padding');
   await page.getByRole('button', { name: 'Стоп / сброс', exact: true }).click();
   await patch(page, { composition: 'multiple' });
-  assert.equal(await host(page, '[data-darkness-phase="frame"]'), 'narrativeFrame');
-  assert.equal(await host(page, '[data-darkness-phase="controls"]'), 'toolbarFrame');
+  await expectHost(page, '[data-darkness-phase="frame"]', 'narrativeFrame');
+  await expectHost(page, '[data-darkness-phase="controls"]', 'toolbarFrame');
   await patch(page, { toolbar: false, duration: 300 });
   assert.equal(await page.locator('[data-darkness-phase]').count(), 3);
   await page.getByTestId('play').click();
@@ -51,6 +57,7 @@ test('frame and through effects select viewport, narrative or Toolbar without co
   const page = await open(context);
   for (const region of ['storyViewportFrame', 'narrativeFrame', 'toolbarFrame']) {
     await patch(page, { demo: 'frame', region, plane: 'belowNarrative' });
+    await expectHost(page, '[data-visual-surface="frame"]', region);
     assert.deepEqual(await page.locator('[data-visual-content="frame"]').boundingBox(), await page.locator(`[data-story-region="${region}"]`).boundingBox());
     const expected = await page.locator(`[data-story-region="${region}"]`).boundingBox();
     for (const element of await page.locator('[data-demo-effect="frame"] [class*="FrameElement"]').elementHandles()) {
@@ -66,7 +73,7 @@ test('frame and through effects select viewport, narrative or Toolbar without co
   }
   for (const region of ['storyViewportFrame', 'narrativeFrame']) {
     await patch(page, { demo: 'through', region });
-    assert.equal(await host(page, '[data-visual-surface="through"]'), region);
+    await expectHost(page, '[data-visual-surface="through"]', region);
     await page.getByTestId('play').click();
     await page.getByRole('button', { name: 'Стоп / сброс', exact: true }).click();
   }
