@@ -36,7 +36,7 @@ export const AdvancingDarkness = (props: VisualRendererProps) => {
       }
 
       return [{
-        node, name: nameCur, milestone: milestones[index], 
+        node, name: nameCur, milestone: milestones[index],
       }];
     });
     const duration = numberParam(props.params, 'duration', 2000) / activePhases.length;
