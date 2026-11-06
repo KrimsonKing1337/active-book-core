@@ -43,10 +43,10 @@ BookApplicationSurface [application]
 | Прямоугольник | `placement.region` |
 | Плоскость и порядок | `depth.plane`, `depth.order` |
 | Рамочные стороны | необязательная `visibility.sides` |
-| Толщина маски | необязательная `visibility.frameWidth: VisualLength` |
+| Толщина маски | необязательная `visibility.frameWidth: VisualLength | Record<FrameSide, VisualLength>` |
 | Художественный clipping | `visibility.mask` circle/polygon |
 
-Без sides любой регион, включая названия с Frame, заполняется полностью. Пустой sides скрывает всю поверхность. Маска использует native CSS gradients; frameWidth по умолчанию 12px, поддерживает px/%. Толщина маски не меняет padding текста или Toolbar. Сохранились прежние четыре plane; новых plane для Toolbar не добавлено.
+Без sides любой регион, включая названия с Frame, заполняется полностью. Пустой sides скрывает всю поверхность. Маска использует native CSS gradients; frameWidth по умолчанию 12px, поддерживает px/% и четыре независимые толщины (`top`, `right`, `bottom`, `left`). Толщина маски не меняет padding текста или Toolbar. Сохранились прежние четыре plane; новых plane для Toolbar не добавлено.
 
 ```ts
 placement: { region: 'toolbarFrame' },
