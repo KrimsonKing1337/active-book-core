@@ -23,8 +23,8 @@ const demos: readonly [Settings['demo'], string][] = [
   ['sequence', '07 · Последовательность'],
   ['single', '08 · Одна сцена'],
   ['ball', '09 · Непрерывный шарик'],
-  ['toolbar', '11 · Toolbar и его рамка'],
   ['advancing', '10 · Наступающая тьма'],
+  ['toolbar', '11 · Toolbar и его рамка'],
 ];
 
 export const Controls = ({
@@ -36,8 +36,10 @@ export const Controls = ({
   onStop,
 }: ControlsProps) => {
   const isBall = settings.demo === 'ball';
-  const isPhysical = ['collapse', 'sequence', 'single'].includes(settings.demo);
-  const durationLabel = isPhysical && settings.demo !== 'single' ? 'Длительность этапа, мс' : 'Длительность, мс';
+  const isComposed = ['collapse', 'sequence', 'single'].includes(settings.demo);
+  const hasFixedRegions = isComposed || ['edges', 'advancing', 'toolbar'].includes(settings.demo);
+  const fixedRegion = settings.demo === 'toolbar' ? 'toolbarFrame' : 'application';
+  const durationLabel = isComposed && settings.demo !== 'single' ? 'Длительность этапа, мс' : 'Длительность, мс';
   const sliders: readonly [keyof Settings, string, number, number, number][] = [
     ['duration', durationLabel, 300, 10000, 100],
     ['intensity', 'Интенсивность', 0.1, 1, 0.05],
@@ -61,7 +63,7 @@ export const Controls = ({
       return settings.demo === 'smoke';
     }
 
-    return name !== 'intensity' || !isPhysical;
+    return name !== 'intensity' || !isComposed;
   });
 
   return (
@@ -72,7 +74,7 @@ export const Controls = ({
         </span>
 
         <small>
-          10 экспериментов
+          {demos.length} экспериментов
         </small>
       </div>
 
@@ -127,8 +129,8 @@ export const Controls = ({
           <label>
             Область действия
             <select
-              value={isPhysical || settings.demo === 'edges' ? 'application' : settings.region}
-              disabled={isPhysical || settings.demo === 'edges'}
+              value={hasFixedRegions ? fixedRegion : settings.region}
+              disabled={hasFixedRegions}
               onChange={(e) => onChange({ region: e.target.value as Settings['region'] })}
             >
               <option value="storyViewport">Весь вьюпорт</option>
