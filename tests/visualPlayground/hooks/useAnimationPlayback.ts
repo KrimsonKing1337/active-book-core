@@ -2,7 +2,6 @@ import { useCallback, useImperativeHandle, useLayoutEffect, useRef, useState } f
 
 import type { VisualRendererProps } from '@active-book/types';
 
-
 import { useVisualEffects } from '@controllers/visualEffects';
 
 import { numberParam } from '../utils';

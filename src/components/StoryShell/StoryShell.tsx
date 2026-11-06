@@ -1,7 +1,5 @@
 import { type HTMLAttributes, type PropsWithChildren } from 'react';
 
-import classNames from 'classnames';
-
 import { Toolbar } from '@components/Toolbar';
 import { Menu } from '@components/Menu';
 import { TableOfContents } from '@components/TableOfContents';
@@ -32,22 +30,12 @@ export const StoryShell = ({
   useBookWindows(windowHistoryScope);
   const { refs } = useStoryRegions();
 
-
-
-  const storyShellClassNames = classNames({
-    [styles.StoryShell]: true,
-  });
-
-  const storyViewportClassNames = classNames({
-    [styles.StoryViewport]: true,
-  });
-
   return (
-    <div id="story-shell" className={storyShellClassNames} {...etc}>
+    <div id="story-shell" className={styles.StoryShell} {...etc}>
       <div
         ref={refs.storyViewport}
         id="story-viewport"
-        className={storyViewportClassNames}
+        className={styles.StoryViewport}
         data-story-region="storyViewport"
       >
         <div ref={refs.storyViewportFrame} className={styles.StoryViewportFrame} data-story-region="storyViewportFrame">
@@ -60,7 +48,6 @@ export const StoryShell = ({
           </Narrative>
           <VisualHost region="narrativeFrame" />
         </div>
-
 
         {!withoutToolbar && (
           <Toolbar sbMode={sbMode} />

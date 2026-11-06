@@ -267,12 +267,11 @@ test('a masked frame uses its real viewport frame host and native side masks', (
   });
 });
 
-
 test('declaration order is explicit and style zIndex never becomes surface depth', () => {
   const registration = createBuiltinRegistration({
     type: 'background',
     options: {
-      id: 'order', kind: 'background', order: 7, style: { zIndex: 999 }, 
+      id: 'order', kind: 'background', order: 7, style: { zIndex: 999 },
     },
     lifetime: { type: 'page', page: 1 },
   });

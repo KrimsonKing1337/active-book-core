@@ -1,4 +1,4 @@
-import { type PropsWithChildren, useEffect, useLayoutEffect } from 'react';
+import { type PropsWithChildren, useEffect, useLayoutEffect, useRef } from 'react';
 
 import classNames from 'classnames';
 import { setWasmUrl } from '@lottiefiles/dotlottie-react';
@@ -68,17 +68,23 @@ export const AppContent = ({
   const application = useBookApplicationSurface();
   const pageId = useSelector(mainSelectors.pageId);
   const selectedPage = storyPages.find((cur) => cur.id === pageId);
-  const pageIdsKey = JSON.stringify(storyPages.map((cur) => cur.id));
+  const previousPageIds = useRef<readonly string[] | null>(null);
 
   useLayoutEffect(() => {
-    const ids: string[] = JSON.parse(pageIdsKey);
+    const ids = storyPages.map((cur) => cur.id);
+    const previous = previousPageIds.current;
+
+    if (previous?.length === ids.length && ids.every((idCur, index) => idCur === previous[index])) {
+      return;
+    }
 
     if (new Set(ids).size !== ids.length || ids.some((cur) => !cur)) {
       throw new Error('Story pages require unique non-empty IDs');
     }
 
+    previousPageIds.current = ids;
     dispatch(mainActions.setStoryPages(ids));
-  }, [dispatch, pageIdsKey]);
+  }, [storyPages, dispatch]);
 
   useLayoutEffect(() => {
     visualEffects.setPageCount(storyPages.length);

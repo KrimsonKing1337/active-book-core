@@ -46,7 +46,8 @@ const createRegistration = (
     definitionId,
     params,
     placement: fillRegion(region),
-    visibility: ['storyViewportFrame', 'toolbarFrame'].includes(region) ? { sides: ['top', 'right', 'bottom', 'left'] } : {},
+    visibility: ['storyViewportFrame', 'toolbarFrame'].includes(region)
+      ? { sides: ['top', 'right', 'bottom', 'left'] } : {},
     depth: {
       plane: ['lab.edges', 'lab.under-curtain', 'lab.single'].includes(definitionId)
         ? 'background' : 'aboveStoryControls',
@@ -63,7 +64,7 @@ const createRegistration = (
 export const definitionsFor = (): HostVisualEffectDefinition[] => {
   const definitions: HostVisualEffectDefinition[] = [
     {
-      id: 'lab.toolbar', defaultParams: {}, Renderer: ToolbarDemo, 
+      id: 'lab.toolbar', defaultParams: {}, Renderer: ToolbarDemo,
     },
     {
       id: 'lab.ball', defaultParams: {}, Renderer: ContinuousBall,

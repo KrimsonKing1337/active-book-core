@@ -4,7 +4,6 @@ import { createContext, useContext } from 'react';
 
 import type { VisualRegion } from '@active-book/types';
 
-
 export type StoryRegion = Exclude<VisualRegion, 'application'>;
 export type RegionElements = Partial<Record<StoryRegion, HTMLDivElement | null>>;
 export type RegionRefs = Record<StoryRegion, RefCallback<HTMLDivElement>>;

@@ -9,7 +9,6 @@ import { compareVisualSurfaces } from '@components/VisualSurfaces/utils/order';
 
 import { VisualSurface } from './components';
 
-
 const layers: Record<VisualSurfaceItem['depth']['plane'], number> = {
   background: 0,
   belowNarrative: 1,

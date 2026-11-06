@@ -2,7 +2,6 @@ import { useLayoutEffect, useMemo, useRef } from 'react';
 
 import type { VisualRendererProps } from '@active-book/types';
 
-
 import { useStoryRegions } from '@components/StoryRegionsProvider';
 
 import { startCssAnimation } from '../hooks/startCssAnimation';
@@ -57,7 +56,7 @@ export const SingleScene = (props: VisualRendererProps) => {
     });
     shadeRef.current = shade;
     const shrink = startCssAnimation({
-      node: viewport, className: styles.Shrink, duration, 
+      node: viewport, className: styles.Shrink, duration,
     });
 
     return { animations: [shade, shrink.animation], cleanup: shrink.cleanup };

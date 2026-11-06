@@ -20,7 +20,7 @@ const registration: VisualEffectRegistration = {
   lifetime: { type: 'range', range: [{ from: 1, to: 2 }] },
 };
 const definitions = [{
-  id: 'test.canvas', defaultParams: {}, Renderer: CanvasEffect, 
+  id: 'test.canvas', defaultParams: {}, Renderer: CanvasEffect,
 }];
 const pages = [{ id: 'first', content: <p>First content</p> }, { id: 'second', content: <MediaPage /> }];
 
@@ -37,7 +37,7 @@ export const MediaBook = () => {
       <StoreProvider>
         <AppWrapper
           config={{
-            id: 'media-continuity', pages: 2, defaultTheme: 'dark', 
+            id: 'media-continuity', pages: 2, defaultTheme: 'dark',
           }}
           storyPages={pages}
           initialPageId="first"

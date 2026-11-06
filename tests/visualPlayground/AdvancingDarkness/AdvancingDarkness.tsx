@@ -35,7 +35,7 @@ export const AdvancingDarkness = (props: VisualRendererProps) => {
       }
 
       return startCssAnimation({
-        node, className: styles.Fade, duration, delay: duration * index, 
+        node, className: styles.Fade, duration, delay: duration * index,
       });
     });
     const animations = effects.map((cur) => cur.animation);

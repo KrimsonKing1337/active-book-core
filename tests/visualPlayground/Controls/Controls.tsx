@@ -113,7 +113,6 @@ export const Controls = ({
         </div>
       )}
 
-
       {!isBall && (
         <>
           <label className={styles.Check}>
