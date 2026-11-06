@@ -17,7 +17,11 @@ type BackgroundParams = JsonObject & Omit<BackgroundEffect, 'id'>;
 
 export type BackgroundRendererProps = PropsWithChildren & VisualRendererProps;
 
-export const BackgroundRenderer = ({ id, params, children }: BackgroundRendererProps) => {
+export const BackgroundRenderer = ({
+  id,
+  params,
+  children,
+}: BackgroundRendererProps) => {
   const options = params as BackgroundParams;
 
   const imageSource = options.kind === 'image' ? options.image?.src : undefined;
@@ -33,12 +37,8 @@ export const BackgroundRenderer = ({ id, params, children }: BackgroundRendererP
     style = {},
   } = options;
 
-  const zIndex = style.zIndex
-    ?? image?.style?.zIndex
-    ?? video?.style?.zIndex
-    ?? shadow?.style?.zIndex;
-
-  const wrapperStyle = kind === 'background' ? style : { zIndex };
+  const wrapperStyle = kind === 'background' || kind === 'component' ? { ...style } : {};
+  delete wrapperStyle.zIndex;
 
   const showShadow = kind === 'shadow' && shadow;
   const showImage = kind === 'image' && image && image?.src.trim();
@@ -49,7 +49,6 @@ export const BackgroundRenderer = ({ id, params, children }: BackgroundRendererP
 
   return (
     <div
-      id={`effect-${id}`}
       data-effect-id={id}
       className={styles.BackgroundObjectsWrapper}
       style={wrapperStyle}

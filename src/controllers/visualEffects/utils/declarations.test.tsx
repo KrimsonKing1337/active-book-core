@@ -143,7 +143,7 @@ test('frame controls merge style and animation changes through the common sessio
   act(() => result.current.updateShadow('frame', 'different-item', { hidden: false }));
   expect(result.current.effects.frame.shadow?.hidden).toBe(true);
   act(() => result.current.updateShadow('frame', 'shadow', { style: { zIndex: 12 } }));
-  expect(session.getSnapshot()[0].effect.depth.order).toBe(12);
+  expect(session.getSnapshot()[0].effect.depth.order).toBe(0);
   act(() => result.current.updateShadow('frame', 'shadow', { style: undefined }));
   expect(result.current.effects.frame.shadow?.style).toBeUndefined();
   expect(session.getSnapshot()[0].effect.depth.order).toBe(0);
@@ -265,4 +265,17 @@ test('a masked frame uses its real viewport frame host and native side masks', (
   expect(registration.effect.visibility).toEqual({
     sides: ['left', 'bottom'],
   });
+});
+
+
+test('declaration order is explicit and style zIndex never becomes surface depth', () => {
+  const registration = createBuiltinRegistration({
+    type: 'background',
+    options: {
+      id: 'order', kind: 'background', order: 7, style: { zIndex: 999 }, 
+    },
+    lifetime: { type: 'page', page: 1 },
+  });
+  expect(registration.effect.depth.order).toBe(7);
+  expect(registration.effect.params).not.toHaveProperty('order');
 });

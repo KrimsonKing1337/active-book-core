@@ -35,6 +35,7 @@ export type BackgroundEffectKind =
   | 'component';
 
 export type BackgroundEffect = {
+  order?: number;
   id: string;
   kind: BackgroundEffectKind;
   style?: React.CSSProperties;

@@ -59,6 +59,7 @@ export type FrameTextItem = FrameElementLayout & {
 };
 
 export type FrameEffect = {
+  order?: number;
   id: string;
   kind: 'shadow' | 'text' | 'component';
   layer?: FrameLayer;

@@ -1,4 +1,4 @@
-import type { CSSProperties, PropsWithChildren } from 'react';
+import type { PropsWithChildren } from 'react';
 
 import type { JsonObject, VisualRendererProps } from '@active-book/types';
 
@@ -15,7 +15,11 @@ type FrameParams = JsonObject & Omit<FrameEffect, 'id'>;
 
 export type FrameRendererProps = PropsWithChildren & VisualRendererProps;
 
-export const FrameRenderer = ({ id, params, children }: FrameRendererProps) => {
+export const FrameRenderer = ({
+  id,
+  params,
+  children,
+}: FrameRendererProps) => {
   const options = params as FrameParams;
 
   const {
@@ -25,11 +29,8 @@ export const FrameRenderer = ({ id, params, children }: FrameRendererProps) => {
     style,
   } = options;
 
-  const zIndex = shadow?.style?.zIndex ?? text?.style?.zIndex;
-
-  const styleSafe = style ?? {};
-
-  const wrapperStyle: CSSProperties = kind === 'component' ? styleSafe : { zIndex };
+  const wrapperStyle = { ...style };
+  delete wrapperStyle.zIndex;
 
   let ShadowComponent = FrameShadow;
 
@@ -45,7 +46,6 @@ export const FrameRenderer = ({ id, params, children }: FrameRendererProps) => {
 
   return (
     <div
-      id={`effect-${id}`}
       data-effect-id={id}
       style={wrapperStyle}
       className={styles.EffectWrapper}

@@ -15,7 +15,6 @@ export const FrameElement = ({
   position = 'top-left',
   offsetX = '0px',
   offsetY = '0px',
-  style: elementStyle,
   hidden = false,
 }: FrameElementProps) => {
   if (hidden) {
@@ -29,13 +28,11 @@ export const FrameElement = ({
     shiftY,
   ] = positionCoordinates[position];
 
-  const zIndex = elementStyle?.zIndex;
   const transform = `translate(calc(${shiftX} + ${offsetX}), calc(${shiftY} + ${offsetY}))`;
 
   const positionStyle: CSSProperties = {
     left,
     top,
-    zIndex,
     transform,
   };
 

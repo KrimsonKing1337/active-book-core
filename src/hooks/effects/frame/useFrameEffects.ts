@@ -7,7 +7,7 @@ import {
 
 import type { JsonObject, VisualEffectRegistration } from '@active-book/types';
 
-import { VisualEffectsContext, createBuiltinRegistration } from '@controllers/visualEffects';
+import { VisualEffectsContext } from '@controllers/visualEffects';
 import { FEEDBACK_DEFINITION, FRAME_DEFINITION } from '@controllers/visualEffects/constants';
 
 import type { FrameEffect, FrameShadowItem, FrameTextItem } from './@types';
@@ -33,7 +33,11 @@ export const useFrameEffects = () => {
     const result: Record<string, FrameEffect> = {};
 
     for (const registrationCur of registrations) {
-      const { id, definitionId, params } = registrationCur.effect;
+      const {
+        id,
+        definitionId,
+        params,
+      } = registrationCur.effect;
 
       if (definitionId === FRAME_DEFINITION || definitionId === FEEDBACK_DEFINITION) {
         // The built-in definition stores the typed frame options as JSON.
@@ -120,29 +124,6 @@ export const useFrameEffects = () => {
       depth: registration.effect.depth,
     };
 
-    const hasStyleChanges = 'style' in changes;
-    const isStyleRemoved = !changes.style;
-    const hasZIndexChanges = changes.style ? 'zIndex' in changes.style : false;
-
-    const orderChanged = hasStyleChanges && (isStyleRemoved || hasZIndexChanges);
-
-    if (orderChanged) {
-      const options = {
-        ...params,
-        id: effectId,
-      };
-
-      const updated = createBuiltinRegistration({
-        type: 'frame',
-        options,
-        lifetime: registration.lifetime,
-      });
-
-      effect.depth = {
-        ...effect.depth,
-        order: updated.effect.depth.order,
-      };
-    }
     session.update(effectId, { effect });
   }, [session]);
 
