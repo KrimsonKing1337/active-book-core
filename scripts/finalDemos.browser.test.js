@@ -18,20 +18,33 @@ const host = (page, selector) => page.locator(selector).evaluate((node) => node.
 
 test('advancing darkness defaults to the whole viewport frame and supports a split composition', async (context) => {
   const page = await open(context);
-  await patch(page, { demo: 'advancing', duration: 2400, color: '#000000' });
+  await patch(page, { demo: 'advancing', duration: 4000, color: '#000000' });
   assert.equal(await page.evaluate(() => window.playground.session.getSnapshot().length), 1);
   assert.equal(await host(page, '[data-darkness-phase="frame"]'), 'storyViewportFrame');
-  assert.equal(await host(page, '[data-darkness-phase="controls"]'), 'toolbar');
+  assert.equal(await host(page, '[data-darkness-phase="controls"]'), 'toolbarFrame');
   await page.getByTestId('play').click();
   await page.waitForFunction(() => window.playground.session.runs.read('advancing')?.milestones.includes('frame-covered'));
   await page.getByRole('button', { name: 'Пауза', exact: true }).click();
   const viewport = await page.locator('[data-story-region="storyViewport"]').boundingBox();
   const color = await pixels(page);
   assert.deepEqual(color(viewport.x + viewport.width / 2, viewport.y + viewport.height - 4), [0, 0, 0], 'frame phase reaches the bottom below Toolbar');
+  await page.getByRole('button', { name: 'Продолжить', exact: true }).click();
+  await page.waitForFunction(() => window.playground.session.runs.read('advancing')?.milestones.includes('controls-covered'));
+  await page.getByRole('button', { name: 'Пауза', exact: true }).click();
+  const toolbar = await page.locator('[data-story-region="toolbar"]').boundingBox();
+  const toolbarFrame = await page.locator('[data-story-region="toolbarFrame"]').boundingBox();
+  assert.equal(await page.locator('[data-darkness-final]').count(), 0);
+  assert.deepEqual((await pixels(page))(toolbar.x - 2, toolbarFrame.y + toolbarFrame.height / 2), [0, 0, 0], 'control phase also covers its layout padding');
   await page.getByRole('button', { name: 'Стоп / сброс', exact: true }).click();
   await patch(page, { composition: 'multiple' });
   assert.equal(await host(page, '[data-darkness-phase="frame"]'), 'narrativeFrame');
   assert.equal(await host(page, '[data-darkness-phase="controls"]'), 'toolbarFrame');
+  await patch(page, { toolbar: false, duration: 300 });
+  assert.equal(await page.locator('[data-darkness-phase]').count(), 3);
+  await page.getByTestId('play').click();
+  await page.waitForFunction(() => window.playground.session.runs.read('advancing')?.status === 'completed');
+  assert(await page.evaluate(() => window.playground.session.runs.read('advancing').milestones.includes('controls-covered')));
+
 });
 
 test('frame and through effects select viewport, narrative or Toolbar without coupling their plane', async (context) => {

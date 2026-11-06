@@ -26,23 +26,31 @@ export const AdvancingDarkness = (props: VisualRendererProps) => {
   const application = useBookApplicationSurface();
   const nodesRef = useRef<(HTMLDivElement | null)[]>([]);
   const { token, status } = useAnimationPlayback(props, () => {
-    const duration = numberParam(props.params, 'duration', 2000) / 4;
-    const effects = names.map((nameCur, index) => {
+    const activePhases = names.flatMap((nameCur, index) => {
       const node = nodesRef.current[index];
-
       if (!node) {
+        if (nameCur === 'controls') {
+          return [];
+        }
         throw new Error(`Darkness phase is not attached: ${nameCur}`);
       }
 
-      return startCssAnimation({
-        node, className: styles.Fade, duration, delay: duration * index,
-      });
+      return [{
+        node, name: nameCur, milestone: milestones[index], 
+      }];
     });
-    const animations = effects.map((cur) => cur.animation);
-    const phaseMilestones = animations.map((animationCur, index) => ({
-      animation: animationCur,
-      name: milestones[index],
+    const duration = numberParam(props.params, 'duration', 2000) / activePhases.length;
+    const effects = activePhases.map((phaseCur, index) => startCssAnimation({
+      node: phaseCur.node, className: styles.Fade, duration, delay: duration * index,
     }));
+    const animations = effects.map((cur) => cur.animation);
+    const phaseMilestones = activePhases.map((phaseCur, index) => ({
+      animation: animations[index], name: phaseCur.milestone,
+    }));
+    if (!activePhases.some((cur) => cur.name === 'controls')) {
+      const frame = activePhases.findIndex((cur) => cur.name === 'frame');
+      phaseMilestones.push({ animation: animations[frame], name: 'controls-covered' });
+    }
 
     return {
       animations,
@@ -52,9 +60,9 @@ export const AdvancingDarkness = (props: VisualRendererProps) => {
   });
   const split = stringParam(props.params, 'composition', 'single') === 'multiple';
   const targets = [application?.hosts.underStory, split ? hosts.narrativeFrame : hosts.storyViewportFrame,
-    split ? hosts.toolbarFrame : hosts.toolbar, hosts.narrativeViewport];
+    hosts.toolbarFrame, hosts.narrativeViewport];
 
-  const phases = names.map((nameCur, index) => {
+  const renderedPhases = names.map((nameCur, index) => {
     const target = targets[index];
 
     if (!target) {
@@ -100,7 +108,7 @@ export const AdvancingDarkness = (props: VisualRendererProps) => {
 
   return (
     <>
-      {phases}
+      {renderedPhases}
 
       {status === 'completed' && finalHost && createPortal(
         <div className={styles.FinalVeil} style={finalStyle} data-darkness-final />,

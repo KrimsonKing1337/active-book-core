@@ -112,7 +112,8 @@ export const Playground = () => {
       loopRef.current = patch.loop;
     }
 
-    const requiresPlaybackReset = patch.demo || patch.region || patch.composition || patch.plane;
+    const requiresPlaybackReset = patch.demo || patch.region || patch.composition || patch.plane
+      || (patch.toolbar !== undefined && settings.demo === 'advancing');
 
     if (requiresPlaybackReset) {
       stop();
@@ -127,7 +128,7 @@ export const Playground = () => {
         ...patch,
       };
     });
-  }, [stop]);
+  }, [settings.demo, stop]);
 
   const handleNavigate = useCallback((nextPage: number) => {
     setPage(nextPage);
