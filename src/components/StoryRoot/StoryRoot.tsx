@@ -1,4 +1,4 @@
-import { type CSSProperties, type HTMLAttributes, type Ref, useCallback, useLayoutEffect, useRef } from 'react';
+import { type CSSProperties, type HTMLAttributes, type Ref, useCallback, useLayoutEffect } from 'react';
 
 import classNames from 'classnames';
 
@@ -40,7 +40,6 @@ export const StoryRoot = ({
   selectedVisualEffectId,
   ...etc
 }: StoryRootProps) => {
-  const storyRef = useRef<HTMLDivElement>(null);
   const { refs } = useStoryRegions();
   const appMode = useAppMode();
   const application = useBookApplicationSurface();
@@ -81,7 +80,6 @@ export const StoryRoot = ({
   });
 
   const attachRoot = useCallback((element: HTMLDivElement | null) => {
-    storyRef.current = element;
     refs.story(element);
 
     if (typeof ref === 'function') {
@@ -89,8 +87,6 @@ export const StoryRoot = ({
 
       if (cleanup) {
         return () => {
-          storyRef.current = null;
-
           cleanup();
         };
       }
