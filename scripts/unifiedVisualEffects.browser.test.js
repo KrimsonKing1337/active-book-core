@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFile, mkdir } from 'node:fs/promises';
 import { test } from 'node:test';
+import { fileURLToPath } from 'node:url';
 import { PNG } from 'pngjs';
 
 import { openBrowserFixture } from './browserFixture.js';
@@ -162,7 +163,7 @@ test('real Background and Frame renderers use the book session in Chromium', asy
     const path = new URL('../tests/unifiedVisualEffects/screenshots/static-chromium-linux.png', import.meta.url);
     if (process.env.CAPTURE_VISUAL_BASELINE === '1') {
       await mkdir(new URL('../tests/unifiedVisualEffects/screenshots/', import.meta.url), { recursive: true });
-      await page.screenshot({ path: path.pathname });
+      await page.screenshot({ path: fileURLToPath(path) });
     } else {
       const expected = PNG.sync.read(await readFile(path));
       const result = PNG.sync.read(actual);

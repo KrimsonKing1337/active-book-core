@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { test } from 'node:test';
+import { fileURLToPath } from 'node:url';
 
 import { near, openBrowserFixture, pixels } from './browserFixture.js';
 
@@ -153,7 +154,7 @@ test('visual playground experiments in Chromium', async (context) => {
     const anchor = await bounds(page, '[data-effect-id="frame-text"] [class*="FrameElement"]');
     const main = await bounds(page, '[data-story-region="storyViewport"]');
     near(anchor.x + anchor.width / 2, main.x + main.width / 2 + 35, 'CSS anchor and offset');
-    await page.screenshot({ path: new URL('01-frame-local.png', artifacts).pathname });
+    await page.screenshot({ path: fileURLToPath(new URL('01-frame-local.png', artifacts)) });
     await page.setViewportSize({ width: 1100, height: 850 });
     await settle(page);
     near((await bounds(page, '[data-visual-content="frame"]')).width, (await bounds(page, '[data-story-region="storyViewport"]')).width, 'native responsive width');
@@ -177,7 +178,7 @@ test('visual playground experiments in Chromium', async (context) => {
     near((await bounds(page, '[data-visual-content="frame"]')).y, fixed.y, 'fixed viewport overlay');
     assert.equal(await frameToken(page), fixedToken);
     assert.equal(await page.locator('[data-surface-layout="geometry"], [data-surface-layout="css"]').count(), 0);
-    await page.screenshot({ path: new URL('02-native-scroll.png', artifacts).pathname });
+    await page.screenshot({ path: fileURLToPath(new URL('02-native-scroll.png', artifacts)) });
   });
 
   await scenario('one session preserves animated frame identity across resize and disjoint active pages', async (page) => {
@@ -210,7 +211,7 @@ test('visual playground experiments in Chromium', async (context) => {
     assert(story.width < app.width && story.height < app.height);
     near(overlay.x, app.x, 'external x');
     near(overlay.width, app.width, 'external width');
-    await page.screenshot({ path: new URL('04-external-darkness.png', artifacts).pathname });
+    await page.screenshot({ path: fileURLToPath(new URL('04-external-darkness.png', artifacts)) });
     await patch(page, { demo: 'edges', duration: 350, storySize: 100, color: '#000000' });
     const viewport = await bounds(page, '[data-story-region="storyViewport"]');
     const sample = { x: viewport.x + viewport.width / 2, y: viewport.y + viewport.height - 7 };
@@ -221,7 +222,7 @@ test('visual playground experiments in Chromium', async (context) => {
     assert.deepEqual(color(sample.x, sample.y), before, 'opaque viewport hides underlay');
     assert.deepEqual(color(app.x + 5, app.y + 5), [0, 0, 0]);
     assert.deepEqual(color(viewport.x + 1, viewport.y + 1), [0, 0, 0], 'rounded corner exposes underlay');
-    await page.screenshot({ path: new URL('05-underlay-corners.png', artifacts).pathname });
+    await page.screenshot({ path: fileURLToPath(new URL('05-underlay-corners.png', artifacts)) });
 
     await patch(page, { demo: 'darkness', region: 'story', duration: 350 });
     // Explicitly set the scope after selecting a preset, whose default is application.
@@ -240,19 +241,19 @@ test('visual playground experiments in Chromium', async (context) => {
     const smoke = page.locator('[data-demo-effect="smoke"]');
     const token = await smoke.getAttribute('data-token');
     assert.equal(await smoke.locator('i').count(), 23);
-    await page.screenshot({ path: new URL('06-css-smoke.png', artifacts).pathname });
+    await page.screenshot({ path: fileURLToPath(new URL('06-css-smoke.png', artifacts)) });
     await patch(page, { width: 950, intensity: 0.7 });
     assert.equal(await smoke.getAttribute('data-token'), token);
     await patch(page, { demo: 'through', duration: 2000 });
     await play(page);
     await page.waitForTimeout(800);
     assert.equal(await page.locator('[data-demo-effect="through"]').count(), 1);
-    await page.screenshot({ path: new URL('07-single-wave.png', artifacts).pathname });
+    await page.screenshot({ path: fileURLToPath(new URL('07-single-wave.png', artifacts)) });
     await patch(page, { composition: 'multiple' });
     await play(page);
     assert.equal(await page.locator('[data-demo-effect^="through-"]').count(), 3);
     await page.waitForTimeout(800);
-    await page.screenshot({ path: new URL('08-composed-wave.png', artifacts).pathname });
+    await page.screenshot({ path: fileURLToPath(new URL('08-composed-wave.png', artifacts)) });
 
     await patch(page, { demo: 'darkness', region: 'application', duration: 350, intensity: 1 });
     await play(page);
@@ -292,7 +293,7 @@ test('visual playground experiments in Chromium', async (context) => {
     assert.equal(collapsed.clientHeight, baseline.height, 'layout height is constant');
     const curtain = await bounds(page, '[data-visual-surface="curtain"]');
     near(curtain.width, (await bounds(page, '[data-book-application]')).width, 'external shade stays fixed');
-    await page.screenshot({ path: new URL('09-collapse-transform.png', artifacts).pathname });
+    await page.screenshot({ path: fileURLToPath(new URL('09-collapse-transform.png', artifacts)) });
     await waitRun(page, 'reveal');
     assert.equal(await page.locator('[data-layout-mode]').count(), 0);
     near((await bounds(page, '[data-story-region="storyViewport"]')).width, baseline.width, 'restored width');
