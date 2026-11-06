@@ -1,0 +1,12 @@
+.Probe {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+
+  animation: orbit 10s linear infinite;
+}
+
+@keyframes orbit {
+  from { transform: translateX(0); }
+  to { transform: translateX(120px); }
+}

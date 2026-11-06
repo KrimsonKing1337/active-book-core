@@ -2,10 +2,6 @@ import { type HTMLAttributes, type PropsWithChildren } from 'react';
 
 import classNames from 'classnames';
 
-import { useSelector } from '@store';
-
-import { mainSelectors } from '@store/main';
-
 import { Toolbar } from '@components/Toolbar';
 import { Menu } from '@components/Menu';
 import { TableOfContents } from '@components/TableOfContents';
@@ -36,7 +32,6 @@ export const StoryShell = ({
   useBookWindows(windowHistoryScope);
   const { refs } = useStoryRegions();
 
-  const showLoader = useSelector(mainSelectors.showLoader);
 
 
   const storyShellClassNames = classNames({
@@ -45,7 +40,6 @@ export const StoryShell = ({
 
   const storyViewportClassNames = classNames({
     [styles.StoryViewport]: true,
-    [styles.isLoading]: showLoader,
   });
 
   return (
