@@ -69,6 +69,43 @@ test('side masks are explicit, include the lower viewport edge and never alter l
   assert.deepEqual((await pixels(page))(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2), [255, 0, 0], 'no implicit frame mask');
 });
 
+test('toolbarFrame supports different mask widths on all four sides without changing padding', async (context) => {
+  const page = await open(context);
+  const region = await box(page, 'toolbarFrame');
+  const beforePadding = await page.locator('[data-story-region="toolbarFrame"]').evaluate((node) => {
+    return getComputedStyle(node).padding;
+  });
+
+  await setSurfaces(page, [effect('toolbarFrame', {
+    sides: ['top', 'right', 'bottom', 'left'],
+    frameWidth: {
+      top: { value: 6, unit: 'px' },
+      right: { value: 20, unit: 'px' },
+      bottom: { value: 11, unit: 'px' },
+      left: { value: 16, unit: 'px' },
+    },
+  })]);
+
+  const screenshot = await pixels(page);
+  const isRed = (x, y) => screenshot(x, y).join(',') === '255,0,0';
+  const middleX = region.x + region.width / 2;
+  const middleY = region.y + region.height / 2;
+
+  assert(isRed(middleX, region.y + 3), 'top band');
+  assert(!isRed(middleX, region.y + 9), 'outside top band');
+  assert(isRed(region.x + region.width - 14, middleY), 'right band');
+  assert(!isRed(region.x + region.width - 24, middleY), 'outside right band');
+  assert(isRed(middleX, region.y + region.height - 8), 'bottom band');
+  assert(!isRed(middleX, region.y + region.height - 14), 'outside bottom band');
+  assert(isRed(region.x + 12, middleY), 'left band');
+  assert(!isRed(region.x + 19, middleY), 'outside left band');
+
+  assert.equal(await page.locator('[data-story-region="toolbarFrame"]').evaluate((node) => {
+    return getComputedStyle(node).padding;
+  }), beforePadding);
+  assert.deepEqual(await box(page, 'toolbarFrame'), region);
+});
+
 test('Toolbar has natural wrapping height and local planes preserve control interaction', async (context) => {
   const page = await open(context);
   const button = page.locator('[data-welcome-tour-id="bookmarks"]');
