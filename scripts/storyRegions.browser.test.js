@@ -131,6 +131,7 @@ test('percentage mask width follows toolbarFrame size changes without altering p
   const desktop = await verifyBand();
   assert(desktop.bounds.width > 500, 'desktop toolbar width');
   assert(desktop.isRed(50), '50px is inside the 10% band on desktop');
+  assert.equal(await toolbarFrame.evaluate((node) => getComputedStyle(node).padding), paddingBefore);
 
   await page.setViewportSize({ width: 390, height: 800 });
   await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
@@ -138,7 +139,6 @@ test('percentage mask width follows toolbarFrame size changes without altering p
   const mobile = await verifyBand();
   assert(mobile.bounds.width <= 390, 'mobile toolbar width');
   assert(!mobile.isRed(50), '50px is outside the 10% band on mobile');
-  assert.equal(await toolbarFrame.evaluate((node) => getComputedStyle(node).padding), paddingBefore);
 });
 
 test('Toolbar has natural wrapping height and local planes preserve control interaction', async (context) => {
