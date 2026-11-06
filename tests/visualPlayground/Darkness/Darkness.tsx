@@ -7,6 +7,8 @@ import type { VisualRendererProps } from '@active-book/types';
 
 import { useStoryRegions } from '@components/StoryRegionsProvider';
 
+import { startCssAnimation } from '../hooks/startCssAnimation';
+
 import { useAnimationPlayback } from '../hooks/useAnimationPlayback';
 import { useRelativeOrigin } from '../hooks/useRelativeOrigin';
 import { numberParam, stringParam } from '../utils';
@@ -19,13 +21,14 @@ export const Darkness = (props: VisualRendererProps) => {
   const { elements } = useStoryRegions();
   const { params, id } = props;
   const direction = stringParam(params, 'direction', 'grow');
+  const edges = params.edges === true;
   const origin = useRelativeOrigin({
+    enabled: !edges,
     source: elements.narrativeFrame,
     target: nodeRef,
     x: numberParam(params, 'originX', 50) / 100,
     y: numberParam(params, 'originY', 50) / 100,
   });
-  const edges = params.edges === true;
   const center = `${origin.x}px ${origin.y}px`;
   const full = `circle(${origin.radius}px at ${center})`;
   const empty = `circle(0px at ${center})`;
@@ -38,12 +41,9 @@ export const Darkness = (props: VisualRendererProps) => {
       return [{ '--lab-hole': '0px' }, { '--lab-hole': `${origin.radius + 1}px` }];
     }
 
-    if (edges) {
-      return [{ '--lab-edge': '100%' }, { '--lab-edge': '-60%' }];
-    }
 
     return [{ clipPath: empty }, { clipPath: full }];
-  }, [full, empty, origin.radius, direction, edges]);
+  }, [full, empty, origin.radius, direction]);
 
   const {
     token,
@@ -54,6 +54,15 @@ export const Darkness = (props: VisualRendererProps) => {
 
     if (!node) {
       throw new Error('Darkness surface is not attached');
+    }
+
+    if (edges) {
+      animationRef.current = null;
+      const effect = startCssAnimation({
+        node, className: styles.Edges, duration: numberParam(params, 'duration', 2000),
+      });
+
+      return { animations: [effect.animation], cleanup: effect.cleanup };
     }
 
     const animation = node.animate(keyframes, {

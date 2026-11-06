@@ -5,6 +5,7 @@ import { useLayoutEffect, useState } from 'react';
 type RelativeOriginOptions = {
   source?: HTMLElement | null;
   target: RefObject<HTMLElement | null>;
+  enabled?: boolean;
   x?: number;
   y?: number;
 };
@@ -13,6 +14,7 @@ type RelativeOriginOptions = {
 export const useRelativeOrigin = ({
   source,
   target,
+  enabled = true,
   x = 0.5,
   y = 0.5,
 }: RelativeOriginOptions) => {
@@ -23,7 +25,7 @@ export const useRelativeOrigin = ({
   useLayoutEffect(() => {
     const element = target.current;
 
-    if (!element) {
+    if (!element || !enabled) {
       return;
     }
 
@@ -49,7 +51,7 @@ export const useRelativeOrigin = ({
     measure();
 
     return () => observer.disconnect();
-  }, [source, target, x, y]);
+  }, [source, target, enabled, x, y]);
 
   return origin;
 };

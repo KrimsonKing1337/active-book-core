@@ -14,3 +14,12 @@
   position: absolute;
   inset: 0;
 }
+
+.Edges {
+  animation: darkness-edges var(--lab-duration) linear both;
+}
+
+@keyframes darkness-edges {
+  from { --lab-edge: 100%; }
+  to { --lab-edge: -60%; }
+}

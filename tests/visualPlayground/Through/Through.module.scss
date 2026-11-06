@@ -13,3 +13,24 @@
   box-shadow: 0 0 40px currentColor;
   opacity: 0;
 }
+
+.Propagation {
+  animation: light-wave var(--lab-duration) linear both;
+}
+
+@keyframes light-wave {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+
+  50% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0;
+  }
+}

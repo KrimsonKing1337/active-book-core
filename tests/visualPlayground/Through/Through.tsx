@@ -7,6 +7,8 @@ import type { VisualRendererProps } from '@active-book/types';
 
 import { useStoryRegions } from '@components/StoryRegionsProvider';
 
+import { startCssAnimation } from '../hooks/startCssAnimation';
+
 import { useAnimationPlayback } from '../hooks/useAnimationPlayback';
 import { useRelativeOrigin } from '../hooks/useRelativeOrigin';
 import { numberParam, stringParam } from '../utils';
@@ -27,18 +29,11 @@ export const Through = (props: VisualRendererProps) => {
       throw new Error('Wave is not attached');
     }
 
-    const animation = wave.animate([
-      { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 },
-      {
-        transform: 'translate(-50%, -50%) scale(0.5)', opacity: 1, offset: 0.5,
-      },
-      { transform: 'translate(-50%, -50%) scale(1)', opacity: 0 },
-    ], {
-      duration: numberParam(props.params, 'duration', 2000),
-      fill: 'both',
+    const effect = startCssAnimation({
+      node: wave, className: styles.Propagation, duration: numberParam(props.params, 'duration', 2000),
     });
 
-    return { animations: [animation] };
+    return { animations: [effect.animation], cleanup: effect.cleanup };
   });
   const style: CSSProperties = {
     color: stringParam(props.params, 'color', '#75e1d5'),
