@@ -29,3 +29,5 @@ https://active-books.ru
 [Результаты CSS/JS-сравнения, управление эффектами и визуальные материалы](docs/visual-playground.md).
 
 Текущий эксперимент `experiment/css-first-story-surfaces`: [CSS-first DOM-регионы, карта коммитов, проверки и замеры](docs/css-first-story-surfaces.ru.md).
+
+Финализация: [DOM-регионы, Toolbar, маски, анимации и готовность к интеграции](docs/story-regions-finalization.ru.md).
