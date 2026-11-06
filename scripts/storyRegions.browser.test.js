@@ -106,6 +106,41 @@ test('toolbarFrame supports different mask widths on all four sides without chan
   assert.deepEqual(await box(page, 'toolbarFrame'), region);
 });
 
+test('percentage mask width follows toolbarFrame size changes without altering padding', async (context) => {
+  const page = await open(context);
+  const toolbarFrame = page.locator('[data-story-region="toolbarFrame"]');
+  const paddingBefore = await toolbarFrame.evaluate((node) => getComputedStyle(node).padding);
+
+  await setSurfaces(page, [effect('toolbarFrame', {
+    sides: ['left'],
+    frameWidth: { value: 10, unit: '%' },
+  })]);
+
+  const verifyBand = async () => {
+    const bounds = await box(page, 'toolbarFrame');
+    const readPixel = await pixels(page);
+    const y = bounds.y + bounds.height / 2;
+    const isRed = (distance) => readPixel(bounds.x + distance, y).join(',') === '255,0,0';
+
+    assert(isRed(bounds.width * 0.05), 'inside 10% left band');
+    assert(!isRed(bounds.width * 0.15), 'outside 10% left band');
+
+    return { bounds, isRed };
+  };
+
+  const desktop = await verifyBand();
+  assert(desktop.bounds.width > 500, 'desktop toolbar width');
+  assert(desktop.isRed(50), '50px is inside the 10% band on desktop');
+
+  await page.setViewportSize({ width: 390, height: 800 });
+  await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+
+  const mobile = await verifyBand();
+  assert(mobile.bounds.width <= 390, 'mobile toolbar width');
+  assert(!mobile.isRed(50), '50px is outside the 10% band on mobile');
+  assert.equal(await toolbarFrame.evaluate((node) => getComputedStyle(node).padding), paddingBefore);
+});
+
 test('Toolbar has natural wrapping height and local planes preserve control interaction', async (context) => {
   const page = await open(context);
   const button = page.locator('[data-welcome-tour-id="bookmarks"]');
