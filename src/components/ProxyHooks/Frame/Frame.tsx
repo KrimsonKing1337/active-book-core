@@ -7,7 +7,10 @@ export type FrameProps = FrameEffect & {
   lifetime?: VisualEffectLifetime;
 };
 
-export const Frame = ({ lifetime, ...props }: FrameProps) => {
+export const Frame = ({
+  lifetime,
+  ...props
+}: FrameProps) => {
   useFrameEffect(props, lifetime);
 
   return null;

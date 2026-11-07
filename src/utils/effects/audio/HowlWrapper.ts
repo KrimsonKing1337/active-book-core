@@ -72,13 +72,17 @@ export class HowlWrapper {
     fadeOutWhenUnload = true,
     delay = 0,
     stopBy = 0,
-
     onPlay = () => {},
     onUnload = () => {},
     onPause = () => {},
     onStop = () => {},
   }: HowlWrapperOptions) {
-    const { sfx, bg, music, global } = this.getVolume();
+    const {
+      sfx,
+      bg,
+      music,
+      global,
+    } = this.getVolume();
 
     const getInitialVolume = (volume: number) => {
       return (volume / 100) * (relativeVolume / 100) * (global / 100);

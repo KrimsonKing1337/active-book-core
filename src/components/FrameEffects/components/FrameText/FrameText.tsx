@@ -11,7 +11,11 @@ type FrameTextProps = PropsWithChildren & {
   style?: CSSProperties;
 };
 
-export const FrameText = ({ children, animation, style }: FrameTextProps) => {
+export const FrameText = ({
+  children,
+  animation,
+  style,
+}: FrameTextProps) => {
   const childrenAsArray = Children.toArray(children);
 
   if (childrenAsArray.length !== 2) {

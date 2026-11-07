@@ -4,7 +4,11 @@ export type Scroll = {
   behavior?: ScrollBehavior;
 };
 
-export function scroll({ elem, scrollTop, behavior = 'auto' }: Scroll) {
+export function scroll({
+  elem,
+  scrollTop,
+  behavior = 'auto',
+}: Scroll) {
   elem.scrollBy({
     top: scrollTop,
     behavior: behavior as ScrollBehavior,
@@ -17,7 +21,11 @@ export type ScrollUp = {
   scrollValue: number;
 };
 
-export function scrollUp({ elem, behavior, scrollValue }: ScrollUp) {
+export function scrollUp({
+  elem,
+  behavior,
+  scrollValue,
+}: ScrollUp) {
   scroll({
     elem,
     behavior,
@@ -25,7 +33,11 @@ export function scrollUp({ elem, behavior, scrollValue }: ScrollUp) {
   });
 }
 
-export function scrollDown({ elem, behavior, scrollValue }: ScrollUp) {
+export function scrollDown({
+  elem,
+  behavior,
+  scrollValue,
+}: ScrollUp) {
   scroll({
     elem,
     behavior,

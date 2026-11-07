@@ -14,8 +14,7 @@ export const Spoiler = ({
   label,
   isOpenDefault = false,
   needToSetHeight = false,
-  setNeedToSetHeightToFalse = () => {
-  },
+  setNeedToSetHeightToFalse = () => {},
   ...rest
 }: PropsWithChildren<SpoilerProps>) => {
   const [isOpen, setIsOpen] = useState(isOpenDefault);
@@ -40,6 +39,7 @@ export const Spoiler = ({
 
     if (!isOpen) {
       contentElement.style.height = '0';
+
       return;
     }
 

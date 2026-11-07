@@ -14,7 +14,7 @@ export type SlideShowProp = {
   isWithoutBorders?: boolean,
   mode?: SlideShowMode;
   onSlideChange?: () => void;
-}
+};
 
 type SlideShowState = {
   slideIndex: number;
@@ -28,8 +28,7 @@ export class SlideShow extends React.Component<PropsWithChildren<SlideShowProp>,
     isVisible: false,
     isWithoutBorders: false,
     mode: null,
-    onSlideChange: () => {
-    },
+    onSlideChange: () => {},
   };
 
   private hammertime: HammerManager | null;
@@ -200,7 +199,11 @@ export class SlideShow extends React.Component<PropsWithChildren<SlideShowProp>,
 
   render() {
     const { isWithoutBorders, mode } = this.props;
-    const { slideIndex, isOverflow, arrowsAreVisible } = this.state;
+    const {
+      slideIndex,
+      isOverflow,
+      arrowsAreVisible,
+    } = this.state;
 
     const isModalMode = mode === 'Modal';
 

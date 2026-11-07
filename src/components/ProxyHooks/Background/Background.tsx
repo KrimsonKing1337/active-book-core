@@ -7,7 +7,10 @@ export type BackgroundProps = BackgroundEffect & {
   lifetime?: VisualEffectLifetime;
 };
 
-export const Background = ({ lifetime, ...props }: BackgroundProps) => {
+export const Background = ({
+  lifetime,
+  ...props
+}: BackgroundProps) => {
   useBackground(props, lifetime);
 
   return null;

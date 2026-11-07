@@ -6,7 +6,10 @@ import { useAppMode } from '@components/App/AppModeContext';
 
 export type FlashlightProps = FlashlightEffectOptions;
 
-export const Flashlight = ({ playOnLoad, ...options }: FlashlightProps) => {
+export const Flashlight = ({
+  playOnLoad,
+  ...options
+}: FlashlightProps) => {
   const appMode = useAppMode();
 
   const playOnLoadAppMode = appMode === 'reader' ? playOnLoad : false;

@@ -16,8 +16,7 @@ export const Action = ({
   className = '',
   fullWidth = false,
   withSpaces = true,
-  onClick = () => {
-  },
+  onClick = () => {},
   ...etc
 }: PropsWithChildren<ActionProps>) => {
   const actionClassNames = classNames({

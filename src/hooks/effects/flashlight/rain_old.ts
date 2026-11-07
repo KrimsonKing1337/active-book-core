@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 
 import { useFlashlight } from '@hooks/effects/flashlight';
+
 import { sleep } from '@utils/sleep';
 
 type FlashLightOn = (n: number) => void;
@@ -11,7 +12,9 @@ async function play(flashlightOn: FlashLightOn) {
   //#region1
   await sleep(1890);
 
-  if (!letItBe) return;
+  if (!letItBe) {
+    return;
+  }
 
   await flashlightOn(125);
 
@@ -19,7 +22,9 @@ async function play(flashlightOn: FlashLightOn) {
   //#endregion1
 
   //#region2
-  if (!letItBe) return;
+  if (!letItBe) {
+    return;
+  }
 
   await flashlightOn(150);
 
@@ -27,7 +32,9 @@ async function play(flashlightOn: FlashLightOn) {
   //#endregion2
 
   //#region3
-  if (!letItBe) return;
+  if (!letItBe) {
+    return;
+  }
 
   await flashlightOn(125);
 
@@ -35,7 +42,9 @@ async function play(flashlightOn: FlashLightOn) {
   //#endregion3
 
   //#region4
-  if (!letItBe) return;
+  if (!letItBe) {
+    return;
+  }
 
   await flashlightOn(150);
 
@@ -43,7 +52,9 @@ async function play(flashlightOn: FlashLightOn) {
   //#endregion4
 
   //#region5
-  if (!letItBe) return;
+  if (!letItBe) {
+    return;
+  }
 
   await flashlightOn(125);
 
@@ -51,7 +62,9 @@ async function play(flashlightOn: FlashLightOn) {
   //#endregion5
 
   //#region6
-  if (!letItBe) return;
+  if (!letItBe) {
+    return;
+  }
 
   await flashlightOn(150);
 
@@ -59,7 +72,9 @@ async function play(flashlightOn: FlashLightOn) {
   //#endregion6
 
   //#region7
-  if (!letItBe) return;
+  if (!letItBe) {
+    return;
+  }
 
   await flashlightOn(125);
 
@@ -67,7 +82,9 @@ async function play(flashlightOn: FlashLightOn) {
   //#endregion7
 
   //#region8
-  if (!letItBe) return;
+  if (!letItBe) {
+    return;
+  }
 
   await flashlightOn(150);
 
@@ -75,7 +92,9 @@ async function play(flashlightOn: FlashLightOn) {
   //#endregion8
 
   //#region9
-  if (!letItBe) return;
+  if (!letItBe) {
+    return;
+  }
 
   await flashlightOn(125);
 
@@ -83,7 +102,9 @@ async function play(flashlightOn: FlashLightOn) {
   //#endregion9
 
   //#region10
-  if (!letItBe) return;
+  if (!letItBe) {
+    return;
+  }
 
   await flashlightOn(150);
 

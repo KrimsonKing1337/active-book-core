@@ -4,7 +4,10 @@ import * as styles from './Article.module.scss';
 
 export type ArticleProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren;
 
-export const Article = ({ children, ...etc }: ArticleProps) => {
+export const Article = ({
+  children,
+  ...etc
+}: ArticleProps) => {
   return (
     <div className={styles.Article} {...etc}>
       {children}

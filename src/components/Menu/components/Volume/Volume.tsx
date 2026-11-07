@@ -83,7 +83,12 @@ export const Volume = () => {
   return (
     <div className={styles.Volume}>
       {volumeControls.map((controlCur) => {
-        const { id, label, value, onChange } = controlCur;
+        const {
+          id,
+          label,
+          value,
+          onChange,
+        } = controlCur;
 
         return (
           <div key={id} className={styles.Item}>

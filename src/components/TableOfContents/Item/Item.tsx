@@ -11,7 +11,11 @@ export type ItemProps = {
   pageNumber: number;
 };
 
-export const Item = ({ title, subtitle = '', pageNumber }: ItemProps) => {
+export const Item = ({
+  title,
+  subtitle = '',
+  pageNumber,
+}: ItemProps) => {
   const { goToPage } = useGoToPage();
 
   const pages = useSelector(mainSelectors.pages);

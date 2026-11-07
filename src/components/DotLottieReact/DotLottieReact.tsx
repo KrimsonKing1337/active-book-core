@@ -21,7 +21,11 @@ export type DotLottieReactProps = DotLottieReactPropsOriginal & {
   }[];
 };
 
-export const DotLottieReact = ({ refCallback, eventListeners = [], ...etc }: DotLottieReactProps) => {
+export const DotLottieReact = ({
+  refCallback,
+  eventListeners = [],
+  ...etc
+}: DotLottieReactProps) => {
   const dispatch = useDispatch();
 
   const [dotLottie, setDotLottie] = useState<DotLottie | null>(null);

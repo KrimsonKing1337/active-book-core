@@ -18,11 +18,21 @@ export const setMuteToAllVideos = (muted: boolean) => {
 
 export const startToPlayAllAudiosWithPlayOnLoad = (audioInstances: HowlInstances, page: number) => {
   Object.values(audioInstances).forEach((audio) => {
-    if (!audio) return;
-    if (audio.page !== page && !audio.isRange) return;
-    if (audio.isUnloading) return;
-    if (audio.playing()) return;
-    if (!audio.playOnLoad) return;
+    if (!audio) {
+      return;
+    }
+    if (audio.page !== page && !audio.isRange) {
+      return;
+    }
+    if (audio.isUnloading) {
+      return;
+    }
+    if (audio.playing()) {
+      return;
+    }
+    if (!audio.playOnLoad) {
+      return;
+    }
 
     audio.play();
   });

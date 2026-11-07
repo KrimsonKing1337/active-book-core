@@ -1,4 +1,4 @@
-export const getShuffledArray = <T1, >(array: T1[]) => {
+export const getShuffledArray = <T1 >(array: T1[]) => {
   const result = [...array];
 
   for (let i = result.length - 1; i > 0; i--) {

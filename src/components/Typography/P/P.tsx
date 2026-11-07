@@ -4,7 +4,10 @@ import * as styles from './P.module.scss';
 
 export type PProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren;
 
-export const P = ({ children, ...etc }: PProps) => {
+export const P = ({
+  children,
+  ...etc
+}: PProps) => {
   return (
     <div className={styles.P} {...etc}>
       {children}

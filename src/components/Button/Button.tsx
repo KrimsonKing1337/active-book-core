@@ -10,7 +10,7 @@ export type ButtonProps = React.HTMLAttributes<HTMLButtonElement> & {
   disabled?: boolean;
 
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
-}
+};
 
 export const Button = ({
   children,

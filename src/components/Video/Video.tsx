@@ -26,7 +26,6 @@ export const Video = ({
   autoPlay = true,
   preserveTime = true,
   elementRef,
-
   onCanPlay,
   onError,
   ...etc

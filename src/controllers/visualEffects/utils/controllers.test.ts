@@ -1,6 +1,8 @@
 import { createVisualControllers } from './controllers';
 
-const makePlayback = () => ({ play: jest.fn(), pause: jest.fn(), stop: jest.fn() });
+const makePlayback = () => ({
+  play: jest.fn(), pause: jest.fn(), stop: jest.fn(),
+});
 
 test('static renderers have a controller but no fabricated playback methods', () => {
   const remove = jest.fn();

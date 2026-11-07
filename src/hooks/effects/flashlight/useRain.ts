@@ -1,13 +1,16 @@
 import { useEffect } from 'react';
 
 import { useFlashlight } from '@hooks/effects/flashlight';
+
 import { sleep } from '@utils/sleep';
 
 let letItBe = false;
 
 const play = async (flashlightOn: (n: number) => void) => {
   const flash = async (sleepAfter: number) => {
-    if (!letItBe) return;
+    if (!letItBe) {
+      return;
+    }
 
     await flashlightOn(125);
 

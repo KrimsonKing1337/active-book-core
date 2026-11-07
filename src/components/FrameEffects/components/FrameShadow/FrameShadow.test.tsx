@@ -1,12 +1,17 @@
+import { renderToStaticMarkup } from 'react-dom/server';
+
 import type { FrameSide } from '@hooks/effects/frame/@types';
 
-import { renderToStaticMarkup } from 'react-dom/server';
 
 import { FrameShadow } from './FrameShadow';
 
 const renderShadow = (sides: FrameSide[]) => {
   return renderToStaticMarkup(
-    <FrameShadow options={{ id: 'shadow', sides, thickness: 20 }} />
+    <FrameShadow
+      options={{
+        id: 'shadow', sides, thickness: 20, 
+      }}
+    />,
   );
 };
 

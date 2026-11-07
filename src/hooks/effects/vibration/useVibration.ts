@@ -9,9 +9,10 @@ import { mainSelectors } from '@store/main';
 
 import { useAppMode } from '@components/App/AppModeContext';
 
+import { off as vibrationOff, on as vibrationOn } from '@utils/effects/vibration';
+
 import { useVibrationPreview } from './useVibrationPreview';
 
-import { off as vibrationOff, on as vibrationOn } from '@utils/effects/vibration';
 
 export const useVibration = (options?: VibrationEffectOptions) => {
   const appMode = useAppMode();

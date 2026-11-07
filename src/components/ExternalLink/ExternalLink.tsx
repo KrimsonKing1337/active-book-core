@@ -4,7 +4,7 @@ import * as styles from './ExternalLink.module.scss';
 
 export type ExternalLinkProps = {
   href: string;
-}
+};
 
 export const ExternalLink = ({ href, children }: PropsWithChildren<ExternalLinkProps>) => {
   return (

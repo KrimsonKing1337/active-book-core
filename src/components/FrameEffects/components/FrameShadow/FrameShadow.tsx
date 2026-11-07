@@ -1,8 +1,9 @@
 import type { CSSProperties, RefObject } from 'react';
 
+import classNames from 'classnames';
+
 import type { FrameSide, FrameShadowItem } from '@hooks/effects/frame/@types';
 
-import classNames from 'classnames';
 
 import * as styles from './FrameShadow.module.scss';
 
@@ -12,7 +13,11 @@ export type FrameShadowProps = {
   className?: string;
 };
 
-export const FrameShadow = ({ options, elementRef, className }: FrameShadowProps) => {
+export const FrameShadow = ({
+  options,
+  elementRef,
+  className,
+}: FrameShadowProps) => {
   const {
     animation,
     style,

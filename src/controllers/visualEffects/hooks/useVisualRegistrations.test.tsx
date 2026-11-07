@@ -5,7 +5,9 @@ import { registration } from '../testFixtures';
 
 import { useVisualRegistrations } from './useVisualRegistrations';
 
-const definition = { id: 'static', defaultParams: {}, Renderer: () => null };
+const definition = {
+  id: 'static', defaultParams: {}, Renderer: () => null,
+};
 
 test('equal descriptions skip updates; props and componentKey update the same registration', () => {
   const session = createVisualEffects({ pages: 5, definitions: [definition] });

@@ -35,7 +35,13 @@ const setAudioVolumeByType = (type: AudioType, volume: number) => {
 
 export function* watchSetAll(action: PayloadAction<State>) {
   const { payload } = action;
-  const { global, bg, music, sfx, videos } = payload;
+  const {
+    global,
+    bg,
+    music,
+    sfx,
+    videos,
+  } = payload;
 
   yield put(actions.setSfx(sfx));
   yield put(actions.setMusic(music));
@@ -51,7 +57,12 @@ export function* watchSetGlobal(action: PayloadAction<State['global']>) {
 
   const volumeAll: State = yield select(selectors.all);
 
-  const { sfx, bg, music, videos } = volumeAll;
+  const {
+    sfx,
+    bg,
+    music,
+    videos,
+  } = volumeAll;
 
   yield call(() => {
     setAudioVolumeByType('sfx', sfx * (payload / 100));

@@ -14,7 +14,6 @@ export const EasterEgg = ({
   children,
   className = '',
   onClick = () => {},
-
   ...etc
 }: PropsWithChildren<EasterEggProps>) => {
   const clickHandler = () => {

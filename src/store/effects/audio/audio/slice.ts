@@ -29,7 +29,9 @@ const slice = createSlice({
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     deleteAudioInstance(_state, _action: PayloadAction<DeleteAudioInstancePayload>) {},
 
-    removeAudioInstance(state, action: PayloadAction<{ id: string; instance: NonNullable<HowlInst> }>) {
+    removeAudioInstance(state, action: PayloadAction<{
+      id: string; instance: NonNullable<HowlInst>
+    }>) {
       const { id, instance } = action.payload;
 
       // Асинхронное удаление старого звука не должно удалить его замену.

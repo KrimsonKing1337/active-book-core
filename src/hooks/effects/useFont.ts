@@ -13,7 +13,10 @@ export type UseFontOptions = Pick<React.CSSProperties, 'color'
   | 'fontWeight'
 >;
 
-export const useFont = ({ color = 'var(--secondary)', ...style }: UseFontOptions) => {
+export const useFont = ({
+  color = 'var(--secondary)',
+  ...style
+}: UseFontOptions) => {
   const dispatch = useDispatch();
 
   useEffect(() => {

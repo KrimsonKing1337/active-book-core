@@ -14,15 +14,14 @@ export type SlideShowProps = {
   isWithoutBorders?: boolean,
   mode?: SlideShowMode;
   onSlideChange?: () => void;
-}
+};
 
 export const SlideShow = ({
   children,
   isVisible = true,
   mode = null,
   isWithoutBorders = false,
-  onSlideChange = () => {
-  },
+  onSlideChange = () => {},
 }: PropsWithChildren<SlideShowProps>) => {
   const childrenAsArray = React.Children.toArray(children);
 

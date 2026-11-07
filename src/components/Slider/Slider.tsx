@@ -80,7 +80,11 @@ export const Slider = ({
   };
 
   const Thumb = ({ props }: IRenderThumbParams) => {
-    const { key, style, ...rest } = props;
+    const {
+      key,
+      style,
+      ...rest
+    } = props;
 
     return (
       <div

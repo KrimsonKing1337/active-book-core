@@ -1,4 +1,5 @@
 import { Howler } from 'howler';
+
 import type { HowlExtended } from '@types';
 
 export const waitForMediaLoad = () => {
