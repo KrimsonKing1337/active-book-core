@@ -24,8 +24,10 @@ export type ToolbarProps = {
 
 export const Toolbar = ({ sbMode }: ToolbarProps) => {
   const dispatch = useDispatch();
-  const { refs } = useStoryRegions();
+
   const fontSize = useSelector(configSelectors.fontSize);
+
+  const { refs } = useStoryRegions();
 
   const dispatchSetFontSize = (isMoreAction: boolean) => {
     const fontSizeNewValue = getNewValueForNarrativeTextStyle(fontSize, isMoreAction);
@@ -87,6 +89,7 @@ export const Toolbar = ({ sbMode }: ToolbarProps) => {
         <Item data-welcome-tour-id="config" onClick={etcIconClickHandler}>
           <EtcIcon />
         </Item>
+
         <VisualHost region="toolbar" />
       </div>
 

@@ -40,15 +40,18 @@ export const StoryRoot = ({
   selectedVisualEffectId,
   ...etc
 }: StoryRootProps) => {
-  const { refs } = useStoryRegions();
   const appMode = useAppMode();
   const application = useBookApplicationSurface();
+  const { refs } = useStoryRegions();
+
   const setApplicationInverse = application?.setInverseColors;
 
   useLayoutEffect(() => {
     setApplicationInverse?.(inverseColors);
 
-    return () => setApplicationInverse?.(false);
+    return () => {
+      return setApplicationInverse?.(false);
+    };
   }, [inverseColors, setApplicationInverse]);
   const registeredSurfaces = useVisualEffectSurfaces({
     visualEffects,
@@ -59,9 +62,14 @@ export const StoryRoot = ({
   const surfaces = [...suppliedSurfaces, ...registeredSurfaces];
 
   const hasSurfaces = surfaces.length > 0;
-  const selectedSurface = appMode === 'editor'
-    ? surfaces.find((cur) => cur.id === selectedVisualEffectId)
-    : undefined;
+
+  let selectedSurface;
+
+  if (appMode === 'editor') {
+    selectedSurface = surfaces.find((surfaceCur) => {
+      return surfaceCur.id === selectedVisualEffectId;
+    });
+  }
 
   const ids = new Set<string>();
 
@@ -95,9 +103,11 @@ export const StoryRoot = ({
     }
   }, [ref, refs]);
 
+  const layerStep = surfaces.length + 1;
+
   const rootStyle = {
     ...etc.style,
-    '--visual-layer-step': surfaces.length + 1,
+    '--visual-layer-step': layerStep,
   } as CSSProperties;
 
   return (
@@ -113,7 +123,7 @@ export const StoryRoot = ({
 
       {hasSurfaces && (
         <VisualEffectsContext value={visualEffects ?? null}>
-          <VisualSurfaces items={surfaces} stride={surfaces.length + 1} />
+          <VisualSurfaces items={surfaces} stride={layerStep} />
         </VisualEffectsContext>
       )}
 

@@ -4,9 +4,9 @@ import { Toolbar } from '@components/Toolbar';
 import { Menu } from '@components/Menu';
 import { TableOfContents } from '@components/TableOfContents';
 import { Bookmarks } from '@components/Bookmarks';
+import { VisualHost } from '@components/VisualHost';
 
 import { useStoryRegions } from '@components/StoryRegionsProvider';
-import { VisualHost } from '@components/VisualHost';
 
 import { Narrative } from './components/Narrative';
 import { useBookWindows } from './useBookWindows';
@@ -38,14 +38,23 @@ export const StoryShell = ({
         className={styles.StoryViewport}
         data-story-region="storyViewport"
       >
-        <div ref={refs.storyViewportFrame} className={styles.StoryViewportFrame} data-story-region="storyViewportFrame">
+        <div
+          ref={refs.storyViewportFrame}
+          className={styles.StoryViewportFrame}
+          data-story-region="storyViewportFrame"
+        >
           <VisualHost region="storyViewportFrame" />
         </div>
 
-        <div ref={refs.narrativeFrame} className={styles.NarrativeFrame} data-story-region="narrativeFrame">
+        <div
+          ref={refs.narrativeFrame}
+          className={styles.NarrativeFrame}
+          data-story-region="narrativeFrame"
+        >
           <Narrative>
             {children}
           </Narrative>
+
           <VisualHost region="narrativeFrame" />
         </div>
 

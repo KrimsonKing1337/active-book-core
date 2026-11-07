@@ -12,10 +12,16 @@ import * as styles from './StoryContent.module.scss';
 /** Only the selected content and its resources belong to a page. */
 export const StoryContent = ({ children }: PropsWithChildren) => {
   const dispatch = useDispatch();
+
   const pending = useSelector(mainSelectors.isPending);
   const showLoader = useSelector(mainSelectors.showLoader);
+
   const isLoading = pending || showLoader;
-  const className = classNames(styles.Content, { [styles.Pending]: isLoading });
+
+  const className = classNames({
+    [styles.Content]: true,
+    [styles.Pending]: isLoading,
+  });
 
   useLayoutEffect(() => {
     return () => {

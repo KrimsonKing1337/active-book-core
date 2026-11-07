@@ -1,6 +1,8 @@
 import type { FrameSide } from '@hooks/effects/frame/@types';
 
-const frameWidth = (side: FrameSide) => `var(--visual-frame-${side}, var(--visual-frame-width, 12px))`;
+const frameWidth = (side: FrameSide) => {
+  return `var(--visual-frame-${side}, var(--visual-frame-width, 12px))`;
+};
 
 const frameMaskGradients: Record<FrameSide, string> = {
   top: `linear-gradient(to bottom, black 0 ${frameWidth('top')}, transparent ${frameWidth('top')})`,

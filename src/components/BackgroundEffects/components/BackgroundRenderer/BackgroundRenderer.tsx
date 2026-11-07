@@ -1,4 +1,4 @@
-import type { PropsWithChildren } from 'react';
+import type { CSSProperties, PropsWithChildren } from 'react';
 
 import type { JsonObject, VisualRendererProps } from '@active-book/types';
 
@@ -24,10 +24,11 @@ export const BackgroundRenderer = ({
 }: BackgroundRendererProps) => {
   const options = params as BackgroundParams;
 
-  const imageSource = options.kind === 'image' ? options.image?.src : undefined;
-  const imageLoad = useMediaReadiness<HTMLImageElement>('images', imageSource);
-  const videoSource = options.kind === 'video' ? options.video?.src : undefined;
-  const videoLoad = useMediaReadiness<HTMLVideoElement>('videos', videoSource);
+  const imageSrc = options.kind === 'image' ? options.image?.src : undefined;
+  const imageLoad = useMediaReadiness<HTMLImageElement>('images', imageSrc);
+
+  const videoSrc = options.kind === 'video' ? options.video?.src : undefined;
+  const videoLoad = useMediaReadiness<HTMLVideoElement>('videos', videoSrc);
 
   const {
     kind,
@@ -37,7 +38,13 @@ export const BackgroundRenderer = ({
     style = {},
   } = options;
 
-  const wrapperStyle = kind === 'background' || kind === 'component' ? { ...style } : {};
+  let wrapperStyle: CSSProperties = {};
+
+  if (kind === 'background' || kind === 'component') {
+    wrapperStyle = { ...style };
+  }
+
+
   delete wrapperStyle.zIndex;
 
   const showShadow = kind === 'shadow' && shadow;

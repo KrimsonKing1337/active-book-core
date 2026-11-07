@@ -25,15 +25,18 @@ type VisualSurfacesProps = {
 export const VisualSurfaces = ({ items, stride }: VisualSurfacesProps) => {
   const { hosts } = useStoryRegions();
   const application = useBookApplicationSurface();
+
   const sorted = [...items].sort(compareVisualSurfaces);
 
   return sorted.map((itemCur, index) => {
     const region = itemCur.placement.region;
     const external = region === 'application';
+
     let target = region === 'application' ? null : hosts[region];
 
     if (external) {
       const underStory = itemCur.depth.plane === 'background';
+
       target = underStory ? application?.hosts.underStory : application?.hosts.aboveStory;
     }
 
@@ -47,6 +50,10 @@ export const VisualSurfaces = ({ items, stride }: VisualSurfacesProps) => {
 
     const zIndex = layers[itemCur.depth.plane] * stride + index;
 
-    return createPortal(<VisualSurface item={itemCur} zIndex={zIndex} />, target, itemCur.id);
+    return createPortal(
+      <VisualSurface item={itemCur} zIndex={zIndex} />,
+      target,
+      itemCur.id,
+    );
   });
 };

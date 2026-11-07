@@ -1,5 +1,8 @@
 import type {
-  JsonObject, VisualEffectLifetime, VisualEffectRegistration, VisualPlacement,
+  JsonObject,
+  VisualEffectLifetime,
+  VisualEffectRegistration,
+  VisualPlacement,
 } from '@active-book/types';
 
 import type { BackgroundEffect } from '@hooks/effects/background/@types';
@@ -13,7 +16,9 @@ export type BuiltinDeclaration = {
   lifetime: VisualEffectLifetime;
 };
 
-export const fillRegion = (region: VisualPlacement['region']): VisualPlacement => ({ region });
+export const fillRegion = (region: VisualPlacement['region']): VisualPlacement => {
+  return { region };
+};
 
 export const createBuiltinRegistration = ({
   type,
@@ -24,18 +29,24 @@ export const createBuiltinRegistration = ({
   const data: Partial<BackgroundEffect | FrameEffect> = { ...options };
   delete data.id;
   delete data.order;
+
   const params: JsonObject = JSON.parse(JSON.stringify(data));
+
   const isBackground = type === 'background';
 
   let definitionId = BACKGROUND_DEFINITION;
   let placement = fillRegion('storyViewport');
+
   let visibility: VisualEffectRegistration['effect']['visibility'] = {};
   let plane: VisualEffectRegistration['effect']['depth']['plane'] = 'background';
+
   const order = options.order ?? 0;
 
   if (!isBackground) {
     const frame = options as FrameEffect;
+
     placement = fillRegion('storyViewportFrame');
+
     definitionId = frame.layer === 'overlay' ? FEEDBACK_DEFINITION : FRAME_DEFINITION;
     plane = frame.layer === 'above' ? 'aboveNarrative' : 'belowNarrative';
 
@@ -46,16 +57,18 @@ export const createBuiltinRegistration = ({
     }
   }
 
+  const effectDepth = {
+    plane,
+    order,
+  };
+
   const effect: VisualEffectRegistration['effect'] = {
     id: options.id,
     definitionId,
     params,
     placement,
     visibility,
-    depth: {
-      plane,
-      order,
-    },
+    depth: effectDepth,
   };
 
   return {

@@ -1,12 +1,21 @@
-import type { PropsWithChildren } from 'react';
+import { type PropsWithChildren, useMemo, useState } from 'react';
 
-import { useMemo, useState } from 'react';
-
-import { StoryRegionsContext, type RegionElements, type RegionRefs, type StoryRegion } from './context';
+import {
+  type RegionElements,
+  type RegionRefs,
+  type StoryRegion,
+  StoryRegionsContext,
+} from './context';
 
 const regions: readonly StoryRegion[] = [
-  'story', 'storyViewport', 'storyViewportFrame', 'narrativeFrame', 'narrativeViewport', 'narrativeContent',
-  'toolbarFrame', 'toolbar',
+  'story',
+  'storyViewport',
+  'storyViewportFrame',
+  'narrativeFrame',
+  'narrativeViewport',
+  'narrativeContent',
+  'toolbarFrame',
+  'toolbar',
 ];
 
 export const StoryRegionsProvider = ({ children }: PropsWithChildren) => {
@@ -14,27 +23,45 @@ export const StoryRegionsProvider = ({ children }: PropsWithChildren) => {
   const [hosts, setHosts] = useState<RegionElements>({});
 
   const refs = useMemo(() => {
-    return Object.fromEntries(regions.map((regionCur) => [regionCur, (element: HTMLDivElement | null) => {
-      setElements((previous) => {
-        if (previous[regionCur] === element) {
-          return previous;
-        }
+    const regionRefs = {} as RegionRefs;
 
-        return { ...previous, [regionCur]: element };
-      });
-    }])) as RegionRefs;
+    for (const regionCur of regions) {
+      regionRefs[regionCur] = (element: HTMLDivElement | null) => {
+        setElements((previousElements) => {
+          if (previousElements[regionCur] === element) {
+            return previousElements;
+          }
+
+          return {
+            ...previousElements,
+            [regionCur]: element,
+          };
+        });
+      };
+    }
+
+    return regionRefs;
   }, []);
 
   const hostRefs = useMemo(() => {
-    return Object.fromEntries(regions.map((regionCur) => [regionCur, (element: HTMLDivElement | null) => {
-      setHosts((previous) => {
-        if (previous[regionCur] === element) {
-          return previous;
-        }
+    const regionRefs = {} as RegionRefs;
 
-        return { ...previous, [regionCur]: element };
-      });
-    }])) as RegionRefs;
+    for (const regionCur of regions) {
+      regionRefs[regionCur] = (element: HTMLDivElement | null) => {
+        setHosts((previousHosts) => {
+          if (previousHosts[regionCur] === element) {
+            return previousHosts;
+          }
+
+          return {
+            ...previousHosts,
+            [regionCur]: element,
+          };
+        });
+      };
+    }
+
+    return regionRefs;
   }, []);
 
   const value = useMemo(() => ({

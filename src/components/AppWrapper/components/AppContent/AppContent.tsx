@@ -66,15 +66,27 @@ export const AppContent = ({
 }: AppContentProps) => {
   const dispatch = useDispatch();
   const application = useBookApplicationSurface();
+
   const pageId = useSelector(mainSelectors.pageId);
+
   const selectedPage = storyPages.find((cur) => cur.id === pageId);
   const previousPageIds = useRef<readonly string[] | null>(null);
 
   useLayoutEffect(() => {
     const ids = storyPages.map((cur) => cur.id);
-    const previous = previousPageIds.current;
+    const prevIds = previousPageIds.current;
 
-    if (previous?.length === ids.length && ids.every((idCur, index) => idCur === previous[index])) {
+    const amountIsEqual = prevIds?.length === ids.length;
+
+    const everyIdIsEqual = ids.every((idCur, index) => {
+      if (!prevIds) {
+        return;
+      }
+
+      return idCur === prevIds[index];
+    });
+
+    if (amountIsEqual && everyIdIsEqual) {
       return;
     }
 
@@ -83,6 +95,7 @@ export const AppContent = ({
     }
 
     previousPageIds.current = ids;
+
     dispatch(mainActions.setStoryPages(ids));
   }, [storyPages, dispatch]);
 
