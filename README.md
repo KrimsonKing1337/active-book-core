@@ -1,3 +1,5 @@
+# @active-book/core
+
 https://active-books.ru
 
 ActiveBooks — Живые книги
@@ -13,12 +15,23 @@ ActiveBooks — Живые книги
 
 Этот репозиторий — это движок живых книг, который называется ActiveBook.
 
-На данный момент реализовано две книги в качестве примера: \
-https://github.com/KrimsonKing1337/activeBook-over-the-garden-wall \
-https://github.com/KrimsonKing1337/activeBook-fairytale-forest
+Исторические примеры на предыдущем поколении движка сохранены в архивах: \
+https://github.com/KrimsonKing1337/active-book-over-the-garden-wall-legacy \
+https://github.com/KrimsonKing1337/active-book-fairytale-forest-legacy
 
 Почитать можно здесь (не работает во встроенном браузере телеграмма и аналогов): \
 https://active-books.ru
+
+## Локальная разработка
+
+Разместите `active-book-core`, `active-book-editor` и `active-book-types` в соседних каталогах.
+В types и core выполните `npm ci`, затем запустите `npm run core:package` из editor.
+Скрипт соберёт `@active-book/core`, создаст архив `active-book-core-<version>.tgz`
+и обновит локальную зависимость редактора. Публикация в npm для этого не нужна.
+
+Пакет настроен как публичный npm-пакет в scope `@active-book` (`publishConfig.access: public`).
+Перед будущей публикацией необходимо проверить права аккаунта на этот scope;
+наличие имени в конфигурации само по себе не предоставляет права публикации.
 
 Текущая архитектура Background/Frame: [общая визуальная сессия](docs/unified-background-frame.md).
 
