@@ -139,6 +139,10 @@ export default defineConfig([globIgnores, {
     'import-x/no-default-export': 'warn',
     'curly': ['error', 'all'],
 
+    'no-unneeded-ternary': ['error', {
+      defaultAssignment: true,
+    }],
+
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'warn',
 

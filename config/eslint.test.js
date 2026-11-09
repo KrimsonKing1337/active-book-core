@@ -85,6 +85,12 @@ const violations = [
     severity: 2,
   },
   {
+    name: 'unneeded boolean ternary',
+    code: 'const value = ready ? true : false;\n',
+    ruleId: 'no-unneeded-ternary',
+    severity: 2,
+  },
+  {
     name: 'explicit any warning',
     code: 'const value: any = input;\n',
     ruleId: '@typescript-eslint/no-explicit-any',
@@ -126,4 +132,30 @@ function Component({ ready }) {
 
   assert(hooks.some((message) => message.ruleId === 'react-hooks/rules-of-hooks' && message.severity === 2));
   assert(focused.some((message) => message.ruleId === 'jest/no-focused-tests' && message.severity === 2));
+});
+
+test('accepts short value choices, nullish fallbacks and intentional truthy defaults', async () => {
+  const snippets = [
+    "const value = ready ? 'yes' : 'no';\n",
+    'const value = current ? current : fallback;\n',
+    'const value = preview.hidden ?? item?.hidden ?? false;\n',
+    'const value = item?.width ?? 0;\n',
+  ];
+
+  for (const snippetCur of snippets) {
+    const messages = await lintMessages(snippetCur);
+
+    assert(!messages.some((message) => message.ruleId === 'no-unneeded-ternary'), JSON.stringify(messages));
+  }
+});
+
+test('preserves the exhaustive dependencies warning', async () => {
+  const messages = await lintMessages(`import { useEffect } from 'react';
+function Component({ value }) {
+  useEffect(() => { consume(value); }, []);
+  return null;
+}
+`);
+
+  assert(messages.some((message) => message.ruleId === 'react-hooks/exhaustive-deps' && message.severity === 1));
 });
