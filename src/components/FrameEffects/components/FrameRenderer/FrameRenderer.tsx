@@ -42,7 +42,6 @@ export const FrameRenderer = ({
 
   const showShadow = kind === 'shadow' && shadow;
   const showText = kind === 'text' && text;
-  const componentContent = kind === 'component' ? children : null;
 
   return (
     <div
@@ -70,7 +69,9 @@ export const FrameRenderer = ({
         </FrameElement>
       )}
 
-      {componentContent}
+      {kind === 'component' && (
+        children
+      )}
     </div>
   );
 };
