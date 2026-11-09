@@ -42,10 +42,47 @@ APIs used by their consumers. Test discovery, linting, coverage, the build and
 all browser scenarios were checked with the replacements.
 
 The Node requirement reflects Vite 8 and the supported glob/minimatch runtimes.
-TypeScript 5.9 and ESLint 9 remain on their compatible lines: the current
-typescript-eslint peer range excludes TypeScript 7, and the current
-eslint-plugin-import/react peer ranges exclude ESLint 10. There was no downgrade
-or forced peer installation. Linter rules and test configuration were preserved.
+TypeScript 5.9 remains within typescript-eslint's supported compiler range.
+ESLint was subsequently migrated to 10.14.0, as described below. There was no
+downgrade or forced peer installation. Test configuration was preserved.
+
+## ESLint 10 migration
+
+ESLint 10.14.0 and @eslint/js 10.0.1 use native flat presets instead of
+FlatCompat; the direct @eslint/eslintrc dependency was removed. The current
+typescript-eslint 8.72.1, Stylistic 5.10.0, React Hooks 7.1.1 and Jest plugin
+29.17.0 all declare ESLint 10 support and remain enabled.
+
+eslint-plugin-import 2.32.0 excludes ESLint 10 from its peer range, so it was
+replaced with the maintained eslint-plugin-import-x 4.18.1. The order and
+no-default-export rules and internal-regex setting moved to the import-x
+namespace with their options and severities unchanged. The unused React plugin
+was removed: there were no active react/* rules in the effective configuration.
+Only disabled obsolete rule aliases were removed.
+
+The newline-destructuring plugin accepts ESLint >=7.2 but calls the removed
+getSourceCode method. ESLint's official @eslint/compat 2.1.1 fixupPluginRules
+adapts it. This preserves the exact pair/triple/rest behavior; Stylistic's
+object-curly-newline and object-property-newline rules do not enforce the same
+destructuring restrictions. Other modern plugins need no compatibility wrapper.
+
+All active user rules, parser options and ignore patterns were preserved.
+The new recommended no-unassigned-vars, no-useless-assignment and
+preserve-caught-error rules are enabled. The core sources needed no changes.
+ESLint 10 also tightens the default no-shadow-restricted-names check to include
+globalThis. The Node engine range now excludes unsupported Node 22.12 and 23.
+
+Validation after a clean `npm ci --strict-peer-deps --no-audit --no-fund`:
+
+- The same 333 source files are linted, with zero errors and the same 40 warnings.
+- Effective configurations and warning diagnostics were compared with ESLint 9;
+  existing enabled rules and their severities were retained, with the documented
+  new recommended rules and stricter globalThis default.
+- `node --test config/eslint.test.js`: 14 passing regression cases for formatting,
+  imports, destructuring, new quality checks, React Hooks and focused Jest tests.
+- Typechecks, Jest and `npm ls --all` passed without invalid peer dependencies.
+
+No mass autofix or source formatting was performed.
 
 ## Validation
 
@@ -68,3 +105,5 @@ or forced peer installation. Linter rules and test configuration were preserved.
 - [Glob advisory and fixed release](https://github.com/advisories/GHSA-3g3m-2fjr-6pw4)
 - [Minimatch advisory and fixed release](https://github.com/advisories/GHSA-g3hv-75wg-m249)
 - [Deepmerge advisory: no patched version](https://github.com/advisories/GHSA-gcqx-w48m-w2h4)
+- [ESLint 10 migration guide](https://eslint.org/docs/latest/use/migrate-to-10.0.0)
+- [Import-x compatibility and migration](https://github.com/un-ts/eslint-plugin-import-x)
