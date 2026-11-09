@@ -13,7 +13,9 @@ const slice = createSlice({
     setCount(state, action: PayloadAction<State['count']>) {
       state.count = action.payload;
     },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     increment(_state) {},
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     decrement(_state) {},
   },
 });
