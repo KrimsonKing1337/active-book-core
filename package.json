@@ -1,6 +1,6 @@
 {
-  "name": "activebook-react-core-next",
-  "version": "0.0.55",
+  "name": "@active-book/core",
+  "version": "0.0.56",
   "description": "",
   "main": "./lib/src/index.js",
   "type": "module",
@@ -63,7 +63,7 @@
     "@active-book/types": "^0.0.3"
   },
   "devDependencies": {
-    "@active-book/types": "file:../activeBook-types",
+    "@active-book/types": "file:../active-book-types",
     "@eslint/compat": "^2.1.1",
     "@eslint/js": "^10.0.1",
     "@jest/types": "^30.5.1",
@@ -112,19 +112,22 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/KrimsonKing1337/activeBook-core.git"
+    "url": "git+https://github.com/KrimsonKing1337/active-book-core.git"
   },
   "author": "Oleg Shilov Jr",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/KrimsonKing1337/activeBook-core/issues"
+    "url": "https://github.com/KrimsonKing1337/active-book-core/issues"
   },
-  "homepage": "https://github.com/KrimsonKing1337/activeBook-core#readme",
+  "homepage": "https://github.com/KrimsonKing1337/active-book-core#readme",
   "overrides": {
     "glob@>=9.0.0 <14.0.2": "^14.0.4",
     "minimatch@>=7.0.0 <11.0.1": "^11.0.5"
   },
   "engines": {
     "node": "^20.19.0 || ^22.13.0 || >=24.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

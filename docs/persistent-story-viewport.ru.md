@@ -145,7 +145,7 @@ npm run typecheck:test
 npx jest --runInBand
 PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run test:browser
 npm run test:scss-alias
-# в соседнем activeBook-editor:
+# в соседнем active-book-editor:
 npm run core:package
 npm run typecheck
 npm run test:unit
