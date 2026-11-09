@@ -1,8 +1,10 @@
+import { defineConfig } from 'jest';
+
 import packageJson from './package.json' with { type: 'json' };
 
-export default {
+export default defineConfig({
   coverageDirectory: '<rootDir>/coverage',
-  rootDir: './',
+  coverageProvider: 'v8',
   verbose: true,
   testResultsProcessor: 'jest-sonar-reporter',
 
@@ -51,9 +53,18 @@ export default {
   testEnvironment: 'jsdom',
 
   transform: {
-    '^.+\\.(js|jsx|mjs|cjs|ts|tsx)$': ['babel-jest', { configFile: './config/jest/babel.config.js' }],
-    '^.+\\.css$': '<rootDir>/config/jest/css-transform.js',
-    '^(?!.*\\.(t|j)sx?|css|json)$': '<rootDir>/config/jest/file-transform.js',
+    '^.+\\.(js|jsx|mjs|cjs|ts|tsx)$': ['@swc/jest', {
+      jsc: {
+        parser: {
+          syntax: 'typescript',
+          tsx: true,
+        },
+        transform: {
+          react: { runtime: 'automatic' },
+        },
+      },
+    }],
+    '^(?!.*\\.(js|jsx|mjs|cjs|ts|tsx|css|json)$).+$': '<rootDir>/config/jest/file-transform.js',
   },
 
   transformIgnorePatterns: [],
@@ -77,4 +88,4 @@ export default {
   ],
 
   resetMocks: true,
-};
+});
