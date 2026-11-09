@@ -127,7 +127,9 @@ export const StoryRoot = ({
         </VisualEffectsContext>
       )}
 
-      <VisualSelectionOutline item={selectedSurface} />
+      {appMode === 'editor' && (
+        <VisualSelectionOutline item={selectedSurface} />
+      )}
     </div>
   );
 };

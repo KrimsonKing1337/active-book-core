@@ -38,19 +38,13 @@ export const BackgroundRenderer = ({
     style = {},
   } = options;
 
-  let wrapperStyle: CSSProperties = {};
-
-  if (kind === 'background' || kind === 'component') {
-    wrapperStyle = { ...style };
-  }
-
+  const wrapperStyle: CSSProperties = kind === 'background' || kind === 'component' ? { ...style } : {};
 
   delete wrapperStyle.zIndex;
 
   const showShadow = kind === 'shadow' && shadow;
   const showImage = kind === 'image' && image && image?.src.trim();
   const showVideo = kind === 'video' && video && video?.src.trim();
-  const componentContent = kind === 'component' ? children : null;
 
   const videoRelativeVolume = video?.relativeVolume ?? 100;
 
@@ -92,7 +86,9 @@ export const BackgroundRenderer = ({
         />
       )}
 
-      {componentContent}
+      {kind === 'component' && (
+        children
+      )}
     </div>
   );
 };

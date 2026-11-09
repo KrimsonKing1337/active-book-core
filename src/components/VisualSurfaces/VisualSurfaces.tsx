@@ -30,18 +30,16 @@ export const VisualSurfaces = ({ items, stride }: VisualSurfacesProps) => {
 
   return sorted.map((itemCur, index) => {
     const region = itemCur.placement.region;
-    const external = region === 'application';
+    let target;
 
-    let target = region === 'application' ? null : hosts[region];
-
-    if (external) {
-      const underStory = itemCur.depth.plane === 'background';
-
-      target = underStory ? application?.hosts.underStory : application?.hosts.aboveStory;
-    }
-
-    if (external && itemCur.depth.plane === 'systemFeedback') {
+    if (region !== 'application') {
+      target = hosts[region];
+    } else if (itemCur.depth.plane === 'systemFeedback') {
       target = application?.hosts.feedback ?? hosts.story;
+    } else if (itemCur.depth.plane === 'background') {
+      target = application?.hosts.underStory;
+    } else {
+      target = application?.hosts.aboveStory;
     }
 
     if (!target) {
