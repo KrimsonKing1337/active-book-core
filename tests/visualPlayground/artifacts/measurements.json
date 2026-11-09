@@ -1,0 +1,99 @@
+[
+  {
+    "options": {
+      "width": 1040,
+      "height": 690,
+      "toolbar": true,
+      "region": "storyViewport",
+      "mask": false
+    },
+    "actual": {
+      "x": 380,
+      "y": 191.5,
+      "width": 500,
+      "height": 675
+    },
+    "expected": {
+      "x": 380,
+      "y": 191.5,
+      "width": 500,
+      "height": 675
+    }
+  },
+  {
+    "options": {
+      "width": 820,
+      "height": 560,
+      "toolbar": true,
+      "region": "narrativeFrame",
+      "mask": false
+    },
+    "actual": {
+      "x": 380,
+      "y": 192.5,
+      "width": 500,
+      "height": 496.8125
+    },
+    "expected": {
+      "x": 380,
+      "y": 192.5,
+      "width": 500,
+      "height": 496.8125
+    }
+  },
+  {
+    "options": {
+      "width": 1040,
+      "height": 720,
+      "toolbar": false,
+      "region": "narrativeFrame",
+      "mask": true
+    },
+    "actual": {
+      "x": 380,
+      "y": 192.5,
+      "width": 500,
+      "height": 705
+    },
+    "expected": {
+      "x": 380,
+      "y": 192.5,
+      "width": 500,
+      "height": 705
+    }
+  },
+  {
+    "options": {
+      "width": 390,
+      "height": 740,
+      "toolbar": true,
+      "region": "storyViewport",
+      "mask": true
+    },
+    "actual": {
+      "x": 435,
+      "y": 187.5,
+      "width": 390,
+      "height": 740
+    },
+    "expected": {
+      "x": 435,
+      "y": 187.5,
+      "width": 390,
+      "height": 740
+    }
+  },
+  {
+    "baseline": {
+      "width": 500,
+      "height": 675,
+      "transform": ""
+    },
+    "collapsed": {
+      "clientWidth": 500,
+      "clientHeight": 675,
+      "width": 0,
+      "height": 0
+    }
+  }
+]
