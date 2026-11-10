@@ -24,7 +24,10 @@
     "postinstall": "node ./scripts/postinstall.js",
     "pre-commit": "lint-staged",
     "dev:visual-lab": "node scripts/visualPlayground.js",
-    "test:visual-lab": "node --test scripts/visualPlayground.browser.test.js"
+    "test:visual-lab": "node --test scripts/visualPlayground.browser.test.js",
+    "lint:ts:check": "eslint \"./src/**/*.{ts,tsx}\"",
+    "lint:css:check": "stylelint \"src/**/*.scss\"",
+    "test:unit": "jest --runInBand"
   },
   "husky": {
     "hooks": {

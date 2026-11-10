@@ -46,3 +46,16 @@ https://active-books.ru
 Финализация: [DOM-регионы, Toolbar, маски, анимации и готовность к интеграции](docs/story-regions-finalization.ru.md).
 
 Regression follow-up: [Windows test paths, portal readiness, masks and package validation](docs/story-regions-test-regressions.ru.md).
+
+## Shared development infrastructure
+
+Common development rules and configuration candidates live in the sibling
+`active-book-common` repository. Read its AGENTS.md first when available, then this
+repository's local additions; local autonomous instructions also cover single-clone
+cloud tasks. Existing tool configurations remain local for independent cloning.
+
+Use `npm run lint:ts:check` and `npm run lint:css:check` for checks without `--fix`;
+existing lint commands keep their behavior. `npm run test:unit` runs Jest once with
+`--runInBand`. The common `npm run check` selects these checks, typecheck,
+typecheck:test and test:scss-alias; browser tests are a separate explicit command.
+`make` remains a build/package operation that increments the core version.
