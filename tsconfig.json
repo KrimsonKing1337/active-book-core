@@ -1,47 +1,78 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig#",
   "compilerOptions": {
-    "strictPropertyInitialization": false,
-    "strict": true,
-    "esModuleInterop": true,
-    "pretty": false,
     "target": "es2020",
     "module": "es2020",
-    "moduleResolution": "node",
     "outDir": "lib",
-    "sourceMap": true,
-    "declaration": true,
-    "jsx": "react-jsx",
     "baseUrl": "./",
     "paths": {
-      "@@": ["./src"],
-      "@@/*": ["./src/*"],
-      "@types": ["./src/@types.ts"],
-      "@assets": ["./src/assets"],
-      "@assets/*": ["./src/assets/*"],
-      "@components": ["./src/components"],
-      "@components/*": ["./src/components/*"],
-      "@controllers": ["./src/controllers"],
-      "@controllers/*": ["./src/controllers/*"],
-      "@pages": ["./src/pages"],
-      "@pages/*": ["./src/pages/*"],
-      "@hooks": ["./src/hooks"],
-      "@hooks/*": ["./src/hooks/*"],
-      "@utils": ["./src/utils"],
-      "@utils/*": ["./src/utils/*"],
-      "@store": ["./src/store"],
-      "@store/*": ["./src/store/*"],
-      "@styles": ["./src/styles"],
-      "@styles/*": ["./src/styles/*"]
+      "@@": [
+        "./src"
+      ],
+      "@@/*": [
+        "./src/*"
+      ],
+      "@types": [
+        "./src/@types.ts"
+      ],
+      "@assets": [
+        "./src/assets"
+      ],
+      "@assets/*": [
+        "./src/assets/*"
+      ],
+      "@components": [
+        "./src/components"
+      ],
+      "@components/*": [
+        "./src/components/*"
+      ],
+      "@controllers/*": [
+        "./src/controllers/*"
+      ],
+      "@pages": [
+        "./src/pages"
+      ],
+      "@pages/*": [
+        "./src/pages/*"
+      ],
+      "@hooks": [
+        "./src/hooks"
+      ],
+      "@hooks/*": [
+        "./src/hooks/*"
+      ],
+      "@utils": [
+        "./src/utils"
+      ],
+      "@utils/*": [
+        "./src/utils/*"
+      ],
+      "@store": [
+        "./src/store"
+      ],
+      "@store/*": [
+        "./src/store/*"
+      ],
+      "@styles": [
+        "./src/styles"
+      ],
+      "@styles/*": [
+        "./src/styles/*"
+      ],
+      "@controllers": [
+        "./src/controllers"
+      ]
     },
-    "lib": ["es2015", "dom"],
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "allowJs": true,
-    "noEmit": false,
-    "allowSyntheticDefaultImports": true,
+    "lib": [
+      "es2015",
+      "dom"
+    ]
   },
-  "include": ["d.ts", "src/**/*"],
+  "include": [
+    "d.ts",
+    "src/**/*"
+  ],
   "exclude": [
     "node_modules",
     "build",
@@ -50,5 +81,6 @@
     "jest",
     "lib",
     "lib-esm"
-  ]
+  ],
+  "extends": "active-book-common/tsconfig.library.json"
 }

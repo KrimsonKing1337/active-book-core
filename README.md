@@ -47,15 +47,24 @@ https://active-books.ru
 
 Regression follow-up: [Windows test paths, portal readiness, masks and package validation](docs/story-regions-test-regressions.ru.md).
 
+
 ## Shared development infrastructure
 
-Common development rules and configuration candidates live in the sibling
-`active-book-common` repository. Read its AGENTS.md first when available, then this
-repository's local additions; local autonomous instructions also cover single-clone
-cloud tasks. Existing tool configurations remain local for independent cloning.
+Clone the ActiveBook repositories as siblings. Install `active-book-common` first,
+then this repository; it has the devDependency `active-book-common: file:../active-book-common`.
+Read `../active-book-common/AGENTS.md` before the local AGENTS.md.
+Shared configurations load directly through the common package exports; no copied
+configuration snapshots or standalone-clone fallback are maintained.
 
-Use `npm run lint:ts:check` and `npm run lint:css:check` for checks without `--fix`;
-existing lint commands keep their behavior. `npm run test:unit` runs Jest once with
-`--runInBand`. The common `npm run check` selects these checks, typecheck,
-typecheck:test and test:scss-alias; browser tests are a separate explicit command.
-`make` remains a build/package operation that increments the core version.
+The common repository supplies grouped `check`, `typecheck`, `lint`, and `test`
+commands, each with `--repo` filtering. `check` and `test` include browser/runtime
+suites; choose `test:unit` or another subgroup for a narrower run. `deps:sync`
+applies standard npm section policies to already declared packages and workspaces.
+See the common README for installation order, groups, presets and policy semantics.
+
+ESLint extends `active-book-common/eslint`; only project aliases, ignores and local
+rules remain here. Stylelint reexports `active-book-common/stylelint`, including
+its SCSS rules and property ordering. `lint:ts:check` / `lint:css:check` check without
+fixes; existing fixing scripts remain available.
+
+TypeScript extends the common library profile. Jest stays local; `make` builds and increments the core version.
