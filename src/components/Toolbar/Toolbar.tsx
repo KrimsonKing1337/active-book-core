@@ -86,7 +86,7 @@ export const Toolbar = ({ sbMode }: ToolbarProps) => {
           </Item>
         </div>
 
-        <Item data-welcome-tour-id="config" onClick={etcIconClickHandler}>
+        <Item className={styles.MenuItem} data-welcome-tour-id="config" onClick={etcIconClickHandler}>
           <EtcIcon />
         </Item>
 

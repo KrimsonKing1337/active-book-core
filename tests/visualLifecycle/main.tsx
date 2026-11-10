@@ -4,6 +4,7 @@ import { createRoot } from 'react-dom/client';
 
 import { LifecycleBook } from './LifecycleBook';
 
+import '@active-book/common/styles';
 import '../../src/styles/styles.scss';
 
 const root = document.getElementById('root');

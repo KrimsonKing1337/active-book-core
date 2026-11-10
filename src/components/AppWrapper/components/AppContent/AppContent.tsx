@@ -39,8 +39,6 @@ import {
 
 import { startToPlayAllAudiosWithPlayOnLoad, startToPlayAllVideosWithPlayOnLoad } from '../../utils';
 
-import '@styles/common.scss';
-
 import * as styles from '../../AppWrapper.module.scss';
 
 export type AppContentProps = PropsWithChildren & AppWrapperProps & {

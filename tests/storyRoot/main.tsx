@@ -2,6 +2,7 @@ import { createRoot } from 'react-dom/client';
 
 import { TestBook } from './TestBook';
 
+import '@active-book/common/styles';
 import '../../src/styles/styles.scss';
 
 const root = document.getElementById('root');
