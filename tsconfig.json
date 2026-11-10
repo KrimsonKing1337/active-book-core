@@ -82,5 +82,5 @@
     "lib",
     "lib-esm"
   ],
-  "extends": "active-book-common/tsconfig.library.json"
+  "extends": "@active-book/common/tsconfig.library.json"
 }
