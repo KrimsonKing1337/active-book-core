@@ -6,13 +6,23 @@ export const addKeyboardControl = (goPrevPage: Fn, goNextPage: Fn) => {
   const narrativeElement = document.querySelector('#narrative');
 
   const listener = (e: KeyboardEvent) => {
+    if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) {
+      return;
+    }
+
+    if (document.querySelector('[data-book-window-open="true"]')) {
+      return;
+    }
+
     const target = e.target;
+
     const isTextInput = target instanceof HTMLElement
       && (target.isContentEditable || target.matches('input, textarea, select'));
-    const hasOpenWindow = document.querySelector('[data-book-window-open="true"]');
-    const isCarousel = target instanceof Element && target.closest('[data-book-carousel]');
 
-    if (isTextInput || hasOpenWindow || isCarousel || e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) {
+    const isInsideCarousel = target instanceof Element
+      && target.closest('[data-book-carousel]');
+
+    if (isTextInput || isInsideCarousel) {
       return;
     }
 

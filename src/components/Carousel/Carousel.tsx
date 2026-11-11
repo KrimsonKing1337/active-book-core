@@ -15,23 +15,27 @@ export const Carousel = ({ slides }: CarouselProps) => {
     previous,
     next,
   } = useCarousel();
+
   const {
     selected,
     canPrevious,
     canNext,
   } = navigation;
+
   const status = `${selected + 1} из ${slides.length}`;
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLElement>) => {
-    if (event.target !== event.currentTarget) {
+  const handleKeyDown = (e: KeyboardEvent<HTMLElement>) => {
+    if (e.target !== e.currentTarget) {
       return;
     }
 
-    if (event.key === 'ArrowLeft') {
-      event.preventDefault();
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+
       previous();
-    } else if (event.key === 'ArrowRight') {
-      event.preventDefault();
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+
       next();
     }
   };
@@ -47,7 +51,7 @@ export const Carousel = ({ slides }: CarouselProps) => {
     >
       <div ref={viewportRef} className={styles.Viewport}>
         <div className={styles.Slides}>
-          {slides.map((slide, index) => {
+          {slides.map((slideCur, index) => {
             const isInactive = index !== selected;
             const label = `${index + 1} из ${slides.length}`;
 
@@ -62,7 +66,7 @@ export const Carousel = ({ slides }: CarouselProps) => {
                 inert={isInactive}
                 data-carousel-slide
               >
-                {slide}
+                {slideCur}
               </div>
             );
           })}

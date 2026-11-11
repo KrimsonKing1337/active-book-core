@@ -2,6 +2,15 @@ import { useEffect, useState } from 'react';
 
 import useEmblaCarousel from 'embla-carousel-react';
 
+const dragSelectors = [
+  'a',
+  'button',
+  'input',
+  'select',
+  'textarea',
+  '[contenteditable="true"]',
+];
+
 export const useCarousel = () => {
   const [viewportRef, api] = useEmblaCarousel({
     align: 'start',
@@ -13,9 +22,12 @@ export const useCarousel = () => {
         return true;
       }
 
-      return !target.closest('a, button, input, select, textarea, [contenteditable="true"]');
+      const selectorsString = dragSelectors.join(', ');
+
+      return !target.closest(selectorsString);
     },
   });
+
   const [navigation, setNavigation] = useState({
     selected: 0,
     canPrevious: false,
