@@ -2,15 +2,15 @@ import type { HTMLAttributes, PropsWithChildren } from 'react';
 
 import * as styles from './P.module.scss';
 
-export type PProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren;
+export type PProps = HTMLAttributes<HTMLParagraphElement> & PropsWithChildren;
 
 export const P = ({
   children,
   ...etc
 }: PProps) => {
   return (
-    <div className={styles.P} {...etc}>
+    <p className={styles.P} {...etc}>
       {children}
-    </div>
+    </p>
   );
 };

@@ -2,15 +2,15 @@ import type { HTMLAttributes, PropsWithChildren } from 'react';
 
 import * as styles from './H1.module.scss';
 
-export type H1Props = HTMLAttributes<HTMLDivElement> & PropsWithChildren;
+export type H1Props = HTMLAttributes<HTMLHeadingElement> & PropsWithChildren;
 
 export const H1 = ({
   children,
   ...etc
 }: H1Props) => {
   return (
-    <div className={styles.H1} {...etc}>
+    <h1 className={styles.H1} {...etc}>
       {children}
-    </div>
+    </h1>
   );
 };
