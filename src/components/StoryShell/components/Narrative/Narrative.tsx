@@ -86,6 +86,10 @@ export const Narrative = ({ children }: PropsWithChildren) => {
     });
 
     hammertime.on('swipe', (e) => {
+      if (e.target instanceof Element && e.target.closest('[data-book-carousel]')) {
+        return;
+      }
+
       const { direction } = e;
 
       const isNext = direction === Hammer.DIRECTION_LEFT;

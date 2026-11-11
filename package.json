@@ -1,6 +1,6 @@
 {
   "name": "@active-book/core",
-  "version": "0.0.60",
+  "version": "0.0.62",
   "description": "",
   "main": "./lib/src/index.js",
   "type": "module",
@@ -48,6 +48,8 @@
     "@reduxjs/toolkit": "^2.14.0",
     "classnames": "2.5.1",
     "cryptr": "^6.4.0",
+    "embla-carousel": "8.6.0",
+    "embla-carousel-react": "8.6.0",
     "hammerjs": "^2.0.8",
     "howler": "^2.2.4",
     "lodash-es": "^4.18.1",

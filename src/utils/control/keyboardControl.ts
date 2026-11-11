@@ -10,8 +10,9 @@ export const addKeyboardControl = (goPrevPage: Fn, goNextPage: Fn) => {
     const isTextInput = target instanceof HTMLElement
       && (target.isContentEditable || target.matches('input, textarea, select'));
     const hasOpenWindow = document.querySelector('[data-book-window-open="true"]');
+    const isCarousel = target instanceof Element && target.closest('[data-book-carousel]');
 
-    if (isTextInput || hasOpenWindow || e.ctrlKey || e.metaKey || e.altKey) {
+    if (isTextInput || hasOpenWindow || isCarousel || e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) {
       return;
     }
 
