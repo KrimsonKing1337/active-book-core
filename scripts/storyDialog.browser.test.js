@@ -87,7 +87,13 @@ test('Dialog preserves dimensions, preferences and focus in reader and preview',
       await page.evaluate(() => {
         window.dialogFixture.setMounted(false);
       });
+      await page.waitForFunction(() => {
+        return document.querySelector('[data-testid="viewport"]').dataset.dialogMounted === 'false';
+      });
       await page.evaluate(() => window.dialogFixture.setMounted(true));
+      await page.waitForFunction(() => {
+        return document.querySelector('[data-testid="viewport"]').dataset.dialogMounted === 'true';
+      });
       await page.getByTestId('open').click();
       await dialog.waitFor();
       if (mode === 'reader') {
@@ -96,10 +102,14 @@ test('Dialog preserves dimensions, preferences and focus in reader and preview',
       } else {
         await assertGeometry(page, { width: 60, height: 70 });
         await page.evaluate(() => window.dialogFixture.setSize({ width: 480, height: 320 }));
+        await page.waitForFunction(() => {
+          return document.querySelector('[data-testid="viewport"]').getBoundingClientRect().width === 480;
+        });
         await assertGeometry(page, { width: 60, height: 70 });
       }
 
       await page.evaluate(() => window.dialogFixture.setCanClose(false));
+      await dialog.getByRole('button', { name: 'Закрыть', exact: true }).waitFor({ state: 'detached' });
       await page.keyboard.press('Escape');
       assert.equal(await dialog.count(), 1);
       assert.equal(await dialog.getByRole('button', { name: 'Закрыть', exact: true }).count(), 0);
@@ -155,15 +165,21 @@ test('denied storage, outside dismissal, mobile resize and missing portal contai
   await assertGeometry(page, { width: 100, height: 100 });
   await dialog.getByRole('button', { name: 'Вернуть размер окна' }).click();
   await page.evaluate(() => window.dialogFixture.setCanClose(false));
+  await dialog.getByRole('button', { name: 'Закрыть', exact: true }).waitFor({ state: 'detached' });
   await page.mouse.click(2, 2);
   assert.equal(await dialog.count(), 1);
   await page.evaluate(() => window.dialogFixture.setCanClose(true));
+  await dialog.getByRole('button', { name: 'Закрыть', exact: true }).waitFor();
   await page.mouse.click(2, 2);
   await dialog.waitFor({ state: 'detached' });
   await page.waitForFunction(() => document.body.style.pointerEvents !== 'none');
   await page.evaluate(() => {
     window.dialogFixture.setContainer(null);
     window.dialogFixture.setOpen(true);
+  });
+  await page.waitForFunction(() => {
+    const viewport = document.querySelector('[data-testid="viewport"]');
+    return viewport.dataset.dialogContainer === 'false' && viewport.dataset.dialogOpen === 'true';
   });
   assert.equal(await dialog.count(), 0, 'missing story viewport never falls back to document.body');
   assert.equal(await page.locator('[data-story-dialog-layer]').count(), 0);

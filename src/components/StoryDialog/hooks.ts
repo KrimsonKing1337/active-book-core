@@ -1,8 +1,14 @@
-import { useLayoutEffect, useState } from 'react';
+import {
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import type { BookDialogPreferences } from '@active-book/types';
 
 import { useAppMode } from '@components/App/AppModeContext';
+
+import type { StoryDialogProps } from './@types';
 
 import {
   defaultDialogPreferences,
@@ -57,4 +63,43 @@ export const useDialogPreferences = (isOpen: boolean) => {
     toggleFullscreen,
     toggleObjectFit,
   };
+};
+
+type DialogFocusOptions = Pick<StoryDialogProps, 'returnFocusRef' | 'fallbackFocusRef' | 'onCloseAutoFocus'>;
+
+export const useDialogFocus = ({
+  returnFocusRef,
+  fallbackFocusRef,
+  onCloseAutoFocus,
+}: DialogFocusOptions) => {
+  const openerRef = useRef<HTMLElement | null>(null);
+
+  const handleOpenAutoFocus = () => {
+    const activeElement = document.activeElement;
+
+    if (activeElement instanceof HTMLElement) {
+      openerRef.current = activeElement;
+    }
+  };
+
+  const handleCloseAutoFocus = (event: Event) => {
+    onCloseAutoFocus?.(event);
+
+    if (event.defaultPrevented) {
+      return;
+    }
+
+    let target = returnFocusRef?.current ?? openerRef.current;
+
+    if (!target?.isConnected || target.closest('[inert]')) {
+      target = fallbackFocusRef?.current ?? null;
+    }
+
+    if (target?.isConnected && !target.closest('[inert]')) {
+      event.preventDefault();
+      target.focus({ preventScroll: true });
+    }
+  };
+
+  return { handleOpenAutoFocus, handleCloseAutoFocus };
 };

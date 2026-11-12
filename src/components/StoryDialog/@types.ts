@@ -10,5 +10,8 @@ export type StoryDialogProps = PropsWithChildren & BookDialogOptions & {
   /** Positioned story viewport. Null never falls back to the browser body. */
   container: HTMLElement | null;
   returnFocusRef?: RefObject<HTMLElement | null>;
+  fallbackFocusRef?: RefObject<HTMLElement | null>;
+
   onOpenChange: (isOpen: boolean) => void;
+  onCloseAutoFocus?: (event: Event) => void;
 };

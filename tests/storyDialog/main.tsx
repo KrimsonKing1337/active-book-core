@@ -99,6 +99,9 @@ const Fixture = () => {
             height: '100%',
           }}
           data-testid="viewport"
+          data-dialog-mounted={isMounted}
+          data-dialog-open={isOpen}
+          data-dialog-container={Boolean(container)}
         >
           <button type="button" data-testid="open" onClick={() => setOpen(true)}>
             Открыть окно

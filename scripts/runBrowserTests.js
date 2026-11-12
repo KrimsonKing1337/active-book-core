@@ -2,6 +2,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const browserTests = [
+  'storyWindows.browser.test.js',
   'storyDialog.browser.test.js',
   'storyRoot.browser.test.js',
   'visualPlacement.browser.test.js',

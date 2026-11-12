@@ -1,7 +1,8 @@
 import { createContext } from 'react';
 
+import type { ReactReduxContextValue } from 'react-redux';
+
 import {
-  type ReactReduxContextValue,
   createStoreHook,
   createDispatchHook,
   createSelectorHook,
@@ -22,6 +23,7 @@ import { bookmarksReducer, watchBookmarksActions } from './bookmarks';
 import { segmentsReducer, watchSegmentsActions } from './segments';
 
 import { counterReducer, watchCounterActions } from './counter';
+import { windowsReducer } from './windows';
 
 const sagaMiddleware = createSagaMiddleware();
 
@@ -37,6 +39,7 @@ const reducer = {
   segments: segmentsReducer,
 
   counter: counterReducer,
+  windows: windowsReducer,
 };
 
 const middleware = [
