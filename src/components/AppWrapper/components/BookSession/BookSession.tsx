@@ -20,8 +20,6 @@ import type { AppWrapperProps } from '../../@types';
 
 import { AppContent } from '../AppContent';
 
-export type { AppWrapperProps } from '../../@types';
-
 export type BookSessionProps = PropsWithChildren<AppWrapperProps>;
 
 export const BookSession = (props: BookSessionProps) => {

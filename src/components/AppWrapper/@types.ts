@@ -2,7 +2,11 @@ import type { ReactNode, Ref } from 'react';
 
 import type { VisualEffectDefinition, VisualEffectRegistration } from '@active-book/types';
 
-import type { Config, RangeEffects, TableOfContents } from '@types';
+import type {
+  Config,
+  RangeEffects,
+  TableOfContents,
+} from '@types';
 
 import type { VisualEffects } from '@controllers/visualEffects';
 
