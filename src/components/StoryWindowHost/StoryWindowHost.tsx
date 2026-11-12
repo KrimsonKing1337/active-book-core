@@ -11,6 +11,7 @@ import {
 } from '@store';
 
 import { windowsActions, windowsSelectors } from '@store/windows';
+import { mainSelectors } from '@store/main';
 
 import { StoryDialog } from '@components';
 import { useStoryRegions } from '@components/StoryRegionsProvider';
@@ -27,13 +28,15 @@ export const StoryWindowHost = ({ resolveContent }: StoryWindowHostProps) => {
 
   const active = useSelector(windowsSelectors.activeWindow);
   const ownerId = useSelector(windowsSelectors.sessionId);
+  const windowPageId = useSelector(windowsSelectors.pageId);
+  const pageId = useSelector(mainSelectors.pageId);
 
   const { elements } = useStoryRegions();
 
   const fallbackFocusRef = useRef<HTMLElement | null>(null);
   fallbackFocusRef.current = elements.storyViewport ?? null;
 
-  if (!sessionId || ownerId !== sessionId || !active) {
+  if (!sessionId || ownerId !== sessionId || windowPageId !== pageId || !active) {
     return null;
   }
 
