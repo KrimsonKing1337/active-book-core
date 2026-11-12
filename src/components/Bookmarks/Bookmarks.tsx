@@ -1,9 +1,9 @@
 import classNames from 'classnames';
 
-
-import { useDispatch, useSelector } from '@store';
+import { useSelector } from '@store';
 import { mainSelectors } from '@store/main';
-import { bookmarksActions, bookmarksSelectors } from '@store/bookmarks';
+
+import { useReaderWindow } from '@components/StoryWindowHost/hooks';
 
 import { Overflow } from '@components/Overflow';
 import { MenuHeader } from '@components/MenuHeader';
@@ -15,16 +15,10 @@ import * as styles from './Bookmarks.module.scss';
 const buttonAddClassNames = classNames([styles.Button, styles.isAdd]);
 
 export const Bookmarks = () => {
-  const dispatch = useDispatch();
-
-  const isOpen = useSelector(bookmarksSelectors.isOpen);
+  const { isOpen, close } = useReaderWindow({ kind: 'bookmarks' });
   const page = useSelector(mainSelectors.page);
 
   const { bookmarks, setBookmarks } = useBookmarks();
-
-  const closeButtonClickHandler = () => {
-    dispatch(bookmarksActions.setIsOpen(false));
-  };
 
   const addButtonClickHandler = () => {
     setBookmarks([...bookmarks, page]);
@@ -41,7 +35,7 @@ export const Bookmarks = () => {
   };
 
   return (
-    <Overflow id="bookmarks" isOpen={isOpen}>
+    <Overflow id="bookmarks" isOpen={isOpen} onClose={close}>
       <MenuHeader label="Закладки" />
 
       <div className={styles.ItemsWrapper}>
@@ -57,7 +51,7 @@ export const Bookmarks = () => {
           Добавить
         </button>
 
-        <button className={styles.Button} onClick={closeButtonClickHandler}>
+        <button className={styles.Button} onClick={close}>
           Закрыть
         </button>
       </div>

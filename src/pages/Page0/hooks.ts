@@ -1,8 +1,8 @@
-import { useState } from 'react';
-
 import { useSelector } from '@store';
 
 import { mainSelectors } from '@store/main';
+
+import { useReaderWindow } from '@components/StoryWindowHost/hooks';
 
 import { Flags as ModalsFlags } from '@utils/localStorage/modalsWereShowed';
 import { modalsWereShowed } from '@utils/localStorage/modalsWereShowed';
@@ -10,17 +10,22 @@ import { modalsWereShowed } from '@utils/localStorage/modalsWereShowed';
 export const useModal = () => {
   const id = useSelector(mainSelectors.id);
 
-  const [modalIsActive, setModalIsActive] = useState(false);
+  const window = useReaderWindow({
+    kind: 'legacy',
+    contentId: 'camera-notice',
+    canClose: false,
+  });
 
   const modalOnClose = () => {
-    setModalIsActive(false);
+    window.forceClose();
 
     modalsWereShowed.set(id, ModalsFlags.usingCamera, true);
   };
 
   return {
-    modalIsActive,
+    modalIsActive: window.isOpen,
+    windowTarget: window.target,
     modalOnClose,
-    setModalIsActive,
+    setModalIsActive: window.setIsOpen,
   };
 };

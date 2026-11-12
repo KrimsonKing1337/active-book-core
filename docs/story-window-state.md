@@ -1,5 +1,8 @@
 # Story windows: Redux ownership stage
 
+This is the historical ownership-stage report. The current History protocol and
+panel migration are documented in [Reader window history](./reader-window-history.md).
+
 The current reader now owns one transient Redux `windows.activeWindow` descriptor.
 No window state is written to book data, localStorage or browser history.
 The slice uses existing Redux Toolkit; there is no second store or registry.

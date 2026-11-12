@@ -1,11 +1,26 @@
-import { PropsWithChildren, useCallback, useEffect, useId, useRef, useState } from 'react';
+import type { PropsWithChildren } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import Hammer from 'hammerjs';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCompress, faCrop, faExpand, faTimes } from '@fortawesome/free-solid-svg-icons';
+import {
+  faCompress,
+  faCrop,
+  faExpand,
+  faTimes,
+} from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames';
 
-import { useWindowHistory } from '@hooks/control/useWindowHistory';
+import type { WindowTarget } from '@store/windows';
+
+import { useDispatch } from '@store';
+import { windowsActions } from '@store/windows';
 
 import { useAppMode } from '@components/App/AppModeContext';
 
@@ -17,7 +32,7 @@ type ModalMode = 'media' | 'text';
 
 export type ModalProps = {
   isOpen: boolean;
-  onOpen?: Func;
+  windowTarget?: WindowTarget;
   onClose?: Func;
   mode?: ModalMode;
   canClose?: boolean;
@@ -30,7 +45,7 @@ export type ModalProps = {
 export const Modal = ({
   children,
   onClose,
-  onOpen,
+  windowTarget,
   isOpen,
   mode = 'text',
   canClose = true,
@@ -40,7 +55,7 @@ export const Modal = ({
   cropDefault = true,
 }: PropsWithChildren<ModalProps>) => {
   const appMode = useAppMode();
-  const historyId = useId();
+  const dispatch = useDispatch();
   // здесь реф-версии нужны для хаммера, обычные для того чтобы ре-рендер срабатывал
   const isFullScreenRef = useRef(false);
   const isCropRef = useRef(true);
@@ -64,13 +79,18 @@ export const Modal = ({
     onClose?.();
   }, [canClose, onClose]);
 
-  useWindowHistory(`content-modal:${historyId}`, isOpen ? 'modal' : null, (next) => {
-    if (next) {
-      onOpen?.();
-    } else {
-      onClose?.();
+  const targetSessionId = windowTarget?.sessionId;
+  const targetInstanceId = windowTarget?.instanceId;
+
+  useLayoutEffect(() => {
+    if (isOpen && targetSessionId && targetInstanceId) {
+      dispatch(windowsActions.setCanClose({
+        sessionId: targetSessionId,
+        instanceId: targetInstanceId,
+        canClose,
+      }));
     }
-  });
+  }, [isOpen, targetSessionId, targetInstanceId, canClose, dispatch]);
 
   useEffect(() => {
     if (!isOpen || appMode !== 'reader') {

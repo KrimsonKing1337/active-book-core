@@ -1,8 +1,6 @@
-import {
-  type PayloadAction,
-  createSlice,
-  nanoid,
-} from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
+
+import { createSlice, nanoid } from '@reduxjs/toolkit';
 
 import type {
   OpenWindowOptions,
@@ -57,6 +55,7 @@ const slice = createSlice({
           instanceId,
           contentId,
           canClose,
+          kind = 'content',
         } = action.payload;
 
         if (state.sessionId !== sessionId || state.pageId !== pageId) {
@@ -64,11 +63,23 @@ const slice = createSlice({
         }
 
         state.activeWindow = {
+          kind,
           instanceId,
           contentId,
           canClose,
         };
       },
+    },
+    setCanClose(state, action: PayloadAction<WindowTarget & { canClose: boolean }>) {
+      const {
+        sessionId,
+        instanceId,
+        canClose,
+      } = action.payload;
+
+      if (state.sessionId === sessionId && state.activeWindow?.instanceId === instanceId) {
+        state.activeWindow.canClose = canClose;
+      }
     },
     requestClose(state, action: PayloadAction<WindowTarget>) {
       const { sessionId, instanceId } = action.payload;

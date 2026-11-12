@@ -36,7 +36,7 @@ export const StoryWindowHost = ({ resolveContent }: StoryWindowHostProps) => {
   const fallbackFocusRef = useRef<HTMLElement | null>(null);
   fallbackFocusRef.current = elements.storyViewport ?? null;
 
-  if (!sessionId || ownerId !== sessionId || windowPageId !== pageId || !active) {
+  if (!sessionId || ownerId !== sessionId || windowPageId !== pageId || !active || active.kind !== 'content') {
     return null;
   }
 

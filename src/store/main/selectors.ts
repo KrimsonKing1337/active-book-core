@@ -20,7 +20,6 @@ export const selectors = {
   authorComments: (state: RootState) => state.main.authorComments,
   allPagesSeen: (state: RootState) => state.main.allPagesSeen,
   tableOfContents: (state: RootState) => state.main.tableOfContents,
-  menuActiveState: (state: RootState) => state.main.menuActiveState,
   isVibrationAvailable: (state: RootState) => state.main.isVibrationAvailable,
   isFlashlightAvailable: (state: RootState) => state.main.isFlashlightAvailable,
   flashlightProblems: (state: RootState) => state.main.flashlightProblems,

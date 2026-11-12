@@ -39,6 +39,10 @@ export const WindowPage = ({ pageId }: { pageId: string }) => {
         <>
           <input aria-label="Содержимое окна" defaultValue={contentId} />
 
+          <button type="button" onClick={() => requestClose(store.getState().windows.activeWindow?.instanceId ?? '')}>
+            Закрыть окно
+          </button>
+
           <button type="button" onClick={() => open({ contentId: 'B' })}>
             Заменить на B
           </button>

@@ -1,4 +1,10 @@
-import { type PropsWithChildren, useEffect, useLayoutEffect, useRef } from 'react';
+import type { PropsWithChildren } from 'react';
+
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+} from 'react';
 
 import classNames from 'classnames';
 import { setWasmUrl } from '@lottiefiles/dotlottie-react';
@@ -11,7 +17,9 @@ import { audioEffectsSelectors } from '@store/effects/audio/audio';
 import { audioBgEffectsSelectors } from '@store/effects/audio/audioBg';
 import { effectsSelectors } from '@store/effects/common';
 
-import { type VisualEffects, useVisualRegistrations } from '@controllers/visualEffects';
+import type { VisualEffects } from '@controllers/visualEffects';
+
+import { useVisualRegistrations } from '@controllers/visualEffects';
 
 import { useEffectsInRange } from '@hooks/effects/range';
 import { useGoToPage } from '@hooks/control/useGoToPage';
@@ -47,7 +55,6 @@ export type AppContentProps = PropsWithChildren & AppWrapperProps & {
 
 export const AppContent = ({
   children,
-  bookKey,
   storyPages,
   withoutToolbar,
   config,
@@ -208,7 +215,6 @@ export const AppContent = ({
     >
       <StoryShell
         withoutToolbar={withoutToolbar}
-        windowHistoryScope={`book-windows:${config.id}:${bookKey ?? ''}`}
         data-page-id={pageId ?? undefined}
       >
         <StoryContent key={pageId === null ? 'start' : `page:${pageId}`}>

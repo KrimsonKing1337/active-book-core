@@ -6,11 +6,11 @@ import { near, openBrowserFixture, pixels, setSurfaces } from './browserFixture.
 const regions = ['story', 'storyViewport', 'storyViewportFrame', 'narrativeFrame',
   'narrativeViewport', 'narrativeContent', 'toolbar', 'toolbarFrame'];
 const box = (page, name) => page.locator(`[data-story-region="${name}"]`).boundingBox();
-const open = async (context) => {
+const open = async (context, mode = 'editor') => {
   const { browser, origin } = await openBrowserFixture(context);
   const page = await browser.newPage({ viewport: { width: 1100, height: 800 } });
   context.after(() => page.close());
-  await page.goto(`${origin}/tests/visualPlacement/`);
+  await page.goto(`${origin}/tests/visualPlacement/?mode=${mode}`);
   await page.getByTestId('first').click();
   await page.getByTestId('page-one').waitFor();
   return page;
@@ -106,8 +106,8 @@ test('toolbarFrame supports different mask widths on all four sides without chan
   assert.deepEqual(await box(page, 'toolbarFrame'), region);
 });
 
-test('Toolbar has natural wrapping height and local planes preserve control interaction', async (context) => {
-  const page = await open(context);
+test('Toolbar has natural wrapping height and local planes preserve reader control interaction', async (context) => {
+  const page = await open(context, 'reader');
   const button = page.locator('[data-welcome-tour-id="bookmarks"]');
   await button.evaluate((node) => { node.style.background = '#0000ff'; });
   const buttonBox = await button.boundingBox();

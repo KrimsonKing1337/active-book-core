@@ -18,13 +18,11 @@ const dispatch = (page, type, payload) => page.evaluate(async ({ type, payload }
 }, { type, payload });
 const activeWindow = (page) => page.evaluate(async () => {
   const { store } = await import('/src/store/index.ts');
-  const { main, bookmarks } = store.getState();
-  return bookmarks.isOpen ? 'bookmarks' : main.menuActiveState;
+  return store.getState().windows.activeWindow?.kind ?? null;
 });
 const waitWindow = (page, windowId) => page.waitForFunction(async (windowId) => {
   const { store } = await import('/src/store/index.ts');
-  const { main, bookmarks } = store.getState();
-  const current = bookmarks.isOpen ? 'bookmarks' : main.menuActiveState;
+  const current = store.getState().windows.activeWindow?.kind ?? null;
   return current === windowId;
 }, windowId);
 
@@ -119,6 +117,13 @@ for (const mode of ['reader', 'editor']) {
     await page.locator('[data-playground-page="1"]').waitFor();
     assert.equal(await previousButton.evaluate((element) => document.activeElement === element), true,
       'persistent Toolbar keeps focus during navigation');
+    if (mode === 'editor') {
+      await page.locator('[data-welcome-tour-id="config"]').click();
+      await page.locator('[data-welcome-tour-id="bookmarks"]').click();
+      assert.equal(await activeWindow(page), null, 'preview does not claim reader window ownership');
+      assert.equal(await page.locator('[data-book-window-open="true"]').count(), 0);
+      assert.equal(await page.evaluate(() => history.length), historyLength);
+    }
     await page.evaluate(() => {
       const ball = document.querySelector('[data-ball="range-ball"]');
       window.finalProbe = { ball, animation: ball.getAnimations()[0] };
@@ -146,37 +151,56 @@ test('book windows use one same-URL history entry and release browser Back', asy
   });
   const url = page.url();
   const initialLength = await page.evaluate(() => history.length);
-  await dispatch(page, '@main/setMenuActiveState', 'menu');
+  await page.locator('[data-welcome-tour-id="config"]').click();
   await waitWindow(page, 'menu');
   assert.equal(page.url(), url);
   assert.equal(await page.evaluate(() => history.length), initialLength + 1);
   assert.equal(await page.evaluate(() => history.state.hostApplication), 'kept');
-  await dispatch(page, '@main/setMenuActiveState', 'tableOfContents');
+  await page.getByRole('button', { name: 'Оглавление', exact: true }).click();
   await waitWindow(page, 'tableOfContents');
-  await dispatch(page, '@bookmarks/setIsOpen', true);
+  assert.equal(await page.locator('[data-book-window-open="true"]').count(), 1);
+  await page.evaluate(async () => {
+    const { store } = await import('/src/store/index.ts');
+    const { windows } = store.getState();
+    store.dispatch({ type: '@windows/open', payload: {
+      sessionId: windows.sessionId, pageId: windows.pageId, instanceId: 'bookmarks-test',
+      kind: 'bookmarks', contentId: 'bookmarks', canClose: true,
+    } });
+  });
   await waitWindow(page, 'bookmarks');
+  assert.equal(await page.locator('[data-book-window-open="true"]').count(), 1);
   assert.equal(await page.evaluate(() => history.length), initialLength + 1, 'switching replaces');
   await page.goBack();
   await waitWindow(page, null);
   await page.goForward();
-  await waitWindow(page, 'bookmarks');
+  await waitWindow(page, null);
+  await page.locator('[data-welcome-tour-id="bookmarks"]').click();
   await page.locator('#bookmarks').getByText('Закрыть', { exact: true }).click();
   await waitWindow(page, null);
-  await page.waitForFunction(() => history.state?.hostApplication === 'kept' && !history.state.activeBookWindow);
+  await page.waitForFunction(() => history.state?.hostApplication === 'kept' && history.state.activeBookWindows?.position === 'base');
   // Forward across an explicitly dismissed window stays closed.
   await page.goForward();
   assert.equal(await activeWindow(page), null);
   await page.goBack();
-  await dispatch(page, '@main/setMenuActiveState', 'menu');
+  await page.locator('[data-welcome-tour-id="config"]').click();
   await waitWindow(page, 'menu');
   await page.keyboard.press('Escape');
   await waitWindow(page, null);
-  await page.waitForFunction(() => !history.state?.activeBookWindow);
+  await page.waitForFunction(() => {
+    return document.activeElement === document.querySelector('[data-welcome-tour-id="config"]');
+  });
+  await page.waitForFunction(() => history.state?.activeBookWindows?.position === 'base');
   await page.goBack();
   assert.equal(new URL(page.url()).hash, '#before-book', 'Back is no longer trapped by book windows or pages');
   await page.goForward();
   assert.equal(await activeWindow(page), null);
   assert.equal(page.url(), url);
+  const state = await page.evaluate(async () => {
+    const { store } = await import('/src/store/index.ts');
+    return store.getState();
+  });
+  assert.equal('menuActiveState' in state.main, false);
+  assert.equal('isOpen' in state.bookmarks, false);
 });
 
 
@@ -187,20 +211,19 @@ test('new tab, reload and actual book unmount keep window state and history alig
   await page.goto(`${origin}/tests/visualPlayground/?mode=reader`);
   await page.locator('[data-demo-effect="frame"]').waitFor();
   const initialLength = await page.evaluate(() => history.length);
-  await dispatch(page, '@main/setMenuActiveState', 'menu');
+  await page.locator('[data-welcome-tour-id="config"]').click();
   await waitWindow(page, 'menu');
   await page.reload();
   await page.locator('[data-demo-effect="frame"]').waitFor();
-  await waitWindow(page, 'menu');
-  assert.equal(await page.evaluate(() => history.length), initialLength + 1, 'reload adopts one existing entry');
+  await waitWindow(page, null);
+  assert.equal(await page.evaluate(() => history.length), initialLength + 1, 'reload never restores a window');
   await page.goBack();
   await waitWindow(page, null);
   await page.goForward();
-  await waitWindow(page, 'menu');
+  await waitWindow(page, null);
   await page.evaluate(() => window.playground.setVisible(false));
   await page.locator('[data-story-region="story"]').waitFor({ state: 'detached' });
   await waitWindow(page, null);
-  await page.waitForFunction(() => !history.state?.activeBookWindow);
   await page.evaluate(() => window.playground.setVisible(true));
   await page.locator('[data-story-region="story"]').waitFor();
   assert.equal(await activeWindow(page), null);
@@ -215,32 +238,40 @@ test('TOC, bookmarks and informational Modal navigate and consume the same-URL h
   await page.locator('[data-demo-effect="frame"]').waitFor();
   const url = page.url();
   await dispatch(page, '@main/setTableOfContents', [{ title: 'Лес после дождя', pageNumber: 4 }]);
-  await dispatch(page, '@main/setMenuActiveState', 'menu');
+  await page.locator('[data-welcome-tour-id="config"]').click();
   await page.getByRole('button', { name: 'Оглавление', exact: true }).click();
   await waitWindow(page, 'tableOfContents');
   await page.locator('#table-of-contents').getByText('Лес после дождя', { exact: true }).click();
   await page.locator('[data-playground-page="4"]').waitFor();
-  await page.goBack();
+  await page.waitForFunction(() => history.state?.activeBookWindows?.position === 'base');
   await waitWindow(page, null);
   await dispatch(page, '@bookmarks/setBookmarks', [2]);
   await page.locator('[data-welcome-tour-id="bookmarks"]').click();
   await waitWindow(page, 'bookmarks');
   await page.locator('#bookmarks').getByText('Страница 2', { exact: true }).click();
   await page.locator('[data-playground-page="2"]').waitFor();
-  await page.goBack();
+  await page.waitForFunction(() => history.state?.activeBookWindows?.position === 'base');
   await waitWindow(page, null);
   await go(page, 1);
   await page.getByRole('button', { name: 'Следующая страница', exact: true }).click();
   const openModal = page.locator('[data-book-window-open="true"]').filter({ hasText: 'Вы можете использовать свайпы' });
   await openModal.waitFor();
+  const noticeLength = await page.evaluate(() => history.length);
+  await page.goBack();
+  await page.waitForFunction(() => history.state?.activeBookWindows?.position === 'guard');
+  assert.equal(await openModal.count(), 1, 'countdown lock is shared with the history adapter');
+  assert.equal(await page.evaluate(() => history.length), noticeLength);
+  await openModal.getByRole('button', { name: 'Хорошо', exact: true }).waitFor();
   await page.goBack();
   await openModal.waitFor({ state: 'detached' });
   await page.locator('[data-playground-page="1"]').waitFor();
   await page.goForward();
+  assert.equal(await openModal.count(), 0);
+  await page.getByRole('button', { name: 'Следующая страница', exact: true }).click();
   await openModal.waitFor();
   await openModal.getByRole('button', { name: 'Хорошо', exact: true }).waitFor();
   await page.keyboard.press('Escape');
   await openModal.waitFor({ state: 'detached' });
-  await page.waitForFunction(() => !history.state?.activeBookWindow);
+  await page.waitForFunction(() => history.state?.activeBookWindows?.position === 'base');
   assert.equal(page.url(), url);
 });

@@ -1,7 +1,5 @@
 import type { TableOfContents } from '@types';
 
-export type MenuActiveState = null | 'menu' | 'tableOfContents' | 'achievementsProgress';
-
 export type FlashlightState = false | 'js' | 'cordova';
 
 export interface State {
@@ -12,7 +10,6 @@ export interface State {
   authorComments: number;
   allPagesSeen: boolean;
   tableOfContents: TableOfContents;
-  menuActiveState: MenuActiveState;
   isVibrationAvailable: boolean | null;
   isFlashlightAvailable: FlashlightState | null;
   flashlightProblems: string;

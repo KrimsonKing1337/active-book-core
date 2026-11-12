@@ -11,7 +11,7 @@ test('one Redux window replaces content and ignores stale callbacks without losi
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto(`${origin}/tests/storyWindows/`);
   await page.getByTestId('open-a').waitFor();
-  const historyBefore = await page.evaluate(() => ({ length: history.length, state: history.state }));
+  const historyBefore = await page.evaluate(() => history.length);
   await page.getByTestId('open-a').click();
   await page.getByRole('dialog', { name: 'Окно A', exact: true }).waitFor();
   const first = await page.evaluate(() => {
@@ -42,7 +42,8 @@ test('one Redux window replaces content and ignores stale callbacks without losi
   await page.keyboard.press('Escape');
   await dialog.waitFor({ state: 'detached' });
   await page.waitForFunction(() => document.activeElement === document.querySelector('[data-testid="open-a"]'));
-  assert.deepEqual(await page.evaluate(() => ({ length: history.length, state: history.state })), historyBefore);
+  await page.waitForFunction(() => history.state?.activeBookWindows?.position === 'base');
+  assert.equal(await page.evaluate(() => history.length), historyBefore + 1);
   assert.deepEqual(errors, []);
 });
 

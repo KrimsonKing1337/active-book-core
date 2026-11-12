@@ -1,6 +1,8 @@
 import { useSelector } from '@store';
 import { mainSelectors } from '@store/main';
 
+import { useReaderWindow } from '@components/StoryWindowHost/hooks';
+
 import { Overflow } from '@components/Overflow';
 import { MenuHeader } from '@components/MenuHeader';
 
@@ -17,13 +19,11 @@ import {
 
 export const Menu = () => {
 
-  const menuActiveState = useSelector(mainSelectors.menuActiveState);
+  const { isOpen, close } = useReaderWindow({ kind: 'menu' });
   const allPagesSeen = useSelector(mainSelectors.allPagesSeen);
 
-  const isOpen = menuActiveState === 'menu';
-
   return (
-    <Overflow isOpen={isOpen}>
+    <Overflow isOpen={isOpen} onClose={close}>
       <MenuHeader label="Настройки" />
       <Volume />
       <Themes />
