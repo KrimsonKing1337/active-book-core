@@ -1,4 +1,4 @@
-import { type HTMLAttributes, type PropsWithChildren } from 'react';
+import type { HTMLAttributes, PropsWithChildren } from 'react';
 
 import { Toolbar } from '@components/Toolbar';
 import { Menu } from '@components/Menu';
@@ -8,8 +8,8 @@ import { VisualHost } from '@components/VisualHost';
 
 import { useStoryRegions } from '@components/StoryRegionsProvider';
 
-import { Narrative } from './components/Narrative';
-import { useBookWindows } from './useBookWindows';
+import { Narrative } from './components';
+import { useBookWindows } from './hooks';
 
 import * as styles from './StoryShell.module.scss';
 
@@ -37,6 +37,7 @@ export const StoryShell = ({
         id="story-viewport"
         className={styles.StoryViewport}
         data-story-region="storyViewport"
+        tabIndex={-1}
       >
         <div
           ref={refs.storyViewportFrame}
@@ -63,7 +64,6 @@ export const StoryShell = ({
         )}
 
         <VisualHost region="storyViewport" />
-
         <Menu />
         <TableOfContents />
         <Bookmarks />

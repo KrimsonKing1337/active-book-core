@@ -1,4 +1,11 @@
-import { type PropsWithChildren, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import type { PropsWithChildren } from 'react';
+
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import { useDispatch } from '@store';
 import { mainActions } from '@store/main';
@@ -6,19 +13,20 @@ import { mainActions } from '@store/main';
 import { createVisualEffects, VisualEffectsContext } from '@controllers/visualEffects';
 
 import { StoryRegionsProvider } from '@components/StoryRegionsProvider';
-
-
+import { StoryWindowSessionContext } from '@components/StoryWindowHost/context';
+import { useStoryWindowSession } from '@components/StoryWindowHost/hooks';
 
 import type { AppWrapperProps } from '../../@types';
 
 import { AppContent } from '../AppContent';
 
-export type { AppWrapperProps } from '../../@types';
-
 export type BookSessionProps = PropsWithChildren<AppWrapperProps>;
 
 export const BookSession = (props: BookSessionProps) => {
   const dispatch = useDispatch();
+
+  const windowSessionId = useStoryWindowSession();
+
   const initialPageIdRef = useRef(props.initialPageId ?? null);
 
   useLayoutEffect(() => {
@@ -60,9 +68,11 @@ export const BookSession = (props: BookSessionProps) => {
 
   return (
     <VisualEffectsContext value={session}>
-      <StoryRegionsProvider>
-        <AppContent {...props} visualEffects={session} />
-      </StoryRegionsProvider>
+      <StoryWindowSessionContext value={windowSessionId}>
+        <StoryRegionsProvider>
+          <AppContent {...props} visualEffects={session} />
+        </StoryRegionsProvider>
+      </StoryWindowSessionContext>
     </VisualEffectsContext>
   );
 };

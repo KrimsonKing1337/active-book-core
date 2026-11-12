@@ -1,12 +1,10 @@
-import { useRef } from 'react';
-
 import * as Dialog from '@radix-ui/react-dialog';
 import classNames from 'classnames';
 
 import type { StoryDialogProps } from './@types';
 
 import { getDialogDimension } from './utils';
-import { useDialogPreferences } from './hooks';
+import { useDialogFocus, useDialogPreferences } from './hooks';
 
 import styles from './StoryDialog.module.scss';
 
@@ -21,9 +19,16 @@ export const StoryDialog = ({
   canClose = true,
   container,
   returnFocusRef,
+  fallbackFocusRef,
+
   onOpenChange,
+  onCloseAutoFocus,
 }: StoryDialogProps) => {
-  const openerRef = useRef<HTMLElement | null>(null);
+  const { handleOpenAutoFocus, handleCloseAutoFocus } = useDialogFocus({
+    returnFocusRef,
+    fallbackFocusRef,
+    onCloseAutoFocus,
+  });
 
   const {
     preferences,
@@ -70,24 +75,6 @@ export const StoryDialog = ({
   const handleDismiss = (e: Event) => {
     if (!canClose) {
       e.preventDefault();
-    }
-  };
-
-  const handleOpenAutoFocus = () => {
-    const activeElement = document.activeElement;
-
-    if (activeElement instanceof HTMLElement) {
-      openerRef.current = activeElement;
-    }
-  };
-
-  const handleCloseAutoFocus = (e: Event) => {
-    const target = returnFocusRef?.current ?? openerRef.current;
-
-    if (target?.isConnected && !target.closest('[inert]')) {
-      e.preventDefault();
-
-      target.focus({ preventScroll: true });
     }
   };
 

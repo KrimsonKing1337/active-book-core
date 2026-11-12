@@ -8,8 +8,10 @@ import { useWindowHistory } from '@hooks/control/useWindowHistory';
 
 export const useBookWindows = (scope: string) => {
   const dispatch = useDispatch();
+
   const menu = useSelector(mainSelectors.menuActiveState);
   const bookmarksOpen = useSelector(bookmarksSelectors.isOpen);
+
   const windowId = bookmarksOpen ? 'bookmarks' : menu;
 
   const change = useCallback((next: string | null) => {

@@ -17,6 +17,7 @@ export * from './Label';
 export * from './Menu';
 export * from './Modal';
 export * from './StoryDialog';
+export * from './StoryWindowHost';
 export * from './ModalDialog';
 export * from './Overflow';
 export * from './StoryShell';
