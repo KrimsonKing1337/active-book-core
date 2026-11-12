@@ -1,4 +1,4 @@
-import type { BookDialogPreferences } from '../../../../../active-book-types';
+import type { BookDialogPreferences } from '@active-book/types';
 
 export const dialogPreferencesKey = 'active-book:dialog-preferences';
 

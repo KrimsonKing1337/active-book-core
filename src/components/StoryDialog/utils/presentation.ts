@@ -1,4 +1,4 @@
-import type { BookDialogMode } from '../../../../../active-book-types';
+import type { BookDialogMode } from '@active-book/types';
 
 /** Read-only structural view of model nodes. This does not extend the supported document schema. */
 type ContentNode = {
