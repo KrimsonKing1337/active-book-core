@@ -16,8 +16,6 @@ import { StoryRegionsProvider } from '@components/StoryRegionsProvider';
 import { StoryWindowSessionContext } from '@components/StoryWindowHost/context';
 import { useStoryWindowSession } from '@components/StoryWindowHost/hooks';
 
-
-
 import type { AppWrapperProps } from '../../@types';
 
 import { AppContent } from '../AppContent';
@@ -28,7 +26,9 @@ export type BookSessionProps = PropsWithChildren<AppWrapperProps>;
 
 export const BookSession = (props: BookSessionProps) => {
   const dispatch = useDispatch();
+
   const windowSessionId = useStoryWindowSession();
+
   const initialPageIdRef = useRef(props.initialPageId ?? null);
 
   useLayoutEffect(() => {

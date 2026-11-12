@@ -7,6 +7,7 @@ import {
 import { nanoid } from '@reduxjs/toolkit';
 
 import { useDispatch, useSelector } from '@store';
+
 import { mainSelectors } from '@store/main';
 import type { OpenWindowOptions } from '@store/windows';
 import { windowsActions } from '@store/windows';
@@ -16,10 +17,12 @@ import { useAppMode } from '@components/App/AppModeContext';
 import { StoryWindowSessionContext } from './context';
 
 export const useStoryWindowSession = () => {
-  const [sessionId] = useState(nanoid);
   const dispatch = useDispatch();
-  const pageId = useSelector(mainSelectors.pageId);
+
   const appMode = useAppMode();
+  const [sessionId] = useState(nanoid);
+
+  const pageId = useSelector(mainSelectors.pageId);
 
   useLayoutEffect(() => {
     if (appMode === 'reader') {
@@ -44,16 +47,20 @@ export const useStoryWindowSession = () => {
   return sessionId;
 };
 
+type OpenOptions = Omit<OpenWindowOptions, 'sessionId' | 'pageId'>;
+
 export const useStoryWindowActions = () => {
-  const sessionId = useContext(StoryWindowSessionContext);
-  const pageId = useSelector(mainSelectors.pageId);
   const dispatch = useDispatch();
+
+  const sessionId = useContext(StoryWindowSessionContext);
+
+  const pageId = useSelector(mainSelectors.pageId);
 
   if (!sessionId) {
     throw new Error('Story window actions require a reader BookSession');
   }
 
-  const open = (options: Omit<OpenWindowOptions, 'sessionId' | 'pageId'>) => {
+  const open = (options: OpenOptions) => {
     const action = windowsActions.open({
       ...options,
       sessionId,

@@ -82,10 +82,10 @@ export const useDialogFocus = ({
     }
   };
 
-  const handleCloseAutoFocus = (event: Event) => {
-    onCloseAutoFocus?.(event);
+  const handleCloseAutoFocus = (e: Event) => {
+    onCloseAutoFocus?.(e);
 
-    if (event.defaultPrevented) {
+    if (e.defaultPrevented) {
       return;
     }
 
@@ -96,7 +96,8 @@ export const useDialogFocus = ({
     }
 
     if (target?.isConnected && !target.closest('[inert]')) {
-      event.preventDefault();
+      e.preventDefault();
+
       target.focus({ preventScroll: true });
     }
   };

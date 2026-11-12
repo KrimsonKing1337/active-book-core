@@ -20,6 +20,7 @@ export const StoryDialog = ({
   container,
   returnFocusRef,
   fallbackFocusRef,
+
   onOpenChange,
   onCloseAutoFocus,
 }: StoryDialogProps) => {

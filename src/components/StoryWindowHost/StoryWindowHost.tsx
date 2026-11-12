@@ -9,9 +9,10 @@ import {
   useSelector,
   useStore,
 } from '@store';
+
 import { windowsActions, windowsSelectors } from '@store/windows';
 
-import { StoryDialog } from '@components/StoryDialog';
+import { StoryDialog } from '@components';
 import { useStoryRegions } from '@components/StoryRegionsProvider';
 
 import type { StoryWindowHostProps } from './@types';
@@ -19,12 +20,16 @@ import type { StoryWindowHostProps } from './@types';
 import { StoryWindowSessionContext } from './context';
 
 export const StoryWindowHost = ({ resolveContent }: StoryWindowHostProps) => {
-  const sessionId = useContext(StoryWindowSessionContext);
-  const active = useSelector(windowsSelectors.activeWindow);
-  const ownerId = useSelector(windowsSelectors.sessionId);
   const store = useStore();
   const dispatch = useDispatch();
+
+  const sessionId = useContext(StoryWindowSessionContext);
+
+  const active = useSelector(windowsSelectors.activeWindow);
+  const ownerId = useSelector(windowsSelectors.sessionId);
+
   const { elements } = useStoryRegions();
+
   const fallbackFocusRef = useRef<HTMLElement | null>(null);
   fallbackFocusRef.current = elements.storyViewport ?? null;
 
@@ -45,13 +50,14 @@ export const StoryWindowHost = ({ resolveContent }: StoryWindowHostProps) => {
     }
   };
 
-  const handleCloseAutoFocus = (event: Event) => {
+  const handleCloseAutoFocus = (e: Event) => {
     const state = store.getState();
+
     const current = windowsSelectors.activeWindow(state);
     const currentOwnerId = windowsSelectors.sessionId(state);
 
     if (currentOwnerId !== sessionId || current) {
-      event.preventDefault();
+      e.preventDefault();
     }
   };
 

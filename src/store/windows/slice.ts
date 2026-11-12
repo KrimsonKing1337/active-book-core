@@ -1,6 +1,8 @@
-import type { PayloadAction } from '@reduxjs/toolkit';
-
-import { createSlice, nanoid } from '@reduxjs/toolkit';
+import {
+  type PayloadAction,
+  createSlice,
+  nanoid,
+} from '@reduxjs/toolkit';
 
 import type {
   OpenWindowOptions,
@@ -14,6 +16,11 @@ export const initialState: State = {
   pageId: null,
   activeWindow: null,
 };
+
+type OpenReducerAction = PayloadAction<OpenWindowOptions & {
+  instanceId: string;
+  canClose: boolean;
+}>;
 
 const slice = createSlice({
   name: '@windows',
@@ -43,7 +50,7 @@ const slice = createSlice({
           },
         };
       },
-      reducer(state, action: PayloadAction<OpenWindowOptions & { instanceId: string; canClose: boolean }>) {
+      reducer(state, action: OpenReducerAction) {
         const {
           sessionId,
           pageId,
@@ -65,6 +72,7 @@ const slice = createSlice({
     },
     requestClose(state, action: PayloadAction<WindowTarget>) {
       const { sessionId, instanceId } = action.payload;
+
       const active = state.activeWindow;
 
       if (state.sessionId === sessionId && active?.instanceId === instanceId && active.canClose) {

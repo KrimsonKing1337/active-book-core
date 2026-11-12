@@ -8,8 +8,8 @@ import { VisualHost } from '@components/VisualHost';
 
 import { useStoryRegions } from '@components/StoryRegionsProvider';
 
-import { Narrative } from './components/Narrative';
-import { useBookWindows } from './useBookWindows';
+import { Narrative } from './components';
+import { useBookWindows } from './hooks';
 
 import * as styles from './StoryShell.module.scss';
 
