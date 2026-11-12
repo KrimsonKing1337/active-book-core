@@ -1,4 +1,4 @@
-import type { BookDialogPreferences } from '@active-book/types';
+import type { BookDialogPreferences } from '../../../../../active-book-types';
 
 export const dialogPreferencesKey = 'active-book:dialog-preferences';
 
@@ -10,20 +10,34 @@ export const defaultDialogPreferences: Readonly<BookDialogPreferences> = {
 let memoryPreferences = { ...defaultDialogPreferences };
 let hasUnsavedPreferences = false;
 
+const isBookDialogPreferences = (value: unknown): value is BookDialogPreferences => {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+
+  if (!('isFullscreen' in value) || typeof value.isFullscreen !== 'boolean') {
+    return false;
+  }
+
+  if (!('objectFit' in value)) {
+    return false;
+  }
+
+  return value.objectFit === 'contain' || value.objectFit === 'cover';
+};
+
 const parsePreferences = (raw: string): BookDialogPreferences => {
   try {
     const value: unknown = JSON.parse(raw);
 
-    if (value && typeof value === 'object'
-      && 'isFullscreen' in value && typeof value.isFullscreen === 'boolean'
-      && 'objectFit' in value && (value.objectFit === 'contain' || value.objectFit === 'cover')) {
+    if (isBookDialogPreferences(value)) {
       return {
         isFullscreen: value.isFullscreen,
         objectFit: value.objectFit,
       };
     }
   } catch {
-    return { ...defaultDialogPreferences };
+    // Некорректный JSON — используем настройки по умолчанию.
   }
 
   return { ...defaultDialogPreferences };
@@ -55,6 +69,7 @@ export const writeDialogPreferences = (preferences: BookDialogPreferences): void
 
   try {
     window.localStorage.setItem(dialogPreferencesKey, JSON.stringify(preferences));
+
     hasUnsavedPreferences = false;
   } catch {
     // Keep reader preferences in memory when browser storage is unavailable or full.

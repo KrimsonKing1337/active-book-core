@@ -2,7 +2,7 @@ import type { PropsWithChildren, RefObject } from 'react';
 
 import type { BookDialogMode, BookDialogOptions } from '@active-book/types';
 
-export type StoryDialogProps = PropsWithChildren<BookDialogOptions & {
+export type StoryDialogProps = PropsWithChildren & BookDialogOptions & {
   isOpen: boolean;
   title: string;
   description?: string;
@@ -11,4 +11,4 @@ export type StoryDialogProps = PropsWithChildren<BookDialogOptions & {
   container: HTMLElement | null;
   returnFocusRef?: RefObject<HTMLElement | null>;
   onOpenChange: (isOpen: boolean) => void;
-}>;
+};

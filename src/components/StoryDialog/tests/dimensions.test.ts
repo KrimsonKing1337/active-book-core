@@ -1,4 +1,4 @@
-import { getDialogDimension } from '../dimensions';
+import { getDialogDimension } from '../utils';
 
 test('defaults to 75 percent and preserves fractional authored percentages', () => {
   expect(getDialogDimension()).toBe('75%');

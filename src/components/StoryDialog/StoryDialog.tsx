@@ -5,8 +5,8 @@ import classNames from 'classnames';
 
 import type { StoryDialogProps } from './@types';
 
-import { getDialogDimension } from './dimensions';
-import { useDialogPreferences } from './useDialogPreferences';
+import { getDialogDimension } from './utils';
+import { useDialogPreferences } from './hooks';
 
 import styles from './StoryDialog.module.scss';
 
@@ -24,17 +24,21 @@ export const StoryDialog = ({
   onOpenChange,
 }: StoryDialogProps) => {
   const openerRef = useRef<HTMLElement | null>(null);
+
   const {
     preferences,
     toggleFullscreen,
     toggleObjectFit,
   } = useDialogPreferences(isOpen);
+
   const { isFullscreen, objectFit } = preferences;
 
   const authoredWidth = getDialogDimension(width);
   const authoredHeight = getDialogDimension(height);
+
   let displayedWidth = authoredWidth;
   let displayedHeight = authoredHeight;
+
   let fullscreenLabel = 'Развернуть окно';
 
   if (isFullscreen) {
@@ -48,10 +52,14 @@ export const StoryDialog = ({
     height: displayedHeight,
     '--story-dialog-object-fit': objectFit,
   };
+
   const contentClasses = classNames(styles.Content, {
     [styles.Fullscreen]: isFullscreen,
   });
-  const bodyClasses = classNames(styles.Body, { [styles.Media]: mode === 'media' });
+
+  const bodyClasses = classNames(styles.Body, {
+    [styles.Media]: mode === 'media',
+  });
 
   const handleOpenChange = (nextOpen: boolean) => {
     if (nextOpen || canClose) {
@@ -59,9 +67,9 @@ export const StoryDialog = ({
     }
   };
 
-  const handleDismiss = (event: Event) => {
+  const handleDismiss = (e: Event) => {
     if (!canClose) {
-      event.preventDefault();
+      e.preventDefault();
     }
   };
 
@@ -73,11 +81,12 @@ export const StoryDialog = ({
     }
   };
 
-  const handleCloseAutoFocus = (event: Event) => {
+  const handleCloseAutoFocus = (e: Event) => {
     const target = returnFocusRef?.current ?? openerRef.current;
 
     if (target?.isConnected && !target.closest('[inert]')) {
-      event.preventDefault();
+      e.preventDefault();
+
       target.focus({ preventScroll: true });
     }
   };

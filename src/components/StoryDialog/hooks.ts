@@ -8,10 +8,11 @@ import {
   defaultDialogPreferences,
   readDialogPreferences,
   writeDialogPreferences,
-} from './preferences';
+} from './utils';
 
 export const useDialogPreferences = (isOpen: boolean) => {
   const appMode = useAppMode();
+
   const [preferences, setPreferences] = useState<BookDialogPreferences>(() => {
     if (appMode === 'reader') {
       return readDialogPreferences();

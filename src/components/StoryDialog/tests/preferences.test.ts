@@ -3,7 +3,7 @@ import {
   dialogPreferencesKey,
   readDialogPreferences,
   writeDialogPreferences,
-} from '../preferences';
+} from '../utils';
 
 beforeEach(() => {
   jest.restoreAllMocks();

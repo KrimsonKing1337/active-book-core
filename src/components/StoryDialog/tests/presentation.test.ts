@@ -1,4 +1,4 @@
-import { getDialogMode } from '../presentation';
+import { getDialogMode } from '../utils';
 
 test.each(['image', 'video'])('uses media for a single %s', (type) => {
   expect(getDialogMode([{ type }])).toBe('media');
