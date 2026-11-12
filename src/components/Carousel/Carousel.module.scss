@@ -1,0 +1,53 @@
+.Carousel {
+  min-width: 0;
+  max-width: 100%;
+  margin-block: 16px;
+
+  padding: 12px;
+
+  border: 1px solid currentColor;
+  border-radius: 8px;
+}
+
+.Viewport {
+  overflow: hidden;
+}
+
+.Slides {
+  display: flex;
+
+  touch-action: pan-y pinch-zoom;
+}
+
+.Slide {
+  flex: 0 0 100%;
+  min-width: 0;
+  padding: 4px;
+
+  overflow-wrap: anywhere;
+}
+
+.Controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+
+  button {
+    padding: 6px 10px;
+
+    color: inherit;
+
+    background: transparent;
+    border: 1px solid currentColor;
+    border-radius: 4px;
+    cursor: pointer;
+
+    &:disabled {
+      cursor: default;
+      opacity: 0.5;
+    }
+  }
+}

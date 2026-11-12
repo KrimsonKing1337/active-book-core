@@ -20,6 +20,7 @@ export * from './ModalDialog';
 export * from './Overflow';
 export * from './StoryShell';
 export * from './SlideShow';
+export * from './Carousel';
 export * from './Spoiler';
 export * from './TableOfContents';
 export * from './Toggle';
