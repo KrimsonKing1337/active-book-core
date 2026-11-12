@@ -1,0 +1,106 @@
+.Layer {
+  position: absolute;
+  inset: 0;
+
+  z-index: calc(var(--visual-layer-step, 1) * 7 + 5);
+
+  pointer-events: none;
+}
+
+.Overlay {
+  position: absolute;
+  inset: 0;
+
+  background: var(--overflow, rgb(0 0 0 / 70%));
+
+  pointer-events: auto;
+}
+
+.Content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+
+  color: var(--secondary, #ddd);
+
+  background: var(--bg, #111);
+  border: 1px solid currentColor;
+  border-radius: 12px;
+  transform: translate(-50%, -50%);
+
+  transition: width 180ms ease, height 180ms ease, border-radius 180ms ease;
+
+  pointer-events: auto;
+}
+
+.Fullscreen {
+  border-width: 0;
+  border-radius: 0;
+}
+
+.Toolbar {
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  padding: 8px;
+
+  button {
+    color: inherit;
+
+    background: transparent;
+    border: 1px solid currentColor;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+}
+
+.Title {
+  flex: 1;
+  margin: 0;
+
+  font-size: 1rem;
+}
+
+.Description {
+  margin: 0;
+  padding: 8px;
+}
+
+.Body {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  padding: 16px;
+  overflow: auto;
+
+  transition: padding 180ms ease;
+}
+
+.Media {
+  padding: 0;
+
+  > img,
+  > video {
+    display: block;
+    width: 100%;
+    height: 100%;
+
+    object-fit: var(--story-dialog-object-fit, contain);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .Content,
+  .Body {
+    transition: none;
+  }
+}
