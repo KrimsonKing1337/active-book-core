@@ -9,6 +9,7 @@
     "unifiedVisualEffects/**/*.tsx",
     "storyRoot/**/*.ts",
     "storyRoot/**/*.tsx",
+    "storyDialog/**/*.tsx",
     "visualPlacement/**/*.ts",
     "visualPlacement/**/*.tsx",
     "visualLifecycle/**/*.ts",
