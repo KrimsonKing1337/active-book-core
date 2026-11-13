@@ -15,7 +15,8 @@ import {
   P,
 } from '@components';
 
-import { WelcomeNotice, Segments } from './components';
+import { Segments } from './components';
+import { WelcomeNotice } from './WelcomeNotice';
 
 import {
   getWelcomeTourTextById,

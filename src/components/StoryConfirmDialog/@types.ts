@@ -2,7 +2,14 @@ import type { WindowTarget } from '@store/windows';
 
 import type { StoryDialogProps } from '@components/StoryDialog';
 
-type ConfirmPresentation = Pick<StoryDialogProps, 'children' | 'title' | 'description' | 'width' | 'height'>;
+type ConfirmPresentation = Pick<
+  StoryDialogProps,
+  | 'children'
+  | 'title'
+  | 'description'
+  | 'width'
+  | 'height'
+>;
 
 export type StoryConfirmDialogProps = ConfirmPresentation & {
   target?: WindowTarget;

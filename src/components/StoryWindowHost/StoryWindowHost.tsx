@@ -14,7 +14,9 @@ import { useStoryWindowDialog } from './hooks';
 
 export const StoryWindowHost = ({ resolveContent }: StoryWindowHostProps) => {
   const sessionId = useContext(StoryWindowSessionContext);
+
   const active = useSelector(windowsSelectors.activeWindow);
+
   let target: WindowTarget | undefined;
 
   if (sessionId && active?.kind === 'content') {

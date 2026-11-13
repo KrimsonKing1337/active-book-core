@@ -76,6 +76,7 @@ export const useDialogFocus = ({
 
   const handleOpenAutoFocus = () => {
     const activeElement = document.activeElement;
+
     openerRef.current = null;
 
     // Replacing a locally rendered dialog can remove the old focused node before this scope mounts.
@@ -105,14 +106,19 @@ export const useDialogFocus = ({
       e.preventDefault();
 
       const previousActiveElement = document.activeElement;
+
       target.focus({ preventScroll: true });
 
       // A connected opener may have become hidden/unfocusable while its dialog was open.
       // Do not override focus if another actor already moved it during the focus event.
-      const focusDidNotMove = document.activeElement === previousActiveElement && document.activeElement !== target;
-      const fallback = fallbackFocusRef?.current;
+      const focusDidNotMove =
+        document.activeElement === previousActiveElement
+        && document.activeElement !== target;
 
-      if (focusDidNotMove && fallback?.isConnected && !fallback.closest('[inert]')) {
+      const fallback = fallbackFocusRef?.current;
+      const fallbackFocusIsRight= fallback?.isConnected && !fallback.closest('[inert]');
+
+      if (focusDidNotMove && fallbackFocusIsRight) {
         fallback.focus({ preventScroll: true });
       }
     }

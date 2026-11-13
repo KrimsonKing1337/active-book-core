@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { type KeyboardEvent, useEffect, useState } from 'react';
 
 import { configSelectors } from '@store/config';
 
@@ -150,6 +150,14 @@ export const Page0 = ({
     go();
   };
 
+  const actionKeydownHandler = (e: KeyboardEvent<HTMLSpanElement>) => {
+    const callback = () => {
+      e.currentTarget.click();
+    };
+
+    activateOnKey(e, callback);
+  };
+
   const actionLabel = lastPage > 0 ? 'Продолжить читать' : 'Начать читать';
 
   return (
@@ -175,7 +183,7 @@ export const Page0 = ({
           style={{ fontSize: '1.375em' /* 22px */ }}
           fullWidth
           onClick={actionClickHandler}
-          onKeyDown={(event) => activateOnKey(event, () => event.currentTarget.click())}
+          onKeyDown={actionKeydownHandler}
         >
           {actionLabel}
         </Action>

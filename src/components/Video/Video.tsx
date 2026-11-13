@@ -38,22 +38,24 @@ export const Video = ({
   autoPlay = true,
   preserveTime = true,
   elementRef,
+
   onCanPlay,
   onError,
   ...etc
 }: VideoProps) => {
   const store = useStore();
-  const playbackOwner = useContext(VideoPlaybackContext);
-  const shouldPreserveTime = preserveTime && playbackOwner !== 'dialog';
-  const shouldAutoPlay = autoPlay && playbackOwner !== 'dialog';
   const dispatch = useDispatch();
+
+  const playbackOwner = useContext(VideoPlaybackContext);
+
+  const { videos: videosVolume, global: globalVolume } = useSelector(volumeSelectors.all);
 
   const ownRef = useRef<HTMLVideoElement>(null);
   const refCurrentTime = useRef(0);
-
   const ref = elementRef ?? ownRef;
 
-  const { videos: videosVolume, global: globalVolume } = useSelector(volumeSelectors.all);
+  const shouldPreserveTime = preserveTime && playbackOwner !== 'dialog';
+  const shouldAutoPlay = autoPlay && playbackOwner !== 'dialog';
 
   useEffect(() => {
     const element = ref.current;
@@ -97,13 +99,16 @@ export const Video = ({
     const restoreTime = () => {
       element.currentTime = savedTime;
     };
+
     if (element.readyState >= 1) {
       restoreTime();
     } else {
       element.addEventListener('loadedmetadata', restoreTime, { once: true });
     }
 
-    return () => element.removeEventListener('loadedmetadata', restoreTime);
+    return () => {
+      element.removeEventListener('loadedmetadata', restoreTime);
+    };
   }, [id, src, shouldPreserveTime, ref, store]);
 
   useEffect(() => {

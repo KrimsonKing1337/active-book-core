@@ -1,1 +1,0 @@
-export { SwipeNotice } from './SwipeNotice';

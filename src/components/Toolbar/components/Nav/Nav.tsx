@@ -21,7 +21,7 @@ import { Item } from '@components/Toolbar/components';
 
 import { Flags, modalsWereShowed } from '@utils/localStorage/modalsWereShowed';
 
-import { SwipeNotice } from './components';
+import { SwipeNotice } from './SwipeNotice';
 
 import * as styles from './Nav.module.scss';
 

@@ -21,15 +21,20 @@ export const StoryConfirmDialog = ({
   confirmLabel = 'OK',
   cancelLabel = 'Отмена',
   children,
+
   onConfirm,
   onCancel,
   ...presentation
 }: StoryConfirmDialogProps) => {
   const dispatch = useDispatch();
+
   const { dialogProps, isCurrentWindow } = useStoryWindowDialog(target);
+
   const instanceId = target?.instanceId;
   const sessionId = target?.sessionId;
+
   const secondsLeft = useConfirmationCountdown({ instanceId, delayMs: confirmationDelayMs });
+
   const canConfirm = dialogProps.isOpen && secondsLeft === 0;
   const canDismiss = canConfirm && allowDismiss;
 

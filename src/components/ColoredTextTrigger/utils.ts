@@ -1,10 +1,13 @@
 import type { KeyboardEvent } from 'react';
 
-export const activateOnKey = (event: KeyboardEvent<HTMLElement>, activate: () => void) => {
-  if (event.repeat || (event.key !== 'Enter' && event.key !== ' ')) {
+export const activateOnKey = (e: KeyboardEvent<HTMLElement>, activate: () => void) => {
+  const wrongKey = e.key !== 'Enter' && e.key !== ' ';
+
+  if (e.repeat || wrongKey) {
     return;
   }
 
-  event.preventDefault();
+  e.preventDefault();
+
   activate();
 };

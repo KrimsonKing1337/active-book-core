@@ -1,6 +1,8 @@
-import type { KeyboardEvent, PropsWithChildren } from 'react';
-
-import { useId } from 'react';
+import {
+  type KeyboardEvent,
+  type PropsWithChildren,
+  useId,
+} from 'react';
 
 import type { BookDialogMode } from '@active-book/types';
 
@@ -33,10 +35,13 @@ export const WithModal = ({
   eggId,
 }: PropsWithChildren<ModalWithVideoEasterEggProps>) => {
   const contentId = useId();
+
   const { open, target } = useReaderWindow({ kind: 'dialog', contentId });
   const { dialogProps, isCurrentWindow } = useStoryWindowDialog(target);
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLElement>) => activateOnKey(event, open);
+  const handleKeyDown = (e: KeyboardEvent<HTMLElement>) => {
+    activateOnKey(e, open);
+  };
 
   const triggerProps = {
     role: 'button',
@@ -47,7 +52,11 @@ export const WithModal = ({
 
   const getTrigger = () => {
     if (triggerType === 'author') {
-      return <AuthorComment {...triggerProps}>{text}</AuthorComment>;
+      return (
+        <AuthorComment {...triggerProps}>
+          {text}
+        </AuthorComment>
+      );
     }
 
     if (triggerType === 'egg') {
@@ -57,20 +66,29 @@ export const WithModal = ({
         return null;
       }
 
-      return <EasterEgg {...triggerProps} id={eggId}>{text}</EasterEgg>;
+      return (
+        <EasterEgg {...triggerProps} id={eggId}>
+          {text}
+        </EasterEgg>
+      );
     }
 
-    return <Action {...triggerProps}>{text}</Action>;
+    return (
+      <Action {...triggerProps}>
+        {text}
+      </Action>
+    );
   };
 
   const trigger = getTrigger();
+  const isMedia = mode === 'media';
 
   return (
     <span className={styles.Wrapper}>
       {trigger}
 
       <StoryDialog {...dialogProps} title={text} mode={mode}>
-        <DialogMedia key={target?.instanceId} isMedia={mode === 'media'} isCurrentWindow={isCurrentWindow}>
+        <DialogMedia key={target?.instanceId} isMedia={isMedia} isCurrentWindow={isCurrentWindow}>
           {children}
         </DialogMedia>
       </StoryDialog>

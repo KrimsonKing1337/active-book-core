@@ -8,6 +8,10 @@ import { useDialogFocus, useDialogPreferences } from './hooks';
 
 import styles from './StoryDialog.module.scss';
 
+type DescriptionProps = {
+  'aria-describedby'?: string;
+};
+
 export const StoryDialog = ({
   children,
   isOpen,
@@ -72,7 +76,7 @@ export const StoryDialog = ({
     }
   };
 
-  const descriptionProps: { 'aria-describedby'?: string } = {};
+  const descriptionProps: DescriptionProps = {};
 
   if (!description) {
     descriptionProps['aria-describedby'] = undefined;

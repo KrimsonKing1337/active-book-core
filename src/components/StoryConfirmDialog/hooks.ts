@@ -13,6 +13,7 @@ type Countdown = {
 
 export const useConfirmationCountdown = ({ instanceId, delayMs }: CountdownOptions) => {
   const [countdown, setCountdown] = useState<Countdown | null>(null);
+
   const hasDelay = Number.isFinite(delayMs) && delayMs > 0;
 
   useEffect(() => {
@@ -21,6 +22,7 @@ export const useConfirmationCountdown = ({ instanceId, delayMs }: CountdownOptio
     }
 
     const deadline = Date.now() + delayMs;
+
     let timeout: ReturnType<typeof setTimeout> | undefined;
     let isActive = true;
 
@@ -29,15 +31,19 @@ export const useConfirmationCountdown = ({ instanceId, delayMs }: CountdownOptio
         return;
       }
 
-      const remaining = Math.max(0, deadline - Date.now());
+      const timeDiff = deadline - Date.now();
+      const remaining = Math.max(0, timeDiff);
+      const secondsLeft = Math.ceil(remaining / 1000);
+      const timeoutDelay = Math.min(remaining, 1000);
+
       setCountdown({
         instanceId,
         delayMs,
-        secondsLeft: Math.ceil(remaining / 1000),
+        secondsLeft,
       });
 
       if (remaining > 0) {
-        timeout = setTimeout(update, Math.min(remaining, 1000));
+        timeout = setTimeout(update, timeoutDelay);
       }
     };
 
@@ -45,6 +51,7 @@ export const useConfirmationCountdown = ({ instanceId, delayMs }: CountdownOptio
 
     return () => {
       isActive = false;
+
       clearTimeout(timeout);
     };
   }, [instanceId, delayMs, hasDelay]);

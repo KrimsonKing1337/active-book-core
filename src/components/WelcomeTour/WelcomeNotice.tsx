@@ -1,22 +1,22 @@
 import type { WindowTarget } from '@store/windows';
 
-import { StoryConfirmDialog } from '@components/StoryConfirmDialog';
+import { StoryConfirmDialog } from '@components';
 
-export type SwipeNoticeProps = {
+export type WelcomeNoticeProps = {
   target?: WindowTarget;
   onConfirm: () => void;
   onCancel: () => void;
 };
 
-export const SwipeNotice = ({
+export const WelcomeNotice = ({
   target,
   onConfirm,
   onCancel,
-}: SwipeNoticeProps) => (
+}: WelcomeNoticeProps) => (
   <StoryConfirmDialog
     target={target}
-    title="Вы можете использовать свайпы"
-    description="А так же стрелки клавиатуры и клавиши A, D"
+    title="Перед тем как начнём..."
+    description="Познакомьтесь с возможностями книги"
     confirmationDelayMs={2000}
     showCancelButton={false}
     confirmLabel="Хорошо"

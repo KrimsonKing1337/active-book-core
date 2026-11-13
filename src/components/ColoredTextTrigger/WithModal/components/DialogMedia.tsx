@@ -1,6 +1,8 @@
-import type { PropsWithChildren } from 'react';
-
-import { useLayoutEffect, useRef } from 'react';
+import {
+  type PropsWithChildren,
+  useLayoutEffect,
+  useRef,
+} from 'react';
 
 import classNames from 'classnames';
 
@@ -46,7 +48,11 @@ export const DialogMedia = ({
     videos.forEach((video) => {
       video.autoplay = false;
       video.currentTime = 0;
-      void video.play().catch((error: unknown) => handlePlayError(video, error));
+
+      void video.play()
+        .catch((error: unknown) => {
+          handlePlayError(video, error);
+        });
     });
 
     return () => {
@@ -57,7 +63,9 @@ export const DialogMedia = ({
     };
   }, [isCurrentWindow]);
 
-  const bodyClassName = classNames({ [styles.Media]: isMedia });
+  const bodyClassName = classNames({
+    [styles.Media]: isMedia,
+  });
 
   return (
     <VideoPlaybackContext value="dialog">
