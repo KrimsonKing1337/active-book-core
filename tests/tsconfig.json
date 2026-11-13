@@ -5,6 +5,7 @@
   },
   "include": [
     "../d.ts",
+    "carousel/**/*.tsx",
     "unifiedVisualEffects/**/*.ts",
     "unifiedVisualEffects/**/*.tsx",
     "storyRoot/**/*.ts",

@@ -1,26 +1,35 @@
 import type { KeyboardEvent, ReactNode } from 'react';
 
+import { isValidElement } from 'react';
+
+import { CarouselSlideActiveContext } from './context';
 import { useCarousel } from './useCarousel';
 
 import styles from './Carousel.module.scss';
 
 export type CarouselProps = {
   slides: readonly ReactNode[];
+  /** Reports the initial zero-based Embla selection and subsequent index changes. */
+  onSelect?: (index: number) => void;
 };
 
-export const Carousel = ({ slides }: CarouselProps) => {
+export const Carousel = ({ slides, onSelect }: CarouselProps) => {
   const {
     viewportRef,
     navigation,
     previous,
     next,
-  } = useCarousel();
+  } = useCarousel(onSelect);
 
   const {
     selected,
     canPrevious,
     canNext,
   } = navigation;
+
+  if (!slides.length) {
+    return null;
+  }
 
   const status = `${selected + 1} из ${slides.length}`;
 
@@ -54,10 +63,15 @@ export const Carousel = ({ slides }: CarouselProps) => {
           {slides.map((slideCur, index) => {
             const isInactive = index !== selected;
             const label = `${index + 1} из ${slides.length}`;
+            let key = `position-${index}`;
+
+            if (isValidElement(slideCur) && slideCur.key !== null) {
+              key = `key-${slideCur.key}`;
+            }
 
             return (
               <div
-                key={index}
+                key={key}
                 className={styles.Slide}
                 role="group"
                 aria-roledescription="слайд"
@@ -66,7 +80,9 @@ export const Carousel = ({ slides }: CarouselProps) => {
                 inert={isInactive}
                 data-carousel-slide
               >
-                {slideCur}
+                <CarouselSlideActiveContext value={!isInactive}>
+                  {slideCur}
+                </CarouselSlideActiveContext>
               </div>
             );
           })}
