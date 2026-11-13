@@ -13,5 +13,5 @@ export type StoryDialogProps = PropsWithChildren & BookDialogOptions & {
   fallbackFocusRef?: RefObject<HTMLElement | null>;
 
   onOpenChange: (isOpen: boolean) => void;
-  onCloseAutoFocus?: (event: Event) => void;
+  onCloseAutoFocus?: (e: Event) => void;
 };

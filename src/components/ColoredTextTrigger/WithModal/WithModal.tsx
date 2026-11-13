@@ -1,25 +1,27 @@
-import type { PropsWithChildren } from 'react';
-
 import {
-  useEffect,
-  useRef,
+  type KeyboardEvent,
+  type PropsWithChildren,
   useId,
 } from 'react';
 
-import type { ModalProps } from '@components/Modal';
-import { Modal as ModalComponent } from '@components/Modal';
-import { useReaderWindow } from '@components/StoryWindowHost/hooks';
+import type { BookDialogMode } from '@active-book/types';
 
+import { StoryDialog } from '@components/StoryDialog';
+import { useReaderWindow, useStoryWindowDialog } from '@components/StoryWindowHost/hooks';
 import { Action } from '@components/ColoredTextTrigger/Action';
 import { AuthorComment } from '@components/ColoredTextTrigger/AuthorComment';
 import { EasterEgg } from '@components/ColoredTextTrigger/EasterEgg';
 
-import * as styles from './WithModal.module.scss';
+import { activateOnKey } from '../utils';
+
+import { DialogMedia } from './components/DialogMedia';
+
+import styles from './WithModal.module.scss';
 
 export type TriggerType = 'action' | 'author' | 'egg';
 
 export type ModalWithVideoEasterEggProps = {
-  mode?: ModalProps['mode'];
+  mode?: BookDialogMode;
   text: string;
   triggerType: TriggerType;
   eggId?: string;
@@ -34,19 +36,24 @@ export const WithModal = ({
 }: PropsWithChildren<ModalWithVideoEasterEggProps>) => {
   const contentId = useId();
 
-  const {
-    isOpen: isActive,
-    open,
-    close,
-    target,
-  } = useReaderWindow({ kind: 'legacy', contentId });
+  const { open, target } = useReaderWindow({ kind: 'dialog', contentId });
+  const { dialogProps, isCurrentWindow } = useStoryWindowDialog(target);
 
-  const wrapperRef = useRef<HTMLDivElement>(null);
+  const handleKeyDown = (e: KeyboardEvent<HTMLElement>) => {
+    activateOnKey(e, open);
+  };
+
+  const triggerProps = {
+    role: 'button',
+    tabIndex: 0,
+    onClick: open,
+    onKeyDown: handleKeyDown,
+  };
 
   const getTrigger = () => {
     if (triggerType === 'author') {
       return (
-        <AuthorComment onClick={open}>
+        <AuthorComment {...triggerProps}>
           {text}
         </AuthorComment>
       );
@@ -60,55 +67,31 @@ export const WithModal = ({
       }
 
       return (
-        <EasterEgg onClick={open} id={eggId}>
+        <EasterEgg {...triggerProps} id={eggId}>
           {text}
         </EasterEgg>
       );
     }
 
     return (
-      <Action onClick={open}>
+      <Action {...triggerProps}>
         {text}
       </Action>
     );
   };
 
-  useEffect(() => {
-    if (!wrapperRef.current) {
-      return;
-    }
-
-    const video = wrapperRef.current.querySelector('video');
-
-    if (!video) {
-      return;
-    }
-
-    if (isActive) {
-      video.play();
-    } else {
-      video.pause();
-      video.currentTime = 0;
-    }
-  }, [isActive]);
-
   const trigger = getTrigger();
+  const isMedia = mode === 'media';
 
   return (
-    <span className={styles.Wrapper} ref={wrapperRef}>
-      <ModalComponent
-        isOpen={isActive}
-        windowTarget={target}
-        mode={mode}
-        canCrop
-        cropDefault={false}
-        canFullScreen
-        onClose={close}
-      >
-        {children}
-      </ModalComponent>
-
+    <span className={styles.Wrapper}>
       {trigger}
+
+      <StoryDialog {...dialogProps} title={text} mode={mode}>
+        <DialogMedia key={target?.instanceId} isMedia={isMedia} isCurrentWindow={isCurrentWindow}>
+          {children}
+        </DialogMedia>
+      </StoryDialog>
     </span>
   );
 };

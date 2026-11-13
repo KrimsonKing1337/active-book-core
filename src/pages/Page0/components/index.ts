@@ -1,1 +1,1 @@
-export * from './Modal';
+export { CameraNotice } from './CameraNotice';

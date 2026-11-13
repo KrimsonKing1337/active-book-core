@@ -21,7 +21,7 @@ import { Item } from '@components/Toolbar/components';
 
 import { Flags, modalsWereShowed } from '@utils/localStorage/modalsWereShowed';
 
-import { Modal } from './components';
+import { SwipeNotice } from './SwipeNotice';
 
 import * as styles from './Nav.module.scss';
 
@@ -44,7 +44,7 @@ export const Nav = () => {
   const [inputValue, setInputValue] = useState('');
 
   const modalWindow = useReaderWindow({
-    kind: 'legacy',
+    kind: 'dialog',
     contentId: 'swipe-notice',
     canClose: false,
   });
@@ -134,11 +134,10 @@ export const Nav = () => {
    * */
   return (
     <>
-      <Modal
-        isActive={modalWindow.isOpen}
-        windowTarget={modalWindow.target}
+      <SwipeNotice
+        target={modalWindow.target}
         onConfirm={modalConfirmHandler}
-        onCancel={() => modalWindow.close()}
+        onCancel={modalWindow.close}
       />
 
       <div className={goToWithArrowsClassNames}>

@@ -5,25 +5,24 @@ import { useReaderWindow } from '@components/StoryWindowHost/hooks';
 
 import { Flags as ModalsFlags, modalsWereShowed } from '@utils/localStorage/modalsWereShowed';
 
-export const useModal = () => {
+export const useCameraNotice = () => {
   const id = useSelector(mainSelectors.id);
 
   const window = useReaderWindow({
-    kind: 'legacy',
+    kind: 'dialog',
     contentId: 'camera-notice',
     canClose: false,
   });
 
-  const modalOnClose = () => {
+  const confirm = () => {
     window.forceClose();
 
     modalsWereShowed.set(id, ModalsFlags.usingCamera, true);
   };
 
   return {
-    modalIsActive: window.isOpen,
-    windowTarget: window.target,
-    setModalIsActive: window.setIsOpen,
-    modalOnClose,
+    target: window.target,
+    open: window.open,
+    confirm,
   };
 };

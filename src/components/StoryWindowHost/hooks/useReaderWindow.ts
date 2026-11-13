@@ -4,12 +4,9 @@ import { useDispatch, useSelector } from '@store';
 
 import { mainSelectors } from '@store/main';
 
-import {
-  type WindowKind,
-  type WindowTarget,
-  windowsActions,
-  windowsSelectors,
-} from '@store/windows';
+import type { WindowKind, WindowTarget } from '@store/windows';
+
+import { windowsActions, windowsSelectors } from '@store/windows';
 
 import { StoryWindowSessionContext } from '../context';
 
@@ -72,20 +69,11 @@ export const useReaderWindow = ({
     }
   };
 
-  const setIsOpen = (isOpen: boolean) => {
-    if (isOpen) {
-      open();
-    } else {
-      close();
-    }
-  };
-
   return {
     isOpen: !!target,
     target,
     open,
     close,
     forceClose,
-    setIsOpen,
   };
 };

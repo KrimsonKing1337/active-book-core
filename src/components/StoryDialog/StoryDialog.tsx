@@ -8,6 +8,10 @@ import { useDialogFocus, useDialogPreferences } from './hooks';
 
 import styles from './StoryDialog.module.scss';
 
+type DescriptionProps = {
+  'aria-describedby'?: string;
+};
+
 export const StoryDialog = ({
   children,
   isOpen,
@@ -72,6 +76,12 @@ export const StoryDialog = ({
     }
   };
 
+  const descriptionProps: DescriptionProps = {};
+
+  if (!description) {
+    descriptionProps['aria-describedby'] = undefined;
+  }
+
   const handleDismiss = (e: Event) => {
     if (!canClose) {
       e.preventDefault();
@@ -89,6 +99,7 @@ export const StoryDialog = ({
           <Dialog.Overlay className={styles.Overlay} />
 
           <Dialog.Content
+            {...descriptionProps}
             className={contentClasses}
             style={contentStyle}
             aria-modal="true"

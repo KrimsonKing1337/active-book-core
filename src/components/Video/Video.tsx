@@ -1,9 +1,21 @@
-import { type RefObject, useEffect, useRef } from 'react';
+import type { RefObject } from 'react';
 
-import { useDispatch, useSelector, useStore } from '@store';
+import {
+  useContext,
+  useEffect,
+  useRef,
+} from 'react';
+
+import {
+  useDispatch,
+  useSelector,
+  useStore,
+} from '@store';
 
 import { volumeSelectors } from '@store/volume';
 import { effectsActions } from '@store/effects/common';
+
+import { VideoPlaybackContext } from './context';
 
 type VideoProps = React.MediaHTMLAttributes<HTMLVideoElement> & {
   id: string;
@@ -26,6 +38,7 @@ export const Video = ({
   autoPlay = true,
   preserveTime = true,
   elementRef,
+
   onCanPlay,
   onError,
   ...etc
@@ -33,18 +46,22 @@ export const Video = ({
   const store = useStore();
   const dispatch = useDispatch();
 
-  const ownRef = useRef<HTMLVideoElement>(null);
-  const refCurrentTime = useRef(0);
-
-  const ref = elementRef ?? ownRef;
+  const playbackOwner = useContext(VideoPlaybackContext);
 
   const { videos: videosVolume, global: globalVolume } = useSelector(volumeSelectors.all);
+
+  const ownRef = useRef<HTMLVideoElement>(null);
+  const refCurrentTime = useRef(0);
+  const ref = elementRef ?? ownRef;
+
+  const shouldPreserveTime = preserveTime && playbackOwner !== 'dialog';
+  const shouldAutoPlay = autoPlay && playbackOwner !== 'dialog';
 
   useEffect(() => {
     const element = ref.current;
 
     return () => {
-      if (preserveTime || !element) {
+      if (shouldPreserveTime || !element) {
         return;
       }
       // StrictMode replays effects while the same DOM node is still connected.
@@ -56,7 +73,7 @@ export const Video = ({
         }
       });
     };
-  }, [preserveTime, ref]);
+  }, [shouldPreserveTime, ref]);
 
   useEffect(() => {
     const element = ref.current;
@@ -75,21 +92,24 @@ export const Video = ({
 
     const savedTime = store.getState().effects.videosCurrentTime[id];
 
-    if (!element || !preserveTime || !savedTime) {
+    if (!element || !shouldPreserveTime || !savedTime) {
       return;
     }
 
     const restoreTime = () => {
       element.currentTime = savedTime;
     };
+
     if (element.readyState >= 1) {
       restoreTime();
     } else {
       element.addEventListener('loadedmetadata', restoreTime, { once: true });
     }
 
-    return () => element.removeEventListener('loadedmetadata', restoreTime);
-  }, [id, src, preserveTime, ref, store]);
+    return () => {
+      element.removeEventListener('loadedmetadata', restoreTime);
+    };
+  }, [id, src, shouldPreserveTime, ref, store]);
 
   useEffect(() => {
     const element = ref.current;
@@ -109,20 +129,20 @@ export const Video = ({
     return () => {
       element.removeEventListener('timeupdate', handleTimeUpdate);
 
-      if (preserveTime && refCurrentTime.current) {
+      if (shouldPreserveTime && refCurrentTime.current) {
         dispatch(effectsActions.setVideoCurrentTime({
           id,
           currentTime: refCurrentTime.current,
         }));
       }
     };
-  }, [id, src, preserveTime, ref, dispatch]);
+  }, [id, src, shouldPreserveTime, ref, dispatch]);
 
   return (
     <video
       ref={ref}
       data-id={id}
-      data-autoplay={autoPlay}
+      data-autoplay={shouldAutoPlay}
       className={className}
       src={src}
       preload="auto"

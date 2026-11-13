@@ -1,5 +1,8 @@
 # Reader windows: one Redux state and Browser History adapter
 
+This is the PR #45 stage report. The current shells and removed legacy components
+are documented in [Reader dialog migration](./reader-dialog-migration.md).
+
 This stage builds on merged PR #44 (`52878d6`). The page-resolution race is fixed
 first in `ebe5f88`, with a regression that explicitly renders main/page B while
 windows still belongs to page A, without running BookSession's synchronization
