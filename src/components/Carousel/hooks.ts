@@ -1,4 +1,9 @@
-import { useEffect, useState } from 'react';
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import useEmblaCarousel from 'embla-carousel-react';
 
@@ -8,10 +13,18 @@ const dragSelectors = [
   'input',
   'select',
   'textarea',
+  'video[controls]',
   '[contenteditable="true"]',
 ];
 
-export const useCarousel = () => {
+export const useCarousel = (onSelect?: (index: number) => void) => {
+  const onSelectRef = useRef(onSelect);
+  const notifiedIndexRef = useRef<number | undefined>(undefined);
+
+  useLayoutEffect(() => {
+    onSelectRef.current = onSelect;
+  }, [onSelect]);
+
   const [viewportRef, api] = useEmblaCarousel({
     align: 'start',
     loop: false,
@@ -36,15 +49,30 @@ export const useCarousel = () => {
 
   useEffect(() => {
     if (!api) {
+      notifiedIndexRef.current = undefined;
+
       return;
     }
 
     const synchronize = () => {
+      const selected = api.selectedScrollSnap();
+
       setNavigation({
-        selected: api.selectedScrollSnap(),
+        selected,
         canPrevious: api.canScrollPrev(),
         canNext: api.canScrollNext(),
       });
+
+      if (!api.slideNodes().length) {
+        notifiedIndexRef.current = undefined;
+
+        return;
+      }
+
+      if (notifiedIndexRef.current !== selected) {
+        notifiedIndexRef.current = selected;
+        onSelectRef.current?.(selected);
+      }
     };
 
     synchronize();
