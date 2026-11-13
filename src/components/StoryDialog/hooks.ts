@@ -116,9 +116,9 @@ export const useDialogFocus = ({
         && document.activeElement !== target;
 
       const fallback = fallbackFocusRef?.current;
-      const fallbackFocusIsRight= fallback?.isConnected && !fallback.closest('[inert]');
+      const isFallbackFocusAvailable = fallback?.isConnected && !fallback.closest('[inert]');
 
-      if (focusDidNotMove && fallbackFocusIsRight) {
+      if (focusDidNotMove && isFallbackFocusAvailable) {
         fallback.focus({ preventScroll: true });
       }
     }
