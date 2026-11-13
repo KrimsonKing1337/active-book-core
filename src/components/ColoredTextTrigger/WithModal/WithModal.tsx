@@ -8,13 +8,14 @@ import type { BookDialogMode } from '@active-book/types';
 
 import { StoryDialog } from '@components/StoryDialog';
 import { useReaderWindow, useStoryWindowDialog } from '@components/StoryWindowHost/hooks';
+
 import { Action } from '@components/ColoredTextTrigger/Action';
 import { AuthorComment } from '@components/ColoredTextTrigger/AuthorComment';
 import { EasterEgg } from '@components/ColoredTextTrigger/EasterEgg';
 
 import { activateOnKey } from '../utils';
 
-import { DialogMedia } from './components/DialogMedia';
+import { DialogMedia } from './DialogMedia';
 
 import styles from './WithModal.module.scss';
 

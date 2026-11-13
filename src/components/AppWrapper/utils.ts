@@ -2,6 +2,14 @@ import type { HowlInstances } from '@types';
 
 import { store } from '@store';
 
+import {
+  getVideoStats,
+  handleVideoPlayError,
+  reportUnexpectedVideoError,
+} from '@components/Video/utils';
+
+const locallyManagedVideoSelector = '[data-book-carousel], [data-video-scope="dialog"]';
+
 export const setMuteToAllVideos = (muted: boolean) => {
   const videos = document.querySelectorAll('video');
 
@@ -21,15 +29,19 @@ export const startToPlayAllAudiosWithPlayOnLoad = (audioInstances: HowlInstances
     if (!audio) {
       return;
     }
+
     if (audio.page !== page && !audio.isRange) {
       return;
     }
+
     if (audio.isUnloading) {
       return;
     }
+
     if (audio.playing()) {
       return;
     }
+
     if (!audio.playOnLoad) {
       return;
     }
@@ -42,10 +54,34 @@ export const startToPlayAllVideosWithPlayOnLoad = () => {
   const videos = Array.from(document.querySelectorAll('video'));
 
   videos.forEach((videoCur) => {
+    const videoIsManaged = videoCur.dataset.videoManaged === 'true';
+
+    const hasLocalOwner = videoIsManaged || videoCur.closest(locallyManagedVideoSelector);
+
+    if (hasLocalOwner) {
+      return;
+    }
+
     const autoPlay = videoCur.getAttribute('data-autoPlay');
 
     if (autoPlay === 'true') {
-      videoCur.play();
+      const source = videoCur.getAttribute('src');
+
+      videoCur.play().then(() => {
+        const { isConnected, sourceIsEqual } = getVideoStats(videoCur, source);
+
+        if (!isConnected && sourceIsEqual) {
+          videoCur.pause();
+        }
+      }).catch((error: unknown) => {
+        const { isConnected, sourceIsEqual } = getVideoStats(videoCur, source);
+
+        if (isConnected && sourceIsEqual) {
+          handleVideoPlayError(videoCur, error);
+        } else {
+          reportUnexpectedVideoError(source, error);
+        }
+      });
     }
   });
 };

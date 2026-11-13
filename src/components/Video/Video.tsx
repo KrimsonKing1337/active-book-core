@@ -2,20 +2,15 @@ import type { RefObject } from 'react';
 
 import {
   useContext,
-  useEffect,
+  useLayoutEffect,
   useRef,
 } from 'react';
 
-import {
-  useDispatch,
-  useSelector,
-  useStore,
-} from '@store';
-
+import { useSelector } from '@store';
 import { volumeSelectors } from '@store/volume';
-import { effectsActions } from '@store/effects/common';
 
 import { VideoPlaybackContext } from './context';
+import { useVideoPlayback, useVideoTime } from './hooks';
 
 type VideoProps = React.MediaHTMLAttributes<HTMLVideoElement> & {
   id: string;
@@ -43,39 +38,14 @@ export const Video = ({
   onError,
   ...etc
 }: VideoProps) => {
-  const store = useStore();
-  const dispatch = useDispatch();
-
   const playbackOwner = useContext(VideoPlaybackContext);
 
   const { videos: videosVolume, global: globalVolume } = useSelector(volumeSelectors.all);
 
   const ownRef = useRef<HTMLVideoElement>(null);
-  const refCurrentTime = useRef(0);
   const ref = elementRef ?? ownRef;
 
-  const shouldPreserveTime = preserveTime && playbackOwner !== 'dialog';
-  const shouldAutoPlay = autoPlay && playbackOwner !== 'dialog';
-
-  useEffect(() => {
-    const element = ref.current;
-
-    return () => {
-      if (shouldPreserveTime || !element) {
-        return;
-      }
-      // StrictMode replays effects while the same DOM node is still connected.
-      queueMicrotask(() => {
-        if (!element.isConnected) {
-          element.pause();
-          element.removeAttribute('src');
-          element.load();
-        }
-      });
-    };
-  }, [shouldPreserveTime, ref]);
-
-  useEffect(() => {
+  useLayoutEffect(() => {
     const element = ref.current;
 
     if (!element) {
@@ -85,64 +55,36 @@ export const Video = ({
     element.volume = (videosVolume / 100) * (relativeVolume / 100) * (globalVolume / 100);
 
     element.setAttribute('data-relativeVolume', relativeVolume.toString());
-  }, [videosVolume, globalVolume, relativeVolume, ref]);
+  }, [
+    videosVolume,
+    globalVolume,
+    relativeVolume,
+    ref,
+  ]);
 
-  useEffect(() => {
-    const element = ref.current;
+  const shouldPreserveTime = preserveTime && playbackOwner === null;
 
-    const savedTime = store.getState().effects.videosCurrentTime[id];
+  useVideoTime(ref, {
+    id,
+    src,
+    preserveTime: shouldPreserveTime,
+  });
 
-    if (!element || !shouldPreserveTime || !savedTime) {
-      return;
-    }
+  const isManaged = useVideoPlayback(ref, {
+    id,
+    src,
+    autoPlay,
+    preserveTime,
+  });
 
-    const restoreTime = () => {
-      element.currentTime = savedTime;
-    };
-
-    if (element.readyState >= 1) {
-      restoreTime();
-    } else {
-      element.addEventListener('loadedmetadata', restoreTime, { once: true });
-    }
-
-    return () => {
-      element.removeEventListener('loadedmetadata', restoreTime);
-    };
-  }, [id, src, shouldPreserveTime, ref, store]);
-
-  useEffect(() => {
-    const element = ref.current;
-
-    if (!element) {
-      return;
-    }
-
-    refCurrentTime.current = element.currentTime;
-
-    const handleTimeUpdate = () => {
-      refCurrentTime.current = element.currentTime;
-    };
-
-    element.addEventListener('timeupdate', handleTimeUpdate);
-
-    return () => {
-      element.removeEventListener('timeupdate', handleTimeUpdate);
-
-      if (shouldPreserveTime && refCurrentTime.current) {
-        dispatch(effectsActions.setVideoCurrentTime({
-          id,
-          currentTime: refCurrentTime.current,
-        }));
-      }
-    };
-  }, [id, src, shouldPreserveTime, ref, dispatch]);
+  const shouldAutoPlay = autoPlay && !isManaged;
 
   return (
     <video
       ref={ref}
       data-id={id}
       data-autoplay={shouldAutoPlay}
+      data-video-managed={isManaged}
       className={className}
       src={src}
       preload="auto"

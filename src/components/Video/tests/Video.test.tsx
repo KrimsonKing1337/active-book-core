@@ -6,10 +6,11 @@ import { StoreProvider, store } from '@store';
 import { volumeActions } from '@store/volume';
 import { effectsActions } from '@store/effects/common';
 
-import { Video } from './Video';
-import { VideoPlaybackContext } from './context';
+import { Video } from '../Video';
+import { VideoPlaybackContext } from '../context';
 
-test('volume edits keep the element and playback position; StrictMode subscriptions are cleaned', () => {
+test('volume edits keep the element and playback position; StrictMode subscriptions are cleaned', async () => {
+  const pause = jest.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(() => {});
   const active = new Set<EventListenerOrEventListenerObject>();
   const add = HTMLMediaElement.prototype.addEventListener;
   const remove = HTMLMediaElement.prototype.removeEventListener;
@@ -60,21 +61,23 @@ test('volume edits keep the element and playback position; StrictMode subscripti
   expect(element.volume).toBeCloseTo(0.1);
   expect(active.size).toBe(1);
   act(() => element.dispatchEvent(new Event('timeupdate')));
-  unmount();
+  await act(async () => unmount());
   expect(active.size).toBe(0);
   expect(store.getState().effects.videosCurrentTime['volume-test']).toBe(12);
   addSpy.mockRestore();
   removeSpy.mockRestore();
+  pause.mockRestore();
 });
 
 
 test('dialog playback does not restore/cache page time or participate in page autoplay', async () => {
+  const play = jest.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue();
   const pause = jest.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(() => {});
   const load = jest.spyOn(HTMLMediaElement.prototype, 'load').mockImplementation(() => {});
   store.dispatch(effectsActions.setVideoCurrentTime({ id: 'dialog-test', currentTime: 18 }));
   const view = render(
     <StoreProvider>
-      <VideoPlaybackContext value="dialog">
+      <VideoPlaybackContext value={{ isCurrentWindow: () => true }}>
         <Video id="dialog-test" src="movie.webm" />
       </VideoPlaybackContext>
     </StoreProvider>,
@@ -95,4 +98,5 @@ test('dialog playback does not restore/cache page time or participate in page au
   expect(load).toHaveBeenCalledTimes(1);
   pause.mockRestore();
   load.mockRestore();
+  play.mockRestore();
 });
