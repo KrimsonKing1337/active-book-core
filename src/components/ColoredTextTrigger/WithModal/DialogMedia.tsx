@@ -8,10 +8,13 @@ import {
 import classNames from 'classnames';
 
 import { VideoPlaybackContext } from '@components/Video/context';
-import { handleVideoPlayError, reportUnexpectedVideoError } from '@components/Video/utils/errors';
+import {
+  getVideoStats,
+  handleVideoPlayError,
+  reportUnexpectedVideoError,
+} from '@components/Video/utils';
 
 import styles from './WithModal.module.scss';
-import { getVideoStats } from '@utils/getVideoStats';
 
 type DialogMediaProps = PropsWithChildren & {
   isMedia: boolean;

@@ -6,7 +6,8 @@ import {
   render,
 } from '@testing-library/react';
 
-import { StoreProvider } from '@store';
+import { StoreProvider, store } from '@store';
+import { effectsActions } from '@store/effects/common';
 
 import { CarouselSlideActiveContext } from '@components/Carousel/context';
 import { startToPlayAllVideosWithPlayOnLoad } from '@components/AppWrapper/utils';
@@ -79,4 +80,53 @@ test('DialogMedia starts native video once and leaves managed playback to Video'
     expect(video.paused).toBe(true);
     expect(video.currentTime).toBe(0);
   });
+});
+
+test('ordinary page video keeps manual playback during unrelated reader loading', async () => {
+  const { container } = render(
+    <StrictMode>
+      <StoreProvider>
+        <Video id="ordinary-page" src="ordinary.webm" autoPlay={false} />
+      </StoreProvider>
+    </StrictMode>,
+  );
+
+  const video = container.querySelector('video');
+
+  if (!video) {
+    throw new Error('Missing ordinary page video');
+  }
+
+  await act(async () => {
+    await video.play();
+  });
+
+  expect(video.paused).toBe(false);
+
+  const pauseCountBeforeLoading = media.pause.mock.calls.length;
+
+  await act(async () => {
+    store.dispatch(effectsActions.setVideosAmount(1));
+  });
+
+  expect(video.paused).toBe(false);
+  expect(media.pause).toHaveBeenCalledTimes(pauseCountBeforeLoading);
+
+  // Native controls must remain usable while other resources are loading.
+  await act(async () => {
+    video.pause();
+  });
+  await act(async () => {
+    await video.play();
+  });
+
+  expect(video.paused).toBe(false);
+  expect(media.pause).toHaveBeenCalledTimes(pauseCountBeforeLoading + 1);
+
+  await act(async () => {
+    store.dispatch(effectsActions.setVideosReadyAmount(1));
+  });
+
+  expect(video.paused).toBe(false);
+  expect(media.pause).toHaveBeenCalledTimes(pauseCountBeforeLoading + 1);
 });

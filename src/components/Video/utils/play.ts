@@ -72,11 +72,16 @@ export const updateVideoPlayback = (playback: VideoPlayback, policy: VideoPolicy
   const wasActive = playback.active;
 
   // A user pause changes paused synchronously, before its queued event is delivered.
-  if (wasActive && playback.element.paused) {
+  if (playback.managed && wasActive && playback.element.paused) {
     playback.wantsPlay = false;
   }
 
   Object.assign(playback, policy);
+
+  // Ordinary page videos belong to AppWrapper, not the slide activity controller.
+  if (!playback.managed) {
+    return;
+  }
 
   const videoIsActive = isVideoActive(playback);
 
@@ -85,10 +90,6 @@ export const updateVideoPlayback = (playback: VideoPlayback, policy: VideoPolicy
       pauseVideo(playback);
     }
 
-    return;
-  }
-
-  if (!playback.managed) {
     return;
   }
 

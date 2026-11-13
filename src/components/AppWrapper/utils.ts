@@ -2,9 +2,13 @@ import type { HowlInstances } from '@types';
 
 import { store } from '@store';
 
-import { handleVideoPlayError, reportUnexpectedVideoError } from '@components/Video/utils';
+import {
+  getVideoStats,
+  handleVideoPlayError,
+  reportUnexpectedVideoError,
+} from '@components/Video/utils';
 
-import { getVideoStats } from '@utils/getVideoStats';
+const locallyManagedVideoSelector = '[data-book-carousel], [data-video-scope="dialog"]';
 
 export const setMuteToAllVideos = (muted: boolean) => {
   const videos = document.querySelectorAll('video');
@@ -52,10 +56,7 @@ export const startToPlayAllVideosWithPlayOnLoad = () => {
   videos.forEach((videoCur) => {
     const videoIsManaged = videoCur.dataset.videoManaged === 'true';
 
-    const selectors = ['[data-book-carousel]', '[data-video-scope="dialog"]'];
-    const selectorsAsString = selectors.join(', ');
-
-    const hasLocalOwner = videoIsManaged || videoCur.closest(selectorsAsString);
+    const hasLocalOwner = videoIsManaged || videoCur.closest(locallyManagedVideoSelector);
 
     if (hasLocalOwner) {
       return;

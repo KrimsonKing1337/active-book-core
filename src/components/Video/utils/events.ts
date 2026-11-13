@@ -8,7 +8,7 @@ export const listenVideoPlayback = (playback: VideoPlayback) => {
   const { element } = playback;
 
   const handlePlay = () => {
-    if (!playback.connected || playback.disposed) {
+    if (!playback.connected || playback.disposed || !playback.managed) {
       return;
     }
 
@@ -28,7 +28,7 @@ export const listenVideoPlayback = (playback: VideoPlayback) => {
   };
 
   const handlePause = () => {
-    if (!playback.connected || playback.disposed) {
+    if (!playback.connected || playback.disposed || !playback.managed) {
       return;
     }
 
@@ -46,7 +46,7 @@ export const listenVideoPlayback = (playback: VideoPlayback) => {
   };
 
   const handleEnded = () => {
-    if (!playback.connected || playback.disposed) {
+    if (!playback.connected || playback.disposed || !playback.managed) {
       return;
     }
 
