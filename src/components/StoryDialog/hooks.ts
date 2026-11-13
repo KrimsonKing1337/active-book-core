@@ -1,4 +1,5 @@
 import {
+  useCallback,
   useLayoutEffect,
   useRef,
   useState,
@@ -15,6 +16,20 @@ import {
   readDialogPreferences,
   writeDialogPreferences,
 } from './utils';
+
+export const usePresentationFocus = () => {
+  const fullscreenRef = useRef<HTMLButtonElement>(null);
+  const fitRef = useRef<HTMLButtonElement | null>(null);
+  const setFitRef = useCallback((element: HTMLButtonElement | null) => {
+    if (!element && fitRef.current === document.activeElement) {
+      fullscreenRef.current?.focus({ preventScroll: true });
+    }
+
+    fitRef.current = element;
+  }, []);
+
+  return { fullscreenRef, setFitRef };
+};
 
 export const useDialogPreferences = (isOpen: boolean) => {
   const appMode = useAppMode();

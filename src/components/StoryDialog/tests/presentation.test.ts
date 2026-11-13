@@ -7,6 +7,7 @@ test.each(['image', 'video'])('uses media for a single %s', (type) => {
 test('uses default for empty, text, mixed and unknown content without inspecting component children', () => {
   expect(getDialogMode([])).toBe('default');
   expect(getDialogMode([{ type: 'paragraph' }])).toBe('default');
+  expect(getDialogMode([{ type: 'text' }])).toBe('default');
   expect(getDialogMode([{ type: 'image' }, { type: 'paragraph' }])).toBe('default');
   expect(getDialogMode([{ type: 'image' }, { type: 'video' }])).toBe('default');
   expect(getDialogMode([{ type: 'coreComponent', content: [{ type: 'image' }] }])).toBe('default');
@@ -44,4 +45,16 @@ test('uses default for missing or invalid selection, empty slides and unsupporte
   const nested = [{ type: 'carousel', content: [{ type: 'carouselSlide', content: emptySlide }] }];
 
   expect(getDialogMode(nested)).toBe('default');
+});
+
+test.each([
+  -1,
+  0.5,
+  1,
+  NaN,
+  Infinity,
+])('does not fall back to the first media slide for invalid selection %s', (index) => {
+  const nodes = [{ type: 'carousel', content: [{ type: 'carouselSlide', content: [{ type: 'video' }] }] }];
+
+  expect(getDialogMode(nodes, index)).toBe('default');
 });

@@ -7,6 +7,8 @@ import {
 
 import useEmblaCarousel from 'embla-carousel-react';
 
+import { recoverCarouselFocus } from './utils';
+
 const dragSelectors = [
   'a',
   'button',
@@ -35,9 +37,9 @@ export const useCarousel = (onSelect?: (index: number) => void) => {
         return true;
       }
 
-      const selectorsString = dragSelectors.join(', ');
+      const selectorsAsString = dragSelectors.join(', ');
 
-      return !target.closest(selectorsString);
+      return !target.closest(selectorsAsString);
     },
   });
 
@@ -56,6 +58,9 @@ export const useCarousel = (onSelect?: (index: number) => void) => {
 
     const synchronize = () => {
       const selected = api.selectedScrollSnap();
+      const slideNodes = api.slideNodes();
+
+      recoverCarouselFocus(api);
 
       setNavigation({
         selected,
@@ -63,7 +68,7 @@ export const useCarousel = (onSelect?: (index: number) => void) => {
         canNext: api.canScrollNext(),
       });
 
-      if (!api.slideNodes().length) {
+      if (!slideNodes.length) {
         notifiedIndexRef.current = undefined;
 
         return;

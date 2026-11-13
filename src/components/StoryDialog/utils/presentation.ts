@@ -1,12 +1,14 @@
 import type { BookDialogMode } from '@active-book/types';
 
 /** Read-only structural view of model nodes. This does not extend the supported document schema. */
-type ContentNode = {
+export type DialogContentNode = {
   readonly type: string;
-  readonly content?: readonly ContentNode[];
+  readonly content?: readonly DialogContentNode[];
 };
 
-const getSingleMediaMode = (nodes: readonly ContentNode[]): BookDialogMode => {
+type Nodes = readonly DialogContentNode[];
+
+const getSingleMediaMode = (nodes: Nodes): BookDialogMode => {
   if (nodes.length !== 1) {
     return 'default';
   }
@@ -20,7 +22,7 @@ const getSingleMediaMode = (nodes: readonly ContentNode[]): BookDialogMode => {
   return 'default';
 };
 
-export const getDialogMode = (nodes: readonly ContentNode[], selectedIndex = 0): BookDialogMode => {
+export const getDialogMode = (nodes: Nodes, selectedIndex = 0): BookDialogMode => {
   if (nodes.length !== 1 || nodes[0].type !== 'carousel') {
     return getSingleMediaMode(nodes);
   }

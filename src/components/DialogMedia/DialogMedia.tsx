@@ -1,5 +1,6 @@
+import type { PropsWithChildren } from 'react';
+
 import {
-  type PropsWithChildren,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -8,13 +9,14 @@ import {
 import classNames from 'classnames';
 
 import { VideoPlaybackContext } from '@components/Video/context';
+
 import {
   getVideoStats,
   handleVideoPlayError,
   reportUnexpectedVideoError,
 } from '@components/Video/utils';
 
-import styles from './WithModal.module.scss';
+import styles from './DialogMedia.module.scss';
 
 type DialogMediaProps = PropsWithChildren & {
   isMedia: boolean;
@@ -106,7 +108,7 @@ export const DialogMedia = ({
     };
   }, [isCurrentWindow]);
 
-  const bodyClassName = classNames({
+  const bodyClassName = classNames(styles.Content, {
     [styles.Media]: isMedia,
   });
 

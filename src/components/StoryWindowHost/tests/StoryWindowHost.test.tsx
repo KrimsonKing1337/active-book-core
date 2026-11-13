@@ -6,8 +6,8 @@ import { windowsActions } from '@store/windows';
 
 import { StoryRegionsProvider } from '@components/StoryRegionsProvider';
 
-import { StoryWindowHost } from './StoryWindowHost';
-import { StoryWindowSessionContext } from './context';
+import { StoryWindowHost } from '../StoryWindowHost';
+import { StoryWindowSessionContext } from '../context';
 
 test('never resolves page A content against page B before the session effect synchronizes', () => {
   store.dispatch(mainActions.setStoryPages(['page-a', 'page-b']));

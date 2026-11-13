@@ -4,7 +4,12 @@ import classNames from 'classnames';
 import type { StoryDialogProps } from './@types';
 
 import { getDialogDimension } from './utils';
-import { useDialogFocus, useDialogPreferences } from './hooks';
+
+import {
+  useDialogFocus,
+  useDialogPreferences,
+  usePresentationFocus,
+} from './hooks';
 
 import styles from './StoryDialog.module.scss';
 
@@ -28,6 +33,8 @@ export const StoryDialog = ({
   onOpenChange,
   onCloseAutoFocus,
 }: StoryDialogProps) => {
+  const { fullscreenRef, setFitRef } = usePresentationFocus();
+
   const { handleOpenAutoFocus, handleCloseAutoFocus } = useDialogFocus({
     returnFocusRef,
     fallbackFocusRef,
@@ -118,12 +125,22 @@ export const StoryDialog = ({
                 {title}
               </Dialog.Title>
 
-              <button type="button" aria-pressed={isFullscreen} onClick={toggleFullscreen}>
+              <button
+                ref={fullscreenRef}
+                type="button"
+                aria-pressed={isFullscreen}
+                onClick={toggleFullscreen}
+              >
                 {fullscreenLabel}
               </button>
 
               {mode === 'media' && (
-                <button type="button" aria-pressed={objectFit === 'cover'} onClick={toggleObjectFit}>
+                <button
+                  ref={setFitRef}
+                  type="button"
+                  aria-pressed={objectFit === 'cover'}
+                  onClick={toggleObjectFit}
+                >
                   Заполнить область
                 </button>
               )}
@@ -141,7 +158,7 @@ export const StoryDialog = ({
               </Dialog.Description>
             )}
 
-            <div className={bodyClasses}>
+            <div className={bodyClasses} data-story-dialog-body={mode}>
               {children}
             </div>
           </Dialog.Content>
