@@ -2,7 +2,7 @@ import { StrictMode } from 'react';
 
 import { act, renderHook } from '@testing-library/react';
 
-import { useCarousel } from '../useCarousel';
+import { useCarousel } from '../hooks';
 
 import { embla } from './embla';
 

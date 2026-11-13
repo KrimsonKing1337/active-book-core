@@ -1,9 +1,11 @@
-import type { KeyboardEvent, ReactNode } from 'react';
-
-import { isValidElement } from 'react';
+import {
+  type KeyboardEvent,
+  type ReactNode,
+  isValidElement,
+} from 'react';
 
 import { CarouselSlideActiveContext } from './context';
-import { useCarousel } from './useCarousel';
+import { useCarousel } from './hooks';
 
 import styles from './Carousel.module.scss';
 
@@ -63,6 +65,7 @@ export const Carousel = ({ slides, onSelect }: CarouselProps) => {
           {slides.map((slideCur, index) => {
             const isInactive = index !== selected;
             const label = `${index + 1} из ${slides.length}`;
+
             let key = `position-${index}`;
 
             if (isValidElement(slideCur) && slideCur.key !== null) {
