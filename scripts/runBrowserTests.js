@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url';
 
 const browserTests = [
   'storyWindows.browser.test.js',
+  'windowHistory.browser.test.js',
   'storyDialog.browser.test.js',
   'storyRoot.browser.test.js',
   'visualPlacement.browser.test.js',

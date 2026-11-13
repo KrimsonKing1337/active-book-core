@@ -1,20 +1,23 @@
-import { useEffect, useRef, useState } from 'react';
+import {
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import classNames from 'classnames';
 
 import ArrowLeft from '@assets/img/toolbar/i-arrow-left.svg';
 import ArrowRight from '@assets/img/toolbar/i-arrow-right.svg';
 
-import { mainSelectors } from '@store/main';
-
 import { useSelector } from '@store';
+import { mainSelectors } from '@store/main';
 
 import { useGoToPage } from '@hooks/control/useGoToPage';
 
+import { useReaderWindow } from '@components/StoryWindowHost/hooks';
 import { useAppMode } from '@components/App/AppModeContext';
 
-
-import { Item } from '@components/Toolbar/components/Item';
+import { Item } from '@components/Toolbar/components';
 
 import { Flags, modalsWereShowed } from '@utils/localStorage/modalsWereShowed';
 
@@ -24,6 +27,7 @@ import * as styles from './Nav.module.scss';
 
 export const Nav = () => {
   const appMode = useAppMode();
+
   const {
     goToPage,
     goPrevPage,
@@ -38,7 +42,12 @@ export const Nav = () => {
 
   const [goToWithInputIsHide, setGoToWithInputIsHide] = useState(true);
   const [inputValue, setInputValue] = useState('');
-  const [isModalActive, setIsModalActive] = useState(false);
+
+  const modalWindow = useReaderWindow({
+    kind: 'legacy',
+    contentId: 'swipe-notice',
+    canClose: false,
+  });
 
   useEffect(() => {
     if (appMode !== 'reader' || goToWithInputIsHide) {
@@ -51,7 +60,7 @@ export const Nav = () => {
   const modalConfirmHandler = () => {
     modalsWereShowed.set(id, Flags.swipes, true);
 
-    setIsModalActive(false);
+    modalWindow.close();
   };
 
   const prevClickHandler = () => {
@@ -62,7 +71,7 @@ export const Nav = () => {
     if (modalsWereShowed.get(id, Flags.swipes)) {
       goNextPage();
     } else {
-      setIsModalActive(true);
+      modalWindow.open();
     }
   };
 
@@ -82,7 +91,6 @@ export const Nav = () => {
     }
 
     setGoToWithInputIsHide(true);
-
     goToPage(pageNumber);
   };
 
@@ -127,10 +135,10 @@ export const Nav = () => {
   return (
     <>
       <Modal
-        isActive={isModalActive}
+        isActive={modalWindow.isOpen}
+        windowTarget={modalWindow.target}
         onConfirm={modalConfirmHandler}
-        onCancel={() => setIsModalActive(false)}
-        onOpen={() => setIsModalActive(true)}
+        onCancel={() => modalWindow.close()}
       />
 
       <div className={goToWithArrowsClassNames}>

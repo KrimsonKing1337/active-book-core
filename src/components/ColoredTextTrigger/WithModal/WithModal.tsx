@@ -1,6 +1,15 @@
-import { PropsWithChildren, useEffect, useRef, useState } from 'react';
+import type { PropsWithChildren } from 'react';
 
-import { Modal as ModalComponent, ModalProps } from '@components/Modal';
+import {
+  useEffect,
+  useRef,
+  useId,
+} from 'react';
+
+import type { ModalProps } from '@components/Modal';
+import { Modal as ModalComponent } from '@components/Modal';
+import { useReaderWindow } from '@components/StoryWindowHost/hooks';
+
 import { Action } from '@components/ColoredTextTrigger/Action';
 import { AuthorComment } from '@components/ColoredTextTrigger/AuthorComment';
 import { EasterEgg } from '@components/ColoredTextTrigger/EasterEgg';
@@ -23,14 +32,21 @@ export const WithModal = ({
   triggerType,
   eggId,
 }: PropsWithChildren<ModalWithVideoEasterEggProps>) => {
-  const [isActive, setIsActive] = useState(false);
+  const contentId = useId();
+
+  const {
+    isOpen: isActive,
+    open,
+    close,
+    target,
+  } = useReaderWindow({ kind: 'legacy', contentId });
 
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   const getTrigger = () => {
     if (triggerType === 'author') {
       return (
-        <AuthorComment onClick={() => setIsActive(true)}>
+        <AuthorComment onClick={open}>
           {text}
         </AuthorComment>
       );
@@ -44,14 +60,14 @@ export const WithModal = ({
       }
 
       return (
-        <EasterEgg onClick={() => setIsActive(true)} id={eggId}>
+        <EasterEgg onClick={open} id={eggId}>
           {text}
         </EasterEgg>
       );
     }
 
     return (
-      <Action onClick={() => setIsActive(true)}>
+      <Action onClick={open}>
         {text}
       </Action>
     );
@@ -82,12 +98,12 @@ export const WithModal = ({
     <span className={styles.Wrapper} ref={wrapperRef}>
       <ModalComponent
         isOpen={isActive}
-        onOpen={() => setIsActive(true)}
-        onClose={() => setIsActive(false)}
+        windowTarget={target}
         mode={mode}
         canCrop
         cropDefault={false}
         canFullScreen
+        onClose={close}
       >
         {children}
       </ModalComponent>

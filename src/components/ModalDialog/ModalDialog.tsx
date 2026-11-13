@@ -1,6 +1,14 @@
-import { type PropsWithChildren, useEffect, useRef, useState } from 'react';
+import type { PropsWithChildren } from 'react';
 
-import { type ModalProps, Modal } from '@components/Modal';
+import {
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+
+import type { ModalProps } from '@components/Modal';
+
+import { Modal } from '@components/Modal';
 import { Button } from '@components/Button';
 
 import * as styles from './ModalDialog.module.scss';
@@ -22,22 +30,25 @@ const defaultFunc = () => {};
 
 export const ModalDialog = ({
   isOpen,
+  windowTarget,
   cantCloseIn = 0,
   showConfirmButton = true,
   confirmButtonLabel = 'OK',
   cancelButtonLabel = 'Отмена',
   showCancelButton = true,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  onClose = defaultFunc,
+
   onConfirm = defaultFunc,
   onCancel = defaultFunc,
   children,
   ...etc
 }: PropsWithChildren<ModalDialogProps>) => {
-  const [canClose, setCanClose] = useState(false);
+  const [unlockedInstanceId, setUnlockedInstanceId] = useState<string | null>(null);
   const [secondsLeft, setSecondsLeft] = useState(0);
 
   const secondsLeftRef = useRef(0);
+
+  const instanceId = windowTarget?.instanceId ?? 'standalone';
+  const canClose = unlockedInstanceId === instanceId;
 
   useEffect(() => {
     if (!isOpen) {
@@ -65,18 +76,18 @@ export const ModalDialog = ({
   }, [isOpen]);
 
   useEffect(() => {
+    setUnlockedInstanceId(null);
+
     if (!isOpen) {
       return;
     }
-
-    setCanClose(false);
 
     secondsLeftRef.current = cantCloseIn / 1000;
 
     setSecondsLeft(secondsLeftRef.current);
 
     const timer = setTimeout(() => {
-      setCanClose(true);
+      setUnlockedInstanceId(instanceId);
     }, cantCloseIn);
 
     return () => {
@@ -84,7 +95,7 @@ export const ModalDialog = ({
         clearTimeout(timer);
       }
     };
-  }, [isOpen, cantCloseIn]);
+  }, [isOpen, cantCloseIn, instanceId]);
 
   const confirmButtonClickHandler = () => {
     if (canClose) {
@@ -100,12 +111,18 @@ export const ModalDialog = ({
     onCancel();
   };
 
-  const confirmBtnLabel = secondsLeft ? `${confirmButtonLabel} (${secondsLeft})` : confirmButtonLabel;
-  const cancelBtnLabel = secondsLeft ? `${cancelButtonLabel} (${secondsLeft})` : cancelButtonLabel;
+  let confirmBtnLabel = confirmButtonLabel;
+  let cancelBtnLabel = cancelButtonLabel;
+
+  if (secondsLeft) {
+    confirmBtnLabel = `${confirmButtonLabel} (${secondsLeft})`;
+    cancelBtnLabel = `${cancelButtonLabel} (${secondsLeft})`;
+  }
 
   return (
     <Modal
       isOpen={isOpen}
+      windowTarget={windowTarget}
       canClose={canClose}
       onClose={closeHandler}
       {...etc}

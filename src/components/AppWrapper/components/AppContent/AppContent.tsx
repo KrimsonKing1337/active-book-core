@@ -1,4 +1,10 @@
-import { type PropsWithChildren, useEffect, useLayoutEffect, useRef } from 'react';
+import type { PropsWithChildren } from 'react';
+
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+} from 'react';
 
 import classNames from 'classnames';
 import { setWasmUrl } from '@lottiefiles/dotlottie-react';
@@ -11,7 +17,9 @@ import { audioEffectsSelectors } from '@store/effects/audio/audio';
 import { audioBgEffectsSelectors } from '@store/effects/audio/audioBg';
 import { effectsSelectors } from '@store/effects/common';
 
-import { type VisualEffects, useVisualRegistrations } from '@controllers/visualEffects';
+import type { VisualEffects } from '@controllers/visualEffects';
+
+import { useVisualRegistrations } from '@controllers/visualEffects';
 
 import { useEffectsInRange } from '@hooks/effects/range';
 import { useGoToPage } from '@hooks/control/useGoToPage';
@@ -37,7 +45,10 @@ import {
   useVisibilityChangeHandler,
 } from '../../hooks';
 
-import { startToPlayAllAudiosWithPlayOnLoad, startToPlayAllVideosWithPlayOnLoad } from '../../utils';
+import {
+  startToPlayAllAudiosWithPlayOnLoad,
+  startToPlayAllVideosWithPlayOnLoad,
+} from '../../utils';
 
 import * as styles from '../../AppWrapper.module.scss';
 
@@ -47,7 +58,6 @@ export type AppContentProps = PropsWithChildren & AppWrapperProps & {
 
 export const AppContent = ({
   children,
-  bookKey,
   storyPages,
   withoutToolbar,
   config,
@@ -196,6 +206,10 @@ export const AppContent = ({
     [styles.isLoading]: showLoader,
   });
 
+  const dataPageId = pageId ?? undefined;
+  const storyContentKey = pageId === null ? 'start' : `page:${pageId}`;
+  const storyContentChildren = pageId === null ? children : selectedPage?.content;
+
   const story = (
     <StoryRoot
       ref={ref}
@@ -208,11 +222,10 @@ export const AppContent = ({
     >
       <StoryShell
         withoutToolbar={withoutToolbar}
-        windowHistoryScope={`book-windows:${config.id}:${bookKey ?? ''}`}
-        data-page-id={pageId ?? undefined}
+        data-page-id={dataPageId}
       >
-        <StoryContent key={pageId === null ? 'start' : `page:${pageId}`}>
-          {pageId === null ? children : selectedPage?.content}
+        <StoryContent key={storyContentKey}>
+          {storyContentChildren}
         </StoryContent>
       </StoryShell>
     </StoryRoot>

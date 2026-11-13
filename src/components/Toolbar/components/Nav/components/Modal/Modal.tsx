@@ -1,28 +1,35 @@
-import { ModalDialog, Article, Header, P } from '@components';
+import type { WindowTarget } from '@store/windows';
+
+import {
+  ModalDialog,
+  Article,
+  Header,
+  P,
+} from '@components';
 
 export type ModalProps = {
   isActive: boolean;
+  windowTarget?: WindowTarget;
   onConfirm: () => void;
   onCancel: () => void;
-  onOpen: () => void;
 };
 
 export const Modal = ({
   isActive,
+  windowTarget,
   onConfirm,
   onCancel,
-  onOpen,
 }: ModalProps) => {
   return (
     <ModalDialog
       isOpen={isActive}
+      windowTarget={windowTarget}
       confirmButtonLabel="Хорошо"
       canFullScreen={false}
       showCancelButton={false}
       cantCloseIn={2000}
       onConfirm={onConfirm}
       onCancel={onCancel}
-      onOpen={onOpen}
     >
       <div>
         <Header>

@@ -34,6 +34,7 @@ test('opening is one atomic replacement even when the previous window cannot clo
   const state = reducer(reducer(started(), first), second);
 
   expect(state.activeWindow).toEqual({
+    kind: 'content',
     instanceId: second.payload.instanceId,
     contentId: 'b',
     canClose: true,
@@ -114,4 +115,28 @@ test('new sessions do not inherit windows and stale teardown cannot end their ow
   expect(renewed.activeWindow).toBeNull();
   expect(reducer(opened, actions.endSession(session.sessionId))).toEqual(opened);
   expect(reducer(opened, actions.open({ ...session, contentId: 'stale' }))).toEqual(opened);
+});
+
+test('specialized shells replace content atomically and stale permission updates are ignored', () => {
+  const first = actions.open({
+    ...session,
+    contentId: 'notice',
+    canClose: false,
+  });
+  const second = actions.open({
+    ...session,
+    contentId: 'menu',
+    kind: 'menu',
+  });
+  const state = reducer(reducer(started(), first), second);
+  const stale = { sessionId: session.sessionId, instanceId: first.payload.instanceId };
+  const target = { sessionId: session.sessionId, instanceId: second.payload.instanceId };
+
+  expect(state.activeWindow?.kind).toBe('menu');
+  expect(reducer(state, actions.setCanClose({ ...stale, canClose: false }))).toEqual(state);
+  const locked = reducer(state, actions.setCanClose({ ...target, canClose: false }));
+  expect(locked.activeWindow?.canClose).toBe(false);
+  expect(reducer(locked, actions.requestClose(target))).toEqual(locked);
+  const unlocked = reducer(locked, actions.setCanClose({ ...target, canClose: true }));
+  expect(reducer(unlocked, actions.requestClose(target)).activeWindow).toBeNull();
 });

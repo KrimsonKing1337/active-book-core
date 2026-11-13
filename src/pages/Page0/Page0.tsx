@@ -3,17 +3,22 @@ import { useEffect, useState } from 'react';
 import { configSelectors } from '@store/config';
 
 import { useDispatch, useSelector } from '@store';
-
 import { mainActions, mainSelectors } from '@store/main';
 
 import { useGoToPage } from '@hooks/control/useGoToPage';
 
-import { Action, WelcomeTour, Header, Article } from '@components';
+import { useReaderWindow } from '@components/StoryWindowHost/hooks';
+
+import {
+  Action,
+  WelcomeTour,
+  Header,
+  Article,
+} from '@components';
 
 import { Flags, modalsWereShowed } from '@utils/localStorage/modalsWereShowed';
 import { flashlightInst } from '@utils/effects/flashlight';
 import { get as localStorageGet } from '@utils/localStorage/localStorage';
-
 import { HowlWrapper } from '@utils/effects/audio/HowlWrapper';
 
 import { Modal } from './components';
@@ -47,10 +52,16 @@ export const Page0 = ({
   const [lastPage, setLastPage] = useState(0);
 
   const [isWelcomeTourActive, setIsWelcomeTourActive] = useState(false);
-  const [isWelcomeTourModalActive, setIsWelcomeTourModalActive] = useState(false);
+
+  const welcomeWindow = useReaderWindow({
+    kind: 'legacy',
+    contentId: 'welcome-notice',
+    canClose: false,
+  });
 
   const {
     modalIsActive,
+    windowTarget,
     modalOnClose,
     setModalIsActive,
   } = useModal();
@@ -129,7 +140,7 @@ export const Page0 = ({
     const isModalWasShowed = modalsWereShowed.get(id, Flags.usingCamera);
 
     if (isWelcomeTourActiveFromConfig) {
-      setIsWelcomeTourModalActive(true);
+      welcomeWindow.open();
 
       return;
     }
@@ -149,9 +160,9 @@ export const Page0 = ({
     <>
       <Modal
         isActive={modalIsActive}
+        windowTarget={windowTarget}
         onConfirm={modalConfirmHandler}
         onCancel={() => setModalIsActive(false)}
-        onOpen={() => setModalIsActive(true)}
       />
 
       {header && (
@@ -175,8 +186,6 @@ export const Page0 = ({
       <WelcomeTour
         isActive={isWelcomeTourActive}
         setIsActive={setIsWelcomeTourActive}
-        isModalActive={isWelcomeTourModalActive}
-        setIsModalActive={setIsWelcomeTourModalActive}
       />
 
       {Footer && (

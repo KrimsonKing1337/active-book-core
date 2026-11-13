@@ -1,4 +1,12 @@
+export type WindowKind =
+  | 'content'
+  | 'menu'
+  | 'tableOfContents'
+  | 'bookmarks'
+  | 'legacy';
+
 export type StoryWindow = {
+  kind: WindowKind;
   instanceId: string;
   contentId: string;
   canClose: boolean;
@@ -10,6 +18,7 @@ export type WindowSession = {
 };
 
 export type OpenWindowOptions = WindowSession & {
+  kind?: WindowKind;
   contentId: string;
   canClose?: boolean;
 };

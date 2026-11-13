@@ -9,25 +9,21 @@ import { VisualHost } from '@components/VisualHost';
 import { useStoryRegions } from '@components/StoryRegionsProvider';
 
 import { Narrative } from './components';
-import { useBookWindows } from './hooks';
 
 import * as styles from './StoryShell.module.scss';
 
 export type StoryShellProps = HTMLAttributes<HTMLDivElement> & {
   withoutToolbar?: boolean;
-  windowHistoryScope?: string;
   sbMode?: boolean;
 };
 
 export const StoryShell = ({
   children,
   withoutToolbar,
-  windowHistoryScope = 'book-windows',
   sbMode,
   ...etc
 }: PropsWithChildren<StoryShellProps>) => {
 
-  useBookWindows(windowHistoryScope);
   const { refs } = useStoryRegions();
 
   return (

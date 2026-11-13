@@ -1,70 +1,84 @@
-import { PropsWithChildren, useEffect, useRef } from 'react';
+import type { HTMLAttributes, PropsWithChildren } from 'react';
+
+import {
+  useContext,
+  useEffect,
+  useRef,
+} from 'react';
 
 import classNames from 'classnames';
 
-
-import { useDispatch } from '@store';
-
-import { mainActions } from '@store/main';
-import { bookmarksActions } from '@store/bookmarks';
+import { useStore } from '@store';
 
 import { useAppMode } from '@components/App/AppModeContext';
-
+import { StoryWindowSessionContext } from '@components/StoryWindowHost/context';
 import { getNarrativeElement } from '@components/StoryShell/components/Narrative/utils';
 
 import * as styles from './Overflow.module.scss';
 
-export type OverflowProps = React.HTMLAttributes<HTMLDivElement> & PropsWithChildren & {
+export type OverflowProps = HTMLAttributes<HTMLDivElement> & PropsWithChildren & {
   isOpen: boolean;
-  className?: string;
+  onClose: () => void;
 };
 
 export const Overflow = ({
   children,
   isOpen,
   className = '',
+  onClose,
   ...etc
 }: OverflowProps) => {
+  const store = useStore();
+
   const appMode = useAppMode();
-  const dispatch = useDispatch();
+  const sessionId = useContext(StoryWindowSessionContext);
 
   const overflowRef = useRef<HTMLDivElement>(null);
 
-  // закрываем по Esc активный Overflow в данный момент
   useEffect(() => {
-    const keypressEscHandler = (e: KeyboardEvent) => {
-      const { key } = e;
-
-      if (key === 'Escape') {
-        dispatch(mainActions.setMenuActiveState(null));
-        dispatch(bookmarksActions.setIsOpen(false));
-      }
-    };
-
-    if (isOpen && appMode === 'reader') {
-      document.addEventListener('keydown', keypressEscHandler);
-    }
-
-    return () => {
-      document.removeEventListener('keydown', keypressEscHandler);
-    };
-  }, [appMode, isOpen, dispatch]);
-
-  useEffect(() => {
-    if (appMode !== 'reader') {
+    if (!isOpen || appMode !== 'reader') {
       return;
     }
 
-    if (isOpen) {
-      // переводим фокус на прокручиваемый элемент для возможности прокрутки с помощью стрелок вверх и вниз
-      overflowRef.current?.focus();
-    } else {
-      // возвращаем фокус на текст
-      const narrativeElement = getNarrativeElement();
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
 
-      narrativeElement?.focus();
+    document.addEventListener('keydown', handleEscape);
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [appMode, isOpen, onClose]);
+
+  useEffect(() => {
+    if (!isOpen || appMode !== 'reader') {
+      return;
     }
-  }, [appMode, isOpen]);
+
+    const opener = document.activeElement;
+
+    overflowRef.current?.focus();
+
+    return () => {
+      const { windows } = store.getState();
+
+      if (windows.sessionId !== sessionId || windows.activeWindow) {
+        return;
+      }
+
+      const selectors = ['[inert]', '[data-book-window-open="false"]'];
+      const selectorsJoined = selectors.join(', ');
+
+      if (opener instanceof HTMLElement && opener.isConnected && !opener.closest(selectorsJoined)) {
+        opener.focus();
+      } else {
+        getNarrativeElement()?.focus();
+      }
+    };
+  }, [appMode, isOpen, sessionId, store]);
 
   const overflowClassNames = classNames({
     [styles.Overflow]: true,

@@ -1,6 +1,7 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
-import { State } from './@types';
+import type { State } from './@types';
 
 export const initialState: State = {
   showLoader: false,
@@ -10,7 +11,6 @@ export const initialState: State = {
   authorComments: 0,
   allPagesSeen: false,
   tableOfContents: [],
-  menuActiveState: null,
   isVibrationAvailable: null,
   isFlashlightAvailable: null,
   flashlightProblems: '',
@@ -52,9 +52,6 @@ const slice = createSlice({
     },
     setAllPagesSeen(state, action: PayloadAction<State['allPagesSeen']>) {
       state.allPagesSeen = action.payload;
-    },
-    setMenuActiveState(state, action: PayloadAction<State['menuActiveState']>) {
-      state.menuActiveState = action.payload;
     },
     setIsVibrationAvailable(state, action: PayloadAction<State['isVibrationAvailable']>) {
       state.isVibrationAvailable = action.payload;

@@ -30,12 +30,12 @@ const center = (rect) => ({ x: rect.x + rect.width / 2, y: rect.y + rect.height 
 test('visual placement in Chromium', async (context) => {
   const { browser, origin } = await openBrowserFixture(context);
 
-  const scenario = async (name, run) => context.test(name, async () => {
+  const scenario = async ({ name, mode = 'editor' }, run) => context.test(name, async () => {
     const page = await browser.newPage({ viewport: { width: 1100, height: 800 } });
     const errors = [];
     page.on('pageerror', (error) => errors.push(error.message));
     try {
-      await page.goto(`${origin}/tests/visualPlacement/`);
+      await page.goto(`${origin}/tests/visualPlacement/?mode=${mode}`);
       await page.getByTestId('first').click();
       await page.getByTestId('page-one').waitFor();
       await page.waitForFunction(() => window.setVisualTestSurfaces
@@ -47,7 +47,7 @@ test('visual placement in Chromium', async (context) => {
     }
   });
 
-  await scenario('all coordinate regions, mixed units, anchors and origins', async (page) => {
+  await scenario({ name: 'all coordinate regions, mixed units, anchors and origins' }, async (page) => {
     const geometry = await readRegions(page);
     const book = await bookBounds(page);
     for (const region of ['story', 'storyViewport', 'narrativeFrame', 'storyViewportFrame', 'narrativeViewport', 'narrativeContent']) {
@@ -68,7 +68,7 @@ test('visual placement in Chromium', async (context) => {
     }
   });
 
-  await scenario('content uses its native scrollport and viewport surfaces remain fixed', async (page) => {
+  await scenario({ name: 'content uses its native scrollport and viewport surfaces remain fixed' }, async (page) => {
     await setSurfaces(page, [item({ placement: fill('narrativeContent') })]);
     const originalToken = await token(page);
     const before = await surface(page).boundingBox();
@@ -83,7 +83,7 @@ test('visual placement in Chromium', async (context) => {
     assert.deepEqual(await surface(page).boundingBox(), fixedBefore);
   });
 
-  await scenario('visibility rectangles and actual frame side masks', async (page) => {
+  await scenario({ name: 'visibility rectangles and actual frame side masks' }, async (page) => {
     const geometry = await readRegions(page);
     const book = await bookBounds(page);
     for (const region of ['story', 'storyViewport', 'narrativeFrame', 'narrativeViewport', 'narrativeContent']) {
@@ -113,7 +113,7 @@ test('visual placement in Chromium', async (context) => {
     }
   });
 
-  await scenario('circle, polygon and intersection with the frame mask', async (page) => {
+  await scenario({ name: 'circle, polygon and intersection with the frame mask' }, async (page) => {
     const book = await bookBounds(page);
     const middle = center(book);
     const radius = Math.hypot(book.width, book.height) / Math.SQRT2 * 0.2;
@@ -142,7 +142,7 @@ test('visual placement in Chromium', async (context) => {
     assert.notDeepEqual(color(book.x + frame.x + frame.width * 0.25, book.y + frame.y + frame.height / 2), [255, 0, 0]);
   });
 
-  await scenario('one continuous gradient crosses logical boundaries and survives edits', async (page) => {
+  await scenario({ name: 'one continuous gradient crosses logical boundaries and survives edits' }, async (page) => {
     const gradient = 'linear-gradient(to right, rgb(0, 0, 0), rgb(255, 255, 255))';
     const probe = item({ placement: fill('narrativeFrame'), visibility: {}, background: gradient });
     await setSurfaces(page, [probe]);
@@ -178,7 +178,7 @@ test('visual placement in Chromium', async (context) => {
     assert.equal(await token(page), originalToken);
   });
 
-  await scenario('painted depth, lexical ties, controls interaction and legacy feedback priority', async (page) => {
+  await scenario({ name: 'painted depth, lexical ties and legacy feedback priority' }, async (page) => {
     // Give real legacy narrative/Toolbar opaque test colors to measure which plane actually paints last.
     await page.locator('[data-story-region="narrativeContent"] > [class*="Text"]').evaluate((element) => {
       element.style.background = '#00ff00';
@@ -210,12 +210,6 @@ test('visual placement in Chromium', async (context) => {
       item({ id: 'lower-plane', background: '#00ff00', depth: { plane: 'aboveNarrative', order: 1e20 } }),
     ]);
     assert.deepEqual((await pixels(page))(...narrativePoint), [255, 255, 0]);
-    const menuButton = page.locator('[data-welcome-tour-id="config"]');
-    await menuButton.click();
-    const menuHeader = await page.getByText('Настройки', { exact: true }).elementHandle();
-    await page.getByText('Настройки', { exact: true }).locator('..')
-      .getByRole('button', { name: 'Закрыть', exact: true }).click();
-    await page.waitForFunction((header) => header.getBoundingClientRect().bottom < 0, menuHeader);
 
     await setSurfaces(page, [item({ background: '#000000' })]);
     const frame = geometry.regions.storyViewportFrame;
@@ -241,6 +235,16 @@ test('visual placement in Chromium', async (context) => {
     await setSurfaces(page, [item({ background: '#000000', depth: { plane: 'belowNarrative', order: 0 } })]);
     assert.deepEqual((await pixels(page))(...narrativePoint), [255, 0, 255], 'inversion preserves narrative priority');
     await page.getByTestId('stop-invert').click();
+  });
+
+  await scenario({ name: 'reader menu remains interactive below visual surfaces', mode: 'reader' }, async (page) => {
+    await setSurfaces(page, [item({ depth: { plane: 'aboveStoryControls', order: 5 } })]);
+    const menuButton = page.locator('[data-welcome-tour-id="config"]');
+    await menuButton.click();
+    const menuHeader = await page.getByText('Настройки', { exact: true }).elementHandle();
+    await page.getByText('Настройки', { exact: true }).locator('..')
+      .getByRole('button', { name: 'Закрыть', exact: true }).click();
+    await page.waitForFunction((header) => header.getBoundingClientRect().bottom < 0, menuHeader);
   });
 });
 

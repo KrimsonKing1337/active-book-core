@@ -7,19 +7,27 @@ import { configActions } from '@store/config';
 
 import { useVibration } from '@hooks/effects/vibration';
 
-import { Action, Button, P } from '@components';
+import { useReaderWindow } from '@components/StoryWindowHost/hooks';
+
+import {
+  Action,
+  Button,
+  P,
+} from '@components';
 
 import { Modal, Segments } from './components';
 
-import { getWelcomeTourTextById, removeHighLight, setHighLight } from './utils';
+import {
+  getWelcomeTourTextById,
+  removeHighLight,
+  setHighLight,
+} from './utils';
 
 import * as styles from './WelcomeTour.module.scss';
 
 export type WelcomeTourProps = {
   isActive: boolean;
   setIsActive: (isActive: boolean) => void;
-  isModalActive: boolean;
-  setIsModalActive: (isActive: boolean) => void;
 };
 
 const elementsIdsArray = [
@@ -34,10 +42,14 @@ const elementsIdsArray = [
 export const WelcomeTour = ({
   isActive,
   setIsActive,
-  isModalActive,
-  setIsModalActive,
 }: WelcomeTourProps) => {
   const dispatch = useDispatch();
+
+  const modalWindow = useReaderWindow({
+    kind: 'legacy',
+    contentId: 'welcome-notice',
+    canClose: false,
+  });
 
   const { vibrationOn } = useVibration();
 
@@ -89,7 +101,7 @@ export const WelcomeTour = ({
   };
 
   const modalConfirmHandler = () => {
-    setIsModalActive(false);
+    modalWindow.close();
     setIsActive(true);
   };
 
@@ -100,10 +112,10 @@ export const WelcomeTour = ({
   return (
     <>
       <Modal
-        isActive={isModalActive}
+        isActive={modalWindow.isOpen}
+        windowTarget={modalWindow.target}
         onConfirm={modalConfirmHandler}
-        onCancel={() => setIsModalActive(false)}
-        onOpen={() => setIsModalActive(true)}
+        onCancel={modalWindow.close}
       />
 
       {isActive && (

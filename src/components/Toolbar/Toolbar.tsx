@@ -4,11 +4,11 @@ import FontBigIcon from '@assets/img/toolbar/i-font-big.svg';
 import EtcIcon from '@assets/img/toolbar/i-etc.svg';
 
 import { useDispatch, useSelector } from '@store';
-import { mainActions } from '@store/main';
 import { configActions, configSelectors } from '@store/config';
-import { bookmarksActions } from '@store/bookmarks';
 
+import { useReaderWindow } from '@components/StoryWindowHost/hooks';
 import { useStoryRegions } from '@components/StoryRegionsProvider';
+
 import { VisualHost } from '@components/VisualHost';
 
 import { getNewValueForNarrativeTextStyle } from '@utils/styles/getNewValueForNarrativeTextStyle';
@@ -25,6 +25,9 @@ export type ToolbarProps = {
 export const Toolbar = ({ sbMode }: ToolbarProps) => {
   const dispatch = useDispatch();
 
+  const bookmarksWindow = useReaderWindow({ kind: 'bookmarks' });
+  const menuWindow = useReaderWindow({ kind: 'menu' });
+
   const fontSize = useSelector(configSelectors.fontSize);
 
   const { refs } = useStoryRegions();
@@ -40,11 +43,11 @@ export const Toolbar = ({ sbMode }: ToolbarProps) => {
   };
 
   const bookmarkClickHandler = () => {
-    dispatch(bookmarksActions.setIsOpen(true));
+    bookmarksWindow.open();
   };
 
   const etcIconClickHandler = () => {
-    dispatch(mainActions.setMenuActiveState('menu'));
+    menuWindow.open();
   };
 
   const fontSmallClickHandler = () => {

@@ -1,7 +1,14 @@
 import type { Task } from 'redux-saga';
-import { put, takeLatest, delay, fork, select, take, cancel } from 'redux-saga/effects';
 
-import { bookmarksActions } from '@store/bookmarks';
+import {
+  put,
+  takeLatest,
+  delay,
+  fork,
+  select,
+  take,
+  cancel,
+} from 'redux-saga/effects';
 
 import { effectsActions } from '@store/effects/common';
 
@@ -90,14 +97,7 @@ function* watchSetPage() {
   yield put(effectsActions.setAudiosReadyAmount(0));
 }
 
-function* closeBookmarks(action: ReturnType<typeof actions.setMenuActiveState>) {
-  if (action.payload) {
-    yield put(bookmarksActions.setIsOpen(false));
-  }
-}
-
 export function* watchActions() {
-  yield takeLatest(actions.setMenuActiveState, closeBookmarks);
   yield takeLatest(actions.setPage, watchSetPage);
 
   yield fork(watchLoaderGate);

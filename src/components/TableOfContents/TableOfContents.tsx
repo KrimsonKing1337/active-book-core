@@ -1,5 +1,7 @@
-import { useDispatch, useSelector } from '@store';
-import { mainActions, mainSelectors } from '@store/main';
+import { useSelector } from '@store';
+import { mainSelectors } from '@store/main';
+
+import { useReaderWindow } from '@components/StoryWindowHost/hooks';
 
 import { Overflow, MenuHeader } from '@components';
 
@@ -8,19 +10,12 @@ import { Item } from './Item';
 import * as styles from './TableOfContents.module.scss';
 
 export const TableOfContents = () => {
-  const dispatch = useDispatch();
+  const { isOpen, close } = useReaderWindow({ kind: 'tableOfContents' });
 
-  const menuActiveState = useSelector(mainSelectors.menuActiveState);
   const tableOfContents = useSelector(mainSelectors.tableOfContents);
 
-  const isOpen = menuActiveState === 'tableOfContents';
-
-  const closeButtonClickHandler = () => {
-    dispatch(mainActions.setMenuActiveState(null));
-  };
-
   return (
-    <Overflow id="table-of-contents" isOpen={isOpen}>
+    <Overflow id="table-of-contents" isOpen={isOpen} onClose={close}>
       <MenuHeader label="Оглавление" />
 
       <div className={styles.ItemsWrapper}>
@@ -35,7 +30,7 @@ export const TableOfContents = () => {
         })}
       </div>
 
-      <button className={styles.Button} onClick={closeButtonClickHandler}>
+      <button className={styles.Button} onClick={close}>
         Закрыть
       </button>
     </Overflow>

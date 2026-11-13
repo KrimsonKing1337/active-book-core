@@ -22,6 +22,10 @@ type OpenReducerAction = PayloadAction<OpenWindowOptions & {
   canClose: boolean;
 }>;
 
+type SetCanCloseAction = PayloadAction<WindowTarget & {
+  canClose: boolean;
+}>;
+
 const slice = createSlice({
   name: '@windows',
   initialState,
@@ -57,6 +61,7 @@ const slice = createSlice({
           instanceId,
           contentId,
           canClose,
+          kind = 'content',
         } = action.payload;
 
         if (state.sessionId !== sessionId || state.pageId !== pageId) {
@@ -64,11 +69,23 @@ const slice = createSlice({
         }
 
         state.activeWindow = {
+          kind,
           instanceId,
           contentId,
           canClose,
         };
       },
+    },
+    setCanClose(state, action: SetCanCloseAction) {
+      const {
+        sessionId,
+        instanceId,
+        canClose,
+      } = action.payload;
+
+      if (state.sessionId === sessionId && state.activeWindow?.instanceId === instanceId) {
+        state.activeWindow.canClose = canClose;
+      }
     },
     requestClose(state, action: PayloadAction<WindowTarget>) {
       const { sessionId, instanceId } = action.payload;

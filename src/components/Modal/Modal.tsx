@@ -1,11 +1,29 @@
-import { PropsWithChildren, useCallback, useEffect, useId, useRef, useState } from 'react';
+import type { PropsWithChildren } from 'react';
+
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import Hammer from 'hammerjs';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCompress, faCrop, faExpand, faTimes } from '@fortawesome/free-solid-svg-icons';
+
+import {
+  faCompress,
+  faCrop,
+  faExpand,
+  faTimes,
+} from '@fortawesome/free-solid-svg-icons';
+
 import classNames from 'classnames';
 
-import { useWindowHistory } from '@hooks/control/useWindowHistory';
+import { useDispatch } from '@store';
+
+import { type WindowTarget, windowsActions } from '@store/windows';
 
 import { useAppMode } from '@components/App/AppModeContext';
 
@@ -17,7 +35,7 @@ type ModalMode = 'media' | 'text';
 
 export type ModalProps = {
   isOpen: boolean;
-  onOpen?: Func;
+  windowTarget?: WindowTarget;
   onClose?: Func;
   mode?: ModalMode;
   canClose?: boolean;
@@ -29,8 +47,7 @@ export type ModalProps = {
 
 export const Modal = ({
   children,
-  onClose,
-  onOpen,
+  windowTarget,
   isOpen,
   mode = 'text',
   canClose = true,
@@ -38,16 +55,18 @@ export const Modal = ({
   fullScreenDefault = false,
   canCrop = false,
   cropDefault = true,
+  onClose,
 }: PropsWithChildren<ModalProps>) => {
+  const dispatch = useDispatch();
   const appMode = useAppMode();
-  const historyId = useId();
+
+  const [isFullScreen, setIsFullScreen] = useState(fullScreenDefault);
+  const [isCrop, setIsCrop] = useState(cropDefault);
+
   // здесь реф-версии нужны для хаммера, обычные для того чтобы ре-рендер срабатывал
   const isFullScreenRef = useRef(false);
   const isCropRef = useRef(true);
   const isZoomingRef = useRef(false);
-
-  const [isFullScreen, setIsFullScreen] = useState(fullScreenDefault);
-  const [isCrop, setIsCrop] = useState(cropDefault);
 
   const overflowRef = useRef<HTMLDivElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -64,13 +83,18 @@ export const Modal = ({
     onClose?.();
   }, [canClose, onClose]);
 
-  useWindowHistory(`content-modal:${historyId}`, isOpen ? 'modal' : null, (next) => {
-    if (next) {
-      onOpen?.();
-    } else {
-      onClose?.();
+  const targetSessionId = windowTarget?.sessionId;
+  const targetInstanceId = windowTarget?.instanceId;
+
+  useLayoutEffect(() => {
+    if (isOpen && targetSessionId && targetInstanceId) {
+      dispatch(windowsActions.setCanClose({
+        sessionId: targetSessionId,
+        instanceId: targetInstanceId,
+        canClose,
+      }));
     }
-  });
+  }, [isOpen, targetSessionId, targetInstanceId, canClose, dispatch]);
 
   useEffect(() => {
     if (!isOpen || appMode !== 'reader') {
