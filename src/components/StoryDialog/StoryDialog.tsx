@@ -72,6 +72,12 @@ export const StoryDialog = ({
     }
   };
 
+  const descriptionProps: { 'aria-describedby'?: string } = {};
+
+  if (!description) {
+    descriptionProps['aria-describedby'] = undefined;
+  }
+
   const handleDismiss = (e: Event) => {
     if (!canClose) {
       e.preventDefault();
@@ -89,6 +95,7 @@ export const StoryDialog = ({
           <Dialog.Overlay className={styles.Overlay} />
 
           <Dialog.Content
+            {...descriptionProps}
             className={contentClasses}
             style={contentStyle}
             aria-modal="true"

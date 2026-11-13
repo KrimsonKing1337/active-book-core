@@ -8,6 +8,7 @@ import { mainActions, mainSelectors } from '@store/main';
 import { useGoToPage } from '@hooks/control/useGoToPage';
 
 import { useReaderWindow } from '@components/StoryWindowHost/hooks';
+import { activateOnKey } from '@components/ColoredTextTrigger/utils';
 
 import {
   Action,
@@ -21,9 +22,9 @@ import { flashlightInst } from '@utils/effects/flashlight';
 import { get as localStorageGet } from '@utils/localStorage/localStorage';
 import { HowlWrapper } from '@utils/effects/audio/HowlWrapper';
 
-import { Modal } from './components';
+import { CameraNotice } from './components';
 
-import { useModal } from './hooks';
+import { useCameraNotice } from './hooks';
 
 export type Page0Props = {
   header?: string;
@@ -54,17 +55,12 @@ export const Page0 = ({
   const [isWelcomeTourActive, setIsWelcomeTourActive] = useState(false);
 
   const welcomeWindow = useReaderWindow({
-    kind: 'legacy',
+    kind: 'dialog',
     contentId: 'welcome-notice',
     canClose: false,
   });
 
-  const {
-    modalIsActive,
-    windowTarget,
-    modalOnClose,
-    setModalIsActive,
-  } = useModal();
+  const cameraNotice = useCameraNotice();
 
   // инициализируем аудио. свайп на айфоне не работает, нужен именно тап
   useEffect(() => {
@@ -131,7 +127,7 @@ export const Page0 = ({
   };
 
   const modalConfirmHandler = () => {
-    modalOnClose();
+    cameraNotice.confirm();
 
     go();
   };
@@ -146,7 +142,7 @@ export const Page0 = ({
     }
 
     if (!isModalWasShowed && !flashlightInst.isInited) {
-      setModalIsActive(true);
+      cameraNotice.open();
 
       return;
     }
@@ -158,12 +154,7 @@ export const Page0 = ({
 
   return (
     <>
-      <Modal
-        isActive={modalIsActive}
-        windowTarget={windowTarget}
-        onConfirm={modalConfirmHandler}
-        onCancel={() => setModalIsActive(false)}
-      />
+      <CameraNotice target={cameraNotice.target} onConfirm={modalConfirmHandler} />
 
       {header && (
         <Header>
@@ -178,7 +169,14 @@ export const Page0 = ({
       )}
 
       {showButton && !isWelcomeTourActive && (
-        <Action style={{ fontSize: '1.375em' /* 22px */ }} fullWidth onClick={actionClickHandler}>
+        <Action
+          role="button"
+          tabIndex={0}
+          style={{ fontSize: '1.375em' /* 22px */ }}
+          fullWidth
+          onClick={actionClickHandler}
+          onKeyDown={(event) => activateOnKey(event, () => event.currentTarget.click())}
+        >
           {actionLabel}
         </Action>
       )}

@@ -1,4 +1,4 @@
-import { PropsWithChildren } from 'react';
+import type { PropsWithChildren } from 'react';
 
 import classNames from 'classnames';
 
@@ -31,6 +31,7 @@ export const Button = ({
     <button
       type="button"
       className={buttonClassNames}
+      disabled={disabled}
       onClick={onClick}
       {...etc}
     >

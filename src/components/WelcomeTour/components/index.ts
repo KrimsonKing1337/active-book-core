@@ -1,2 +1,2 @@
-export * from './Modal';
+export { WelcomeNotice } from './WelcomeNotice';
 export * from './Segments';

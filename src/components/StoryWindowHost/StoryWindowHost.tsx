@@ -1,85 +1,37 @@
-import {
-  Fragment,
-  useContext,
-  useRef,
-} from 'react';
+import { Fragment, useContext } from 'react';
 
-import {
-  useDispatch,
-  useSelector,
-  useStore,
-} from '@store';
+import type { WindowTarget } from '@store/windows';
 
-import { windowsActions, windowsSelectors } from '@store/windows';
-import { mainSelectors } from '@store/main';
+import { useSelector } from '@store';
+import { windowsSelectors } from '@store/windows';
 
-import { StoryDialog } from '@components';
-import { useStoryRegions } from '@components/StoryRegionsProvider';
+import { StoryDialog } from '@components/StoryDialog';
 
 import type { StoryWindowHostProps } from './@types';
 
 import { StoryWindowSessionContext } from './context';
+import { useStoryWindowDialog } from './hooks';
 
 export const StoryWindowHost = ({ resolveContent }: StoryWindowHostProps) => {
-  const dispatch = useDispatch();
-  const store = useStore();
-
   const sessionId = useContext(StoryWindowSessionContext);
-
   const active = useSelector(windowsSelectors.activeWindow);
-  const ownerId = useSelector(windowsSelectors.sessionId);
-  const windowPageId = useSelector(windowsSelectors.pageId);
-  const pageId = useSelector(mainSelectors.pageId);
+  let target: WindowTarget | undefined;
 
-  const { elements } = useStoryRegions();
+  if (sessionId && active?.kind === 'content') {
+    target = { sessionId, instanceId: active.instanceId };
+  }
 
-  const fallbackFocusRef = useRef<HTMLElement | null>(null);
-  fallbackFocusRef.current = elements.storyViewport ?? null;
+  const { dialogProps } = useStoryWindowDialog(target);
 
-  const isCurrentSession = sessionId !== null && ownerId === sessionId;
-  const isCurrentPage = pageId === windowPageId;
-  const isMatchingWindow = active?.kind === 'content';
-
-  if (!isCurrentSession || !isCurrentPage || !isMatchingWindow) {
+  if (!dialogProps.isOpen || !active) {
     return null;
   }
 
-  const {
-    instanceId,
-    contentId,
-    canClose,
-  } = active;
-
-  const { children, ...contentProps } = resolveContent(contentId);
-
-  const handleOpenChange = (isOpen: boolean) => {
-    if (!isOpen) {
-      dispatch(windowsActions.requestClose({ sessionId, instanceId }));
-    }
-  };
-
-  const handleCloseAutoFocus = (e: Event) => {
-    const state = store.getState();
-
-    const current = windowsSelectors.activeWindow(state);
-    const currentOwnerId = windowsSelectors.sessionId(state);
-
-    if (currentOwnerId !== sessionId || current) {
-      e.preventDefault();
-    }
-  };
+  const { children, ...contentProps } = resolveContent(active.contentId);
 
   return (
-    <StoryDialog
-      {...contentProps}
-      isOpen
-      canClose={canClose}
-      container={elements.storyViewport ?? null}
-      fallbackFocusRef={fallbackFocusRef}
-      onOpenChange={handleOpenChange}
-      onCloseAutoFocus={handleCloseAutoFocus}
-    >
-      <Fragment key={instanceId}>
+    <StoryDialog {...contentProps} {...dialogProps}>
+      <Fragment key={active.instanceId}>
         {children}
       </Fragment>
     </StoryDialog>

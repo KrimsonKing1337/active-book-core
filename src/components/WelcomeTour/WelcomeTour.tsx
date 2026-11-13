@@ -15,7 +15,7 @@ import {
   P,
 } from '@components';
 
-import { Modal, Segments } from './components';
+import { WelcomeNotice, Segments } from './components';
 
 import {
   getWelcomeTourTextById,
@@ -46,7 +46,7 @@ export const WelcomeTour = ({
   const dispatch = useDispatch();
 
   const modalWindow = useReaderWindow({
-    kind: 'legacy',
+    kind: 'dialog',
     contentId: 'welcome-notice',
     canClose: false,
   });
@@ -111,9 +111,8 @@ export const WelcomeTour = ({
 
   return (
     <>
-      <Modal
-        isActive={modalWindow.isOpen}
-        windowTarget={modalWindow.target}
+      <WelcomeNotice
+        target={modalWindow.target}
         onConfirm={modalConfirmHandler}
         onCancel={modalWindow.close}
       />

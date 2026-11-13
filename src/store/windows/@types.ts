@@ -3,7 +3,7 @@ export type WindowKind =
   | 'menu'
   | 'tableOfContents'
   | 'bookmarks'
-  | 'legacy';
+  | 'dialog';
 
 export type StoryWindow = {
   kind: WindowKind;
