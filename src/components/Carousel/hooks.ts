@@ -7,6 +7,8 @@ import {
 
 import useEmblaCarousel from 'embla-carousel-react';
 
+import { recoverCarouselFocus } from './utils';
+
 const dragSelectors = [
   'a',
   'button',
@@ -56,6 +58,7 @@ export const useCarousel = (onSelect?: (index: number) => void) => {
 
     const synchronize = () => {
       const selected = api.selectedScrollSnap();
+      recoverCarouselFocus(api);
 
       setNavigation({
         selected,

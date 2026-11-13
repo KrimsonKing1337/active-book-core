@@ -1,8 +1,8 @@
-import {
-  type KeyboardEvent,
-  type ReactNode,
-  isValidElement,
-} from 'react';
+import type { KeyboardEvent, ReactNode } from 'react';
+
+import { isValidElement } from 'react';
+
+import classNames from 'classnames';
 
 import { CarouselSlideActiveContext } from './context';
 import { useCarousel } from './hooks';
@@ -11,11 +11,17 @@ import styles from './Carousel.module.scss';
 
 export type CarouselProps = {
   slides: readonly ReactNode[];
+  /** Fill a bounded content area while keeping navigation outside the scrollable slides. */
+  layout?: 'flow' | 'fill';
   /** Reports the initial zero-based Embla selection and subsequent index changes. */
   onSelect?: (index: number) => void;
 };
 
-export const Carousel = ({ slides, onSelect }: CarouselProps) => {
+export const Carousel = ({
+  slides,
+  layout = 'flow',
+  onSelect,
+}: CarouselProps) => {
   const {
     viewportRef,
     navigation,
@@ -34,6 +40,7 @@ export const Carousel = ({ slides, onSelect }: CarouselProps) => {
   }
 
   const status = `${selected + 1} из ${slides.length}`;
+  const rootClassName = classNames(styles.Carousel, { [styles.Fill]: layout === 'fill' });
 
   const handleKeyDown = (e: KeyboardEvent<HTMLElement>) => {
     if (e.target !== e.currentTarget) {
@@ -53,10 +60,11 @@ export const Carousel = ({ slides, onSelect }: CarouselProps) => {
 
   return (
     <section
-      className={styles.Carousel}
+      className={rootClassName}
       aria-label="Карусель"
       aria-roledescription="карусель"
       data-book-carousel
+      data-carousel-layout={layout}
       tabIndex={0}
       onKeyDown={handleKeyDown}
     >

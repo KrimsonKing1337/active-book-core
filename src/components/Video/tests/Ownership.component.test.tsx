@@ -11,7 +11,7 @@ import { effectsActions } from '@store/effects/common';
 
 import { CarouselSlideActiveContext } from '@components/Carousel/context';
 import { startToPlayAllVideosWithPlayOnLoad } from '@components/AppWrapper/utils';
-import { DialogMedia } from '@components/ColoredTextTrigger/WithModal/DialogMedia';
+import { DialogMedia } from '@components/DialogMedia';
 
 import { Video } from '../Video';
 
