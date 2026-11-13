@@ -2,6 +2,8 @@ import type { HowlInstances } from '@types';
 
 import { store } from '@store';
 
+import { handleVideoPlayError, reportUnexpectedVideoError } from '@components/Video/utils/errors';
+
 export const setMuteToAllVideos = (muted: boolean) => {
   const videos = document.querySelectorAll('video');
 
@@ -42,10 +44,29 @@ export const startToPlayAllVideosWithPlayOnLoad = () => {
   const videos = Array.from(document.querySelectorAll('video'));
 
   videos.forEach((videoCur) => {
+    const hasLocalOwner = videoCur.dataset.videoManaged === 'true'
+      || videoCur.closest('[data-book-carousel], [data-video-scope="dialog"]');
+
+    if (hasLocalOwner) {
+      return;
+    }
+
     const autoPlay = videoCur.getAttribute('data-autoPlay');
 
     if (autoPlay === 'true') {
-      videoCur.play();
+      const source = videoCur.getAttribute('src');
+
+      void videoCur.play().then(() => {
+        if (!videoCur.isConnected && videoCur.getAttribute('src') === source) {
+          videoCur.pause();
+        }
+      }).catch((error: unknown) => {
+        if (videoCur.isConnected && videoCur.getAttribute('src') === source) {
+          handleVideoPlayError(videoCur, error);
+        } else {
+          reportUnexpectedVideoError(source, error);
+        }
+      });
     }
   });
 };

@@ -1,12 +1,14 @@
 import {
   type PropsWithChildren,
   useLayoutEffect,
+  useMemo,
   useRef,
 } from 'react';
 
 import classNames from 'classnames';
 
 import { VideoPlaybackContext } from '@components/Video/context';
+import { handleVideoPlayError, reportUnexpectedVideoError } from '@components/Video/utils/errors';
 
 import styles from '../WithModal.module.scss';
 
@@ -21,45 +23,74 @@ export const DialogMedia = ({
   isCurrentWindow,
 }: DialogMediaProps) => {
   const bodyRef = useRef<HTMLDivElement>(null);
+  const startedRef = useRef(new WeakSet<HTMLVideoElement>());
+  const scope = useMemo(() => ({ isCurrentWindow }), [isCurrentWindow]);
 
   useLayoutEffect(() => {
-    const videos = bodyRef.current?.querySelectorAll('video');
+    const body = bodyRef.current;
 
-    if (!videos || !isCurrentWindow()) {
+    if (!body || !isCurrentWindow()) {
       return;
     }
 
-    const handlePlayError = (video: HTMLVideoElement, error: unknown) => {
-      if (!video.isConnected || !isCurrentWindow()) {
-        return;
-      }
-
-      if (error instanceof DOMException && error.name === 'NotAllowedError') {
-        video.controls = true;
-
-        return;
-      }
-
-      if (!(error instanceof DOMException && error.name === 'AbortError')) {
-        console.warn('Dialog video could not start', error);
-      }
-    };
+    const videos = body.querySelectorAll('video');
 
     videos.forEach((video) => {
+      if (video.dataset.videoManaged === 'true') {
+        return;
+      }
+
+      // Native carousel media must opt into Video's React activity contract.
+      if (video.closest('[data-book-carousel]')) {
+        video.autoplay = false;
+        video.pause();
+
+        return;
+      }
+
+      if (startedRef.current.has(video)) {
+        return;
+      }
+
+      startedRef.current.add(video);
       video.autoplay = false;
       video.currentTime = 0;
+      const source = video.getAttribute('src');
 
-      void video.play()
-        .catch((error: unknown) => {
-          handlePlayError(video, error);
-        });
+      void video.play().then(() => {
+        if (!video.isConnected || !isCurrentWindow()) {
+          video.pause();
+          video.currentTime = 0;
+        }
+      }).catch((error: unknown) => {
+        if (video.isConnected && isCurrentWindow() && video.getAttribute('src') === source) {
+          handleVideoPlayError(video, error);
+        } else {
+          reportUnexpectedVideoError(source, error);
+        }
+      });
     });
 
     return () => {
-      videos.forEach((video) => {
-        video.pause();
-        video.currentTime = 0;
-      });
+      const finish = () => {
+        if (body.isConnected && isCurrentWindow()) {
+          return;
+        }
+
+        const remaining = new Set([...videos, ...body.querySelectorAll('video')]);
+
+        remaining.forEach((video) => {
+          video.pause();
+          video.currentTime = 0;
+        });
+      };
+
+      // StrictMode reconnects this same scope before the microtask runs.
+      if (!isCurrentWindow() || !body.isConnected) {
+        finish();
+      } else {
+        queueMicrotask(finish);
+      }
     };
   }, [isCurrentWindow]);
 
@@ -68,8 +99,8 @@ export const DialogMedia = ({
   });
 
   return (
-    <VideoPlaybackContext value="dialog">
-      <div ref={bodyRef} className={bodyClassName}>
+    <VideoPlaybackContext value={scope}>
+      <div ref={bodyRef} className={bodyClassName} data-video-scope="dialog">
         {children}
       </div>
     </VideoPlaybackContext>

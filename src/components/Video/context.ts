@@ -1,4 +1,8 @@
 import { createContext } from 'react';
 
-// Dialog media is mounted only while active and resets instead of restoring page playback.
-export const VideoPlaybackContext = createContext<'page' | 'dialog'>('page');
+type DialogVideoScope = {
+  isCurrentWindow: () => boolean;
+};
+
+// A scope belongs to one DialogMedia instance; null retains ordinary page ownership.
+export const VideoPlaybackContext = createContext<DialogVideoScope | null>(null);

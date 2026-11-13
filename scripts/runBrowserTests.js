@@ -2,6 +2,9 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const browserTests = [
+  'videoPlayback.browser.test.js',
+  'videoDialogs.browser.test.js',
+  'videoLoading.browser.test.js',
   'carousel.browser.test.js',
   'carouselContent.browser.test.js',
   'carouselInteraction.browser.test.js',

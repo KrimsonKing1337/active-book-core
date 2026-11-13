@@ -1,0 +1,87 @@
+import type { VideoPlayback, VideoPolicy } from './state';
+
+import { handleVideoPlayError, reportUnexpectedVideoError } from './errors';
+import { isVideoActive, pauseVideo } from './state';
+
+const requestVideoPlay = (playback: VideoPlayback) => {
+  const { element } = playback;
+
+  if (!playback.wantsPlay || playback.pending || !element.paused || element.ended) {
+    return;
+  }
+
+  playback.pending = true;
+  playback.version += 1;
+  const version = playback.version;
+  const source = element.getAttribute('src');
+
+  const reject = (error: unknown) => {
+    if (playback.disposed || playback.version !== version) {
+      reportUnexpectedVideoError(source, error);
+
+      return;
+    }
+
+    playback.pending = false;
+
+    if (!isVideoActive(playback)) {
+      reportUnexpectedVideoError(source, error);
+
+      return;
+    }
+
+    if (error instanceof DOMException && error.name === 'NotAllowedError') {
+      playback.wantsPlay = false;
+    }
+
+    handleVideoPlayError(element, error);
+  };
+
+  try {
+    void element.play().then(() => {
+      if (playback.disposed) {
+        return;
+      }
+
+      if ((!isVideoActive(playback) || !playback.wantsPlay) && !element.paused) {
+        pauseVideo(playback);
+      }
+
+      if (playback.version === version) {
+        playback.pending = false;
+      }
+    }).catch(reject);
+  } catch (error) {
+    reject(error);
+  }
+};
+
+export const updateVideoPlayback = (playback: VideoPlayback, policy: VideoPolicy) => {
+  const wasActive = playback.active;
+
+  // A user pause changes paused synchronously, before its queued event is delivered.
+  if (wasActive && playback.element.paused) {
+    playback.wantsPlay = false;
+  }
+
+  Object.assign(playback, policy);
+
+  if (!isVideoActive(playback)) {
+    if (wasActive || !playback.element.paused || playback.pending) {
+      pauseVideo(playback);
+    }
+
+    return;
+  }
+
+  if (!playback.managed) {
+    return;
+  }
+
+  if (!playback.initialized) {
+    playback.initialized = true;
+    playback.wantsPlay = playback.autoPlay;
+  }
+
+  requestVideoPlay(playback);
+};
