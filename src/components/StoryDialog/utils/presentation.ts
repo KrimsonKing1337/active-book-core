@@ -6,7 +6,9 @@ export type DialogContentNode = {
   readonly content?: readonly DialogContentNode[];
 };
 
-const getSingleMediaMode = (nodes: readonly DialogContentNode[]): BookDialogMode => {
+type Nodes = readonly DialogContentNode[];
+
+const getSingleMediaMode = (nodes: Nodes): BookDialogMode => {
   if (nodes.length !== 1) {
     return 'default';
   }
@@ -20,7 +22,7 @@ const getSingleMediaMode = (nodes: readonly DialogContentNode[]): BookDialogMode
   return 'default';
 };
 
-export const getDialogMode = (nodes: readonly DialogContentNode[], selectedIndex = 0): BookDialogMode => {
+export const getDialogMode = (nodes: Nodes, selectedIndex = 0): BookDialogMode => {
   if (nodes.length !== 1 || nodes[0].type !== 'carousel') {
     return getSingleMediaMode(nodes);
   }

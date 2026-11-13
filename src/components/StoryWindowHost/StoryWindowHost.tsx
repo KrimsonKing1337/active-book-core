@@ -26,9 +26,10 @@ type Presentation = {
 
 export const StoryWindowHost = ({ resolveContent }: StoryWindowHostProps) => {
   const sessionId = useContext(StoryWindowSessionContext);
-  const [presentation, setPresentation] = useState<Presentation | null>(null);
 
   const active = useSelector(windowsSelectors.activeWindow);
+
+  const [presentation, setPresentation] = useState<Presentation | null>(null);
 
   let target: WindowTarget | undefined;
 
@@ -43,12 +44,14 @@ export const StoryWindowHost = ({ resolveContent }: StoryWindowHostProps) => {
   }
 
   const content = resolveContent(active.contentId);
+
   let children = content.children;
   let mode = content.mode ?? 'default';
 
   if (content.nodes && content.render) {
     const { nodes } = content;
     const { instanceId } = active;
+
     mode = getDialogMode(nodes);
 
     if (presentation?.instanceId === instanceId) {
@@ -71,8 +74,10 @@ export const StoryWindowHost = ({ resolveContent }: StoryWindowHostProps) => {
       });
     };
 
+    const isMedia = mode === 'media';
+
     children = (
-      <DialogMedia isMedia={mode === 'media'} isCurrentWindow={isCurrentWindow}>
+      <DialogMedia isMedia={isMedia} isCurrentWindow={isCurrentWindow}>
         {content.render(handleSelect)}
       </DialogMedia>
     );

@@ -9,6 +9,7 @@ import {
 import classNames from 'classnames';
 
 import { VideoPlaybackContext } from '@components/Video/context';
+
 import {
   getVideoStats,
   handleVideoPlayError,

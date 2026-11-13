@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import type { StoryDialogProps } from './@types';
 
 import { getDialogDimension } from './utils';
+
 import {
   useDialogFocus,
   useDialogPreferences,
@@ -33,6 +34,7 @@ export const StoryDialog = ({
   onCloseAutoFocus,
 }: StoryDialogProps) => {
   const { fullscreenRef, setFitRef } = usePresentationFocus();
+
   const { handleOpenAutoFocus, handleCloseAutoFocus } = useDialogFocus({
     returnFocusRef,
     fallbackFocusRef,
