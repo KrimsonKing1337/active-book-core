@@ -1,17 +1,25 @@
-import type { VideoPlayback, VideoPolicy } from './state';
-
 import { handleVideoPlayError, reportUnexpectedVideoError } from './errors';
-import { isVideoActive, pauseVideo } from './state';
+
+import {
+  type VideoPlayback,
+  type VideoPolicy,
+  isVideoActive,
+  pauseVideo,
+} from './state';
 
 const requestVideoPlay = (playback: VideoPlayback) => {
   const { element } = playback;
 
-  if (!playback.wantsPlay || playback.pending || !element.paused || element.ended) {
+  if (!playback.wantsPlay
+    || playback.pending
+    || !element.paused
+    || element.ended) {
     return;
   }
 
   playback.pending = true;
   playback.version += 1;
+
   const version = playback.version;
   const source = element.getAttribute('src');
 
@@ -24,7 +32,9 @@ const requestVideoPlay = (playback: VideoPlayback) => {
 
     playback.pending = false;
 
-    if (!isVideoActive(playback)) {
+    const videoIsActive = isVideoActive(playback);
+
+    if (!videoIsActive) {
       reportUnexpectedVideoError(source, error);
 
       return;
@@ -38,12 +48,14 @@ const requestVideoPlay = (playback: VideoPlayback) => {
   };
 
   try {
-    void element.play().then(() => {
+    element.play().then(() => {
       if (playback.disposed) {
         return;
       }
 
-      if ((!isVideoActive(playback) || !playback.wantsPlay) && !element.paused) {
+      const videoIsActive = isVideoActive(playback);
+
+      if ((!videoIsActive || !playback.wantsPlay) && !element.paused) {
         pauseVideo(playback);
       }
 
@@ -66,7 +78,9 @@ export const updateVideoPlayback = (playback: VideoPlayback, policy: VideoPolicy
 
   Object.assign(playback, policy);
 
-  if (!isVideoActive(playback)) {
+  const videoIsActive = isVideoActive(playback);
+
+  if (!videoIsActive) {
     if (wasActive || !playback.element.paused || playback.pending) {
       pauseVideo(playback);
     }

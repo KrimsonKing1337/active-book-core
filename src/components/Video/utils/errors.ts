@@ -1,10 +1,14 @@
 export const reportUnexpectedVideoError = (src: string | null, error: unknown) => {
-  const isExpected = error instanceof DOMException
-    && (error.name === 'NotAllowedError' || error.name === 'AbortError');
+  if (error instanceof DOMException) {
+    const isNotAllowedError = error.name === 'NotAllowedError';
+    const isAbortError = error.name === 'AbortError';
 
-  if (!isExpected) {
-    console.warn('Video could not start', src, error);
+    if (isNotAllowedError || isAbortError) {
+      return;
+    }
   }
+
+  console.warn('Video could not start', src, error);
 };
 
 export const handleVideoPlayError = (element: HTMLVideoElement, error: unknown) => {
@@ -14,5 +18,7 @@ export const handleVideoPlayError = (element: HTMLVideoElement, error: unknown) 
     return;
   }
 
-  reportUnexpectedVideoError(element.getAttribute('src'), error);
+  const source = element.getAttribute('src');
+
+  reportUnexpectedVideoError(source, error);
 };

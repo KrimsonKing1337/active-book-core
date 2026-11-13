@@ -10,7 +10,7 @@ import { StoreProvider } from '@store';
 
 import { CarouselSlideActiveContext } from '@components/Carousel/context';
 import { startToPlayAllVideosWithPlayOnLoad } from '@components/AppWrapper/utils';
-import { DialogMedia } from '@components/ColoredTextTrigger/WithModal/components/DialogMedia';
+import { DialogMedia } from '@components/ColoredTextTrigger/WithModal/DialogMedia';
 
 import { Video } from '../Video';
 

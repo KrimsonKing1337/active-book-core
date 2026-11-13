@@ -1,6 +1,8 @@
-import type { RefObject } from 'react';
-
-import { useLayoutEffect, useRef } from 'react';
+import {
+  type RefObject,
+  useLayoutEffect,
+  useRef,
+} from 'react';
 
 import { useDispatch, useStore } from '@store';
 import { effectsActions } from '@store/effects/common';
@@ -18,14 +20,18 @@ type VideoTime = {
   restore: number;
 };
 
-export const useVideoTime = (ref: RefObject<HTMLVideoElement | null>, options: VideoTimeOptions) => {
+type VideoRef = RefObject<HTMLVideoElement | null>;
+
+export const useVideoTime = (ref: VideoRef, options: VideoTimeOptions) => {
   const {
     id,
     src,
     preserveTime,
   } = options;
+
   const store = useStore();
   const dispatch = useDispatch();
+
   const trackingRef = useRef<VideoTime | null>(null);
 
   useLayoutEffect(() => {
@@ -78,6 +84,7 @@ export const useVideoTime = (ref: RefObject<HTMLVideoElement | null>, options: V
       }
 
       element.currentTime = tracking.restore;
+
       tracking.time = element.currentTime;
       tracking.restore = 0;
     };

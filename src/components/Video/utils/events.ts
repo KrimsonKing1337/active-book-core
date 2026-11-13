@@ -1,6 +1,8 @@
-import type { VideoPlayback } from './state';
-
-import { isVideoActive, pauseVideo } from './state';
+import {
+  type VideoPlayback,
+  isVideoActive,
+  pauseVideo,
+} from './state';
 
 export const listenVideoPlayback = (playback: VideoPlayback) => {
   const { element } = playback;

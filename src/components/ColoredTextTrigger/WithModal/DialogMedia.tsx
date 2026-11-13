@@ -10,7 +10,8 @@ import classNames from 'classnames';
 import { VideoPlaybackContext } from '@components/Video/context';
 import { handleVideoPlayError, reportUnexpectedVideoError } from '@components/Video/utils/errors';
 
-import styles from '../WithModal.module.scss';
+import styles from './WithModal.module.scss';
+import { getVideoStats } from '@utils/getVideoStats';
 
 type DialogMediaProps = PropsWithChildren & {
   isMedia: boolean;
@@ -24,7 +25,10 @@ export const DialogMedia = ({
 }: DialogMediaProps) => {
   const bodyRef = useRef<HTMLDivElement>(null);
   const startedRef = useRef(new WeakSet<HTMLVideoElement>());
-  const scope = useMemo(() => ({ isCurrentWindow }), [isCurrentWindow]);
+
+  const scope = useMemo(() => {
+    return { isCurrentWindow };
+  }, [isCurrentWindow]);
 
   useLayoutEffect(() => {
     const body = bodyRef.current;
@@ -53,17 +57,21 @@ export const DialogMedia = ({
       }
 
       startedRef.current.add(video);
+
       video.autoplay = false;
       video.currentTime = 0;
+
       const source = video.getAttribute('src');
 
-      void video.play().then(() => {
+      video.play().then(() => {
         if (!video.isConnected || !isCurrentWindow()) {
           video.pause();
           video.currentTime = 0;
         }
       }).catch((error: unknown) => {
-        if (video.isConnected && isCurrentWindow() && video.getAttribute('src') === source) {
+        const { isConnected, sourceIsEqual } = getVideoStats(video, source);
+
+        if (isConnected && isCurrentWindow() && sourceIsEqual) {
           handleVideoPlayError(video, error);
         } else {
           reportUnexpectedVideoError(source, error);
@@ -77,11 +85,12 @@ export const DialogMedia = ({
           return;
         }
 
-        const remaining = new Set([...videos, ...body.querySelectorAll('video')]);
+        const allHtmlVideos = body.querySelectorAll('video');
+        const remaining = new Set([...videos, ...allHtmlVideos]);
 
-        remaining.forEach((video) => {
-          video.pause();
-          video.currentTime = 0;
+        remaining.forEach((videoCur) => {
+          videoCur.pause();
+          videoCur.currentTime = 0;
         });
       };
 

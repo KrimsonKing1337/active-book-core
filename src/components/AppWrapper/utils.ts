@@ -2,7 +2,9 @@ import type { HowlInstances } from '@types';
 
 import { store } from '@store';
 
-import { handleVideoPlayError, reportUnexpectedVideoError } from '@components/Video/utils/errors';
+import { handleVideoPlayError, reportUnexpectedVideoError } from '@components/Video/utils';
+
+import { getVideoStats } from '@utils/getVideoStats';
 
 export const setMuteToAllVideos = (muted: boolean) => {
   const videos = document.querySelectorAll('video');
@@ -23,15 +25,19 @@ export const startToPlayAllAudiosWithPlayOnLoad = (audioInstances: HowlInstances
     if (!audio) {
       return;
     }
+
     if (audio.page !== page && !audio.isRange) {
       return;
     }
+
     if (audio.isUnloading) {
       return;
     }
+
     if (audio.playing()) {
       return;
     }
+
     if (!audio.playOnLoad) {
       return;
     }
@@ -44,8 +50,12 @@ export const startToPlayAllVideosWithPlayOnLoad = () => {
   const videos = Array.from(document.querySelectorAll('video'));
 
   videos.forEach((videoCur) => {
-    const hasLocalOwner = videoCur.dataset.videoManaged === 'true'
-      || videoCur.closest('[data-book-carousel], [data-video-scope="dialog"]');
+    const videoIsManaged = videoCur.dataset.videoManaged === 'true';
+
+    const selectors = ['[data-book-carousel]', '[data-video-scope="dialog"]'];
+    const selectorsAsString = selectors.join(', ');
+
+    const hasLocalOwner = videoIsManaged || videoCur.closest(selectorsAsString);
 
     if (hasLocalOwner) {
       return;
@@ -56,12 +66,16 @@ export const startToPlayAllVideosWithPlayOnLoad = () => {
     if (autoPlay === 'true') {
       const source = videoCur.getAttribute('src');
 
-      void videoCur.play().then(() => {
-        if (!videoCur.isConnected && videoCur.getAttribute('src') === source) {
+      videoCur.play().then(() => {
+        const { isConnected, sourceIsEqual } = getVideoStats(videoCur, source);
+
+        if (!isConnected && sourceIsEqual) {
           videoCur.pause();
         }
       }).catch((error: unknown) => {
-        if (videoCur.isConnected && videoCur.getAttribute('src') === source) {
+        const { isConnected, sourceIsEqual } = getVideoStats(videoCur, source);
+
+        if (isConnected && sourceIsEqual) {
           handleVideoPlayError(videoCur, error);
         } else {
           reportUnexpectedVideoError(source, error);

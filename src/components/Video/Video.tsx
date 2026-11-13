@@ -7,7 +7,6 @@ import {
 } from 'react';
 
 import { useSelector } from '@store';
-
 import { volumeSelectors } from '@store/volume';
 
 import { VideoPlaybackContext } from './context';
@@ -70,12 +69,14 @@ export const Video = ({
     src,
     preserveTime: shouldPreserveTime,
   });
+
   const isManaged = useVideoPlayback(ref, {
     id,
     src,
     autoPlay,
     preserveTime,
   });
+
   const shouldAutoPlay = autoPlay && !isManaged;
 
   return (
