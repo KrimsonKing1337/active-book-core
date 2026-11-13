@@ -106,9 +106,10 @@ Deleted:
 
 WithModal remains a supported trigger/content composition; it no longer uses the
 old Modal. There are no remaining production consumers of either deleted shell.
-Hammer remains in package.json because Narrative, SlideShow and SlideShowOnClass
-still import it. Those implementations, VisualEffects Session and page navigation
-are unchanged. The existing History API limits documented for PR #45 also remain.
+Hammer and its types remain dependencies because Narrative still imports Hammer.
+Core's Embla-based Carousel is the only reader carousel implementation.
+Narrative, VisualEffects Session and page navigation are unchanged. The existing
+History API limits documented for PR #45 also remain.
 
 ## Validation
 

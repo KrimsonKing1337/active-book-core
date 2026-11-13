@@ -20,7 +20,6 @@ export * from './StoryWindowHost';
 export * from './StoryConfirmDialog';
 export * from './Overflow';
 export * from './StoryShell';
-export * from './SlideShow';
 export * from './Carousel';
 export * from './Spoiler';
 export * from './TableOfContents';
