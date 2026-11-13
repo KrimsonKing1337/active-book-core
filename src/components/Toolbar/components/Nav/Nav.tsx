@@ -9,17 +9,15 @@ import classNames from 'classnames';
 import ArrowLeft from '@assets/img/toolbar/i-arrow-left.svg';
 import ArrowRight from '@assets/img/toolbar/i-arrow-right.svg';
 
-import { mainSelectors } from '@store/main';
-
 import { useSelector } from '@store';
+import { mainSelectors } from '@store/main';
 
 import { useGoToPage } from '@hooks/control/useGoToPage';
 
 import { useReaderWindow } from '@components/StoryWindowHost/hooks';
-
 import { useAppMode } from '@components/App/AppModeContext';
 
-import { Item } from '@components/Toolbar/components/Item';
+import { Item } from '@components/Toolbar/components';
 
 import { Flags, modalsWereShowed } from '@utils/localStorage/modalsWereShowed';
 
@@ -29,6 +27,7 @@ import * as styles from './Nav.module.scss';
 
 export const Nav = () => {
   const appMode = useAppMode();
+
   const {
     goToPage,
     goPrevPage,
@@ -43,6 +42,7 @@ export const Nav = () => {
 
   const [goToWithInputIsHide, setGoToWithInputIsHide] = useState(true);
   const [inputValue, setInputValue] = useState('');
+
   const modalWindow = useReaderWindow({
     kind: 'legacy',
     contentId: 'swipe-notice',
@@ -91,7 +91,6 @@ export const Nav = () => {
     }
 
     setGoToWithInputIsHide(true);
-
     goToPage(pageNumber);
   };
 

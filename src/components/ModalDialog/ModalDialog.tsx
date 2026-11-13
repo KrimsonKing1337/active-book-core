@@ -36,19 +36,19 @@ export const ModalDialog = ({
   confirmButtonLabel = 'OK',
   cancelButtonLabel = 'Отмена',
   showCancelButton = true,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  onClose = defaultFunc,
+
   onConfirm = defaultFunc,
   onCancel = defaultFunc,
   children,
   ...etc
 }: PropsWithChildren<ModalDialogProps>) => {
   const [unlockedInstanceId, setUnlockedInstanceId] = useState<string | null>(null);
-  const instanceId = windowTarget?.instanceId ?? 'standalone';
-  const canClose = unlockedInstanceId === instanceId;
   const [secondsLeft, setSecondsLeft] = useState(0);
 
   const secondsLeftRef = useRef(0);
+
+  const instanceId = windowTarget?.instanceId ?? 'standalone';
+  const canClose = unlockedInstanceId === instanceId;
 
   useEffect(() => {
     if (!isOpen) {

@@ -10,15 +10,16 @@ import { MenuHeader } from '@components/MenuHeader';
 
 import { Item } from './Item';
 import { useBookmarks } from './hooks';
+
 import * as styles from './Bookmarks.module.scss';
 
 const buttonAddClassNames = classNames([styles.Button, styles.isAdd]);
 
 export const Bookmarks = () => {
   const { isOpen, close } = useReaderWindow({ kind: 'bookmarks' });
-  const page = useSelector(mainSelectors.page);
-
   const { bookmarks, setBookmarks } = useBookmarks();
+
+  const page = useSelector(mainSelectors.page);
 
   const addButtonClickHandler = () => {
     setBookmarks([...bookmarks, page]);

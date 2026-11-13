@@ -3,11 +3,13 @@ import { windowsActions } from '@store/windows';
 import type { HistoryConnection, HistoryMarker } from './@types';
 
 import { pushGuard } from './entries';
+
 import {
   listenToHistory,
   navigation,
   traversePair,
 } from './navigation';
+
 import {
   isSamePair,
   isSamePosition,
@@ -32,7 +34,9 @@ export const connectWindowHistory = ({ store, sessionId }: HistoryConnection) =>
 
   const reconcile = () => {
     const active = getActiveWindow();
+
     const previous = previousInstanceId;
+
     previousInstanceId = active?.instanceId ?? null;
 
     if (isHandlingPop) {
@@ -41,7 +45,7 @@ export const connectWindowHistory = ({ store, sessionId }: HistoryConnection) =>
 
     if (navigation.pending) {
       // Closing Back must finish before arming a successor. A compensating Forward may be
-      // cancelled by rapid native Back without another popstate. It must not freeze UI commands.
+      // canceled by rapid native Back without another popstate. It must not freeze UI commands.
       if (navigation.pending.position === 'base' || previous === previousInstanceId) {
         return;
       }
@@ -49,6 +53,7 @@ export const connectWindowHistory = ({ store, sessionId }: HistoryConnection) =>
 
     // An embedding application may have replaced history.state since the last notification.
     position = readMarker(window.history.state);
+
     const isOwnGuard = position?.sessionId === sessionId && position.position === 'guard';
 
     if (active) {
@@ -66,7 +71,9 @@ export const connectWindowHistory = ({ store, sessionId }: HistoryConnection) =>
 
   const handlePopState = (event: PopStateEvent, pending: HistoryMarker | null) => {
     const departure = position;
+
     position = readMarker(event.state);
+
     const currentPosition = readMarker(window.history.state);
 
     // An earlier host popstate listener may already have opened a successor and pushed its Guard.
@@ -115,12 +122,15 @@ export const connectWindowHistory = ({ store, sessionId }: HistoryConnection) =>
     }
 
     isHandlingPop = true;
+
     store.dispatch(windowsActions.requestClose({ sessionId, instanceId: active.instanceId }));
+
     isHandlingPop = false;
   };
 
   const unsubscribe = store.subscribe(reconcile);
   const stopListening = listenToHistory(handlePopState);
+
   reconcile();
 
   return () => {

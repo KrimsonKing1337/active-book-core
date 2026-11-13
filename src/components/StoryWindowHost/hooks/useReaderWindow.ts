@@ -1,10 +1,15 @@
 import { useContext } from 'react';
 
-import type { WindowKind, WindowTarget } from '@store/windows';
-
 import { useDispatch, useSelector } from '@store';
+
 import { mainSelectors } from '@store/main';
-import { windowsActions, windowsSelectors } from '@store/windows';
+
+import {
+  type WindowKind,
+  type WindowTarget,
+  windowsActions,
+  windowsSelectors,
+} from '@store/windows';
 
 import { StoryWindowSessionContext } from '../context';
 
@@ -22,16 +27,25 @@ export const useReaderWindow = ({
   canClose = true,
 }: ReaderWindowOptions) => {
   const dispatch = useDispatch();
-  const sessionId = useContext(StoryWindowSessionContext);
+
   const ownerId = useSelector(windowsSelectors.sessionId);
   const pageId = useSelector(mainSelectors.pageId);
   const windowPageId = useSelector(windowsSelectors.pageId);
   const active = useSelector(windowsSelectors.activeWindow);
+
+  const sessionId = useContext(StoryWindowSessionContext);
+
   let target: WindowTarget | undefined;
 
-  if (sessionId && ownerId === sessionId && pageId === windowPageId &&
-      active?.kind === kind && active.contentId === contentId) {
-    target = { sessionId, instanceId: active.instanceId };
+  const isCurrentSession = sessionId !== null && ownerId === sessionId;
+  const isCurrentPage = pageId === windowPageId;
+  const isMatchingWindow = active?.kind === kind && active.contentId === contentId;
+
+  if (isCurrentSession && isCurrentPage && isMatchingWindow) {
+    target = {
+      sessionId,
+      instanceId: active.instanceId,
+    };
   }
 
   const open = () => {

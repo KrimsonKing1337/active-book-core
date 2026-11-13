@@ -11,6 +11,7 @@ export const pushGuard = (sessionId: string): HistoryMarker => {
     pairId: nanoid(),
     position: 'base',
   };
+
   const guard: HistoryMarker = { ...base, position: 'guard' };
 
   window.history.replaceState(withMarker(window.history.state, base), '');

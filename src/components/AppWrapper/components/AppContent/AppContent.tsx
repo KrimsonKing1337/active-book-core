@@ -45,7 +45,10 @@ import {
   useVisibilityChangeHandler,
 } from '../../hooks';
 
-import { startToPlayAllAudiosWithPlayOnLoad, startToPlayAllVideosWithPlayOnLoad } from '../../utils';
+import {
+  startToPlayAllAudiosWithPlayOnLoad,
+  startToPlayAllVideosWithPlayOnLoad,
+} from '../../utils';
 
 import * as styles from '../../AppWrapper.module.scss';
 
@@ -203,6 +206,10 @@ export const AppContent = ({
     [styles.isLoading]: showLoader,
   });
 
+  const dataPageId = pageId ?? undefined;
+  const storyContentKey = pageId === null ? 'start' : `page:${pageId}`;
+  const storyContentChildren = pageId === null ? children : selectedPage?.content;
+
   const story = (
     <StoryRoot
       ref={ref}
@@ -215,10 +222,10 @@ export const AppContent = ({
     >
       <StoryShell
         withoutToolbar={withoutToolbar}
-        data-page-id={pageId ?? undefined}
+        data-page-id={dataPageId}
       >
-        <StoryContent key={pageId === null ? 'start' : `page:${pageId}`}>
-          {pageId === null ? children : selectedPage?.content}
+        <StoryContent key={storyContentKey}>
+          {storyContentChildren}
         </StoryContent>
       </StoryShell>
     </StoryRoot>

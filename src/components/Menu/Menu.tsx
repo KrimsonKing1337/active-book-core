@@ -18,8 +18,8 @@ import {
 } from './components';
 
 export const Menu = () => {
-
   const { isOpen, close } = useReaderWindow({ kind: 'menu' });
+
   const allPagesSeen = useSelector(mainSelectors.allPagesSeen);
 
   return (

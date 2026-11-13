@@ -1,49 +1,80 @@
+import { isRecord } from '@utils/isRecord';
+
 import type { HistoryMarker } from './@types';
 
 export const markerKey = 'activeBookWindows';
 
 export const readMarker = (state: unknown): HistoryMarker | null => {
-  if (!state || typeof state !== 'object' || !(markerKey in state)) {
+  if (!isRecord(state)) {
     return null;
   }
 
   const marker = state[markerKey];
 
-  if (!marker || typeof marker !== 'object') {
+  if (!isRecord(marker)) {
     return null;
   }
 
-  if (!('version' in marker) || marker.version !== 1 ||
-      !('sessionId' in marker) || typeof marker.sessionId !== 'string' || !marker.sessionId ||
-      !('pairId' in marker) || typeof marker.pairId !== 'string' || !marker.pairId ||
-      !('position' in marker) || (marker.position !== 'base' && marker.position !== 'guard')) {
+  const {
+    version,
+    sessionId,
+    pairId,
+    position,
+  } = marker;
+
+  if (version !== 1) {
+    return null;
+  }
+
+  if (typeof sessionId !== 'string' || !sessionId) {
+    return null;
+  }
+
+  if (typeof pairId !== 'string' || !pairId) {
+    return null;
+  }
+
+  if (position !== 'base' && position !== 'guard') {
     return null;
   }
 
   return {
-    version: 1,
-    sessionId: marker.sessionId,
-    pairId: marker.pairId,
-    position: marker.position,
+    version,
+    sessionId,
+    pairId,
+    position,
   };
 };
 
 export const withMarker = (state: unknown, marker: HistoryMarker) => {
   if (state && typeof state === 'object') {
-    return { ...state, [markerKey]: marker };
+    return {
+      ...state,
+      [markerKey]: marker,
+    };
   }
 
-  return { [markerKey]: marker };
+  return {
+    [markerKey]: marker,
+  };
 };
 
-export const isSamePair = (first: HistoryMarker | null, second: HistoryMarker | null) => {
-  return !!first && !!second && first.sessionId === second.sessionId && first.pairId === second.pairId;
+type HistoryUnit = HistoryMarker | null;
+
+export const isSamePair = (first: HistoryUnit, second: HistoryUnit) => {
+  if (!first || !second) {
+    return false;
+  }
+
+  return first.sessionId === second.sessionId && first.pairId === second.pairId;
 };
 
-export const isSamePosition = (first: HistoryMarker | null, second: HistoryMarker | null) => {
+export const isSamePosition = (first: HistoryUnit, second: HistoryUnit) => {
   if (!first || !second) {
     return first === second;
   }
 
-  return isSamePair(first, second) && first.position === second.position;
+  const pairIsSame = isSamePair(first, second);
+
+  return pairIsSame && first.position === second.position;
 };

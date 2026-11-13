@@ -9,7 +9,6 @@ import { useVibration } from '@hooks/effects/vibration';
 
 import { useReaderWindow } from '@components/StoryWindowHost/hooks';
 
-
 import {
   Action,
   Button,
@@ -45,6 +44,7 @@ export const WelcomeTour = ({
   setIsActive,
 }: WelcomeTourProps) => {
   const dispatch = useDispatch();
+
   const modalWindow = useReaderWindow({
     kind: 'legacy',
     contentId: 'welcome-notice',

@@ -1,4 +1,5 @@
 import type { PropsWithChildren } from 'react';
+
 import {
   useCallback,
   useEffect,
@@ -8,19 +9,21 @@ import {
 } from 'react';
 
 import Hammer from 'hammerjs';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
 import {
   faCompress,
   faCrop,
   faExpand,
   faTimes,
 } from '@fortawesome/free-solid-svg-icons';
+
 import classNames from 'classnames';
 
-import type { WindowTarget } from '@store/windows';
-
 import { useDispatch } from '@store';
-import { windowsActions } from '@store/windows';
+
+import { type WindowTarget, windowsActions } from '@store/windows';
 
 import { useAppMode } from '@components/App/AppModeContext';
 
@@ -44,7 +47,6 @@ export type ModalProps = {
 
 export const Modal = ({
   children,
-  onClose,
   windowTarget,
   isOpen,
   mode = 'text',
@@ -53,16 +55,18 @@ export const Modal = ({
   fullScreenDefault = false,
   canCrop = false,
   cropDefault = true,
+  onClose,
 }: PropsWithChildren<ModalProps>) => {
-  const appMode = useAppMode();
   const dispatch = useDispatch();
+  const appMode = useAppMode();
+
+  const [isFullScreen, setIsFullScreen] = useState(fullScreenDefault);
+  const [isCrop, setIsCrop] = useState(cropDefault);
+
   // здесь реф-версии нужны для хаммера, обычные для того чтобы ре-рендер срабатывал
   const isFullScreenRef = useRef(false);
   const isCropRef = useRef(true);
   const isZoomingRef = useRef(false);
-
-  const [isFullScreen, setIsFullScreen] = useState(fullScreenDefault);
-  const [isCrop, setIsCrop] = useState(cropDefault);
 
   const overflowRef = useRef<HTMLDivElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);

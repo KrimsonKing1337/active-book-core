@@ -7,8 +7,8 @@ import { useDispatch, useSelector } from '@store';
 import { configActions, configSelectors } from '@store/config';
 
 import { useReaderWindow } from '@components/StoryWindowHost/hooks';
-
 import { useStoryRegions } from '@components/StoryRegionsProvider';
+
 import { VisualHost } from '@components/VisualHost';
 
 import { getNewValueForNarrativeTextStyle } from '@utils/styles/getNewValueForNarrativeTextStyle';
@@ -24,6 +24,7 @@ export type ToolbarProps = {
 
 export const Toolbar = ({ sbMode }: ToolbarProps) => {
   const dispatch = useDispatch();
+
   const bookmarksWindow = useReaderWindow({ kind: 'bookmarks' });
   const menuWindow = useReaderWindow({ kind: 'menu' });
 

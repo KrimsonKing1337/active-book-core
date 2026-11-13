@@ -1,4 +1,5 @@
 import type { PropsWithChildren } from 'react';
+
 import {
   useEffect,
   useRef,
@@ -32,6 +33,7 @@ export const WithModal = ({
   eggId,
 }: PropsWithChildren<ModalWithVideoEasterEggProps>) => {
   const contentId = useId();
+
   const {
     isOpen: isActive,
     open,
@@ -97,11 +99,11 @@ export const WithModal = ({
       <ModalComponent
         isOpen={isActive}
         windowTarget={target}
-        onClose={close}
         mode={mode}
         canCrop
         cropDefault={false}
         canFullScreen
+        onClose={close}
       >
         {children}
       </ModalComponent>

@@ -1,11 +1,9 @@
 import { useContext } from 'react';
 
-import type { OpenWindowOptions } from '@store/windows';
-
-
 import { useDispatch, useSelector } from '@store';
+
 import { mainSelectors } from '@store/main';
-import { windowsActions } from '@store/windows';
+import { type OpenWindowOptions, windowsActions } from '@store/windows';
 
 import { StoryWindowSessionContext } from '../context';
 
@@ -14,9 +12,9 @@ type OpenOptions = Omit<OpenWindowOptions, 'sessionId' | 'pageId'>;
 export const useStoryWindowActions = () => {
   const dispatch = useDispatch();
 
-  const sessionId = useContext(StoryWindowSessionContext);
-
   const pageId = useSelector(mainSelectors.pageId);
+
+  const sessionId = useContext(StoryWindowSessionContext);
 
   if (!sessionId) {
     throw new Error('Story window actions require a reader BookSession');

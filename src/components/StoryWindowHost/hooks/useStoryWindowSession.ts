@@ -1,7 +1,4 @@
-import {
-  useLayoutEffect,
-  useState,
-} from 'react';
+import { useLayoutEffect, useState } from 'react';
 
 import { nanoid } from '@reduxjs/toolkit';
 
@@ -18,6 +15,7 @@ export const useStoryWindowSession = () => {
   const dispatch = useDispatch();
 
   const appMode = useAppMode();
+
   const [sessionId] = useState(nanoid);
 
   const pageId = useSelector(mainSelectors.pageId);

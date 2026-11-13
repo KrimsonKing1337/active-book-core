@@ -11,6 +11,7 @@ import * as styles from './TableOfContents.module.scss';
 
 export const TableOfContents = () => {
   const { isOpen, close } = useReaderWindow({ kind: 'tableOfContents' });
+
   const tableOfContents = useSelector(mainSelectors.tableOfContents);
 
   return (

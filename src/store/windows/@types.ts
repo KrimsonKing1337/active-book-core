@@ -1,4 +1,9 @@
-export type WindowKind = 'content' | 'menu' | 'tableOfContents' | 'bookmarks' | 'legacy';
+export type WindowKind =
+  | 'content'
+  | 'menu'
+  | 'tableOfContents'
+  | 'bookmarks'
+  | 'legacy';
 
 export type StoryWindow = {
   kind: WindowKind;

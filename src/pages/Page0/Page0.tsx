@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { configSelectors } from '@store/config';
 
 import { useDispatch, useSelector } from '@store';
-
 import { mainActions, mainSelectors } from '@store/main';
 
 import { useGoToPage } from '@hooks/control/useGoToPage';
@@ -20,7 +19,6 @@ import {
 import { Flags, modalsWereShowed } from '@utils/localStorage/modalsWereShowed';
 import { flashlightInst } from '@utils/effects/flashlight';
 import { get as localStorageGet } from '@utils/localStorage/localStorage';
-
 import { HowlWrapper } from '@utils/effects/audio/HowlWrapper';
 
 import { Modal } from './components';
@@ -54,6 +52,7 @@ export const Page0 = ({
   const [lastPage, setLastPage] = useState(0);
 
   const [isWelcomeTourActive, setIsWelcomeTourActive] = useState(false);
+
   const welcomeWindow = useReaderWindow({
     kind: 'legacy',
     contentId: 'welcome-notice',

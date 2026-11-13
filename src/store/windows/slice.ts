@@ -1,6 +1,8 @@
-import type { PayloadAction } from '@reduxjs/toolkit';
-
-import { createSlice, nanoid } from '@reduxjs/toolkit';
+import {
+  type PayloadAction,
+  createSlice,
+  nanoid,
+} from '@reduxjs/toolkit';
 
 import type {
   OpenWindowOptions,
@@ -17,6 +19,10 @@ export const initialState: State = {
 
 type OpenReducerAction = PayloadAction<OpenWindowOptions & {
   instanceId: string;
+  canClose: boolean;
+}>;
+
+type SetCanCloseAction = PayloadAction<WindowTarget & {
   canClose: boolean;
 }>;
 
@@ -70,7 +76,7 @@ const slice = createSlice({
         };
       },
     },
-    setCanClose(state, action: PayloadAction<WindowTarget & { canClose: boolean }>) {
+    setCanClose(state, action: SetCanCloseAction) {
       const {
         sessionId,
         instanceId,

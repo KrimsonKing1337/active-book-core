@@ -28,9 +28,11 @@ export const Overflow = ({
   onClose,
   ...etc
 }: OverflowProps) => {
-  const appMode = useAppMode();
   const store = useStore();
+
+  const appMode = useAppMode();
   const sessionId = useContext(StoryWindowSessionContext);
+
   const overflowRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -38,15 +40,17 @@ export const Overflow = ({
       return;
     }
 
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
         onClose();
       }
     };
 
     document.addEventListener('keydown', handleEscape);
 
-    return () => document.removeEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+    };
   }, [appMode, isOpen, onClose]);
 
   useEffect(() => {
@@ -55,6 +59,7 @@ export const Overflow = ({
     }
 
     const opener = document.activeElement;
+
     overflowRef.current?.focus();
 
     return () => {
@@ -64,8 +69,10 @@ export const Overflow = ({
         return;
       }
 
-      if (opener instanceof HTMLElement && opener.isConnected &&
-          !opener.closest('[inert], [data-book-window-open="false"]')) {
+      const selectors = ['[inert]', '[data-book-window-open="false"]'];
+      const selectorsJoined = selectors.join(', ');
+
+      if (opener instanceof HTMLElement && opener.isConnected && !opener.closest(selectorsJoined)) {
         opener.focus();
       } else {
         getNarrativeElement()?.focus();
