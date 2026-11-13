@@ -69,7 +69,9 @@ test('clipping follows narrative viewport height even if selected content and ro
 test('preview resize, real scroll and selected region changes retain the visible outline', async (context) => {
   const page = await openOutline(context);
   await page.getByRole('button', { name: 'Resize preview' }).click();
-  await page.waitForFunction(() => document.querySelector('[data-visual-selection]').getBoundingClientRect().width < 400);
+  await page.waitForFunction(() => {
+    return document.querySelector('[data-visual-selection]').getBoundingClientRect().width < 400;
+  });
   await assertAligned(page);
   await page.getByTestId('viewport').hover();
   await page.mouse.wheel(0, 100);
