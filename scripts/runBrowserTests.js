@@ -2,6 +2,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const browserTests = [
+  'selectionOutline.browser.test.js',
   'dialogCarousel.browser.test.js',
   'dialogCarouselLayout.browser.test.js',
   'dialogCarouselFocus.browser.test.js',

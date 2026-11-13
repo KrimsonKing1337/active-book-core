@@ -58,6 +58,16 @@ export const VisualSelectionOutline = ({ item }: VisualSelectionOutlineProps) =>
       const bounds = element.getBoundingClientRect();
       const rootBounds = root.getBoundingClientRect();
 
+      if (!root.offsetWidth || !root.offsetHeight || !rootBounds.width || !rootBounds.height) {
+        setOutline(null);
+
+        return;
+      }
+
+      // DOM rectangles include an axis-aligned embed scale; CSS positions are local.
+      const scaleX = rootBounds.width / root.offsetWidth;
+      const scaleY = rootBounds.height / root.offsetHeight;
+
       let left = bounds.left;
       let top = bounds.top;
       let right = bounds.right;
@@ -73,10 +83,10 @@ export const VisualSelectionOutline = ({ item }: VisualSelectionOutlineProps) =>
       }
 
       setOutline({
-        left: left - rootBounds.left,
-        top: top - rootBounds.top,
-        width: Math.max(0, right - left),
-        height: Math.max(0, bottom - top),
+        left: (left - rootBounds.left) / scaleX - root.clientLeft,
+        top: (top - rootBounds.top) / scaleY - root.clientTop,
+        width: Math.max(0, right - left) / scaleX,
+        height: Math.max(0, bottom - top) / scaleY,
         borderRadius: getComputedStyle(element).borderRadius,
       });
     };
@@ -89,6 +99,10 @@ export const VisualSelectionOutline = ({ item }: VisualSelectionOutlineProps) =>
 
     observer.observe(element);
     observer.observe(root);
+
+    if (region === 'narrativeContent' && scrollViewPort) {
+      observer.observe(scrollViewPort);
+    }
 
     root.addEventListener('scroll', schedule, true);
     window.addEventListener('resize', schedule);
@@ -105,7 +119,14 @@ export const VisualSelectionOutline = ({ item }: VisualSelectionOutlineProps) =>
         cancelAnimationFrame(frame);
       }
     };
-  }, [element, root, scrollViewPort, region, hidden]);
+  }, [
+    element,
+    root,
+    scrollViewPort,
+    region,
+    hidden,
+    item,
+  ]);
 
   if (hidden || !outline || !selectionHost || !item) {
     return null;
