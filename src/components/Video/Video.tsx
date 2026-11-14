@@ -12,7 +12,7 @@ import { volumeSelectors } from '@store/volume';
 import { VideoPlaybackContext } from './context';
 import { useVideoPlayback, useVideoTime } from './hooks';
 
-type VideoProps = React.MediaHTMLAttributes<HTMLVideoElement> & {
+type VideoProps = React.VideoHTMLAttributes<HTMLVideoElement> & {
   id: string;
   className?: string;
   src: string;
