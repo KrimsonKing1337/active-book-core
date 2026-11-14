@@ -24,6 +24,7 @@
     "visualPlayground/**/*.tsx",
     "mediaContinuity/**/*.ts",
     "mediaContinuity/**/*.tsx",
-    "dialogCarousel/**/*.tsx"
+    "dialogCarousel/**/*.tsx",
+    "selectionOutline/**/*.tsx"
   ]
 }
