@@ -2,13 +2,12 @@
   "name": "@active-book/core",
   "version": "0.0.64",
   "description": "",
-  "main": "./lib/src/index.js",
   "type": "module",
   "scripts": {
     "make": "node ./scripts/make.js",
     "clean": "rimraf dist tgz lib lib-esm",
-    "ts": "tsc -m es2020 --outDir lib",
-    "copy-files": "copyfiles -u 1 -s -e \"src/**/*.ts\" -e \"src/**/*.tsx\" \"src/**/*.*\" lib/src/",
+    "ts": "tsc --project tsconfig.build.json",
+    "copy-files": "node ./scripts/copyRuntimeFiles.js",
     "packaging": "node ./scripts/tgzPrepare.js && npm pack --pack-destination ./tgz",
     "up": "npm version patch --git-tag-version false --commit-hooks false",
     "scss": "npx sass src:src",
@@ -21,14 +20,14 @@
     "lint:ts": "eslint \"./src/**/*.{ts,tsx}\" --fix",
     "lint:css": "stylelint \"src/**/*.scss\" --fix",
     "lint-staged": "lint-staged",
-    "postinstall": "node ./scripts/postinstall.js",
     "pre-commit": "lint-staged",
     "dev:visual-lab": "node scripts/visualPlayground.js",
     "test:visual-lab": "node --test tests/visualPlayground/visualPlayground.browser.test.js",
     "lint:ts:check": "eslint \"./src/**/*.{ts,tsx}\"",
     "lint:css:check": "stylelint \"src/**/*.scss\"",
     "test:unit": "jest --runInBand",
-    "test:scripts": "node --test tests/eslint/eslint.test.js tests/jest/file-transform.test.js tests/infrastructure/testLayout.test.js"
+    "test:scripts": "node --test tests/eslint/eslint.test.js tests/jest/file-transform.test.js tests/infrastructure/testLayout.test.js tests/packaging/package.test.js",
+    "build": "node ./scripts/build.js"
   },
   "husky": {
     "hooks": {
@@ -63,7 +62,8 @@
     "react-redux": "^9.3.1",
     "react-style-stringify": "^1.2.0",
     "react-toastify": "^11.2.0",
-    "redux-saga": "^1.5.1"
+    "redux-saga": "^1.5.1",
+    "@types/howler": "^2.2.13"
   },
   "peerDependencies": {
     "@active-book/types": "^0.0.3"
@@ -77,14 +77,12 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.3",
     "@types/hammerjs": "^2.0.46",
-    "@types/howler": "^2.2.13",
     "@types/jest": "^30.0.0",
     "@types/lodash-es": "^4.17.12",
     "@types/node": "^20.19.43",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "@types/w3c-image-capture": "^1.0.11",
-    "copyfiles": "^2.4.1",
     "eslint": "10.14.0",
     "eslint-plugin-jest": "^29.17.0",
     "husky": "^9.1.7",
@@ -124,5 +122,129 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "files": [
+    "lib/src"
+  ],
+  "exports": {
+    "./@types": {
+      "types": "./lib/src/@types.d.ts",
+      "import": "./lib/src/@types.js",
+      "default": "./lib/src/@types.js"
+    },
+    "./components": {
+      "types": "./lib/src/components/index.d.ts",
+      "import": "./lib/src/components/index.js",
+      "default": "./lib/src/components/index.js"
+    },
+    "./components/App/AppModeContext": {
+      "types": "./lib/src/components/App/AppModeContext.d.ts",
+      "import": "./lib/src/components/App/AppModeContext.js",
+      "default": "./lib/src/components/App/AppModeContext.js"
+    },
+    "./components/BackgroundEffects/components/BackgroundRenderer": {
+      "types": "./lib/src/components/BackgroundEffects/components/BackgroundRenderer/index.d.ts",
+      "import": "./lib/src/components/BackgroundEffects/components/BackgroundRenderer/index.js",
+      "default": "./lib/src/components/BackgroundEffects/components/BackgroundRenderer/index.js"
+    },
+    "./components/BookApplicationSurface": {
+      "types": "./lib/src/components/BookApplicationSurface/index.d.ts",
+      "import": "./lib/src/components/BookApplicationSurface/index.js",
+      "default": "./lib/src/components/BookApplicationSurface/index.js"
+    },
+    "./components/Carousel": {
+      "types": "./lib/src/components/Carousel/index.d.ts",
+      "import": "./lib/src/components/Carousel/index.js",
+      "default": "./lib/src/components/Carousel/index.js"
+    },
+    "./components/FrameEffects/components/FrameRenderer": {
+      "types": "./lib/src/components/FrameEffects/components/FrameRenderer/index.d.ts",
+      "import": "./lib/src/components/FrameEffects/components/FrameRenderer/index.js",
+      "default": "./lib/src/components/FrameEffects/components/FrameRenderer/index.js"
+    },
+    "./components/FrameEffects/components/FrameShadow/presets": {
+      "types": "./lib/src/components/FrameEffects/components/FrameShadow/presets/index.d.ts",
+      "import": "./lib/src/components/FrameEffects/components/FrameShadow/presets/index.js",
+      "default": "./lib/src/components/FrameEffects/components/FrameShadow/presets/index.js"
+    },
+    "./components/ProxyHooks": {
+      "types": "./lib/src/components/ProxyHooks/index.d.ts",
+      "import": "./lib/src/components/ProxyHooks/index.js",
+      "default": "./lib/src/components/ProxyHooks/index.js"
+    },
+    "./components/StoryDialog": {
+      "types": "./lib/src/components/StoryDialog/index.d.ts",
+      "import": "./lib/src/components/StoryDialog/index.js",
+      "default": "./lib/src/components/StoryDialog/index.js"
+    },
+    "./components/Video": {
+      "types": "./lib/src/components/Video/index.d.ts",
+      "import": "./lib/src/components/Video/index.js",
+      "default": "./lib/src/components/Video/index.js"
+    },
+    "./controllers/visualEffects": {
+      "types": "./lib/src/controllers/visualEffects/index.d.ts",
+      "import": "./lib/src/controllers/visualEffects/index.js",
+      "default": "./lib/src/controllers/visualEffects/index.js"
+    },
+    "./controllers/visualEffects/utils/declarations": {
+      "types": "./lib/src/controllers/visualEffects/utils/declarations.d.ts",
+      "import": "./lib/src/controllers/visualEffects/utils/declarations.js",
+      "default": "./lib/src/controllers/visualEffects/utils/declarations.js"
+    },
+    "./controllers/visualEffects/utils/serialization": {
+      "types": "./lib/src/controllers/visualEffects/utils/serialization.d.ts",
+      "import": "./lib/src/controllers/visualEffects/utils/serialization.js",
+      "default": "./lib/src/controllers/visualEffects/utils/serialization.js"
+    },
+    "./hooks/control/useGoToPage": {
+      "types": "./lib/src/hooks/control/useGoToPage.d.ts",
+      "import": "./lib/src/hooks/control/useGoToPage.js",
+      "default": "./lib/src/hooks/control/useGoToPage.js"
+    },
+    "./hooks/effects": {
+      "types": "./lib/src/hooks/effects/index.d.ts",
+      "import": "./lib/src/hooks/effects/index.js",
+      "default": "./lib/src/hooks/effects/index.js"
+    },
+    "./hooks/effects/background": {
+      "types": "./lib/src/hooks/effects/background/index.d.ts",
+      "import": "./lib/src/hooks/effects/background/index.js",
+      "default": "./lib/src/hooks/effects/background/index.js"
+    },
+    "./hooks/effects/background/@types": {
+      "types": "./lib/src/hooks/effects/background/@types.d.ts",
+      "import": "./lib/src/hooks/effects/background/@types.js",
+      "default": "./lib/src/hooks/effects/background/@types.js"
+    },
+    "./hooks/effects/frame/@types": {
+      "types": "./lib/src/hooks/effects/frame/@types.d.ts",
+      "import": "./lib/src/hooks/effects/frame/@types.js",
+      "default": "./lib/src/hooks/effects/frame/@types.js"
+    },
+    "./pages/Page0": {
+      "types": "./lib/src/pages/Page0/index.d.ts",
+      "import": "./lib/src/pages/Page0/index.js",
+      "default": "./lib/src/pages/Page0/index.js"
+    },
+    "./store": {
+      "types": "./lib/src/store/index.d.ts",
+      "import": "./lib/src/store/index.js",
+      "default": "./lib/src/store/index.js"
+    },
+    "./store/config": {
+      "types": "./lib/src/store/config/index.d.ts",
+      "import": "./lib/src/store/config/index.js",
+      "default": "./lib/src/store/config/index.js"
+    },
+    "./store/main": {
+      "types": "./lib/src/store/main/index.d.ts",
+      "import": "./lib/src/store/main/index.js",
+      "default": "./lib/src/store/main/index.js"
+    },
+    "./assets/*": "./lib/src/assets/*",
+    "./styles/*": "./lib/src/styles/*",
+    "./vendors/*": "./lib/src/vendors/*",
+    "./package.json": "./package.json"
   }
 }

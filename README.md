@@ -70,7 +70,37 @@ rules remain here. Stylelint reexports `@active-book/common/stylelint`, includin
 its SCSS rules and property ordering. `lint:ts:check` / `lint:css:check` check without
 fixes; existing fixing scripts remain available.
 
-TypeScript extends the common library profile. Jest stays local; `make` builds and increments the core version.
+TypeScript extends the common library profile. Jest stays local; production emission
+uses `tsconfig.build.json`, separately from source/test typechecking.
+
+## Build and package
+
+```sh
+npm run build
+npm run packaging
+```
+
+`build` cleans and recreates `lib/`, copies runtime resources, rewrites JS/SCSS
+aliases and resolves relative JS imports. It does not change source files, the
+version or the lockfile. Lottie WASM is copied from the installed dependency directly
+to `lib/src/vendors/`. `packaging` creates `tgz/active-book-core-<version>.tgz` from
+the existing build; run `build` first. `make` runs these two steps without changing
+the version. Version changes are an explicit `npm run up` operation.
+
+The archive contains `lib/src/`, package metadata, README and license. Production
+compilation excludes tests, fixtures and Jest setup; tooling and diagnostic materials
+are outside the package allowlist. No install scripts or file relocation are needed.
+
+The package has no root import: use the supported subpaths such as
+`@active-book/core/components`, `@active-book/core/store` and
+`@active-book/core/controllers/visualEffects`. Each JS module export has a matching
+`types` target. Resources retain `@active-book/core/styles/*`, `assets/*` and
+`vendors/*` paths. The editor/book-builder serve and emit the exported Lottie WASM
+at the existing `/vendors/dotlottie-player.wasm` URL. Howler declarations are a package
+dependency because they appear in the public audio types.
+
+`npm run test:scripts` includes two-build/two-archive reproducibility checks, source
+and manifest integrity checks, package contents, exports and runtime resources.
 
 Test commands, fixture locations and the browser scenario inventory:
 [tests/README.md](tests/README.md).
