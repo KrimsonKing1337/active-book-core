@@ -1,16 +1,24 @@
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
+const scripts = ['build', 'packaging'];
+
+const cwd = fileURLToPath(new URL('../', import.meta.url));
+
+const options = {
+  cwd,
+  stdio: 'inherit',
+};
+
 try {
-  for (const script of ['build', 'packaging']) {
-    execFileSync(process.execPath, [
+  for (const scriptCur of scripts) {
+    const args = [
       process.env.npm_execpath,
       'run',
-      script,
-    ], {
-      cwd: fileURLToPath(new URL('../', import.meta.url)),
-      stdio: 'inherit',
-    });
+      scriptCur,
+    ];
+
+    execFileSync(process.execPath, args, options);
   }
 } catch (error) {
   console.error(error);

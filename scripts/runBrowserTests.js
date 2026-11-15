@@ -1,6 +1,6 @@
 import { spawnSync } from 'node:child_process';
-import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import path from 'node:path';
 
 export const browserTests = [
   'selectionOutline/selectionOutline.browser.test.js',
@@ -33,8 +33,8 @@ export const browserTests = [
 ];
 
 export const runBrowserTests = () => {
-  const testFiles = browserTests.map((filename) => {
-    return fileURLToPath(new URL(`../tests/${filename}`, import.meta.url));
+  const testFiles = browserTests.map((filenameCur) => {
+    return fileURLToPath(new URL(`../tests/${filenameCur}`, import.meta.url));
   });
 
   const result = spawnSync(process.execPath, [

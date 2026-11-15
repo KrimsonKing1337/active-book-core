@@ -1,30 +1,45 @@
 import { cpSync } from 'node:fs';
-import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { basename, resolve } from 'node:path';
+
+const root = fileURLToPath(new URL('../', import.meta.url));
+const scriptPath = fileURLToPath(import.meta.url);
+
+const sourceDirectory = resolve(root, 'src');
+const targetDirectory = resolve(root, 'lib/src');
+
+const excludedDirectories = new Set([
+  'tests',
+  '__tests__',
+  '__mocks__',
+]);
+
+const sourceFilePattern = /\.[cm]?[jt]sx?$/u;
+const excludedRuntimeFile = 'dotlottie-player.wasm';
+
+const shouldCopyFile = (source) => {
+  const name = basename(source);
+
+  if (excludedDirectories.has(name)) {
+    return false;
+  }
+
+  if (sourceFilePattern.test(name)) {
+    return false;
+  }
+
+  return name !== excludedRuntimeFile;
+};
 
 export const copyRuntimeFiles = () => {
-  cpSync(new URL('../src/', import.meta.url), new URL('../lib/src/', import.meta.url), {
+  cpSync(sourceDirectory, targetDirectory, {
     recursive: true,
-    filter: (source) => {
-      const name = path.basename(source);
-
-      if ([
-        'tests',
-        '__tests__',
-        '__mocks__',
-      ].includes(name)) {
-        return false;
-      }
-
-      if (/\.[cm]?[jt]sx?$/.test(name) || name === 'dotlottie-player.wasm') {
-        return false;
-      }
-
-      return true;
-    },
+    filter: shouldCopyFile,
   });
 };
 
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+const isDirectExecution = process.argv[1] && resolve(process.argv[1]) === scriptPath;
+
+if (isDirectExecution) {
   copyRuntimeFiles();
 }
