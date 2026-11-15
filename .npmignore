@@ -5,15 +5,9 @@ src
 tgz
 test-report.xml
 tests
-scripts/bookVisualRoot.browser.test.js
-scripts/visualPlacement.browser.test.js
-scripts/browserFixture.js
 
 !lib/src
 !lib-esm/src
-scripts/visualLifecycle.browser.test.js
-scripts/unifiedVisualEffects.browser.test.js
 
 scripts/visualPlayground.js
-scripts/visualPlayground.browser.test.js
 docs/visual-playground

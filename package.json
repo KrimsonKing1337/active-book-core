@@ -14,7 +14,7 @@
     "scss": "npx sass src:src",
     "test": "jest",
     "test:coverage": "jest --coverage",
-    "test:scss-alias": "node --test ./scripts/scssAlias.test.js",
+    "test:scss-alias": "node --test ./tests/scssAlias/scssAlias.test.js",
     "test:browser": "node ./scripts/runBrowserTests.js",
     "typecheck": "tsc --noEmit",
     "typecheck:test": "tsc --project tests/tsconfig.json",
@@ -24,10 +24,11 @@
     "postinstall": "node ./scripts/postinstall.js",
     "pre-commit": "lint-staged",
     "dev:visual-lab": "node scripts/visualPlayground.js",
-    "test:visual-lab": "node --test scripts/visualPlayground.browser.test.js",
+    "test:visual-lab": "node --test tests/visualPlayground/visualPlayground.browser.test.js",
     "lint:ts:check": "eslint \"./src/**/*.{ts,tsx}\"",
     "lint:css:check": "stylelint \"src/**/*.scss\"",
-    "test:unit": "jest --runInBand"
+    "test:unit": "jest --runInBand",
+    "test:scripts": "node --test tests/eslint/eslint.test.js tests/jest/file-transform.test.js tests/infrastructure/testLayout.test.js"
   },
   "husky": {
     "hooks": {

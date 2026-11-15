@@ -72,7 +72,7 @@ and embedded sizing, fullscreen restoration, mode changes, long content,
 focus trapping/restoration, dismissal locking, preference isolation, mobile
 resize, resource cleanup and null-container behavior in StrictMode.
 
-Run `node --test scripts/storyDialog.browser.test.js` with a configured Playwright
+Run `node --test tests/storyDialog/storyDialog.browser.test.js` with a configured Playwright
 Chromium executable, or use the normal `test:browser` suite.
 
 Validated on 2026-11-12: Core and fixture typechecks, full Stylelint, 65 unit tests,

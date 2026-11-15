@@ -71,3 +71,6 @@ its SCSS rules and property ordering. `lint:ts:check` / `lint:css:check` check w
 fixes; existing fixing scripts remain available.
 
 TypeScript extends the common library profile. Jest stays local; `make` builds and increments the core version.
+
+Test commands, fixture locations and the browser scenario inventory:
+[tests/README.md](tests/README.md).

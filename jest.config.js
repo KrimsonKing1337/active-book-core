@@ -18,7 +18,7 @@ export default defineConfig({
   collectCoverageFrom: [
     'src/**/*.{ts,tsx,js,jsx}',
     '!src/**/*.d.ts',
-    '!src/test/**/*',
+    '!tests/jest/**/*',
     '!src/**/types.ts',
     '!src/**/*.test.ts',
     '!src/**/*.test.tsx',
@@ -44,7 +44,7 @@ export default defineConfig({
   ],
 
   setupFiles: ['react-app-polyfill/jsdom'],
-  setupFilesAfterEnv: ['<rootDir>/src/test/setup-tests.ts'],
+  setupFilesAfterEnv: ['<rootDir>/tests/jest/setup-tests.ts'],
 
   testMatch: [
     '<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}',
@@ -72,7 +72,7 @@ export default defineConfig({
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
     '.+\\.(css|scss|png|jpg|jpeg|ttf|woff|woff2)$': 'jest-transform-stub',
-    '\\.svg': '<rootDir>/src/test/svg-mock.ts',
+    '\\.svg': '<rootDir>/tests/jest/svg-mock.ts',
     '^react($|/.+)': '<rootDir>/node_modules/react$1',
     '^@@/(.*)$': '<rootDir>/src/$1',
     '^@types$': '<rootDir>/src/@types.ts',
