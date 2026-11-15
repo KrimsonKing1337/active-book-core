@@ -2,7 +2,8 @@
 
 Run the unit tests with `npm test`, watch them with `npm test -- --watch`, or
 collect coverage with `npm run test:coverage`. Run the file transformer regression
-tests with `node --test config/jest/file-transform.test.js`.
+tests together with ESLint and test-layout regressions with `npm run test:scripts`.
+The transformer suite alone is `node --test tests/jest/file-transform.test.js`.
 
 ## Transformation and types
 
@@ -31,7 +32,7 @@ enabled. `react-app-polyfill/jsdom` is retained because it provides `fetch`,
 `Headers`, `Request` and `Response` in jsdom.
 
 CSS, SCSS, image and font mappings still use `jest-transform-stub`; SVG imports
-still use `src/test/svg-mock.ts`. The redundant CSS transformer and unreachable
+still use `tests/jest/svg-mock.ts`. The redundant CSS transformer and unreachable
 SVG branch in the fallback transformer were removed. Other assets use the file
 transformer, which exports their basename. Its pattern now actually matches
 asset paths, and its return value follows Jest's `{ code }` transformer contract.

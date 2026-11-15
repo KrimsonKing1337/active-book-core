@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react';
 
 import { createVisualEffects } from '../createVisualEffects';
-import { registration } from '../testFixtures';
+import { registration } from '../tests/testFixtures';
 
 import { useVisualRegistrations } from './useVisualRegistrations';
 

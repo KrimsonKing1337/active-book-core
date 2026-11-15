@@ -1,6 +1,6 @@
 import { writeFile } from 'node:fs/promises';
 const root = process.argv[2];
-const { openBrowserFixture } = await import(`${root}/scripts/browserFixture.js`);
+const { openBrowserFixture } = await import(`${root}/tests/browserFixture.js`);
 const cleanup = [];
 const { browser, origin } = await openBrowserFixture({ after(fn) { cleanup.push(fn); } });
 try {

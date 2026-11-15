@@ -11,7 +11,8 @@
 
 ## Проверки и локальная разработка
 
-Быстрые проверки: `npm run typecheck`, `npm run typecheck:test`, `npm run lint:ts:check`, `npm run lint:css:check`, `npm run test:unit`, `npm run test:scss-alias`.
+Быстрые проверки: `npm run typecheck`, `npm run typecheck:test`, `npm run lint:ts:check`, `npm run lint:css:check`, `npm run test:unit`, `npm run test:scripts`, `npm run test:scss-alias`.
 Браузерные проверки запускайте отдельно через `npm run test:browser`.
+Размещение тестов определяется разделом «Тесты» общих соглашений выше; его запрет на тесты и фикстуры в `scripts/` проверяет `test:scripts`. Этот же набор проверяет полноту списка браузерного раннера.
 Конфигурации сборки, тестов, алиасы и workspaces относятся к этому репозиторию.
 `npm run make` очищает выходные файлы, собирает пакет и повышает его версию; не запускайте его как проверку.
