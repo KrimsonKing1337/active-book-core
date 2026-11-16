@@ -161,7 +161,11 @@ function changeIndexOfPage(folderPath, newIndex) {
  *
  * Важно: новые страницы создаём через tmp-папку, чтобы никогда не затирать существующую.
  */
-function addPages(root, indexStart, amount) {
+function addPages({
+  root,
+  indexStart,
+  amount,
+}) {
   const pagesPath = resolvePagesPath(root);
   if (!exists(pagesPath)) throw new Error(`Pages path not found: ${pagesPath}`);
 
@@ -190,15 +194,18 @@ function addPages(root, indexStart, amount) {
 
   if (indexStart <= maxIndex) {
     for (let i = maxIndex; i >= indexStart; i--) {
+      const shiftedIndex = i + amount;
       const oldDir = path.join(pagesPath, `Page${i}`);
-      const newDir = path.join(pagesPath, `Page${i + amount}`);
+      const newDir = path.join(pagesPath, `Page${shiftedIndex}`);
       renameSyncWithRetry(oldDir, newDir);
-      changeIndexOfPage(newDir, i + amount);
+      changeIndexOfPage(newDir, shiftedIndex);
     }
   }
 
   // 2) Создание новых страниц (дырка)
-  for (let i = indexStart; i < indexStart + amount; i++) {
+  const endIndex = indexStart + amount;
+
+  for (let i = indexStart; i < endIndex; i++) {
     const targetDir = path.join(pagesPath, `Page${i}`);
     if (exists(targetDir)) {
       throw new Error(
@@ -219,7 +226,11 @@ function addPages(root, indexStart, amount) {
  * REMOVE:
  * удаляем [indexStart..indexStart+amount-1], потом сдвигаем хвост влево.
  */
-function removePages(root, indexStart, amount) {
+function removePages({
+  root,
+  indexStart,
+  amount,
+}) {
   const pagesPath = path.join(process.cwd(), root);
 
   const indexes = getExistingPageIndexes(pagesPath);
@@ -248,11 +259,12 @@ function removePages(root, indexStart, amount) {
 
   // 2) сдвинуть хвост влево на amount
   for (let i = lastToRemove + 1; i <= maxIndex; i++) {
+    const shiftedIndex = i - amount;
     const oldDir = path.join(pagesPath, `Page${i}`);
-    const newDir = path.join(pagesPath, `Page${i - amount}`);
+    const newDir = path.join(pagesPath, `Page${shiftedIndex}`);
 
     fs.renameSync(oldDir, newDir);
-    changeIndexOfPage(newDir, i - amount);
+    changeIndexOfPage(newDir, shiftedIndex);
   }
 }
 
@@ -353,13 +365,21 @@ function main() {
       indexStart += 1;
     }
 
-    addPages(root, indexStart, amount);
+    addPages({
+      root,
+      indexStart,
+      amount,
+    });
   } else {
     if (after || before) {
       console.warn('Flags --after/-a and --before/-b are ignored for remove');
     }
 
-    removePages(root, indexStart, amount);
+    removePages({
+      root,
+      indexStart,
+      amount,
+    });
   }
 }
 

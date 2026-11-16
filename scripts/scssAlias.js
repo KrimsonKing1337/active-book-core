@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 const scriptsDirectory = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = path.resolve(scriptsDirectory, '..');
 const defaultOutputDirectory = path.join(repositoryRoot, 'lib/src');
+const atRulePattern = /^@(use|forward|import)\b/i;
 
 const isAliasPath = (val) => /^~[A-Za-z_][A-Za-z0-9_-]*(?:\/|$)/.test(val);
 
@@ -192,7 +193,7 @@ const isUrlAt = (content, index) => {
 };
 
 const scanAtRule = ({ content, startIndex, replacements, filePath, outputDirectory }) => {
-  const match = /^@(use|forward|import)\b/i.exec(content.slice(startIndex));
+  const match = atRulePattern.exec(content.slice(startIndex));
 
   let index = startIndex + match[0].length;
 
@@ -264,14 +265,12 @@ export const rewriteScss = ({ content, filePath, outputDirectory }) => {
     const isQuotedString = currentCharacter === '"' || currentCharacter === "'";
 
     if (isQuotedString) {
-      index = findStringEnd(content, index) + 1
-      ;
+      index = findStringEnd(content, index) + 1;
+
       continue;
     }
 
-    const re = /^@(use|forward|import)\b/i;
-
-    if (re.test(content.slice(index))) {
+    if (atRulePattern.test(content.slice(index))) {
       index = scanAtRule({
         content,
         startIndex: index,

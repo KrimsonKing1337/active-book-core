@@ -33,15 +33,18 @@ export const browserTests = [
 ];
 
 export const runBrowserTests = () => {
+  const testsDirectory = new URL('../tests/', import.meta.url);
   const testFiles = browserTests.map((filenameCur) => {
-    return fileURLToPath(new URL(`../tests/${filenameCur}`, import.meta.url));
+    return fileURLToPath(new URL(filenameCur, testsDirectory));
   });
 
-  const result = spawnSync(process.execPath, [
+  const args = [
     '--test',
     '--test-concurrency=1',
     ...testFiles,
-  ], { stdio: 'inherit' });
+  ];
+
+  const result = spawnSync(process.execPath, args, { stdio: 'inherit' });
 
   if (result.error) {
     console.error(result.error);
