@@ -1,12 +1,14 @@
-import { HowlWrapper } from './HowlWrapper';
+import type { HowlWrapper } from './HowlWrapper';
 
 /*
-  если аудио слишком короткое (до 1.2 секунды) - сначала ждём пока оно доиграет, затем производим unload
+  Короткому конечному звуку (до 1.2 секунды) даём доиграть перед unload.
+  waitTillTheEnd пропускает loop и ограничивает ожидание, если событие завершения потеряно.
 */
 export const unloadAudio = async (audioInstance: HowlWrapper) => {
-  const dur = parseFloat(audioInstance.howlInst.duration().toFixed(1));
+  const fixedDur = audioInstance.howlInst.duration().toFixed(1);
+  const floatDur = parseFloat(fixedDur);
 
-  if (dur < 1.2) {
+  if (floatDur < 1.2) {
     await audioInstance.waitTillTheEnd();
   }
 

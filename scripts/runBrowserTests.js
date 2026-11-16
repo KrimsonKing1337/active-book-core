@@ -3,6 +3,8 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
 export const browserTests = [
+  'audioLifecycle/audioLifecycle.browser.test.js',
+  'audioLifecycle/audioDisposal.browser.test.js',
   'selectionOutline/selectionOutline.browser.test.js',
   'dialogCarousel/dialogCarousel.browser.test.js',
   'dialogCarousel/dialogCarouselLayout.browser.test.js',
