@@ -80,7 +80,7 @@ export const useFlashlight = (options: Partial<FlashlightEffectOptions> = {}) =>
       timerRef.current = null;
     }
 
-    // An imperative caller may await the pulse (e.g. useRain).
+    // An imperative caller may await the pulse.
     resolvePulseRef.current?.();
     resolvePulseRef.current = null;
 

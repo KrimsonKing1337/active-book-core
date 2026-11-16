@@ -1,3 +1,5 @@
+// Не удалять. Используется как пресет для эффекта вспышки
+
 import { useEffect } from 'react';
 
 import { useFlashlight } from '@hooks/effects/flashlight';

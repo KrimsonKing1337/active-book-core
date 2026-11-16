@@ -1,5 +1,3 @@
-import type { Howl } from 'howler';
-
 import type { ItemProps as TableOfContentsItem } from '@components/TableOfContents/Item';
 
 import type { HowlWrapper } from '@utils/effects/audio/HowlWrapper';
@@ -60,10 +58,6 @@ export type ThemeOptions = {
   bg: string;
   'text-shadow-for-hover': string;
   overflow: string;
-};
-
-export type HowlExtended = Howl & {
-  _howls: Howl[];
 };
 
 export type Config = {
