@@ -1,6 +1,6 @@
-import type { HowlWrapperOptions } from '../../src/utils/effects/audio/HowlWrapper';
-
 import { Howler } from 'howler';
+
+import type { HowlWrapperOptions } from '../../src/utils/effects/audio/HowlWrapper';
 
 import { HowlWrapper } from '../../src/utils/effects/audio/HowlWrapper';
 
