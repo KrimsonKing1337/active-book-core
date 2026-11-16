@@ -1,6 +1,6 @@
 import type { ItemProps as TableOfContentsItem } from '@components/TableOfContents/Item';
 
-import { HowlWrapper } from '@utils/effects/audio/HowlWrapper';
+import type { HowlWrapper } from '@utils/effects/audio/HowlWrapper';
 
 export type AppMode = 'reader' | 'editor';
 
