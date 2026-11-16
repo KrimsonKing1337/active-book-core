@@ -4,6 +4,8 @@ import type { AudioType } from '@types';
 
 import { store } from '@store';
 
+import { getMediaVolume } from '@utils/volume/getMediaVolume';
+
 export type HowlWrapperOptions = {
   id: string;
   page?: number;
@@ -96,27 +98,26 @@ export class HowlWrapper {
       global,
     } = this.getVolume();
 
-    const getInitialVolume = (volume: number) => {
-      return (volume / 100) * (relativeVolume / 100) * (global / 100);
-    };
+    let categoryVolume = sfx;
 
-    let volumeValue = getInitialVolume(sfx);
+    if (type === 'bg') {
+      categoryVolume = bg;
+    } else if (type === 'music') {
+      categoryVolume = music;
+    }
+
+    const volume = getMediaVolume({
+      global: global / 100,
+      category: categoryVolume / 100,
+      relative: relativeVolume / 100,
+    });
 
     const options: HowlerOptions = {
       src,
       format,
       loop,
+      volume,
     };
-
-    if (type === 'bg') {
-      volumeValue = getInitialVolume(bg);
-    }
-
-    if (type === 'music') {
-      volumeValue = getInitialVolume(music);
-    }
-
-    options.volume = volumeValue;
 
     if (screamer) {
       options.volume = 1;
@@ -140,9 +141,18 @@ export class HowlWrapper {
     this.onUnload = onUnload;
   }
 
-  volume(n: number) {
+  // Category volume uses 0..1 here; mixer settings and relative volume remain percentages.
+  volume(categoryVolume: number) {
+    if (this.isUnloading || this.isDisposed) {
+      return;
+    }
+
     const globalVolume = this.getVolume().global;
-    const newValue = n * (this.relativeVolume / 100) * (globalVolume / 100);
+    const newValue = getMediaVolume({
+      global: globalVolume / 100,
+      category: categoryVolume,
+      relative: this.relativeVolume / 100,
+    });
 
     this.howlInst.volume(newValue);
   }

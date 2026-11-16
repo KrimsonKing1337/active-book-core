@@ -1,6 +1,7 @@
 import type { HowlInstances } from '@types';
 
 import { store } from '@store';
+import { setVideosVolume } from '@utils/volume/setVideosVolume';
 
 import {
   getVideoStats,
@@ -11,42 +12,34 @@ import {
 const locallyManagedVideoSelector = '[data-book-carousel], [data-video-scope="dialog"]';
 
 export const setMuteToAllVideos = (muted: boolean) => {
-  const videos = document.querySelectorAll('video');
+  const { videos: videosVolume } = store.getState().volume;
 
-  const { videos: videosVolume, global: globalVolume } = store.getState().volume;
-
-  videos.forEach((videoCur) => {
-    const volume = muted ? 0 : (videosVolume / 100);
-    const relativeVolumeStr = videoCur.getAttribute('data-relativeVolume');
-    const relativeVolume = Number(relativeVolumeStr) || 100;
-
-    videoCur.volume = volume * (relativeVolume / 100) * (globalVolume / 100);
-  });
+  setVideosVolume(videosVolume, muted);
 };
 
 export const startToPlayAllAudiosWithPlayOnLoad = (audioInstances: HowlInstances, page: number) => {
-  Object.values(audioInstances).forEach((audio) => {
-    if (!audio) {
+  Object.values(audioInstances).forEach((audioCur) => {
+    if (!audioCur) {
       return;
     }
 
-    if (audio.page !== page) {
+    if (audioCur.page !== page) {
       return;
     }
 
-    if (audio.isUnloading) {
+    if (audioCur.isUnloading) {
       return;
     }
 
-    if (audio.playing()) {
+    if (audioCur.playing()) {
       return;
     }
 
-    if (!audio.playOnLoad) {
+    if (!audioCur.playOnLoad) {
       return;
     }
 
-    audio.play();
+    audioCur.play();
   });
 };
 
