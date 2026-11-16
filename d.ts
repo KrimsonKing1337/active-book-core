@@ -12,7 +12,6 @@ declare module '*.png';
 
 declare namespace NodeJS {
   interface ProcessEnv {
-    ENCRYPT_STORAGE_SECRET_KEY: string;
     PAGES: string;
     EASTER_EGGS: string;
     AUTHOR_COMMENTS: string;
