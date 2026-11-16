@@ -1,6 +1,4 @@
-import type { HowlOptions } from 'howler';
-
-import { Howl } from 'howler';
+import { type HowlOptions, Howl } from 'howler';
 
 import type { AudioType } from '@types';
 
@@ -31,6 +29,17 @@ type HowlerOptions = {
   format?: HowlOptions['format'];
   loop?: HowlOptions['loop'];
   volume?: HowlOptions['volume'];
+};
+
+type ScheduleCallbacks = {
+  complete: () => void;
+  cancel?: () => void;
+};
+
+type ListenOnceOptions = {
+  event: string;
+  callback: () => void;
+  id?: number;
 };
 
 export class HowlWrapper {
@@ -139,9 +148,8 @@ export class HowlWrapper {
 
   getVolume() {
     const storeState = store.getState();
-    const { volume } = storeState;
 
-    return volume;
+    return storeState.volume;
   }
 
   getVolumeByType() {
@@ -166,19 +174,19 @@ export class HowlWrapper {
     }
   }
 
-  private schedule(duration: number, callbacks: {
-    complete: () => void;
-    cancel?: () => void;
-  }) {
+  private schedule(duration: number, callbacks: ScheduleCallbacks) {
     const cancel = () => {
       clearTimeout(timer);
+
       this.pendingOperations.delete(cancel);
       callbacks.cancel?.();
     };
+
     const timer = setTimeout(() => {
       this.pendingOperations.delete(cancel);
       callbacks.complete();
     }, duration);
+
     this.pendingOperations.add(cancel);
 
     return cancel;
@@ -198,9 +206,11 @@ export class HowlWrapper {
     }
 
     const revision = this.revision;
+
     const detach = () => {
       this.howlInst.off('load', handleLoad);
       this.howlInst.off('loaderror', handleError);
+
       this.pendingOperations.delete(cancel);
     };
     const cancel = () => {
@@ -214,6 +224,7 @@ export class HowlWrapper {
         ready();
       }
     };
+
     const handleError = () => {
       // A failed resource invalidates all requests waiting for that same load.
       if (revision === this.revision) {
@@ -222,20 +233,19 @@ export class HowlWrapper {
     };
 
     this.pendingOperations.add(cancel);
+
     this.howlInst.once('load', handleLoad);
     this.howlInst.once('loaderror', handleError);
   }
 
-  private listenOnce(options: {
-    event: string;
-    callback: () => void;
-    id?: number;
-  }) {
+  private listenOnce(options: ListenOnceOptions) {
     const revision = this.revision;
+
     const cancel = () => {
       this.howlInst.off(options.event, handleEvent, options.id);
       this.pendingOperations.delete(cancel);
     };
+
     const handleEvent = () => {
       cancel();
 
@@ -277,12 +287,16 @@ export class HowlWrapper {
     }
 
     let hasFailed = false;
+
     let cancelDeadline = () => {};
+
     const handleFailure = () => {
       hasFailed = true;
       cancelDeadline();
     };
+
     const onPlay = this.onPlay;
+
     const start = () => this.afterLoad(() => {
       if (this.isUnloading) {
         return;
@@ -336,13 +350,17 @@ export class HowlWrapper {
 
   private async halt(event: 'pause' | 'stop', withFadeOut: boolean) {
     this.cancelPendingOperations();
+
     const revision = this.revision;
 
     if (this.isDisposed) {
       return;
     }
 
-    if (withFadeOut && !this.isFading && !this.isUnloading && this.state() === 'loaded') {
+    const notFading = withFadeOut && !this.isFading;
+    const loaded = !this.isUnloading && this.state() === 'loaded';
+
+    if (notFading && loaded) {
       await this.fadeOut();
     }
 
@@ -388,8 +406,9 @@ export class HowlWrapper {
       return Promise.resolve();
     }
 
-    this.isUnloading = true;
     this.cancelPendingOperations();
+
+    this.isUnloading = true;
     this.unloadPromise = this.finishUnload();
 
     return this.unloadPromise;
@@ -401,6 +420,7 @@ export class HowlWrapper {
     }
 
     this.cancelPendingOperations();
+
     this.isFading = false;
     this.isDisposed = true;
     this.howlInst.off();
