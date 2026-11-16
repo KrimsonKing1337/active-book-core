@@ -37,8 +37,6 @@ adapters over the common session. They are the temporary connection for the
 current editor and compiled reader, not a second lifetime system. With no explicit
 lifetime, a mounted declaration follows the current author page; an explicit
 VisualEffectLifetime is available for fixed page and persistent range declarations.
-The rangeEffects prop also translates background/frame entries to registrations
-once, rather than selecting and rebuilding them on each navigation.
 
 ```tsx
 <Frame
@@ -53,8 +51,7 @@ A declaration which owns a range must be placed outside changing page components
 Unmounting any declaration removes its registration. Data-driven consumers can
 instead register createBuiltinRegistration(...) on their book-owned session.
 
-Parameters are a JSON copy of the typed options. IDs, React nodes and the obsolete
-inRange flag are not parameters. A per-session runtime component bridge retains
+Parameters are a JSON copy of the typed options. IDs and React nodes are not parameters. A per-session runtime component bridge retains
 existing ReactNode inputs outside serialized snapshots; remove/unregister clears
 it. The new contract already supports normal custom VisualEffectDefinition
 renderers directly, without this bridge. The bridge is retained until the editor,
@@ -115,11 +112,11 @@ Removed infrastructure:
 - useBackgroundInRange's page-by-page Redux reconciliation.
 - BackgroundEffects/FrameEffects global rendering trees and their layer wrappers.
 - PageWrapper's bulk Background/Frame cleanup.
-- The unused legacy background equality helper and inRange marker.
+- The unused legacy background equality helper.
 
-The existing audio range path, PageWrapper segment cleanup, editor preview
-providers and current book.json/builder format stay in place. None competes with
-the visual session's activation rule.
+PageWrapper segment cleanup, editor preview providers and the current
+book.json/builder format stay in place. Audio uses the page-owned audio slice;
+the legacy range-audio subsystem has been removed.
 
 ## Verification and next integration
 

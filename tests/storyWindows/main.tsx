@@ -45,7 +45,6 @@ const Fixture = () => {
             { id: 'page-b', content: <WindowPage pageId="page-b" /> },
           ]}
           tableOfContents={[]}
-          rangeEffects={[]}
         />
       )}
     </StoreProvider>

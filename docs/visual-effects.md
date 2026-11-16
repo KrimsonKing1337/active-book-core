@@ -18,10 +18,14 @@ instances. Manual plane changes can still remount a surface. Ordinary geometry,
 mask, style and parameter updates keep its registration and renderer identity.
 
 The old useBuiltinDeclarations/useVisualRanges hooks and ReactNode instance map
-are removed. `rangeEffects` is now specialized audio only. Public CSS/media
+are removed. Public CSS/media
 useBackground and useFrameEffect hooks remain and use the common reconciler.
 createBuiltinRegistration remains a pure convenience for those APIs and panel
 projection; its module can be imported by the builder without loading renderers.
+
+Audio categories `bg`, `music` and `sfx` use the shared audio slice and page-bound
+`useAudio` hook. `BookRuntime` retains `useAudioController` for caller-owned manual
+instances. Cross-page audio will be designed separately from visual lifetimes.
 
 Range registration validates positive integer ordered intervals independently of
 the current page count. A shortened book preserves endpoints; activation also

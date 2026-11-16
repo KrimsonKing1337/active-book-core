@@ -1,7 +1,5 @@
 import { Howl } from 'howler';
 
-import type { BackgroundEffect } from '@hooks/effects/background/@types';
-
 import type { ItemProps as TableOfContentsItem } from '@components/TableOfContents/Item';
 
 import { HowlWrapper } from '@utils/effects/audio/HowlWrapper';
@@ -21,7 +19,6 @@ export type AudioEffectOptions = {
   lifecycle?: AudioLifecycle;
   id: string;
   page: number;
-  inRange?: boolean;
   src: string;
   format?: string[];
   fadeOutWhenUnload?: boolean;
@@ -55,25 +52,6 @@ export type FlashlightEffectOptions = {
   withFrameShadow?: boolean;
   speed?: number;
 };
-
-export type Range = {
-  from: number;
-  to: number;
-};
-
-export type RangeType = 'audio';
-
-export type AudioEffectOptionsRange = Omit<AudioEffectOptions, 'id' | 'page'>;
-export type BackgroundEffectOptionsRange = Omit<BackgroundEffect, 'id'>;
-
-export type RangeEffect = {
-  id: string;
-  type: RangeType;
-  range: Range[];
-  options?: AudioEffectOptionsRange;
-};
-
-export type RangeEffects = RangeEffect[];
 
 export type ThemeOptions = {
   main: string;

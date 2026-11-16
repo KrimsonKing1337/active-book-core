@@ -66,7 +66,6 @@ export const Fixture = () => {
             { id: 'page-b', content: <p data-testid="second-page">Вторая страница</p> },
           ]}
           tableOfContents={[]}
-          rangeEffects={[]}
         >
           <Page0
             header="Тестовая история"

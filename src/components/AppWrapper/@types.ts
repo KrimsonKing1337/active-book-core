@@ -2,11 +2,7 @@ import type { ReactNode, Ref } from 'react';
 
 import type { VisualEffectDefinition, VisualEffectRegistration } from '@active-book/types';
 
-import type {
-  Config,
-  RangeEffects,
-  TableOfContents,
-} from '@types';
+import type { Config, TableOfContents } from '@types';
 
 import type { VisualEffects } from '@controllers/visualEffects';
 
@@ -29,7 +25,6 @@ export type AppWrapperProps = {
   registrations?: readonly VisualEffectRegistration[];
   definitions?: readonly VisualEffectDefinition[];
   tableOfContents: TableOfContents;
-  rangeEffects: RangeEffects;
   editorTools?: ReactNode;
   ref?: Ref<HTMLDivElement>;
   visualSurfaces?: readonly VisualSurfaceItem[];

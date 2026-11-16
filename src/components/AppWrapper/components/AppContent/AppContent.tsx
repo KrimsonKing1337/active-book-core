@@ -14,14 +14,12 @@ import { useDispatch, useSelector } from '@store';
 
 import { mainActions, mainSelectors } from '@store/main';
 import { audioEffectsSelectors } from '@store/effects/audio/audio';
-import { audioBgEffectsSelectors } from '@store/effects/audio/audioBg';
 import { effectsSelectors } from '@store/effects/common';
 
 import type { VisualEffects } from '@controllers/visualEffects';
 
 import { useVisualRegistrations } from '@controllers/visualEffects';
 
-import { useEffectsInRange } from '@hooks/effects/range';
 import { useGoToPage } from '@hooks/control/useGoToPage';
 
 import { BookApplicationSurface, useBookApplicationSurface } from '@components/BookApplicationSurface';
@@ -62,7 +60,6 @@ export const AppContent = ({
   withoutToolbar,
   config,
   tableOfContents,
-  rangeEffects,
   editorTools,
   ref,
   visualSurfaces,
@@ -126,7 +123,6 @@ export const AppContent = ({
   const page = useSelector(mainSelectors.page);
   const inverseColors = useSelector(effectsSelectors.inverseColorIsActive);
   const audioInstances = useSelector(audioEffectsSelectors.audioInstances);
-  const audioInstancesBg = useSelector(audioBgEffectsSelectors.audioInstances);
 
   // применяю конфиг
   useSetUpConfig(config);
@@ -165,8 +161,7 @@ export const AppContent = ({
     }
 
     startToPlayAllAudiosWithPlayOnLoad(audioInstances, page);
-    startToPlayAllAudiosWithPlayOnLoad(audioInstancesBg, page);
-  }, [page, isLoading, audioInstances, audioInstancesBg]);
+  }, [page, isLoading, audioInstances]);
 
   // Удаляю id видео из списка currentTime, если видео с data-id на странице нет
   // todo: вспомнить зачем это вообще нужно
@@ -199,7 +194,6 @@ export const AppContent = ({
 
   useAllPagesSeen();
   useBeforeUnloadHandler();
-  useEffectsInRange(rangeEffects);
 
   const appWrapperClassNames = classNames({
     [styles.AppWrapper]: true,

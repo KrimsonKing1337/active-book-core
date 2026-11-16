@@ -42,7 +42,6 @@ export const MediaBook = () => {
           storyPages={pages}
           initialPageId="first"
           tableOfContents={[]}
-          rangeEffects={[]}
           registrations={[registration]}
           definitions={definitions}
           editorTools={tools}

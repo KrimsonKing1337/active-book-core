@@ -30,7 +30,7 @@ export const startToPlayAllAudiosWithPlayOnLoad = (audioInstances: HowlInstances
       return;
     }
 
-    if (audio.page !== page && !audio.isRange) {
+    if (audio.page !== page) {
       return;
     }
 

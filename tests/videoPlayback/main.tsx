@@ -38,7 +38,6 @@ createRoot(root).render(
         withoutToolbar
         storyPages={pages}
         tableOfContents={[]}
-        rangeEffects={[]}
       >
         <p>Start</p>
       </AppWrapper>

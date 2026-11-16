@@ -75,7 +75,6 @@ export const PlacementBook = () => {
             },
           ]}
           tableOfContents={[]}
-          rangeEffects={[]}
           visualSurfaces={surfaces}
           selectedVisualEffectId={selectedVisualEffectId}
           editorTools={tools}

@@ -267,7 +267,6 @@ export const Playground = () => {
                           withoutToolbar={!settings.toolbar}
                           config={config}
                           tableOfContents={[]}
-                          rangeEffects={[]}
                           visualEffects={session}
                           registrations={registrations}
                           definitions={definitions}

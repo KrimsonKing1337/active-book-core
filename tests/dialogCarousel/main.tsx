@@ -45,7 +45,6 @@ if (!new URLSearchParams(location.search).has('preview')) {
         withoutToolbar
         storyPages={[{ id: 'presentation-page', content: <Content /> }]}
         tableOfContents={[]}
-        rangeEffects={[]}
       />
     </StoreProvider>
   );
