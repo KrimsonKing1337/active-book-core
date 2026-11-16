@@ -60,10 +60,6 @@ export type ThemeOptions = {
   overflow: string;
 };
 
-export type HowlExtended = Howl & {
-  _howls: Howl[];
-};
-
 export type Config = {
   id: string;
   authorComments?: number;
