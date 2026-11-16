@@ -493,6 +493,7 @@ export class HowlWrapper {
 
     // All current voices started before cleanup. One full clip at the current rate bounds their grace period.
     const deadline = Math.ceil((duration / rate) * 1000);
+
     const events = [
       'end',
       'pause',
@@ -501,14 +502,16 @@ export class HowlWrapper {
 
     this.completionPromise = new Promise<void>((resolve) => {
       let hasFinished = false;
+
       const finish = () => {
         if (hasFinished) {
           return;
         }
 
         hasFinished = true;
-        cancelDeadline();
+
         this.pendingOperations.delete(finish);
+        cancelDeadline();
 
         for (const event of events) {
           this.howlInst.off(event, checkCompletion);
@@ -522,10 +525,11 @@ export class HowlWrapper {
         }
       };
       const cancelDeadline = this.schedule(deadline, { complete: finish });
+
       this.pendingOperations.add(finish);
 
-      for (const event of events) {
-        this.howlInst.on(event, checkCompletion);
+      for (const eventCur of events) {
+        this.howlInst.on(eventCur, checkCompletion);
       }
     });
 

@@ -5,9 +5,10 @@ import type { HowlWrapper } from './HowlWrapper';
   waitTillTheEnd пропускает loop и ограничивает ожидание, если событие завершения потеряно.
 */
 export const unloadAudio = async (audioInstance: HowlWrapper) => {
-  const dur = parseFloat(audioInstance.howlInst.duration().toFixed(1));
+  const fixedDur = audioInstance.howlInst.duration().toFixed(1);
+  const floatDur = parseFloat(fixedDur);
 
-  if (dur < 1.2) {
+  if (floatDur < 1.2) {
     await audioInstance.waitTillTheEnd();
   }
 
