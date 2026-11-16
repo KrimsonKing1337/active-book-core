@@ -16,6 +16,17 @@ beforeEach(() => {
 
 afterEach(() => fixture.restore());
 
+test('fade-out on a loading resource cannot leave an irreversible restore-volume operation', async () => {
+  const instance = fixture.create();
+  fixture.states.set(instance.howlInst, 'loading');
+  const fadeOut = instance.fadeOut();
+  const play = instance.play(true);
+  await instance.stop();
+  await Promise.all([fadeOut, play]);
+  expect(Reflect.get(instance.howlInst, '_queue')).toEqual([]);
+  expect(instance.playing()).toBe(false);
+});
+
 const controls: Array<'stop' | 'pause' | 'unload'> = [
   'stop',
   'pause',

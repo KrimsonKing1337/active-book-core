@@ -405,8 +405,11 @@ export class HowlWrapper {
       this.fadingOut = null;
       this.haltOperation = null;
       this.cancelPendingOperations();
-      const targetVolume = this.howlInst.volume();
-      this.howlInst.volume(targetVolume);
+
+      if (this.state() === 'loaded') {
+        const targetVolume = this.howlInst.volume();
+        this.howlInst.volume(targetVolume);
+      }
     }
 
     return new Promise<void>((resolve) => {

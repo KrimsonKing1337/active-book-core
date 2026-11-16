@@ -63,13 +63,15 @@ test('cancelling faded play while loading settles its promise before the resourc
   const cancelled = await page.evaluate(async () => {
     const fixture = window.audioLifecycle;
     const audio = fixture.create({ id: 'loading-fade', src: '/fade-loading.wav' });
+    const fadeOut = audio.fadeOut();
     const play = audio.play(true);
     await audio.stop();
-    await play;
+    await Promise.all([fadeOut, play]);
 
-    return audio.playing();
+    return { playing: audio.playing(), queued: Reflect.get(audio.howlInst, '_queue').length };
   });
-  assert.equal(cancelled, false);
+  assert.equal(cancelled.playing, false);
+  assert.equal(cancelled.queued, 0);
   release();
   await page.waitForFunction(() => window.audioLifecycle.get('loading-fade').state() === 'loaded');
   const result = await page.evaluate(async () => {
