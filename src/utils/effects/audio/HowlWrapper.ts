@@ -238,6 +238,8 @@ export class HowlWrapper {
     this.onUnload();
   }
 
+  // todo: Заменить три параметра на один object
+  // eslint-disable-next-line max-params
   fade(from: number, to: number, dur: number) {
     return new Promise<void>((resolve) => {
       setTimeout(() => {
