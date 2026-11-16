@@ -67,6 +67,7 @@ export const useDeleteAllVideosWithoutDataIdOnThePage = () => {
   // Здесь ранее videosCurrentTime запрашивались напрямую из стора без зависимостей, мб нужно сделать через ref
   useEffect(() => {
     const videos = document.querySelectorAll('video');
+
     const savedTimes = videosCurrentTimeRef.current;
     const videosCurrentTimeNewValue: typeof videosCurrentTime = {};
 
@@ -130,7 +131,11 @@ export const useAllPagesSeen = () => {
       dispatch(mainActions.setAllPagesSeen(true));
       dispatch(configActions.setAuthorComments(true));
     }
-  }, [page, pages, allPagesSeen]);
+  }, [
+    page,
+    pages,
+    allPagesSeen,
+  ]);
 };
 
 export const useBeforeUnloadHandler = () => {
@@ -194,6 +199,7 @@ export const useSetUpConfig = (passedConfig: Config) => {
 
     if (bodyStyle) {
       const bodyStyleForSet = stringifyCSSProperties(bodyStyle);
+
       document.querySelector('body')?.setAttribute('style', bodyStyleForSet);
     }
   }, []);
