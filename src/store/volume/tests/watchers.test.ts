@@ -7,7 +7,7 @@ import { audioEffectsActions } from '@store/effects/audio/audio';
 
 import { HowlWrapper } from '@utils/effects/audio/HowlWrapper';
 
-import { actions } from './slice';
+import { actions } from '../slice';
 
 const categories: AudioType[] = [
   'bg',

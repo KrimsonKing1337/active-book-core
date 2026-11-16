@@ -2,6 +2,10 @@ import { Howler } from 'howler';
 
 import type { HowlWrapperOptions } from '../../src/utils/effects/audio/HowlWrapper';
 
+import { store } from '../../src/store';
+import { volumeActions } from '../../src/store/volume';
+import { audioEffectsActions } from '../../src/store/effects/audio/audio';
+
 import { HowlWrapper } from '../../src/utils/effects/audio/HowlWrapper';
 import { unloadAudio } from '../../src/utils/effects/audio/unloadAudio';
 
@@ -49,6 +53,9 @@ const fixture = {
   get,
   events,
   resourceCount,
+  store,
+  volumeActions,
+  audioEffectsActions,
   cleanup: (id = 'audio') => unloadAudio(get(id)),
 };
 

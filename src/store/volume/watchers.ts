@@ -48,13 +48,11 @@ export function* watchSetAll(action: PayloadAction<State>) {
   yield put(actions.setBg(bg));
   yield put(actions.setVideos(videos));
 
-  // сначала устанавливаем значения для каждой категории отдельно, затем применяем к ним громкость от global
+  // Обновляем категории, затем синхронизируем ресурсы с общей громкостью.
   yield put(actions.setGlobal(global));
 }
 
-export function* watchSetGlobal(action: PayloadAction<State['global']>) {
-  const { payload } = action;
-
+export function* watchSetGlobal() {
   const volumeAll: State = yield select(selectors.all);
 
   const {
@@ -65,11 +63,11 @@ export function* watchSetGlobal(action: PayloadAction<State['global']>) {
   } = volumeAll;
 
   yield call(() => {
-    setAudioVolumeByType('sfx', sfx * (payload / 100));
-    setAudioVolumeByType('bg', bg * (payload / 100));
-    setAudioVolumeByType('music', music * (payload / 100));
+    setAudioVolumeByType('sfx', sfx);
+    setAudioVolumeByType('bg', bg);
+    setAudioVolumeByType('music', music);
 
-    setVideosVolume(videos * (payload / 100));
+    setVideosVolume(videos);
   });
 }
 

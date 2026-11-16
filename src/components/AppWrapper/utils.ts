@@ -1,6 +1,7 @@
 import type { HowlInstances } from '@types';
 
 import { store } from '@store';
+import { setVideosVolume } from '@store/volume/utils';
 
 import {
   getVideoStats,
@@ -11,17 +12,9 @@ import {
 const locallyManagedVideoSelector = '[data-book-carousel], [data-video-scope="dialog"]';
 
 export const setMuteToAllVideos = (muted: boolean) => {
-  const videos = document.querySelectorAll('video');
+  const { videos: videosVolume } = store.getState().volume;
 
-  const { videos: videosVolume, global: globalVolume } = store.getState().volume;
-
-  videos.forEach((videoCur) => {
-    const volume = muted ? 0 : (videosVolume / 100);
-    const relativeVolumeStr = videoCur.getAttribute('data-relativeVolume');
-    const relativeVolume = Number(relativeVolumeStr) || 100;
-
-    videoCur.volume = volume * (relativeVolume / 100) * (globalVolume / 100);
-  });
+  setVideosVolume(videosVolume, muted);
 };
 
 export const startToPlayAllAudiosWithPlayOnLoad = (audioInstances: HowlInstances, page: number) => {

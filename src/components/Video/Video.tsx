@@ -9,6 +9,8 @@ import {
 import { useSelector } from '@store';
 import { volumeSelectors } from '@store/volume';
 
+import { getMediaVolume } from '@utils/getMediaVolume';
+
 import { VideoPlaybackContext } from './context';
 import { useVideoPlayback, useVideoTime } from './hooks';
 
@@ -52,7 +54,17 @@ export const Video = ({
       return;
     }
 
-    element.volume = (videosVolume / 100) * (relativeVolume / 100) * (globalVolume / 100);
+    let volume = getMediaVolume({
+      global: globalVolume / 100,
+      category: videosVolume / 100,
+      relative: relativeVolume / 100,
+    });
+
+    if (document.hidden) {
+      volume = 0;
+    }
+
+    element.volume = volume;
 
     element.setAttribute('data-relativeVolume', relativeVolume.toString());
   }, [
