@@ -19,12 +19,6 @@ export function* watchRemoveAudioInstance(action: PayloadAction<RemoveAudioInsta
     return;
   }
 
-  Object.values(instance.timers).forEach((timer) => {
-    if (timer) {
-      clearTimeout(timer);
-    }
-  });
-
   if (!instance.isUnloading) {
     void unloadAudio(instance);
   }
