@@ -11,6 +11,8 @@ export const readVolumeMatrix = async () => {
     'bg',
     'music',
   ];
+  const video = document.createElement('video');
+  document.body.append(video);
   const failures = [];
   let checked = 0;
   const check = async (phase, expected) => {
@@ -41,11 +43,24 @@ export const readVolumeMatrix = async () => {
 
       checked += 1;
     }
+
+    if (Math.abs(video.volume - expected) > 1e-12) {
+      failures.push({
+        id: 'video',
+        phase,
+        actual: video.volume,
+        expected,
+      });
+    }
+
+    checked += 1;
   };
 
   for (const global of levels) {
     for (const category of levels) {
       for (const relative of levels) {
+        video.setAttribute('data-relativeVolume', String(relative));
+
         for (const id of ids) {
           fixture.get(id).relativeVolume = relative;
         }
@@ -64,6 +79,7 @@ export const readVolumeMatrix = async () => {
         fixture.store.dispatch(fixture.volumeActions.setSfx(category));
         fixture.store.dispatch(fixture.volumeActions.setBg(category));
         fixture.store.dispatch(fixture.volumeActions.setMusic(category));
+        fixture.store.dispatch(fixture.volumeActions.setVideos(category));
         await check('same categories', expected);
 
         for (const type of [
@@ -96,6 +112,8 @@ export const readVolumeMatrix = async () => {
   for (const id of ids) {
     await fixture.cleanup(id);
   }
+
+  video.remove();
 
   return {
     checked,

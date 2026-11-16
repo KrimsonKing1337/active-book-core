@@ -3,7 +3,7 @@ import { test } from 'node:test';
 
 import { openAudio } from './audioLifecycleFixture.js';
 
-test('real Howler creation, mixer updates and live voice gains share the full volume matrix', async (context) => {
+test('real Howler gains and native video share the full volume matrix on creation and updates', async (context) => {
   const page = await openAudio(context);
   await page.evaluate(async () => {
     const fixture = window.audioLifecycle;
@@ -37,7 +37,7 @@ test('real Howler creation, mixer updates and live voice gains share the full vo
 
     return readVolumeMatrix();
   });
-  assert.equal(result.checked, 768);
+  assert.equal(result.checked, 960);
   assert.deepEqual(result.failures, []);
   assert.equal(result.resources, 0);
 });
