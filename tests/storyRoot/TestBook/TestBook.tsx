@@ -52,7 +52,6 @@ export const TestBook = () => {
             content: index < 2 ? <TestPage name={index === 0 ? 'one' : 'two'} /> : null,
           }))}
           tableOfContents={[]}
-          rangeEffects={[]}
           editorTools={tools}
         >
 

@@ -1,6 +1,10 @@
 import type { PropsWithChildren, ReactNode } from 'react';
 
-import type { AppMode, RangeEffects, Config, TableOfContents } from '@types';
+import type {
+  AppMode,
+  Config,
+  TableOfContents,
+} from '@types';
 
 import { StoreProvider } from '@store';
 
@@ -18,7 +22,6 @@ export type AppProps = {
   appMode?: AppMode;
   config: Config;
   tableOfContents: TableOfContents;
-  rangeEffects: RangeEffects;
   editorTools?: ReactNode;
   visualSurfaces?: readonly VisualSurfaceItem[];
   visualEffects?: VisualEffects;
@@ -30,7 +33,6 @@ export const App = ({
   appMode = 'reader',
   config,
   tableOfContents,
-  rangeEffects,
   editorTools,
   visualSurfaces,
   visualEffects,
@@ -42,7 +44,6 @@ export const App = ({
           storyPages={storyPages}
           config={config}
           tableOfContents={tableOfContents}
-          rangeEffects={rangeEffects}
           editorTools={editorTools}
           visualSurfaces={visualSurfaces}
           visualEffects={visualEffects}

@@ -144,7 +144,6 @@ export const EffectsBook = () => {
           id: `page-${index + 1}`,
           content: <EffectsPage number={index + 1} />,
         }))}
-        rangeEffects={[]}
         registrations={registrations}
         selectedVisualEffectId={selectedVisualEffectId}
         definitions={definitions}

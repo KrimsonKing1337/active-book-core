@@ -67,7 +67,6 @@ export const LifecycleBook = () => {
               },
             ]}
             tableOfContents={[]}
-            rangeEffects={[]}
             editorTools={tools}
             visualEffects={visualEffects}
           />

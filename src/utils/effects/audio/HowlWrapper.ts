@@ -11,7 +11,6 @@ export type HowlWrapperOptions = {
   format?: HowlOptions['format'];
   loop?: HowlOptions['loop'];
   type?: AudioType;
-  isRange?: boolean;
   playOnLoad?: boolean;
   relativeVolume?: number;
   screamer?: boolean;
@@ -40,7 +39,6 @@ export class HowlWrapper {
   public page: HowlWrapperOptions['page'];
   public src: HowlOptions['src'] = '';
   public type: AudioType = 'sfx';
-  public isRange = false;
   public playOnLoad = false;
   public relativeVolume: number;
   public fadeOutWhenUnload = true;
@@ -65,7 +63,6 @@ export class HowlWrapper {
     format,
     loop,
     type = 'sfx',
-    isRange = false,
     playOnLoad = false,
     relativeVolume = 100,
     screamer = false,
@@ -116,7 +113,6 @@ export class HowlWrapper {
     this.page = page;
     this.src = src;
     this.type = type;
-    this.isRange = isRange;
     this.relativeVolume = relativeVolume;
     this.fadeOutWhenUnload = fadeOutWhenUnload;
     this.delay = delay;
@@ -242,6 +238,8 @@ export class HowlWrapper {
     this.onUnload();
   }
 
+  // todo: Заменить три параметра на один object
+  // eslint-disable-next-line max-params
   fade(from: number, to: number, dur: number) {
     return new Promise<void>((resolve) => {
       setTimeout(() => {

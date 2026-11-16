@@ -43,7 +43,6 @@ createRoot(root).render(
         withoutToolbar
         storyPages={pages}
         tableOfContents={[]}
-        rangeEffects={[]}
       />
     </StoreProvider>
   </StrictMode>,

@@ -1,11 +1,15 @@
-import { PayloadAction } from '@reduxjs/toolkit';
-import { call, put, select, takeLatest } from 'redux-saga/effects';
+import type { PayloadAction } from '@reduxjs/toolkit';
+
+import {
+  call,
+  put,
+  select,
+  takeLatest,
+} from 'redux-saga/effects';
 
 import type { AudioType } from '@types';
 
-import type { HowlInstances } from '@types';
-
-import { getAudioInstances } from '@utils/effects/audio/getAudioInstances';
+import { store } from '@store';
 
 import type { State } from './@types';
 
@@ -15,26 +19,22 @@ import { selectors } from './selectors';
 import { setVideosVolume } from './utils';
 
 const setAudioVolumeByType = (type: AudioType, volume: number) => {
-  const setVolume = (audioInstances: HowlInstances) => {
-    Object.values(audioInstances).forEach((audioInstanceCur) => {
-      if (!audioInstanceCur) {
-        return;
-      }
+  const { audioInstances } = store.getState().audioEffects;
 
-      if (audioInstanceCur.type === type) {
-        audioInstanceCur.volume(volume / 100);
-      }
-    });
-  };
+  Object.values(audioInstances).forEach((audioInstanceCur) => {
+    if (!audioInstanceCur) {
+      return;
+    }
 
-  const { audioInstances, audioBgInstances } = getAudioInstances();
-
-  setVolume(audioInstances);
-  setVolume(audioBgInstances);
+    if (audioInstanceCur.type === type) {
+      audioInstanceCur.volume(volume / 100);
+    }
+  });
 };
 
 export function* watchSetAll(action: PayloadAction<State>) {
   const { payload } = action;
+
   const {
     global,
     bg,
