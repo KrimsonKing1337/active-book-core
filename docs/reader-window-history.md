@@ -198,7 +198,7 @@ A	src/components/StoryWindowHost/history/hooks.ts
 A	src/components/StoryWindowHost/history/index.ts
 A	src/components/StoryWindowHost/history/navigation.ts
 A	src/components/StoryWindowHost/history/utils.test.ts
-A	src/components/StoryWindowHost/history/utils.ts
+A	src/components/StoryWindowHost/history/setVideosVolume.ts
 A	src/components/StoryWindowHost/hooks/index.ts
 A	src/components/StoryWindowHost/hooks/useReaderWindow.ts
 R054	src/components/StoryWindowHost/hooks.ts	src/components/StoryWindowHost/hooks/useStoryWindowActions.ts

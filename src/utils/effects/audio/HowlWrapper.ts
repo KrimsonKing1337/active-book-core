@@ -1,12 +1,10 @@
-import type { HowlOptions } from 'howler';
-
-import { Howl } from 'howler';
+import { type HowlOptions, Howl } from 'howler';
 
 import type { AudioType } from '@types';
 
 import { store } from '@store';
 
-import { getMediaVolume } from '@utils/getMediaVolume';
+import { getMediaVolume } from '@utils/volume/getMediaVolume';
 
 export type HowlWrapperOptions = {
   id: string;
@@ -108,15 +106,17 @@ export class HowlWrapper {
       categoryVolume = music;
     }
 
+    const volume = getMediaVolume({
+      global: global / 100,
+      category: categoryVolume / 100,
+      relative: relativeVolume / 100,
+    });
+
     const options: HowlerOptions = {
       src,
       format,
       loop,
-      volume: getMediaVolume({
-        global: global / 100,
-        category: categoryVolume / 100,
-        relative: relativeVolume / 100,
-      }),
+      volume,
     };
 
     if (screamer) {

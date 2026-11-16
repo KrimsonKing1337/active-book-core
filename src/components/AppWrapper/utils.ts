@@ -1,7 +1,7 @@
 import type { HowlInstances } from '@types';
 
 import { store } from '@store';
-import { setVideosVolume } from '@store/volume/utils';
+import { setVideosVolume } from '@utils/volume/setVideosVolume';
 
 import {
   getVideoStats,
@@ -18,28 +18,28 @@ export const setMuteToAllVideos = (muted: boolean) => {
 };
 
 export const startToPlayAllAudiosWithPlayOnLoad = (audioInstances: HowlInstances, page: number) => {
-  Object.values(audioInstances).forEach((audio) => {
-    if (!audio) {
+  Object.values(audioInstances).forEach((audioCur) => {
+    if (!audioCur) {
       return;
     }
 
-    if (audio.page !== page) {
+    if (audioCur.page !== page) {
       return;
     }
 
-    if (audio.isUnloading) {
+    if (audioCur.isUnloading) {
       return;
     }
 
-    if (audio.playing()) {
+    if (audioCur.playing()) {
       return;
     }
 
-    if (!audio.playOnLoad) {
+    if (!audioCur.playOnLoad) {
       return;
     }
 
-    audio.play();
+    audioCur.play();
   });
 };
 

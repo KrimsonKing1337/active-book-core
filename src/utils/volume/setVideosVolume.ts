@@ -1,6 +1,6 @@
 import { store } from '@store';
 
-import { getMediaVolume } from '@utils/getMediaVolume';
+import { getMediaVolume } from '@utils/volume/getMediaVolume';
 
 export const setVideosVolume = (volume: number, muted = document.hidden) => {
   const videos = document.querySelectorAll('video');

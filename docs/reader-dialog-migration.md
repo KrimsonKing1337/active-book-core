@@ -150,7 +150,7 @@ M	src/components/Button/Button.tsx
 M	src/components/ColoredTextTrigger/WithModal/WithModal.module.scss
 M	src/components/ColoredTextTrigger/WithModal/WithModal.tsx
 A	src/components/ColoredTextTrigger/WithModal/components/DialogMedia.tsx
-A	src/components/ColoredTextTrigger/utils.ts
+A	src/components/ColoredTextTrigger/setVideosVolume.ts
 D	src/components/Modal/Modal.module.scss
 D	src/components/Modal/Modal.tsx
 D	src/components/Modal/index.ts
@@ -171,7 +171,7 @@ M	src/components/StoryWindowHost/StoryWindowHost.tsx
 M	src/components/StoryWindowHost/hooks/index.ts
 M	src/components/StoryWindowHost/hooks/useReaderWindow.ts
 A	src/components/StoryWindowHost/hooks/useStoryWindowDialog.ts
-A	src/components/StoryWindowHost/utils.ts
+A	src/components/StoryWindowHost/setVideosVolume.ts
 M	src/components/Toolbar/components/Nav/Nav.tsx
 D	src/components/Toolbar/components/Nav/components/Modal/Modal.tsx
 D	src/components/Toolbar/components/Nav/components/Modal/index.ts

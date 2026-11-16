@@ -11,12 +11,13 @@ import type { AudioType } from '@types';
 
 import { store } from '@store';
 
+import { setVideosVolume } from '@utils/volume/setVideosVolume';
+
 import type { State } from './@types';
 
 import { actions } from './slice';
 import { selectors } from './selectors';
 
-import { setVideosVolume } from './utils';
 
 const setAudioVolumeByType = (type: AudioType, volume: number) => {
   const { audioInstances } = store.getState().audioEffects;
