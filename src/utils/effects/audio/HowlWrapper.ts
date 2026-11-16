@@ -322,13 +322,19 @@ export class HowlWrapper {
 
   private listenOnce(options: ListenOnceOptions) {
     const revision = this.revision;
+    let isActive = true;
 
     const cancel = () => {
+      isActive = false;
       this.howlInst.off(options.event, handleEvent, options.id);
       this.pendingOperations.delete(operation);
     };
 
     const handleEvent = () => {
+      if (!isActive) {
+        return;
+      }
+
       cancel();
 
       if (revision === this.revision && !this.isDisposed) {
@@ -565,13 +571,13 @@ export class HowlWrapper {
     }
 
     return new Promise<boolean>((resolve) => {
-      let active = true;
+      let isActive = true;
       const finish = (completed: boolean) => {
-        if (!active) {
+        if (!isActive) {
           return;
         }
 
-        active = false;
+        isActive = false;
         cancelDeadline();
         this.pendingOperations.delete(operation);
         this.howlInst.off('end', checkPlaying, soundId);

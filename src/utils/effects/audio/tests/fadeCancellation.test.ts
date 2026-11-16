@@ -1,4 +1,5 @@
 import { installFadeFixture } from './fadeFixture';
+import { emit } from './howlerFixture';
 
 let fixture: ReturnType<typeof installFadeFixture>;
 
@@ -7,6 +8,27 @@ beforeEach(() => {
 });
 
 afterEach(() => fixture.restore());
+
+test('playerror cancels a play callback already captured by the Howler event queue', async () => {
+  const onPlay = jest.fn();
+  const instance = fixture.create({ onPlay });
+  const play = instance.play(true);
+  const voice = fixture.state(instance.howlInst).voices.get(1001);
+
+  if (!voice) {
+    throw new Error('Missing voice');
+  }
+
+  voice.playing = false;
+  emit(instance.howlInst, { name: 'playerror', id: 1001 });
+  await jest.advanceTimersByTimeAsync(0);
+  await play;
+  expect(onPlay).not.toHaveBeenCalled();
+  expect(instance.playing()).toBe(false);
+  expect(instance.isFading).toBe(false);
+  await instance.unload();
+  expect(jest.getTimerCount()).toBe(0);
+});
 
 test.each<'pause' | 'stop' | 'unload'>([
   'pause',
