@@ -3,6 +3,7 @@ import { Howler } from 'howler';
 import type { HowlWrapperOptions } from '../../src/utils/effects/audio/HowlWrapper';
 
 import { HowlWrapper } from '../../src/utils/effects/audio/HowlWrapper';
+import { unloadAudio } from '../../src/utils/effects/audio/unloadAudio';
 
 const instances = new Map<string, HowlWrapper>();
 const events: string[] = [];
@@ -48,6 +49,7 @@ const fixture = {
   get,
   events,
   resourceCount,
+  cleanup: (id = 'audio') => unloadAudio(get(id)),
 };
 
 declare global {

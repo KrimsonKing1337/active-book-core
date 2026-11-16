@@ -55,6 +55,7 @@ export class HowlWrapper {
   private isDisposed = false;
   private pendingOperations = new Set<() => void>();
   private unloadPromise: Promise<void> | null = null;
+  private completionPromise: Promise<void> | null = null;
 
   public onPlay: () => void;
   public onPause: () => void;
@@ -468,21 +469,66 @@ export class HowlWrapper {
   }
 
   waitTillTheEnd() {
+    if (this.unloadPromise) {
+      return this.unloadPromise;
+    }
+
+    if (this.completionPromise) {
+      return this.completionPromise;
+    }
+
     this.isUnloading = true;
     this.cancelPendingOperations();
 
-    return new Promise<void>((resolve) => {
-      if (this.playing()) {
-        const interval = setInterval(() => {
-          if (!this.playing()) {
-            clearInterval(interval);
+    if (this.isDisposed || this.state() !== 'loaded' || !this.playing() || this.howlInst.loop()) {
+      return Promise.resolve();
+    }
 
-            resolve();
-          }
-        }, 10);
-      } else {
+    const duration = this.howlInst.duration();
+    const rate = this.howlInst.rate();
+
+    if (!Number.isFinite(duration) || duration <= 0 || !Number.isFinite(rate) || rate <= 0) {
+      return Promise.resolve();
+    }
+
+    // All current voices started before cleanup. One full clip at the current rate bounds their grace period.
+    const deadline = Math.ceil((duration / rate) * 1000);
+    const events = [
+      'end',
+      'pause',
+      'stop',
+    ];
+
+    this.completionPromise = new Promise<void>((resolve) => {
+      let hasFinished = false;
+      const finish = () => {
+        if (hasFinished) {
+          return;
+        }
+
+        hasFinished = true;
+        cancelDeadline();
+        this.pendingOperations.delete(finish);
+
+        for (const event of events) {
+          this.howlInst.off(event, checkCompletion);
+        }
+
         resolve();
+      };
+      const checkCompletion = () => {
+        if (!this.playing() || this.howlInst.loop()) {
+          finish();
+        }
+      };
+      const cancelDeadline = this.schedule(deadline, { complete: finish });
+      this.pendingOperations.add(finish);
+
+      for (const event of events) {
+        this.howlInst.on(event, checkCompletion);
       }
     });
+
+    return this.completionPromise;
   }
 }

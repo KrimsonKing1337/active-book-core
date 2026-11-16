@@ -1,20 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { openBrowserFixture } from '../browserFixture.js';
-
-const openAudio = async (context) => {
-  const { browser, origin } = await openBrowserFixture(context);
-  const page = await browser.newPage();
-  const errors = [];
-  page.on('pageerror', (error) => errors.push(error.message));
-  context.after(() => assert.deepEqual(errors, []));
-  await page.goto(`${origin}/tests/audioLifecycle/index.html`);
-  await page.waitForFunction(() => window.audioLifecycle?.get().state() === 'loaded');
-  await page.getByRole('button', { name: 'Unlock audio' }).click();
-
-  return page;
-};
+import { openAudio } from './audioLifecycleFixture.js';
 
 test('real Howler cancels delayed requests on stop/pause and permits a fresh start', async (context) => {
   const page = await openAudio(context);
@@ -88,7 +75,7 @@ test('real Howler cannot restart from an obsolete fade continuation after unload
   assert.equal(await page.evaluate(() => window.audioLifecycle.get().state()), 'unloaded');
 });
 
-test('real Howler does not enqueue playback while a resource is still loading', async (context) => {
+test('real Howler cancels stop and lifetime cleanup while resources are still loading', async (context) => {
   const page = await openAudio(context);
   let release;
   const gate = new Promise((resolve) => {
@@ -103,11 +90,15 @@ test('real Howler does not enqueue playback while a resource is still loading', 
     const audio = window.audioLifecycle.create({ id: 'loading', src: '/delayed.wav' });
     await audio.play();
     await audio.stop();
+    const disposed = window.audioLifecycle.create({ id: 'disposed', src: '/delayed.wav' });
+    await disposed.play();
+    await window.audioLifecycle.cleanup('disposed');
   });
   release();
   await page.waitForFunction(() => window.audioLifecycle.get('loading').state() === 'loaded');
   await page.waitForTimeout(150);
-  assert.deepEqual(await page.evaluate(() => window.audioLifecycle.events), []);
+  assert.deepEqual(await page.evaluate(() => window.audioLifecycle.events), ['unload:disposed']);
+  assert.equal(await page.evaluate(() => window.audioLifecycle.get('disposed').state()), 'unloaded');
   await page.evaluate(async () => {
     await window.audioLifecycle.get('loading').unload();
     await window.audioLifecycle.get().unload();
