@@ -1,5 +1,7 @@
 import { Howl } from 'howler';
 
+import { installFadeFixture } from './fadeFixture';
+
 import {
   emit,
   installHowlerFixture,
@@ -33,8 +35,8 @@ test.each(controls)('%s cancels a start waiting for load', async (method) => {
   expect(listenerCount(instance.howlInst, 'loaderror')).toBe(0);
 });
 
-test.each(controls)('%s invalidates the continuation after fadeIn', async (method) => {
-  const instance = fixture.create();
+test.each(controls)('%s cancels fade-in before a delayed start', async (method) => {
+  const instance = fixture.create({ delay: 100 });
   const play = instance.play(true);
   await instance[method]();
   await jest.advanceTimersByTimeAsync(1000);
@@ -44,13 +46,15 @@ test.each(controls)('%s invalidates the continuation after fadeIn', async (metho
   expect(jest.getTimerCount()).toBe(0);
 });
 
-test('a new play interrupts a fade without letting its old continuation start another voice', async () => {
+test('a new play during fade-in preserves both voices without a late third start', async () => {
+  fixture.restore();
+  fixture = installFadeFixture();
   const instance = fixture.create();
   const previous = instance.play(true);
   await instance.play();
   await jest.advanceTimersByTimeAsync(1000);
   await previous;
-  expect(Howl.prototype.play).toHaveBeenCalledTimes(1);
+  expect(Howl.prototype.play).toHaveBeenCalledTimes(2);
 });
 
 test('load failure clears the request deadline and allows a subsequent loaded request', async () => {
@@ -81,6 +85,7 @@ test('callbacks already queued by Howler cannot fire after cancellation', async 
 
 test('repeated pause and stop without native events do not accumulate listeners', async () => {
   const instance = fixture.create();
+  const ownerListeners = listenerCount(instance.howlInst, 'stop');
 
   for (let index = 0; index < 5; index += 1) {
     await instance.pause();
@@ -88,7 +93,7 @@ test('repeated pause and stop without native events do not accumulate listeners'
   }
 
   expect(listenerCount(instance.howlInst, 'pause')).toBe(0);
-  expect(listenerCount(instance.howlInst, 'stop')).toBeLessThanOrEqual(1);
+  expect(listenerCount(instance.howlInst, 'stop')).toBeLessThanOrEqual(ownerListeners + 1);
   await instance.unload();
   expect(listenerCount(instance.howlInst, 'stop')).toBe(0);
 });
@@ -108,6 +113,8 @@ test('loading retains multiple play requests and clears both load subscriptions 
 });
 
 test('an obsolete faded stop cannot stop a newer play', async () => {
+  fixture.restore();
+  fixture = installFadeFixture();
   const instance = fixture.create();
   await instance.play();
   const stop = instance.stop(true);
