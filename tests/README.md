@@ -10,8 +10,11 @@
 | --- | --- |
 | `npm run typecheck` | Исходники и локальные Jest-тесты в `src/` |
 | `npm run typecheck:test` | TypeScript-фикстуры и служебные TS-файлы корневого `tests/` |
+| `npm run lint:ts:check` | Все TS/TSX/MTS/CTS: исходники, тесты и фикстуры |
+| `npm run lint:js:check` | Все JS/JSX/MJS/CJS: инструменты, конфигурации, Node/browser/infrastructure тесты |
+| `npm run lint:css:check` | SCSS в `src/` и `tests/`, включая reset и mixins |
 | `npm run test:unit` | Jest: unit/component-тесты в `src/` |
-| `npm run test:scripts` | Node: ESLint, Jest transformer, размещение тестов, browser manifest и production-упаковка |
+| `npm run test:scripts` | Node: правила и покрытие ESLint, Jest transformer, размещение тестов, browser manifest и production-упаковка |
 | `npm run test:scss-alias` | Node: SCSS alias unit/CLI-тесты |
 | `npm run test:browser` | Node + Playwright: все браузерные сценарии последовательно |
 | `npm run test:visual-lab` | Поднабор browser: только visual playground |
@@ -27,6 +30,8 @@
 ```sh
 PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run test:browser
 ```
+
+Подробное покрытие, существующие нарушения и план следующего этапа: [аудит 6.1](../docs/lint-coverage-6.1.md).
 
 ## Каталоги и фикстуры
 

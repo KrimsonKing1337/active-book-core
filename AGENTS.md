@@ -11,9 +11,10 @@
 
 ## Проверки и локальная разработка
 
-Быстрые проверки: `npm run typecheck`, `npm run typecheck:test`, `npm run lint:ts:check`, `npm run lint:css:check`, `npm run test:unit`, `npm run test:scripts`, `npm run test:scss-alias`.
+Быстрые проверки: `npm run typecheck`, `npm run typecheck:test`, `npm run lint:ts:check`, `npm run lint:js:check`, `npm run lint:css:check`, `npm run test:unit`, `npm run test:scripts`, `npm run test:scss-alias`.
 Браузерные проверки запускайте отдельно через `npm run test:browser`.
 Размещение тестов определяется разделом «Тесты» общих соглашений выше; его запрет на тесты и фикстуры в `scripts/` проверяет `test:scripts`. Этот же набор проверяет полноту списка браузерного раннера.
+ESLint проверяет TS и JS отдельными командами во всём репозитории, включая тесты, фикстуры и инструменты. Покрытие, окружения и исключение сгенерированных файлов закреплены в `tests/infrastructure/lintCoverage.test.js`.
 Конфигурации сборки, тестов, алиасы и workspaces относятся к этому репозиторию.
 `npm run build` пересоздаёт `lib/` без изменения версии и исходников; production-компиляция использует `tsconfig.build.json`.
 `npm run packaging` упаковывает готовую сборку в `tgz/`. `make` объединяет только build и packaging; версия изменяется отдельно через `npm run up`.

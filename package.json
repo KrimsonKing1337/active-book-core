@@ -17,17 +17,19 @@
     "test:browser": "node ./scripts/runBrowserTests.js",
     "typecheck": "tsc --noEmit",
     "typecheck:test": "tsc --project tests/tsconfig.json",
-    "lint:ts": "eslint \"./src/**/*.{ts,tsx}\" --fix",
-    "lint:css": "stylelint \"src/**/*.scss\" --fix",
+    "lint:ts": "eslint \"**/*.{ts,tsx,mts,cts}\" --fix",
+    "lint:css": "stylelint \"{src,tests}/**/*.scss\" --fix",
     "lint-staged": "lint-staged",
     "pre-commit": "lint-staged",
     "dev:visual-lab": "node scripts/visualPlayground.js",
     "test:visual-lab": "node --test tests/visualPlayground/visualPlayground.browser.test.js",
-    "lint:ts:check": "eslint \"./src/**/*.{ts,tsx}\"",
-    "lint:css:check": "stylelint \"src/**/*.scss\"",
+    "lint:ts:check": "eslint \"**/*.{ts,tsx,mts,cts}\"",
+    "lint:css:check": "stylelint \"{src,tests}/**/*.scss\"",
     "test:unit": "jest --runInBand",
-    "test:scripts": "node --test tests/eslint/eslint.test.js tests/jest/file-transform.test.js tests/infrastructure/testLayout.test.js tests/packaging/package.test.js",
-    "build": "node ./scripts/build.js"
+    "test:scripts": "node --test tests/eslint/eslint.test.js tests/jest/file-transform.test.js tests/infrastructure/*.test.js tests/packaging/package.test.js",
+    "build": "node ./scripts/build.js",
+    "lint:js": "eslint \"**/*.{js,jsx,mjs,cjs}\" --fix",
+    "lint:js:check": "eslint \"**/*.{js,jsx,mjs,cjs}\""
   },
   "husky": {
     "hooks": {
@@ -35,7 +37,7 @@
     }
   },
   "lint-staged": {
-    "*.{ts,tsx}": "eslint --fix",
+    "*.{js,jsx,mjs,cjs,ts,tsx,mts,cts}": "eslint --fix",
     "*.scss": "stylelint --fix"
   },
   "dependencies": {

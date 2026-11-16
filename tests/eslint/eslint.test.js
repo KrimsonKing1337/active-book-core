@@ -13,8 +13,8 @@ const eslint = new ESLint({
   },
 });
 
-const lintMessages = async (code) => {
-  const [result] = await eslint.lintText(code, { filePath: 'src/components/Video/Video.tsx' });
+const lintMessages = async (code, filePath = 'src/components/Video/Video.tsx') => {
+  const [result] = await eslint.lintText(code, { filePath });
 
   return result.messages;
 };
@@ -22,7 +22,7 @@ const lintMessages = async (code) => {
 const violations = [
   {
     name: 'import grouping',
-    code: "import local from './local';\n\nimport React from 'react';\n",
+    code: 'import local from \'./local\';\n\nimport React from \'react\';\n',
     ruleId: 'import-x/order',
     severity: 2,
   },
@@ -64,7 +64,7 @@ const violations = [
   },
   {
     name: 'caught error causes',
-    code: "try { run(); } catch (error) { throw new Error('failed'); }\n",
+    code: 'try { run(); } catch (error) { throw new Error(\'failed\'); }\n',
     ruleId: 'preserve-caught-error',
     severity: 2,
   },
@@ -130,7 +130,10 @@ function Component({ ready }) {
   return null;
 }
 `);
-  const focused = await lintMessages("test.only('focused', () => { expect(true).toBe(true); });\n");
+  const focused = await lintMessages(
+    'test.only(\'focused\', () => { expect(true).toBe(true); });\n',
+    'src/components/Video/tests/Video.test.tsx',
+  );
 
   assert(hooks.some((message) => message.ruleId === 'react-hooks/rules-of-hooks' && message.severity === 2));
   assert(focused.some((message) => message.ruleId === 'jest/no-focused-tests' && message.severity === 2));
@@ -138,7 +141,7 @@ function Component({ ready }) {
 
 test('accepts short value choices, nullish fallbacks and intentional truthy defaults', async () => {
   const snippets = [
-    "const value = ready ? 'yes' : 'no';\n",
+    'const value = ready ? \'yes\' : \'no\';\n',
     'const value = current ? current : fallback;\n',
     'const value = preview.hidden ?? item?.hidden ?? false;\n',
     'const value = item?.width ?? 0;\n',
