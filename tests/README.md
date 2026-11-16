@@ -11,7 +11,7 @@
 | `npm run typecheck` | Исходники и локальные Jest-тесты в `src/` |
 | `npm run typecheck:test` | TypeScript-фикстуры и служебные TS-файлы корневого `tests/` |
 | `npm run test:unit` | Jest: unit/component-тесты в `src/` |
-| `npm run test:scripts` | Node: ESLint, Jest transformer, размещение тестов и полнота browser manifest |
+| `npm run test:scripts` | Node: ESLint, Jest transformer, размещение тестов, browser manifest и production-упаковка |
 | `npm run test:scss-alias` | Node: SCSS alias unit/CLI-тесты |
 | `npm run test:browser` | Node + Playwright: все браузерные сценарии последовательно |
 | `npm run test:visual-lab` | Поднабор browser: только visual playground |

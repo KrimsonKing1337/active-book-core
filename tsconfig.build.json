@@ -1,0 +1,26 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "lib",
+    "noEmit": false,
+    "noEmitOnError": true,
+    "sourceMap": false
+  },
+  "include": [
+    "d.ts",
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "lib",
+    "dist",
+    "tests",
+    "src/**/tests/**",
+    "src/**/__tests__/**",
+    "src/**/__mocks__/**",
+    "src/**/*.test.*",
+    "src/**/*.spec.*",
+    "src/**/testFixtures.*"
+  ]
+}
