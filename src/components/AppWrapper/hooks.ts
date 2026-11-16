@@ -66,20 +66,21 @@ export const useDeleteAllVideosWithoutDataIdOnThePage = () => {
 
   // Здесь ранее videosCurrentTime запрашивались напрямую из стора без зависимостей, мб нужно сделать через ref
   useEffect(() => {
-    const videos = Array.from(document.querySelectorAll('video'));
-
+    const videos = document.querySelectorAll('video');
+    const savedTimes = videosCurrentTimeRef.current;
     const videosCurrentTimeNewValue: typeof videosCurrentTime = {};
 
-    videos.forEach((videoCur) => {
-      const id = videoCur.getAttribute('data-id');
+    for (const videoCur of videos) {
+      const id = videoCur.getAttribute('data-id') ?? '';
+      const currentTime = savedTimes?.[id];
 
-      if (id && videosCurrentTimeRef.current?.[id]) {
-        videosCurrentTimeRef.current[id] = videosCurrentTime[id];
+      if (id && currentTime !== undefined) {
+        videosCurrentTimeNewValue[id] = currentTime;
       }
-    });
+    }
 
     dispatch(effectsActions.setVideosCurrentTime(videosCurrentTimeNewValue));
-  }, [page]);
+  }, [page, dispatch]);
 };
 
 export const useAllPagesSeen = () => {

@@ -7,6 +7,7 @@ import type { Config } from '../../src/@types';
 import { StoreProvider } from '../../src/store';
 import { initialState as defaultConfig } from '../../src/store/config/slice';
 import { AppWrapper } from '../../src/components/AppWrapper';
+import { Video } from '../../src/components/Video';
 
 import { Content } from './Content';
 
@@ -26,7 +27,26 @@ if (!root) {
   throw new Error('Missing video playback fixture root');
 }
 
-const nextPage = <p data-testid="next-page">Next page</p>;
+let nextPage = <p data-testid="next-page">Next page</p>;
+
+if (new URLSearchParams(location.search).has('time-cache')) {
+  nextPage = (
+    <>
+      <p data-testid="next-page">
+        Next page
+      </p>
+
+      <Video
+        id="outside"
+        data-testid="restored-outside"
+        src="/tests/unifiedVisualEffects/movie.webm?id=outside"
+        autoPlay={false}
+        controls
+      />
+    </>
+  );
+}
+
 const pages = [{ id: 'video-page', content: <Content /> }, { id: 'next-page', content: nextPage }];
 
 createRoot(root).render(

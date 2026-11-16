@@ -30,6 +30,11 @@ Resize, Embla reInit and unrelated rerenders do not create a new playback cycle.
 Changing `id` or `src` retires the old cycle, starts position and intent afresh,
 and prevents an old metadata callback from restoring the previous position.
 Existing page time persistence remains separate from mounted-slide position.
+Its Redux cache is keyed by video ID. On page changes, AppContent builds a new
+cache containing saved entries whose `data-id` is still present in the DOM,
+including positions equal to zero. Missing IDs are dropped; returning to a page
+does not recreate dropped entries. Repeated IDs share the same cache entry.
+Restoration and source-replacement resets remain Video's responsibility.
 
 ## Async and disposal
 
@@ -47,7 +52,7 @@ disposal runs. Replay neither seeks nor removes the source nor starts another
 request. Final disposal is idempotent. Dialog close/replacement stops and resets
 all nested videos; reopening uses new instance-bound content at position zero.
 Ordinary page removal pauses playback while retaining its existing time-cache
-policy. The separate known page-transition cache-cleanup defect is unchanged.
+policy. Page-transition filtering does not mutate the previous Redux snapshot.
 
 ## Native content boundary
 

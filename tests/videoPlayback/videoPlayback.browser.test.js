@@ -93,3 +93,31 @@ test('resize and rerender keep manual pause and position; page exit stops every 
   assert(await oldFirst.evaluate((element) => element.paused));
   assert(await oldOutside.evaluate((element) => element.paused));
 });
+
+test('page navigation keeps a matching cached ID without mutating frozen Redux state', async (context) => {
+  const page = await openVideos(context, { search: 'time-cache' });
+  const first = page.getByTestId('outside');
+  await waitPlaying(first);
+  await first.evaluate((video) => {
+    video.pause();
+    video.currentTime = 1.25;
+    video.dispatchEvent(new Event('timeupdate'));
+  });
+  await page.evaluate(async () => {
+    const { store } = await import('/src/store/index.ts');
+    const { effectsActions } = await import('/src/store/effects/common/index.ts');
+    store.dispatch(effectsActions.setVideosCurrentTime({ outside: 1.25, absent: 3 }));
+  });
+  await page.getByRole('button', { name: 'Next page', exact: true }).click();
+  await page.getByTestId('next-page').waitFor();
+  const restored = page.getByTestId('restored-outside');
+  await page.waitForFunction(() => document.querySelector('[data-testid="restored-outside"]').currentTime >= 1.2);
+  assert(Math.abs(await time(restored) - 1.25) < 0.05);
+  assert.equal(await playing(restored), false);
+  const saved = await page.evaluate(async () => {
+    const { store } = await import('/src/store/index.ts');
+
+    return store.getState().effects.videosCurrentTime;
+  });
+  assert.deepEqual(saved, { outside: 1.25 });
+});
