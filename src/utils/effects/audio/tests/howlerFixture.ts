@@ -77,14 +77,25 @@ export const installHowlerFixture = () => {
 };
 
 // Howler dispatches even already queued callbacks asynchronously; keep its real emitter.
-export const emit = (howl: Howl, event: string) => {
+export const emit = (howl: Howl, event: string | {
+  name: string;
+  id: number;
+}) => {
   const emitEvent: unknown = Reflect.get(howl, '_emit');
 
   if (typeof emitEvent !== 'function') {
     throw new Error('Howler emitter is unavailable');
   }
 
-  emitEvent.call(howl, event, 1);
+  let name = event;
+  let soundId = 1;
+
+  if (typeof event !== 'string') {
+    name = event.name;
+    soundId = event.id;
+  }
+
+  emitEvent.call(howl, name, soundId);
 };
 
 export const listenerCount = (howl: Howl, event: string) => {

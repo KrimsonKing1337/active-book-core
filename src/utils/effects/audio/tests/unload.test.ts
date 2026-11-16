@@ -2,6 +2,8 @@ import { Howl } from 'howler';
 
 import { unloadAudio } from '../unloadAudio';
 
+import { installFadeFixture } from './fadeFixture';
+
 import {
   emit,
   installHowlerFixture,
@@ -128,6 +130,9 @@ test.each([
 });
 
 test('repeated lifetime cleanup does not interrupt or restart the existing unload fade', async () => {
+  fixture.restore();
+  fixture = installFadeFixture();
+  jest.spyOn(Howl.prototype, 'duration').mockReturnValue(0.2);
   const instance = fixture.create({ loop: true, fadeOutWhenUnload: true });
   await instance.play();
   const first = unloadAudio(instance);

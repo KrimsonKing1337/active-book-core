@@ -53,6 +53,7 @@ const fixture = {
   get,
   events,
   resourceCount,
+  howler: Howler,
   store,
   volumeActions,
   audioEffectsActions,
