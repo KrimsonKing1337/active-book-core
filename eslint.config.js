@@ -110,6 +110,10 @@ export default defineConfig([
       'tests/**/*.{test,spec}.{js,mjs,cjs}',
       'tests/**/*Fixture.js',
     ],
+    languageOptions: { globals: globals.nodeBuiltin },
+  },
+  {
+    files: ['*.cjs', '{scripts,config,tests}/**/*.cjs'],
     languageOptions: { globals: globals.node },
   },
   {
