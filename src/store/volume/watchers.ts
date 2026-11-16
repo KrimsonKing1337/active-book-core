@@ -1,5 +1,11 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
-import { call, put, select, takeLatest } from 'redux-saga/effects';
+
+import {
+  call,
+  put,
+  select,
+  takeLatest,
+} from 'redux-saga/effects';
 
 import type { AudioType } from '@types';
 
@@ -28,6 +34,7 @@ const setAudioVolumeByType = (type: AudioType, volume: number) => {
 
 export function* watchSetAll(action: PayloadAction<State>) {
   const { payload } = action;
+
   const {
     global,
     bg,
