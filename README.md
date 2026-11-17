@@ -1,106 +1,137 @@
 # @active-book/core
 
-https://active-books.ru
+Браузерный движок ActiveBook для иллюстрированных линейных историй: текст, изображения,
+видео, фоновое аудио, интерактивные компоненты и визуальные эффекты в одном reader.
+Тот же движок используется для предпросмотра книги в редакторе.
 
-ActiveBooks — Живые книги
+Проект находится **до первого релиза**. На текущем поколении движка ещё нет выпущенных
+книг; в репозиториях есть демонстрации и тестовые сценарии. Публичный API пока меняется.
 
-Живые книги — это формат цифрового повествования, в котором текст, звук, анимация и визуальные эффекты работают вместе, усиливая погружение, но не разрушая саму суть чтения. Также используются вспышка и вибрация (там где доступно).
+## Место в проекте
 
-Живая книга — это линейная история (без ветвлений и переменных), в которой:
+Ядро использует React 19, Redux Toolkit и redux-saga. Компоненты формируют поверхность
+книги и её DOM-регионы, общая визуальная сессия управляет регистрацией background/frame
+эффектов и их временем жизни, включая страницы и диапазоны. Аудио и видео используют
+браузерные API; воспроизведение может требовать первого действия пользователя.
+Вибрация и фонарик доступны только там, где их поддерживают браузер, устройство и разрешения.
 
-+ Текст остаётся главным носителем смысла
-+ Музыка и звуки сопровождают страницы
-+ Анимации и эффекты усиливают атмосферу сцены
-+ Визуальный стиль может меняться вместе
+Редактор, сборщик и production reader находятся в [active-book-editor](https://github.com/KrimsonKing1337/active-book-editor/blob/main/README.md),
+публичные контракты расширений — в [active-book-types](https://github.com/KrimsonKing1337/active-book-types/blob/main/README.md),
+конфигурации и соглашения — в [active-book-common](https://github.com/KrimsonKing1337/active-book-common/blob/main/README.md).
 
-Этот репозиторий — это движок живых книг, который называется ActiveBook.
+## Установка и сборка
 
-Исторические примеры на предыдущем поколении движка сохранены в архивах: \
-https://github.com/KrimsonKing1337/active-book-over-the-garden-wall-legacy \
-https://github.com/KrimsonKing1337/active-book-fairytale-forest-legacy
+Нужны Node.js **24 LTS** (24.15+ в ветке 24.x), npm **11.x** и соседние common/types.
+Точная проверяемая версия в `.nvmrc` — **24.19.0**, npm — **11.9.0**.
+[Общая инструкция с клонированием четырёх репозиториев](https://github.com/KrimsonKing1337/active-book-common/blob/main/README.md#установка-с-нуля-и-запуск-редактора).
 
-Почитать можно здесь (не работает во встроенном браузере телеграмма и аналогов): \
-https://active-books.ru
+После установки common и types, из корня core:
 
-## Локальная разработка
+```sh
+npm ci
+npm run build
+```
 
-Разместите `active-book-core`, `active-book-editor` и `active-book-types` в соседних каталогах.
-В types и core выполните `npm ci`, затем запустите `npm run core:package` из editor.
-Скрипт соберёт `@active-book/core`, создаст архив `active-book-core-<version>.tgz`
-и обновит локальную зависимость редактора. Публикация в npm для этого не нужна.
+`build` очищает и пересоздаёт `lib/`, компилирует production TypeScript, копирует
+ресурсы и преобразует JS/SCSS aliases в относительные пути. Он не меняет исходники,
+версию и lockfile. `lib/` не хранится в Git. dotLottie WASM копируется из зависимости
+непосредственно в `lib/src/vendors/`, без записи в `src/`.
 
-Пакет настроен как публичный npm-пакет в scope `@active-book` (`publishConfig.access: public`).
-Перед будущей публикацией необходимо проверить права аккаунта на этот scope;
-наличие имени в конфигурации само по себе не предоставляет права публикации.
+Требования инструментов разработки проверяются npm через `devEngines`.
+`engines.node` пакета сохраняет более широкий диапазон для потребителей: готовый
+браузерный пакет не требует, чтобы сборщик каждого потребителя работал на Node.js 24.
+Проверенный путь разработки этого репозитория — Node.js 24/npm 11; Node.js 20/22 здесь
+не проверялись. Сам reader работает в браузере, не в Node.js.
 
-Текущая архитектура Background/Frame: [общая визуальная сессия](docs/unified-background-frame.md).
+## Использование локального пакета
 
+В editor настроено `@active-book/core: file:../active-book-core`. До `npm ci` в editor
+нужно установить и собрать core. После изменения ядра выполните в editor
+`npm run core:build` и перезапустите dev-сервер. Установка/перепаковка TGZ для этого не нужна.
 
-## Экспериментальная лаборатория эффектов
+Корневого импорта `@active-book/core` нет. Используйте объявленные в `exports` подмодули:
 
-В ветке `experiment/visual-effects-playground` запустите `npm run dev:visual-lab`.
-[Результаты CSS/JS-сравнения, управление эффектами и визуальные материалы](docs/visual-playground.md).
+```tsx
+import type { Config } from '@active-book/core/@types';
 
-Текущий эксперимент `experiment/css-first-story-surfaces`: [CSS-first DOM-регионы, карта коммитов, проверки и замеры](docs/css-first-story-surfaces.ru.md).
+import { App, P } from '@active-book/core/components';
+import { StoreProvider } from '@active-book/core/store';
+```
 
-Финализация: [DOM-регионы, Toolbar, маски, анимации и готовность к интеграции](docs/story-regions-finalization.ru.md).
+JS и декларации разрешаются непосредственно в `lib/src/`. Пакет предназначен для
+браузерного сборщика с обработкой React, SCSS и SVG; импорт всего UI обычным Node.js
+не является поддерживаемым способом запуска. Editor и book-builder уже настраивают
+эту обработку и dedupe `react`/`react-dom` для связанных локальных пакетов.
 
-Regression follow-up: [Windows test paths, portal readiness, masks and package validation](docs/story-regions-test-regressions.ru.md).
+Ресурсы доступны по `@active-book/core/styles/*`, `assets/*`, `vendors/*`.
+Приложения подключают базовые стили common перед `@active-book/core/styles/styles.scss`.
+Существующий Vite-плагин editor/builder обслуживает и включает WASM по URL
+`/vendors/dotlottie-player.wasm`. Тесты ресурсов проверяют также SVG, постер и шрифты.
 
-
-## Shared development infrastructure
-
-Clone the ActiveBook repositories as siblings. Install `active-book-common` first,
-then this repository; it has the devDependency `@active-book/common: file:../active-book-common`.
-Coding conventions for human contributors and agents:
-[ActiveBook coding conventions](https://github.com/KrimsonKing1337/active-book-common/blob/main/CODING_CONVENTIONS.md).
-Agents should also read `../active-book-common/AGENTS.md` and this repository's
-`AGENTS.md` for task-specific workflow.
-Shared configurations load directly through the common package exports; no copied
-configuration snapshots or standalone-clone fallback are maintained.
-
-The common repository supplies grouped `check`, `typecheck`, `lint`, and `test`
-commands, each with `--repo` filtering. `check` and `test` include browser/runtime
-suites; choose `test:unit` or another subgroup for a narrower run. `deps:sync`
-applies standard npm section policies to already declared packages and workspaces.
-See the common README for installation order, groups, presets and policy semantics.
-
-ESLint extends `@active-book/common/eslint`; only project aliases, ignores and local
-rules remain here. Stylelint reexports `@active-book/common/stylelint`, including
-its SCSS rules and property ordering. `lint:ts:check` / `lint:css:check` check without
-fixes; existing fixing scripts remain available.
-
-TypeScript extends the common library profile. Jest stays local; production emission
-uses `tsconfig.build.json`, separately from source/test typechecking.
-
-## Build and package
+## Production-упаковка
 
 ```sh
 npm run build
 npm run packaging
 ```
 
-`build` cleans and recreates `lib/`, copies runtime resources, rewrites JS/SCSS
-aliases and resolves relative JS imports. It does not change source files, the
-version or the lockfile. Lottie WASM is copied from the installed dependency directly
-to `lib/src/vendors/`. `packaging` creates `tgz/active-book-core-<version>.tgz` from
-the existing build; run `build` first. `make` runs these two steps without changing
-the version. Version changes are an explicit `npm run up` operation.
+`packaging` создаёт `tgz/active-book-core-<version>.tgz` из готовой сборки.
+`make` последовательно выполняет build и packaging; версия изменяется только отдельной
+явной командой `npm run up`. Для обычной разработки достаточно `build`.
+Архив не устанавливается в editor автоматически.
 
-The archive contains `lib/src/`, package metadata, README and license. Production
-compilation excludes tests, fixtures and Jest setup; tooling and diagnostic materials
-are outside the package allowlist. No install scripts or file relocation are needed.
+В архив входят `lib/src/`, metadata, README и лицензия. Тесты, фикстуры, Jest setup,
+инструменты и диагностические материалы исключены. `postinstall` не нужен.
+Настройка `publishConfig.access: public` относится к будущей публикации, а не подтверждает,
+что текущая версия опубликована или публичный API стабилен.
 
-The package has no root import: use the supported subpaths such as
-`@active-book/core/components`, `@active-book/core/store` and
-`@active-book/core/controllers/visualEffects`. Each JS module export has a matching
-`types` target. Resources retain `@active-book/core/styles/*`, `assets/*` and
-`vendors/*` paths. The editor/book-builder serve and emit the exported Lottie WASM
-at the existing `/vendors/dotlottie-player.wasm` URL. Howler declarations are a package
-dependency because they appear in the public audio types.
+## Проверки
 
-`npm run test:scripts` includes two-build/two-archive reproducibility checks, source
-and manifest integrity checks, package contents, exports and runtime resources.
+```sh
+npm run typecheck
+npm run typecheck:test
+npm run test:unit
+npm run test:scripts
+npm run test:scss-alias
+npm run lint:ts:check
+npm run lint:css:check
+```
 
-Test commands, fixture locations and the browser scenario inventory:
-[tests/README.md](tests/README.md).
+Для настоящего Chromium установите браузер из editor (`npx playwright install chromium`)
+либо задайте `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`, затем запустите здесь:
+
+```sh
+npm run test:browser
+```
+
+Browser runner выполняет сценарии последовательно. Не запускайте упаковочные тесты
+параллельно с ручным `build`: они также пересобирают `lib/`.
+В исходниках есть известный долг ESLint; его устранение не является частью установки.
+`lint:ts`/`lint:css` применяют исправления — для просмотра используйте варианты `:check`.
+[Подробный состав тестов и фикстур](tests/README.md).
+
+## Структура и технические материалы
+
+- `src/components/` — reader, типографика, медиа, диалоги и визуальные поверхности.
+- `src/controllers/visualEffects/` — определения, регистрации и жизненный цикл эффектов.
+- `src/hooks/`, `src/store/`, `src/utils/` — API ядра, состояние и служебная логика.
+- `src/styles/`, `src/assets/` — runtime-стили, изображения и шрифты.
+- `scripts/` — инструменты сборки и запуска проверок; тестов и фикстур здесь нет.
+- `tests/` — самостоятельные browser/infrastructure сценарии; модульные тесты также есть в `src/`.
+- `lib/`, `tgz/` — генерируемые результаты сборки и упаковки.
+
+[Визуальная сессия Background/Frame](docs/unified-background-frame.md),
+[DOM-регионы и Toolbar](docs/story-regions-finalization.ru.md),
+[лаборатория и демонстрации](tests/visualPlayground/README.md).
+`npm run dev:visual-lab` работает из текущего checkout; старые экспериментальные ветки
+для запуска не требуются. Материалы экспериментов описывают историю решений.
+
+## История проекта
+
+Предыдущее поколение движка и созданные для него книги сохранены отдельно:
+[Over the Garden Wall](https://github.com/KrimsonKing1337/active-book-over-the-garden-wall-legacy),
+[Fairytale Forest](https://github.com/KrimsonKing1337/active-book-fairytale-forest-legacy),
+[исторический сайт](https://active-books.ru).
+Они не демонстрируют выпуск книг на текущей реализации ActiveBook.
+
+[Общие соглашения](https://github.com/KrimsonKing1337/active-book-common/blob/main/CODING_CONVENTIONS.md), [инструкции для агентов](AGENTS.md).
