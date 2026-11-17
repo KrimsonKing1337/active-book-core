@@ -1,6 +1,11 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
-import { State, Segment, Segments } from './@types';
+import type {
+  State,
+  Segment,
+  Segments,
+} from './@types';
 
 export const initialState: State = {
   segments: {},
@@ -24,9 +29,9 @@ const slice = createSlice({
     },
 
     incrementSegmentsCount() {},
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+     
     setSegment(_state, _action: PayloadAction<Segment>) {},
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+     
     removeSegment(_state, _action: PayloadAction<string>) {},
 
     reset() {

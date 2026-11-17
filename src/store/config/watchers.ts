@@ -1,5 +1,10 @@
-import { PayloadAction } from '@reduxjs/toolkit';
-import { call, put, select, takeLatest } from 'redux-saga/effects';
+import type { PayloadAction } from '@reduxjs/toolkit';
+import {
+  call,
+  put,
+  select,
+  takeLatest,
+} from 'redux-saga/effects';
 
 import { mainSelectors } from '@store/main';
 
@@ -8,7 +13,7 @@ import { set as localStorageSet } from '@utils/localStorage/localStorage';
 
 import { setCssVariable } from '@utils/styles/setCssVariable';
 
-import { State } from './@types';
+import type { State } from './@types';
 import { actions } from './slice';
 import { selectors } from './selectors';
 

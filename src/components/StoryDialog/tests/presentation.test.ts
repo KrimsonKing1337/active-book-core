@@ -14,15 +14,17 @@ test('uses default for empty, text, mixed and unknown content without inspecting
 });
 
 test('only the selected carousel slide determines presentation', () => {
-  const carousel = [{
-    type: 'carousel',
-    content: [
-      { type: 'carouselSlide', content: [{ type: 'image' }] },
-      { type: 'carouselSlide', content: [{ type: 'paragraph' }] },
-      { type: 'carouselSlide', content: [{ type: 'video' }] },
-      { type: 'carouselSlide', content: [{ type: 'image' }, { type: 'paragraph' }] },
-    ],
-  }];
+  const carousel = [
+    {
+      type: 'carousel',
+      content: [
+        { type: 'carouselSlide', content: [{ type: 'image' }] },
+        { type: 'carouselSlide', content: [{ type: 'paragraph' }] },
+        { type: 'carouselSlide', content: [{ type: 'video' }] },
+        { type: 'carouselSlide', content: [{ type: 'image' }, { type: 'paragraph' }] },
+      ],
+    },
+  ];
 
   expect(getDialogMode(carousel)).toBe('media');
   expect(getDialogMode(carousel, 1)).toBe('default');

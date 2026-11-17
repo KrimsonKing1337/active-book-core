@@ -1,4 +1,8 @@
-import { useCallback, useEffect, useRef } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useRef,
+} from 'react';
 
 import { isEqual } from 'lodash-es';
 
@@ -84,7 +88,11 @@ export const useVisualRegistrations = ({
         });
       }
     }
-  }, [session, registrations, definitions]);
+  }, [
+    session,
+    registrations,
+    definitions,
+  ]);
 
   const clear = useCallback(() => {
     ownedRef.current.forEach((cur) => cur.remove());

@@ -25,8 +25,12 @@ test('shares only reader preferences independently of authored geometry', () => 
   });
 });
 
-test.each(['invalid JSON', 'null', '{"isFullscreen":"true","objectFit":"cover"}',
-  '{"isFullscreen":true,"objectFit":"fill"}'])('safely handles malformed storage: %s', (raw) => {
+test.each([
+  'invalid JSON',
+  'null',
+  '{"isFullscreen":"true","objectFit":"cover"}',
+  '{"isFullscreen":true,"objectFit":"fill"}',
+])('safely handles malformed storage: %s', (raw) => {
   localStorage.setItem(dialogPreferencesKey, raw);
 
   expect(readDialogPreferences()).toEqual(defaultDialogPreferences);

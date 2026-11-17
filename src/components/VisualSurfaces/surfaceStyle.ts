@@ -1,6 +1,11 @@
 import type { CSSProperties } from 'react';
 
-import type { AnchorPoint, VisualLength, VisualMask, VisualPlacement } from '@active-book/types';
+import type {
+  AnchorPoint,
+  VisualLength,
+  VisualMask,
+  VisualPlacement,
+} from '@active-book/types';
 
 const anchors: Record<AnchorPoint, readonly [number, number]> = {
   'top-left': [0, 0],

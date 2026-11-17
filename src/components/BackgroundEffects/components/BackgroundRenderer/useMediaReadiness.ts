@@ -1,4 +1,8 @@
-import { useCallback, useLayoutEffect, useRef } from 'react';
+import {
+  useCallback,
+  useLayoutEffect,
+  useRef,
+} from 'react';
 
 import { useStore } from '@store';
 

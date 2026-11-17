@@ -40,9 +40,7 @@ const reducer = {
   windows: windowsReducer,
 };
 
-const middleware = [
-  sagaMiddleware,
-];
+const middleware = [sagaMiddleware];
 
 export const store = configureStore({
   reducer,

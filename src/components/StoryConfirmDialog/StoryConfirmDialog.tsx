@@ -46,7 +46,13 @@ export const StoryConfirmDialog = ({
         canClose: canDismiss,
       }));
     }
-  }, [dialogProps.isOpen, sessionId, instanceId, canDismiss, dispatch]);
+  }, [
+    dialogProps.isOpen,
+    sessionId,
+    instanceId,
+    canDismiss,
+    dispatch,
+  ]);
 
   const handleConfirm = () => {
     if (canConfirm && isCurrentWindow()) {

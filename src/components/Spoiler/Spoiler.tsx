@@ -1,4 +1,9 @@
-import { PropsWithChildren, useEffect, useRef, useState } from 'react';
+import type { PropsWithChildren } from 'react';
+import {
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import * as styles from './Spoiler.module.scss';
 

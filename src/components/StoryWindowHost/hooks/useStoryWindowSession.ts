@@ -24,7 +24,12 @@ export const useStoryWindowSession = () => {
     if (appMode === 'reader') {
       dispatch(windowsActions.synchronizeSession({ sessionId, pageId }));
     }
-  }, [sessionId, pageId, appMode, dispatch]);
+  }, [
+    sessionId,
+    pageId,
+    appMode,
+    dispatch,
+  ]);
 
   let readerSessionId: string | null = null;
 
@@ -42,7 +47,11 @@ export const useStoryWindowSession = () => {
     return () => {
       dispatch(windowsActions.endSession(sessionId));
     };
-  }, [sessionId, appMode, dispatch]);
+  }, [
+    sessionId,
+    appMode,
+    dispatch,
+  ]);
 
   if (appMode !== 'reader') {
     return null;

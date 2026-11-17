@@ -1,4 +1,8 @@
-import { actions, initialState, reducer } from './slice';
+import {
+  actions,
+  initialState,
+  reducer,
+} from './slice';
 
 test('video readiness releases its loading gate without changing other media readiness', () => {
   const state = {

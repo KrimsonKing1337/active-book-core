@@ -53,7 +53,11 @@ export const useStoryWindowDialog = (target: WindowTarget | undefined) => {
         }
       });
     };
-  }, [targetSessionId, instanceId, dispatch]);
+  }, [
+    targetSessionId,
+    instanceId,
+    dispatch,
+  ]);
 
   const isCurrentWindow = useCallback(() => {
     if (!targetSessionId || !instanceId) {
@@ -61,7 +65,11 @@ export const useStoryWindowDialog = (target: WindowTarget | undefined) => {
     }
 
     return matchesWindowTarget(store.getState(), { sessionId: targetSessionId, instanceId });
-  }, [targetSessionId, instanceId, store]);
+  }, [
+    targetSessionId,
+    instanceId,
+    store,
+  ]);
 
   const handleOpenChange = (nextOpen: boolean) => {
     if (!nextOpen && target) {

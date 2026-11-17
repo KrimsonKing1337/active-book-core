@@ -6,6 +6,12 @@ test('defaults to 75 percent and preserves fractional authored percentages', () 
   expect(getDialogDimension(100)).toBe('100%');
 });
 
-test.each([0, -1, 101, NaN, Infinity])('rejects an invalid authored dimension: %s', (dimension) => {
+test.each([
+  0,
+  -1,
+  101,
+  NaN,
+  Infinity,
+])('rejects an invalid authored dimension: %s', (dimension) => {
   expect(() => getDialogDimension(dimension)).toThrow(RangeError);
 });

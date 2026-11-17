@@ -1,4 +1,8 @@
-import { useCallback, useId, useRef } from 'react';
+import {
+  useCallback,
+  useId,
+  useRef,
+} from 'react';
 
 import type { FrameEffect, FrameShadowItem } from '@hooks/effects/frame/@types';
 import { useFrameEffect, useFrameEffects } from '@hooks/effects/frame';

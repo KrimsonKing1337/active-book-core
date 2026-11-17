@@ -1,4 +1,8 @@
-import { type PropsWithChildren, Suspense, useLayoutEffect } from 'react';
+import {
+  type PropsWithChildren,
+  Suspense,
+  useLayoutEffect,
+} from 'react';
 
 import classNames from 'classnames';
 

@@ -35,7 +35,13 @@ export const BookApplicationSurface = ({
       hosts,
       setInverseColors,
     };
-  }, [element, underStory, aboveStory, feedback, selection]);
+  }, [
+    element,
+    underStory,
+    aboveStory,
+    feedback,
+    selection,
+  ]);
 
   const rootClasses = classNames(styles.Application, className, {
     [styles.InverseColors]: inverseColors,
@@ -64,12 +70,14 @@ export const BookApplicationSurface = ({
           data-application-host="aboveStory"
           inert
         />
+
         <div
           ref={setFeedback}
           className={styles.Feedback}
           data-application-host="feedback"
           inert
         />
+
         <div
           ref={setSelection}
           className={styles.Selection}

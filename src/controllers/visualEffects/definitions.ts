@@ -3,7 +3,11 @@ import { FrameRenderer } from '@components/FrameEffects';
 
 import type { HostVisualEffectDefinition } from './@types';
 
-import { BACKGROUND_DEFINITION, FRAME_DEFINITION, FEEDBACK_DEFINITION } from './constants';
+import {
+  BACKGROUND_DEFINITION,
+  FRAME_DEFINITION,
+  FEEDBACK_DEFINITION,
+} from './constants';
 
 export const builtinVisualDefinitions: readonly HostVisualEffectDefinition[] = [
   {

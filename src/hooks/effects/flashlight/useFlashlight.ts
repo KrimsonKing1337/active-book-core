@@ -1,4 +1,9 @@
-import { useCallback, useEffect, useId, useRef } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+} from 'react';
 
 import type { FlashlightEffectOptions } from '@types';
 
@@ -7,7 +12,11 @@ import { useSelector } from '@store';
 import { configSelectors } from '@store/config';
 import { mainSelectors } from '@store/main';
 
-import type { FrameAnimation, FrameEffect, FrameShadowItem } from '@hooks/effects/frame/@types';
+import type {
+  FrameAnimation,
+  FrameEffect,
+  FrameShadowItem,
+} from '@hooks/effects/frame/@types';
 
 import { useFrameEffect } from '@hooks/effects/frame/useFrameEffect';
 import { useFrameEffects } from '@hooks/effects/frame/useFrameEffects';
@@ -89,7 +98,11 @@ export const useFlashlight = (options: Partial<FlashlightEffectOptions> = {}) =>
     }
 
     flashlightInst.off();
-  }, [withFrameShadow, updateShadow, shadowEffectId]);
+  }, [
+    withFrameShadow,
+    updateShadow,
+    shadowEffectId,
+  ]);
 
   const on = useCallback(async (pulseDuration?: number) => {
     // Invalidate pending camera initialization and any previous auto-off timer.
@@ -129,7 +142,13 @@ export const useFlashlight = (options: Partial<FlashlightEffectOptions> = {}) =>
         timerRef.current = setTimeout(off, pulseDuration);
       });
     }
-  }, [flashlightEnabled, withFrameShadow, off, updateShadow, shadowEffectId]);
+  }, [
+    flashlightEnabled,
+    withFrameShadow,
+    off,
+    updateShadow,
+    shadowEffectId,
+  ]);
 
   // Preserve the original imperative hook's behavior on unmount.
   useEffect(() => {

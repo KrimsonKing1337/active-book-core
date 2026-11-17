@@ -1,4 +1,4 @@
-import { ThemeOptions } from '@types';
+import type { ThemeOptions } from '@types';
 
 export const getThemes = (customThemes?: Record<string, ThemeOptions>) => {
   const defaultThemes: Record<string, ThemeOptions> = {

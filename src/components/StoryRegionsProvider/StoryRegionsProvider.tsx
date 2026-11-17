@@ -1,4 +1,8 @@
-import { type PropsWithChildren, useMemo, useState } from 'react';
+import {
+  type PropsWithChildren,
+  useMemo,
+  useState,
+} from 'react';
 
 import {
   type RegionElements,
@@ -69,7 +73,12 @@ export const StoryRegionsProvider = ({ children }: PropsWithChildren) => {
     hosts,
     refs,
     hostRefs,
-  }), [elements, hosts, refs, hostRefs]);
+  }), [
+    elements,
+    hosts,
+    refs,
+    hostRefs,
+  ]);
 
   return (
     <StoryRegionsContext value={value}>

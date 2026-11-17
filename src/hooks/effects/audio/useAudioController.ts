@@ -1,6 +1,10 @@
 import { useCallback } from 'react';
 
-import { store, useDispatch, useSelector } from '@store';
+import {
+  store,
+  useDispatch,
+  useSelector,
+} from '@store';
 
 import { audioEffectsActions, audioEffectsSelectors } from '@store/effects/audio/audio';
 
@@ -36,7 +40,11 @@ export const useAudioController = (id: string) => {
     }
 
     dispatch(audioEffectsActions.removeAudioInstance({ id, instance }));
-  }, [id, getAudio, dispatch]);
+  }, [
+    id,
+    getAudio,
+    dispatch,
+  ]);
 
   return {
     audio,

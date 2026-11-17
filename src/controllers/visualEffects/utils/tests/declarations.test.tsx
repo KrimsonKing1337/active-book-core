@@ -34,7 +34,13 @@ const frame: FrameEffect = {
 };
 
 beforeEach(() => {
-  store.dispatch(mainActions.setStoryPages(['one', 'two', 'three', 'four', 'five']));
+  store.dispatch(mainActions.setStoryPages([
+    'one',
+    'two',
+    'three',
+    'four',
+    'five',
+  ]));
   store.dispatch(mainActions.setPage(1));
 });
 
@@ -152,20 +158,25 @@ test('frame controls merge style and animation changes through the common sessio
 
 test('range declarations reconcile equal input without replacing registration or serializing React nodes', () => {
   const session = createVisualEffects({ pages: 5 });
-  const ranges = [{
-    id: 'range',
-    type: 'frame' as const,
-    range: [{
-      from: 1,
-      to: 2,
-    }, {
-      from: 4,
-      to: 4,
-    }],
-    options: {
-      kind: 'component' as const,
+  const ranges = [
+    {
+      id: 'range',
+      type: 'frame' as const,
+      range: [
+        {
+          from: 1,
+          to: 2,
+        },
+        {
+          from: 4,
+          to: 4,
+        },
+      ],
+      options: {
+        kind: 'component' as const,
+      },
     },
-  }];
+  ];
   const { rerender, unmount } = renderHook(() => {
     const registrations = ranges.map((rangeCur) => createBuiltinRegistration({
       type: rangeCur.type,
@@ -197,10 +208,12 @@ test('page count changes preserve registrations and authored endpoints while val
   const session = createVisualEffects({ pages: 5 });
   const lifetime = {
     type: 'range' as const,
-    range: [{
-      from: 1,
-      to: 5,
-    }],
+    range: [
+      {
+        from: 1,
+        to: 5,
+      },
+    ],
   };
   session.register(createBuiltinRegistration({
     type: 'frame',
@@ -271,7 +284,10 @@ test('declaration order is explicit and style zIndex never becomes surface depth
   const registration = createBuiltinRegistration({
     type: 'background',
     options: {
-      id: 'order', kind: 'background', order: 7, style: { zIndex: 999 },
+      id: 'order',
+      kind: 'background',
+      order: 7,
+      style: { zIndex: 999 },
     },
     lifetime: { type: 'page', page: 1 },
   });

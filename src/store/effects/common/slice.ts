@@ -1,6 +1,6 @@
 import { type PayloadAction, createSlice } from '@reduxjs/toolkit';
 
-import { State, VideoCurrentTime } from './@types';
+import type { State, VideoCurrentTime } from './@types';
 
 export const initialState: State = {
   inverseColorIsActive: false,

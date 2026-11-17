@@ -1,13 +1,15 @@
 import type { HowlInstances } from '@types';
 
 import { store } from '@store';
-import { setVideosVolume } from '@utils/volume/setVideosVolume';
 
 import {
   getVideoStats,
   handleVideoPlayError,
   reportUnexpectedVideoError,
 } from '@components/Video/utils';
+
+import { setVideosVolume } from '@utils/volume/setVideosVolume';
+
 
 const locallyManagedVideoSelector = '[data-book-carousel], [data-video-scope="dialog"]';
 

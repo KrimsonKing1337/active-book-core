@@ -1,4 +1,9 @@
-import { type PropsWithChildren, useEffect, useRef, useState } from 'react';
+import {
+  type PropsWithChildren,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowDown } from '@fortawesome/free-solid-svg-icons';
@@ -59,7 +64,13 @@ export const Segment = ({
 
       onExit();
     }
-  }, [isLoading, id, activeId, onEnter, onExit]);
+  }, [
+    isLoading,
+    id,
+    activeId,
+    onEnter,
+    onExit,
+  ]);
 
   useEffect(() => {
     const uuid = defaultId ? defaultId : nanoid();

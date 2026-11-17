@@ -1,7 +1,11 @@
-import { PayloadAction } from '@reduxjs/toolkit';
-import { put, takeLatest, select } from 'redux-saga/effects';
+import type { PayloadAction } from '@reduxjs/toolkit';
+import {
+  put,
+  takeLatest,
+  select,
+} from 'redux-saga/effects';
 
-import { Segment, Segments } from './@types';
+import type { Segment, Segments } from './@types';
 
 import { actions } from './slice';
 import { selectors } from './selectors';

@@ -161,7 +161,11 @@ export const AppContent = ({
     }
 
     startToPlayAllAudiosWithPlayOnLoad(audioInstances, page);
-  }, [page, isLoading, audioInstances]);
+  }, [
+    page,
+    isLoading,
+    audioInstances,
+  ]);
 
   // Удаляю id видео из списка currentTime, если видео с data-id на странице нет
   // todo: вспомнить зачем это вообще нужно
@@ -173,7 +177,11 @@ export const AppContent = ({
     }
 
     return addKeyboardControl(goPrevPage, goNextPage);
-  }, [appMode, goPrevPage, goNextPage]);
+  }, [
+    appMode,
+    goPrevPage,
+    goNextPage,
+  ]);
 
   useEffect(() => {
     // addTouchSupportForCssHover(); // вместо этого просто "удаляю" :hover везде, возможно так и оставлю

@@ -70,14 +70,16 @@ test('derives only mode from onSelect while preserving shell, carousel, local st
   let notify: ((index: number) => void) | undefined;
   const resolver = (): StoryWindowContent => ({
     title: 'Gallery',
-    nodes: [{
-      type: 'carousel',
-      content: [
-        { type: 'carouselSlide', content: [{ type: 'paragraph' }] },
-        { type: 'carouselSlide', content: [{ type: 'image' }] },
-        { type: 'carouselSlide', content: [{ type: 'video' }] },
-      ],
-    }],
+    nodes: [
+      {
+        type: 'carousel',
+        content: [
+          { type: 'carouselSlide', content: [{ type: 'paragraph' }] },
+          { type: 'carouselSlide', content: [{ type: 'image' }] },
+          { type: 'carouselSlide', content: [{ type: 'video' }] },
+        ],
+      },
+    ],
     render: (onSelect) => {
       notify = onSelect;
 

@@ -16,7 +16,11 @@ export const useGoToPage = () => {
     if (currentPage < pages) {
       goToPage(currentPage + 1);
     }
-  }, [currentPage, pages, goToPage]);
+  }, [
+    currentPage,
+    pages,
+    goToPage,
+  ]);
 
   const goPrevPage = useCallback(() => {
     if (currentPage > 0) {

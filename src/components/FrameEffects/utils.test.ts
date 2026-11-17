@@ -19,7 +19,12 @@ test('places the bottom frame at the edge of its containing region', () => {
 });
 
 test('combines independent side masks into one component surface', () => {
-  const sides: FrameSide[] = ['top', 'right', 'bottom', 'left'];
+  const sides: FrameSide[] = [
+    'top',
+    'right',
+    'bottom',
+    'left',
+  ];
   const image = getFrameMaskImage(sides);
 
   expect(image.split('linear-gradient(')).toHaveLength(5);

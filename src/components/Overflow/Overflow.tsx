@@ -51,7 +51,11 @@ export const Overflow = ({
     return () => {
       document.removeEventListener('keydown', handleEscape);
     };
-  }, [appMode, isOpen, onClose]);
+  }, [
+    appMode,
+    isOpen,
+    onClose,
+  ]);
 
   useEffect(() => {
     if (!isOpen || appMode !== 'reader') {
@@ -78,7 +82,12 @@ export const Overflow = ({
         getNarrativeElement()?.focus();
       }
     };
-  }, [appMode, isOpen, sessionId, store]);
+  }, [
+    appMode,
+    isOpen,
+    sessionId,
+    store,
+  ]);
 
   const overflowClassNames = classNames({
     [styles.Overflow]: true,

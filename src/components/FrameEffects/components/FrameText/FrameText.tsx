@@ -1,4 +1,8 @@
-import { type CSSProperties, type PropsWithChildren, Children } from 'react';
+import {
+  type CSSProperties,
+  type PropsWithChildren,
+  Children,
+} from 'react';
 
 import classNames from 'classnames';
 

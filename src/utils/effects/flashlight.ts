@@ -46,9 +46,11 @@ export class Flashlight {
     }
 
     this.track.applyConstraints({
-      advanced: [{
-        torch: state,
-      }],
+      advanced: [
+        {
+          torch: state,
+        },
+      ],
     });
   }
 

@@ -1,4 +1,10 @@
-import { type CSSProperties, type HTMLAttributes, type Ref, useCallback, useLayoutEffect } from 'react';
+import {
+  type CSSProperties,
+  type HTMLAttributes,
+  type Ref,
+  useCallback,
+  useLayoutEffect,
+} from 'react';
 
 import classNames from 'classnames';
 

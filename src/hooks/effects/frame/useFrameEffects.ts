@@ -10,7 +10,11 @@ import type { JsonObject, VisualEffectRegistration } from '@active-book/types';
 import { VisualEffectsContext } from '@controllers/visualEffects';
 import { FEEDBACK_DEFINITION, FRAME_DEFINITION } from '@controllers/visualEffects/constants';
 
-import type { FrameEffect, FrameShadowItem, FrameTextItem } from './@types';
+import type {
+  FrameEffect,
+  FrameShadowItem,
+  FrameTextItem,
+} from './@types';
 
 const emptySnapshot: readonly VisualEffectRegistration[] = [];
 

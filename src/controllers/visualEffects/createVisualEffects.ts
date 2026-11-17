@@ -2,11 +2,19 @@ import { isEqual } from 'lodash-es';
 
 import type { VisualEffectDefinition, VisualEffectRegistration } from '@active-book/types';
 
-import type { CreateVisualEffectsOptions, HostVisualEffectDefinition, VisualEffectChanges } from './@types';
+import type {
+  CreateVisualEffectsOptions,
+  HostVisualEffectDefinition,
+  VisualEffectChanges,
+} from './@types';
 
 import { builtinVisualDefinitions } from './definitions';
 import { createEffectRuns } from './runs';
-import { copyVisualData, createVisualControllers, validateVisualLifetime } from './utils';
+import {
+  copyVisualData,
+  createVisualControllers,
+  validateVisualLifetime,
+} from './utils';
 
 export const createVisualEffects = ({ definitions = [], pages }: CreateVisualEffectsOptions) => {
   if (!Number.isInteger(pages) || pages < 1) {

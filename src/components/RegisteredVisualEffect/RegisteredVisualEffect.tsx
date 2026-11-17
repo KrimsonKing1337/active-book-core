@@ -1,7 +1,15 @@
-import { memo, useLayoutEffect, useMemo, useRef } from 'react';
+import {
+  memo,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+} from 'react';
 
 import type {
-  VisualEffectDefinition, VisualEffectInstance, VisualPlayback, VisualRegionElements,
+  VisualEffectDefinition,
+  VisualEffectInstance,
+  VisualPlayback,
+  VisualRegionElements,
 } from '@active-book/types';
 
 import type { VisualEffects } from '@controllers/visualEffects';

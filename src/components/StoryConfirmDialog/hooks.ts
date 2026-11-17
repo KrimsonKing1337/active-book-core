@@ -54,7 +54,11 @@ export const useConfirmationCountdown = ({ instanceId, delayMs }: CountdownOptio
 
       clearTimeout(timeout);
     };
-  }, [instanceId, delayMs, hasDelay]);
+  }, [
+    instanceId,
+    delayMs,
+    hasDelay,
+  ]);
 
   if (!instanceId || !hasDelay) {
     return 0;

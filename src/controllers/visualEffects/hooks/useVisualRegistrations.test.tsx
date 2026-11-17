@@ -6,7 +6,9 @@ import { registration } from '../tests/testFixtures';
 import { useVisualRegistrations } from './useVisualRegistrations';
 
 const definition = {
-  id: 'static', defaultParams: {}, Renderer: () => null,
+  id: 'static',
+  defaultParams: {},
+  Renderer: () => null,
 };
 
 test('equal descriptions skip updates; props and componentKey update the same registration', () => {

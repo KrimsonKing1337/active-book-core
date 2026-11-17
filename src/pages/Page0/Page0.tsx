@@ -1,4 +1,8 @@
-import { type KeyboardEvent, useEffect, useState } from 'react';
+import {
+  type KeyboardEvent,
+  useEffect,
+  useState,
+} from 'react';
 
 import { configSelectors } from '@store/config';
 

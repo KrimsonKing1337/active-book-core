@@ -12,8 +12,24 @@ test('range membership is inclusive and positional, including disjoint ranges an
   };
   const original = JSON.stringify(lifetime);
 
-  expect([0, 1, 2, 3, 4, 5, 6].map((cur) => isVisualEffectActive(lifetime, cur)))
-    .toEqual([false, false, true, true, false, true, false]);
+  expect([
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+  ].map((cur) => isVisualEffectActive(lifetime, cur)))
+    .toEqual([
+      false,
+      false,
+      true,
+      true,
+      false,
+      true,
+      false,
+    ]);
   validateVisualLifetime(lifetime, 6);
   expect(JSON.stringify(lifetime)).toBe(original);
   expect(isVisualEffectActive({ type: 'range', range: [] }, 1)).toBe(false);

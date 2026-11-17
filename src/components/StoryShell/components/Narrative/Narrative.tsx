@@ -1,4 +1,9 @@
-import { PropsWithChildren, useEffect, useLayoutEffect, useRef } from 'react';
+import type { PropsWithChildren } from 'react';
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+} from 'react';
 
 import Hammer from 'hammerjs';
 
@@ -105,7 +110,11 @@ export const Narrative = ({ children }: PropsWithChildren) => {
       hammertime.off('swipe');
       hammertime.destroy();
     };
-  }, [appMode, goNextPage, goPrevPage]);
+  }, [
+    appMode,
+    goNextPage,
+    goPrevPage,
+  ]);
 
   return (
     <div ref={refs.narrativeViewport} className={styles.Viewport} data-story-region="narrativeViewport">
@@ -133,9 +142,11 @@ export const Narrative = ({ children }: PropsWithChildren) => {
           <div className={styles.Text}>
             {children}
           </div>
+
           <VisualHost region="narrativeContent" />
         </div>
       </div>
+
       <VisualHost region="narrativeViewport" />
     </div>
   );

@@ -42,7 +42,12 @@ export const useVibration = (options?: VibrationEffectOptions) => {
     if (canVibrate) {
       vibrationOn(n);
     }
-  }, [appMode, isVibrationAvailable, vibrationEnabled, startPreview]);
+  }, [
+    appMode,
+    isVibrationAvailable,
+    vibrationEnabled,
+    startPreview,
+  ]);
 
   const off = useCallback(() => {
     stopPreview();

@@ -1,4 +1,8 @@
-import { useLayoutEffect, useMemo, useSyncExternalStore } from 'react';
+import {
+  useLayoutEffect,
+  useMemo,
+  useSyncExternalStore,
+} from 'react';
 
 import type { VisualEffectRegistration } from '@active-book/types';
 
@@ -51,7 +55,12 @@ export const useVisualEffectSurfaces = ({
     }).map((registrationCur) => registrationCur.effect.id);
 
     visualEffects?.runs.retainActive(new Set(activeIds));
-  }, [registrations, page, pages, visualEffects]);
+  }, [
+    registrations,
+    page,
+    pages,
+    visualEffects,
+  ]);
 
   return useMemo<VisualSurfaceItem[]>(() => {
     if (!visualEffects || page < 1 || page > pages) {
@@ -95,13 +104,19 @@ export const useVisualEffectSurfaces = ({
       const isHidden = hiddenVisualEffects.includes(id);
 
       return {
-        id: id,
-        placement: placement,
-        visibility: visibility,
+        id,
+        placement,
+        visibility,
         depth,
         content,
         hidden: isHidden,
       };
     });
-  }, [registrations, page, pages, visualEffects, hiddenVisualEffects]);
+  }, [
+    registrations,
+    page,
+    pages,
+    visualEffects,
+    hiddenVisualEffects,
+  ]);
 };

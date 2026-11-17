@@ -47,7 +47,9 @@ export const createEffectRuns = () => {
 
     const milestones = milestone ? [...current.milestones, milestone] : current.milestones;
     const next = Object.freeze({
-      ...current, status, milestones: Object.freeze(milestones),
+      ...current,
+      status,
+      milestones: Object.freeze(milestones),
     });
     states.set(run.effectId, next);
     publish();
@@ -87,7 +89,8 @@ export const createEffectRuns = () => {
   };
 
   const wait = (run: EffectRun, options: {
-    milestone?: string; signal: AbortSignal
+    milestone?: string;
+    signal: AbortSignal
   }) => {
     return new Promise<void>((resolve, reject) => {
       let unsubscribe = () => {};

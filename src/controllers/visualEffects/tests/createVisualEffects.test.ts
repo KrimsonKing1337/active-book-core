@@ -3,11 +3,13 @@ import { registration } from './testFixtures';
 
 const options = {
   pages: 5,
-  definitions: [{
-    id: 'static',
-    defaultParams: { color: 'blue' },
-    Renderer: () => null,
-  }],
+  definitions: [
+    {
+      id: 'static',
+      defaultParams: { color: 'blue' },
+      Renderer: () => null,
+    },
+  ],
 };
 
 test('stores copied serializable registrations, diagnoses IDs and unknown definitions', () => {
@@ -97,10 +99,12 @@ test('rejects invalid ranges, duplicate definitions and nonserializable data wit
   expect(() => visualEffects.update('test', {
     lifetime: {
       type: 'range',
-      range: [{
-        from: 3,
-        to: 2,
-      }],
+      range: [
+        {
+          from: 3,
+          to: 2,
+        },
+      ],
     },
   }))
     .toThrow('reversed');
@@ -144,10 +148,12 @@ test('restores ranges outside a shortened book without rewriting endpoints', () 
   });
   const lifetime = {
     type: 'range' as const,
-    range: [{
-      from: 3,
-      to: 5,
-    }],
+    range: [
+      {
+        from: 3,
+        to: 5,
+      },
+    ],
   };
   session.register({
     ...registration,
