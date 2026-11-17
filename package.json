@@ -1,7 +1,7 @@
 {
   "name": "@active-book/core",
   "version": "0.0.64",
-  "description": "Браузерный движок иллюстрированных историй ActiveBook",
+  "description": "",
   "type": "module",
   "scripts": {
     "make": "node ./scripts/make.js",
