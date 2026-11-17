@@ -1,7 +1,7 @@
 # Проверки core
 
 Общие правила размещения тестов и фикстур:
-[ActiveBook coding conventions](https://github.com/KrimsonKing1337/active-book-common/blob/main/CODING_CONVENTIONS.md#тесты).
+[Общие соглашения ActiveBook](https://github.com/KrimsonKing1337/active-book-common/blob/main/CODING_CONVENTIONS.md#тесты).
 Локальные инструкции агента и ссылка на соседний checkout common находятся в [AGENTS.md](../AGENTS.md).
 
 ## Команды
