@@ -40,6 +40,7 @@ export const browserTests = [
 
 export const runBrowserTests = () => {
   const testsDirectory = new URL('../tests/', import.meta.url);
+
   const testFiles = browserTests.map((filenameCur) => {
     return fileURLToPath(new URL(filenameCur, testsDirectory));
   });
