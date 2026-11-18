@@ -58,8 +58,27 @@ import { App, P } from '@active-book/core/components';
 import { StoreProvider } from '@active-book/core/store';
 ```
 
-JS и декларации разрешаются непосредственно в `lib/src/`. Пакет предназначен для
-браузерного сборщика с обработкой React, SCSS и SVG; импорт всего UI обычным Node.js
+JS и декларации разрешаются непосредственно в `lib/src/`: TypeScript находит соседний
+`.d.ts` при разрешении экспортированного `.js`.
+Модули `components/*`, `controllers/*`, `hooks/*`, `pages/*` и `store/*` импортируются
+через `index.ts`/`index.tsx` соответствующей директории, без `/index` в пакетном пути:
+
+```ts
+import type { FrameSide } from '@active-book/core/hooks/effects/frame';
+
+import { AppModeContext } from '@active-book/core/components/App';
+import { copyVisualData } from '@active-book/core/controllers/visualEffects/utils';
+import { useGoToPage } from '@active-book/core/hooks/control';
+```
+
+Шаблоны поддерживают вложенные каталоги, например `components/StoryDialog/utils`.
+Они явно направляют импорт в `index.js`; Node.js не ищет индекс автоматически.
+Прямые импорты файлов внутри этих пяти областей, включая путь с `/index`, не поддерживаются.
+Для остальных собранных файлов действует `./*`, например `@active-book/core/@types`.
+Корневые barrel-входы `components` и `store` сохранены отдельно.
+Строгие границы публичного API будут обсуждаться при разработке SDK (issue #66).
+
+Пакет предназначен для браузерного сборщика с обработкой React, SCSS и SVG; импорт всего UI обычным Node.js
 не является поддерживаемым способом запуска. Editor и book-builder уже настраивают
 эту обработку и dedupe `react`/`react-dom` для связанных локальных пакетов.
 
