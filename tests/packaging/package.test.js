@@ -13,6 +13,8 @@ import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
+import { assertModuleExports } from './exports.js';
+
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const digest = (filename) => createHash('sha256').update(readFileSync(filename)).digest('hex');
 
@@ -90,14 +92,7 @@ test('production builds and archives are reproducible without changing source or
     assert(!/\.(?:test|spec)\.|testFixtures|setup-tests|svg-mock/.test(filename), filename);
   }
 
-  for (const target of Object.values(packageJson.exports)) {
-    if (typeof target === 'string') {
-      continue;
-    }
-
-    assert(files.has(target.types.slice(2)), target.types);
-    assert(files.has(target.import.slice(2)), target.import);
-  }
+  await assertModuleExports({ root, files });
 
   const resources = [
     'styles/styles.scss',

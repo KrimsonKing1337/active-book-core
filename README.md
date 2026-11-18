@@ -58,8 +58,16 @@ import { App, P } from '@active-book/core/components';
 import { StoreProvider } from '@active-book/core/store';
 ```
 
-JS и декларации разрешаются непосредственно в `lib/src/`. Пакет предназначен для
-браузерного сборщика с обработкой React, SCSS и SVG; импорт всего UI обычным Node.js
+JS и декларации разрешаются непосредственно в `lib/src/`: TypeScript находит соседний
+`.d.ts` при разрешении экспортированного `.js`. Шаблон `./*` открывает
+собранные модули на любой глубине, например
+`@active-book/core/controllers/visualEffects/utils/lifetime`.
+Для каталогов указывайте `/index`, например `@active-book/core/store/windows/index`;
+существующие короткие пути к каталогам, такие как `components` и `store/config`, сохранены явно.
+Node.js не ищет `index.js` автоматически при разрешении exports.
+Строгие границы публичного API будут обсуждаться при разработке SDK (issue #66).
+
+Пакет предназначен для браузерного сборщика с обработкой React, SCSS и SVG; импорт всего UI обычным Node.js
 не является поддерживаемым способом запуска. Editor и book-builder уже настраивают
 эту обработку и dedupe `react`/`react-dom` для связанных локальных пакетов.
 
