@@ -108,8 +108,10 @@ test('production builds and archives are reproducible without changing source or
     assert(statSync(resolved).size > 0, resource);
   }
 
-  const { copyVisualData } = await import('@active-book/core/controllers/visualEffects/utils/serialization');
-  const { createBuiltinRegistration } = await import('@active-book/core/controllers/visualEffects/utils/declarations');
+  const {
+    copyVisualData,
+    createBuiltinRegistration,
+  } = await import('@active-book/core/controllers/visualEffects/utils');
   assert.deepEqual(copyVisualData({ installed: true }), { installed: true });
   assert.equal(typeof createBuiltinRegistration, 'function');
 });

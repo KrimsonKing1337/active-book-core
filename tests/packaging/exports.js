@@ -6,26 +6,9 @@ import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
 import { createServer, normalizePath } from 'vite';
 
-const require = createRequire(import.meta.url);
+import { assertEntryExports, getModuleEntries } from './entrypoints.js';
 
-const directoryAliases = [
-  'components',
-  'components/BackgroundEffects/components/BackgroundRenderer',
-  'components/BookApplicationSurface',
-  'components/Carousel',
-  'components/FrameEffects/components/FrameRenderer',
-  'components/FrameEffects/components/FrameShadow/presets',
-  'components/ProxyHooks',
-  'components/StoryDialog',
-  'components/Video',
-  'controllers/visualEffects',
-  'hooks/effects',
-  'hooks/effects/background',
-  'pages/Page0',
-  'store',
-  'store/config',
-  'store/main',
-];
+const require = createRequire(import.meta.url);
 
 const typeResolvers = [
   {
@@ -52,20 +35,7 @@ const typeResolvers = [
 ];
 
 export const assertModuleExports = async ({ root, files }) => {
-  const modules = new Map();
-
-  for (const aliasCur of directoryAliases) {
-    modules.set(aliasCur, `${aliasCur}/index`);
-  }
-
-  for (const filenameCur of files) {
-    if (filenameCur.startsWith('lib/src/') && filenameCur.endsWith('.js')) {
-      const modulePath = filenameCur.slice('lib/src/'.length, -3);
-
-      modules.set(modulePath, modulePath);
-    }
-  }
-
+  const modules = getModuleEntries(files);
   const importer = path.join(root, 'tests/packaging/consumer.mts');
   const server = await createServer({
     configFile: false,
@@ -101,5 +71,32 @@ export const assertModuleExports = async ({ root, files }) => {
     }
   } finally {
     await server.close();
+  }
+
+  assertEntryExports(root);
+
+  const internalFiles = [
+    'components/App/AppModeContext',
+    'controllers/visualEffects/utils/serialization',
+    'controllers/visualEffects/utils/declarations',
+    'hooks/control/useGoToPage',
+    'hooks/effects/background/@types',
+    'hooks/effects/frame/@types',
+    'components/Video/index',
+    'store/main/slice',
+  ];
+
+  for (const filenameCur of internalFiles) {
+    const specifier = `@active-book/core/${filenameCur}`;
+
+    assert.throws(() => require.resolve(specifier), { code: 'MODULE_NOT_FOUND' });
+    await assert.rejects(import(specifier), { code: 'ERR_MODULE_NOT_FOUND' });
+
+    for (const resolverCur of typeResolvers) {
+      const resolution = ts.resolveModuleName(specifier, importer, resolverCur.options,
+        ts.sys, undefined, undefined, ts.ModuleKind.ESNext);
+
+      assert.equal(resolution.resolvedModule, undefined, `${specifier} (${resolverCur.name})`);
+    }
   }
 };
