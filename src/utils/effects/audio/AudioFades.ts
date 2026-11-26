@@ -231,9 +231,24 @@ export class AudioFades {
 
   shortenFadeOut(soundId: number, duration: number) {
     const voice = this.voices.get(soundId);
-    const ramp = voice?.ramp;
 
-    if (!voice || !ramp || ramp.to !== 0 || voice.absolute || !Number.isFinite(duration)) {
+    if (!voice) {
+      return;
+    }
+
+    const { ramp } = voice;
+
+    if (!ramp) {
+      return;
+    }
+
+    const isFadingOut = ramp.to === 0;
+
+    if (!isFadingOut || voice.absolute) {
+      return;
+    }
+
+    if (!Number.isFinite(duration)) {
       return;
     }
 
