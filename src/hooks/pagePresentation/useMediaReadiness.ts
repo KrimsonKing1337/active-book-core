@@ -2,8 +2,46 @@ import { type RefObject, useMemo } from 'react';
 
 import { type SettlePageResource, usePageResource } from './usePageResource';
 
+type MediaElement = HTMLImageElement | HTMLVideoElement;
+type MediaReadinessOutcome = 'ready' | 'failed';
+
+type MediaReadinessResult = {
+  element: MediaElement;
+  outcome: MediaReadinessOutcome;
+};
+
+type GetMediaOutcomeReturns = MediaReadinessOutcome | undefined;
+
+const getMediaOutcome = (element: MediaElement): GetMediaOutcomeReturns => {
+  const { currentSrc, src } = element;
+
+  if (currentSrc && currentSrc !== src) {
+    return;
+  }
+
+  if (element instanceof HTMLImageElement) {
+    if (!element.complete) {
+      return;
+    }
+
+    if (element.naturalWidth === 0) {
+      return 'failed';
+    }
+
+    return 'ready';
+  }
+
+  if (element.error) {
+    return 'failed';
+  }
+
+  if (element.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+    return 'ready';
+  }
+};
+
 export const useMediaReadiness = (
-  ref: RefObject<HTMLImageElement | HTMLVideoElement | null>,
+  ref: RefObject<MediaElement | null>,
   source: string | undefined,
 ) => {
   const prepare = useMemo(() => {
@@ -11,10 +49,7 @@ export const useMediaReadiness = (
       return null;
     }
 
-    let previous: {
-      element: HTMLImageElement | HTMLVideoElement;
-      outcome: 'ready' | 'failed'
-    } | undefined;
+    let previousResult: MediaReadinessResult | undefined;
 
     return (settle: SettlePageResource) => {
       const element = ref.current;
@@ -25,44 +60,50 @@ export const useMediaReadiness = (
         return;
       }
 
-      if (previous?.element === element) {
-        settle(previous.outcome);
+      if (previousResult?.element === element) {
+        settle(previousResult.outcome);
 
         return;
       }
 
-      const image = element instanceof HTMLImageElement;
-      const loaded = image ? element.complete : element.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA;
-      const sameSource = !element.currentSrc || element.currentSrc === element.src;
+      const finish = (outcome: MediaReadinessOutcome) => {
+        previousResult = { element, outcome };
 
-      const finish = (outcome: 'ready' | 'failed') => {
-        previous = { element, outcome };
         settle(outcome);
       };
 
-      if (sameSource && (loaded || (!image && element.error))) {
-        const failed = image ? element.naturalWidth === 0 : !!element.error;
+      const outcome = getMediaOutcome(element);
 
-        finish(failed ? 'failed' : 'ready');
+      if (outcome !== undefined) {
+        finish(outcome);
 
         return;
       }
 
-      const readyEvent = image ? 'load' : 'loadeddata';
-      const ready = () => finish('ready');
-      const error = () => finish('failed');
+      const isVideo = element instanceof HTMLVideoElement;
 
-      element.addEventListener(readyEvent, ready);
-      element.addEventListener('error', error);
-      if (!image) {
-        element.addEventListener('canplay', ready);
+      let readyEvent = 'load';
+
+      if (isVideo) {
+        readyEvent = 'loadeddata';
+      }
+
+      const handleReady = () => finish('ready');
+      const handleError = () => finish('failed');
+
+      element.addEventListener(readyEvent, handleReady);
+      element.addEventListener('error', handleError);
+
+      if (isVideo) {
+        element.addEventListener('canplay', handleReady);
       }
 
       return () => {
-        element.removeEventListener(readyEvent, ready);
-        element.removeEventListener('error', error);
-        if (!image) {
-          element.removeEventListener('canplay', ready);
+        element.removeEventListener(readyEvent, handleReady);
+        element.removeEventListener('error', handleError);
+
+        if (isVideo) {
+          element.removeEventListener('canplay', handleReady);
         }
       };
     };

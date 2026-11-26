@@ -12,9 +12,8 @@ import classNames from 'classnames';
 
 import { nanoid } from 'nanoid';
 
-import { segmentsActions, segmentsSelectors } from '@store/segments';
-
 import { useDispatch, useSelector } from '@store';
+import { segmentsActions, segmentsSelectors } from '@store/segments';
 
 import { usePagePresented } from '@hooks/pagePresentation/context';
 

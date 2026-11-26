@@ -2,27 +2,46 @@ import type { RootState } from '@store';
 
 import { visitIsPreparing } from './slice';
 
-const isPending = (state: RootState) => {
-  const { visit } = state.main;
+const isPending = ({ main }: RootState) => {
+  const { visit } = main;
 
-  return visit !== null && visit.presentedAt === null && visitIsPreparing(visit);
+  if (!visit) {
+    return false;
+  }
+
+  if (visit.presentedAt !== null) {
+    return false;
+  }
+
+  return visitIsPreparing(visit);
+};
+
+const isPagePresented = ({ main }: RootState) => {
+  const { showLoader, visit } = main;
+
+  const isVisitPresented = !visit || visit.presentedAt !== null;
+
+  return !showLoader && isVisitPresented;
+};
+
+const page = ({ main }: RootState) => {
+  const pageId = main.pageId ?? '';
+  const index = main.pageIds.indexOf(pageId);
+
+  return index + 1;
 };
 
 export const selectors = {
+  page,
   isPending,
+  isPagePresented,
   bookSessionId: (state: RootState) => state.main.bookSessionId,
   visit: (state: RootState) => state.main.visit,
   visitId: (state: RootState) => state.main.visit?.id ?? null,
   presentedAt: (state: RootState) => state.main.visit?.presentedAt ?? null,
-  isPagePresented: ({ main }: RootState) => {
-    return !main.showLoader && (!main.visit || main.visit.presentedAt !== null);
-  },
-
   showLoader: (state: RootState) => state.main.showLoader,
-
   id: (state: RootState) => state.main.id,
   pageId: (state: RootState) => state.main.pageId,
-  page: (state: RootState) => state.main.pageIds.indexOf(state.main.pageId ?? '') + 1,
   pages: (state: RootState) => state.main.pageIds.length,
   authorComments: (state: RootState) => state.main.authorComments,
   allPagesSeen: (state: RootState) => state.main.allPagesSeen,

@@ -10,10 +10,10 @@ import {
 const requestVideoPlay = (playback: VideoPlayback) => {
   const { element } = playback;
 
-  if (!playback.wantsPlay
-    || playback.pending
-    || !element.paused
-    || element.ended) {
+  const playbackIsNotReady = !playback.wantsPlay || playback.pending;
+  const elementCantPlay = !element.paused || element.ended;
+
+  if (playbackIsNotReady || elementCantPlay) {
     return;
   }
 
@@ -85,7 +85,10 @@ export const updateVideoPlayback = (playback: VideoPlayback, policy: VideoPolicy
   const videoIsActive = isVideoActive(playback);
 
   if (!videoIsActive) {
-    if (playback.managed && (wasActive || !playback.element.paused || playback.pending)) {
+    const isPlaying = !playback.element.paused;
+    const shouldPause = wasActive || isPlaying || playback.pending;
+
+    if (playback.managed && shouldPause) {
       pauseVideo(playback);
     }
 

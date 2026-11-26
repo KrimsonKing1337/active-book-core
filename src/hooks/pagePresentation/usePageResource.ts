@@ -3,8 +3,10 @@ import { useContext, useLayoutEffect } from 'react';
 import { nanoid } from '@reduxjs/toolkit';
 
 import { storeContext } from '@store';
-import { mainActions } from '@store/main';
+
 import type { PageResourceOutcome } from '@store/main/@types';
+
+import { mainActions } from '@store/main';
 
 import { usePageVisit } from './context';
 
@@ -21,29 +23,45 @@ export const usePageResource = (prepare: PrepareResource | null) => {
   const visitId = usePageVisit()?.id;
 
   useLayoutEffect(() => {
-    const visit = store?.getState().main.visit;
-
-    if (!store || !prepare || !visit || visit.id !== visitId || visit.presentedAt !== null) {
+    if (!store || !prepare) {
       return;
     }
 
-    const resource = { visitId, resourceId: nanoid() };
+    const { visit } = store.getState().main;
+
+    if (!visit || visit.id !== visitId) {
+      return;
+    }
+
+    if (visit.presentedAt !== null) {
+      return;
+    }
+
+    const resourceId = nanoid();
+    const resource = { visitId, resourceId };
 
     store.dispatch(mainActions.registerPageResource(resource));
 
-    let pending = true;
+    let isPending = true;
 
     const settle: SettlePageResource = (outcome = 'ready') => {
-      if (pending) {
-        pending = false;
-        store.dispatch(mainActions.settlePageResource({ ...resource, outcome }));
+      if (!isPending) {
+        return;
       }
+
+      isPending = false;
+
+      store.dispatch(mainActions.settlePageResource({
+        ...resource,
+        outcome,
+      }));
     };
 
     const cleanup = prepare(settle);
 
     return () => {
       settle('cancelled');
+
       cleanup?.();
     };
   }, [

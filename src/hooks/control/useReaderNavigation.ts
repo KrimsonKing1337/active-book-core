@@ -10,13 +10,17 @@ export const useReaderNavigation = () => {
   const appMode = useAppMode();
 
   const goToPage = useCallback((page: string | number | null) => {
-    if (appMode === 'editor' || mainSelectors.isPagePresented(store.getState())) {
+    const state = store.getState();
+    const isPagePresented = mainSelectors.isPagePresented(state);
+
+    if (appMode === 'editor' || isPagePresented) {
       store.dispatch(mainActions.setPage(page));
     }
   }, [appMode, store]);
 
   const goPrevPage = useCallback(() => {
-    const page = mainSelectors.page(store.getState());
+    const state = store.getState();
+    const page = mainSelectors.page(state);
 
     if (page > 0) {
       goToPage(page - 1);

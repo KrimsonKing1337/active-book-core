@@ -1,6 +1,5 @@
-import type { RefObject } from 'react';
-
 import {
+  type RefObject,
   useContext,
   useLayoutEffect,
   useRef,
@@ -45,8 +44,9 @@ export const Video = ({
   onError,
   ...etc
 }: VideoProps) => {
-  const slideActive = useCarouselSlideActive();
   const playbackOwner = useContext(VideoPlaybackContext);
+
+  const slideActive = useCarouselSlideActive();
 
   const { videos: videosVolume, global: globalVolume } = useSelector(volumeSelectors.all);
 

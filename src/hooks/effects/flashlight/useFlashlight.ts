@@ -28,6 +28,7 @@ import { flashlightInst } from '@utils/effects/flashlight';
 export const useFlashlight = (options: Partial<FlashlightEffectOptions> = {}) => {
   const canStart = useCanStartPageEffects();
   const presented = usePagePresented();
+
   const currentPage = useSelector(mainSelectors.page);
   const flashlightEnabled = useSelector(configSelectors.flashlight);
   const theme = useSelector(configSelectors.theme);
@@ -48,9 +49,7 @@ export const useFlashlight = (options: Partial<FlashlightEffectOptions> = {}) =>
   const shadowEffectId = `flashlight-frame-${generatedId}`;
   const shadowId = 'glow';
 
-  const shadowStyle = {
-    color,
-  };
+  const shadowStyle = { color };
 
   const shadowAnimation: FrameAnimation = {
     preset: 'pulse',
@@ -108,11 +107,17 @@ export const useFlashlight = (options: Partial<FlashlightEffectOptions> = {}) =>
     shadowEffectId,
   ]);
 
-  const on = useCallback(async (pulseDuration?: number, isCurrent: () => boolean = () => true) => {
+  const isCurrentDefault: () => boolean = () => true;
+
+  const on = useCallback(async (
+    pulseDuration?: number,
+    isCurrent = isCurrentDefault) => {
     // Invalidate pending camera initialization and any previous auto-off timer.
     off();
 
-    if (document.hidden || (!flashlightEnabled && !withFrameShadow)) {
+    const noFlashlightOrFrameShadow = !flashlightEnabled && !withFrameShadow;
+
+    if (document.hidden || noFlashlightOrFrameShadow) {
       return;
     }
 
@@ -162,7 +167,21 @@ export const useFlashlight = (options: Partial<FlashlightEffectOptions> = {}) =>
   }, [off]);
 
   useEffect(() => {
-    if (!presented || !canStart() || !id || page !== currentPage || !playOnLoad || duration <= 0) {
+    if (!presented) {
+      return;
+    }
+
+    const canStartPlayback = canStart();
+
+    if (!canStartPlayback) {
+      return;
+    }
+
+    if (!id || page !== currentPage) {
+      return;
+    }
+
+    if (!playOnLoad || duration <= 0) {
       return;
     }
 
@@ -172,7 +191,7 @@ export const useFlashlight = (options: Partial<FlashlightEffectOptions> = {}) =>
     }
 
     const timer = setTimeout(() => {
-      if (canStart()) {
+      if (canStartPlayback) {
         void on(duration, canStart);
       }
     }, delay);

@@ -1,5 +1,5 @@
-import type { PropsWithChildren } from 'react';
 import {
+  type PropsWithChildren,
   useEffect,
   useLayoutEffect,
   useRef,
@@ -32,7 +32,11 @@ export const Narrative = ({ children }: PropsWithChildren) => {
   const pageId = useSelector(mainSelectors.pageId);
   const visit = useSelector(mainSelectors.visit);
   const showLoader = useSelector(mainSelectors.showLoader);
-  const locked = appMode === 'reader' && (showLoader || (visit !== null && !visit.reveal));
+
+  const reveal = visit !== null && !visit.reveal;
+  const isLoading = showLoader || reveal;
+  const locked = appMode === 'reader' && isLoading;
+
   const contentHadFocusRef = useRef(false);
 
   // const fontSize = useSelector(configSelectors.fontSize);
@@ -59,7 +63,9 @@ export const Narrative = ({ children }: PropsWithChildren) => {
     if (element) {
       element.scrollTop = 0;
 
-      if (appMode === 'reader' && contentHadFocusRef.current && document.activeElement === document.body) {
+      const bodyIsActive = document.activeElement === document.body;
+
+      if (appMode === 'reader' && contentHadFocusRef.current && bodyIsActive) {
         element.focus({ preventScroll: true });
       }
     }
@@ -68,7 +74,9 @@ export const Narrative = ({ children }: PropsWithChildren) => {
   }, [pageId, appMode]);
 
   useEffect(() => {
-    if (appMode === 'reader' && !locked && document.activeElement === document.body) {
+    const bodyIsActive = document.activeElement === document.body;
+
+    if (appMode === 'reader' && !locked && bodyIsActive) {
       ref.current?.focus({ preventScroll: true });
     }
   }, [appMode, locked]);
@@ -112,8 +120,22 @@ export const Narrative = ({ children }: PropsWithChildren) => {
     goPrevPage,
   ]);
 
+  const handleFocusCapture = () => {
+    contentHadFocusRef.current = true;
+  };
+
+  const handleBlurCapture = (e: React.FocusEvent) => {
+    if (e.relatedTarget instanceof Node && !e.currentTarget.contains(e.relatedTarget)) {
+      contentHadFocusRef.current = false;
+    }
+  };
+
   return (
-    <div ref={refs.narrativeViewport} className={styles.Viewport} data-story-region="narrativeViewport">
+    <div
+      ref={refs.narrativeViewport}
+      className={styles.Viewport}
+      data-story-region="narrativeViewport"
+    >
       <div
         ref={ref}
         id="narrative"
@@ -121,18 +143,11 @@ export const Narrative = ({ children }: PropsWithChildren) => {
         style={narrativeStyle}
         tabIndex={0}
         inert={locked}
-        onFocusCapture={() => {
-          contentHadFocusRef.current = true;
-        }}
-        onBlurCapture={(e) => {
-          if (e.relatedTarget instanceof Node && !e.currentTarget.contains(e.relatedTarget)) {
-            contentHadFocusRef.current = false;
-          }
-        }}
+        onFocusCapture={handleFocusCapture}
+        onBlurCapture={handleBlurCapture}
       >
         <div
           ref={refs.narrativeContent}
-          className="Narrative__Text"
           style={textStyle}
           data-story-region="narrativeContent"
         >

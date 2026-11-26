@@ -35,15 +35,16 @@ export const Nav = () => {
   } = useReaderNavigation();
 
   const presented = useSelector(mainSelectors.isPagePresented);
-  const locked = appMode === 'reader' && !presented;
   const id = useSelector(mainSelectors.id);
   const page = useSelector(mainSelectors.page);
   const pages = useSelector(mainSelectors.pages);
 
-  const inputRef = useRef<HTMLInputElement>(null);
-
   const [goToWithInputIsHide, setGoToWithInputIsHide] = useState(true);
   const [inputValue, setInputValue] = useState('');
+
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const locked = appMode === 'reader' && !presented;
 
   const modalWindow = useReaderWindow({
     kind: 'dialog',

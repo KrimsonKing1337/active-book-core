@@ -18,7 +18,7 @@ import { mainActions, mainSelectors } from '@store/main';
 import { BookPresentationContext } from '@hooks/pagePresentation/context';
 import { type SettlePageResource, usePageResource } from '@hooks/pagePresentation/usePageResource';
 
-import { StoryContent } from './StoryContent';
+import { StoryContent } from '../StoryContent';
 
 const read = () => store.getState().main;
 

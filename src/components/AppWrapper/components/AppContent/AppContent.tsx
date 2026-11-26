@@ -39,6 +39,8 @@ import { removeCssHover } from '@utils/touch/removeCssHover';
 import { addKeyboardControl } from '@utils/control/keyboardControl';
 import { hideAddressBarInMobileDevices } from '@utils/mobile/hideAddressBarInMobileDevices';
 
+import type { HowlWrapper } from '@utils/effects/audio/HowlWrapper';
+
 import type { AppWrapperProps } from '../../@types';
 
 import {
@@ -73,8 +75,11 @@ export const AppContent = ({
   selectedVisualEffectId,
 }: AppContentProps) => {
   const dispatch = useDispatch();
+
   const store = useStore();
+
   const bookSession = useContext(BookPresentationContext);
+
   const visit = usePageVisit();
   const application = useBookApplicationSurface();
 
@@ -101,7 +106,10 @@ export const AppContent = ({
       return;
     }
 
-    if (new Set(ids).size !== ids.length || ids.some((cur) => !cur)) {
+    const idsAreUnique = new Set(ids).size === ids.length;
+    const idsAreNonEmpty = ids.every((cur) => !!cur);
+
+    if (!idsAreUnique || !idsAreNonEmpty) {
       throw new Error('Story pages require unique non-empty IDs');
     }
 
@@ -129,7 +137,9 @@ export const AppContent = ({
   const page = useSelector(mainSelectors.page);
   const inverseColors = useSelector(effectsSelectors.inverseColorIsActive);
   const audioInstances = useSelector(audioEffectsSelectors.audioInstances);
+
   const audioStarted = useRef(new WeakMap<object, number>());
+
   const visitId = visit?.id;
   const presentedAt = visit?.presentedAt;
 
@@ -172,10 +182,14 @@ export const AppContent = ({
       'keydown',
     ];
 
-    events.forEach((event) => window.addEventListener(event, unlock));
+    events.forEach((eventCur) => {
+      window.addEventListener(eventCur, unlock);
+    });
 
     return () => {
-      events.forEach((event) => window.removeEventListener(event, unlock));
+      events.forEach((eventCur) => {
+        window.removeEventListener(eventCur, unlock);
+      });
     };
   }, [
     appMode,
@@ -184,31 +198,50 @@ export const AppContent = ({
   ]);
 
   useEffect(() => {
-    if (appMode !== 'reader'
-      || !canPlayAudio
-      || visitId === undefined
-      || presentedAt == null
-      || mainSelectors.visitId(store.getState()) !== visitId) {
+    if (appMode !== 'reader' || !canPlayAudio) {
       return;
     }
 
-    startToPlayAllAudiosWithPlayOnLoad(audioInstances, {
-      page,
-      allowStart: (instance) => {
-        const state = store.getState();
+    if (visitId === undefined || presentedAt == null) {
+      return;
+    }
 
-        if (!canAutoplayAudio(instance, bookSession)
-          || mainSelectors.visitId(state) !== visitId
-          || state.audioEffects.audioInstances[instance.id] !== instance
-          || audioStarted.current.get(instance) === visitId) {
-          return false;
-        }
+    const currentVisitId = mainSelectors.visitId(store.getState());
 
-        audioStarted.current.set(instance, visitId);
+    if (currentVisitId !== visitId) {
+      return;
+    }
 
-        return true;
-      },
-    });
+    const allowStart = (instance: HowlWrapper) => {
+      if (!canAutoplayAudio(instance, bookSession)) {
+        return false;
+      }
+
+      const state = store.getState();
+      const isCurrentVisit = mainSelectors.visitId(state) === visitId;
+
+      if (!isCurrentVisit) {
+        return false;
+      }
+
+      const registeredInstance = state.audioEffects.audioInstances[instance.id];
+
+      if (registeredInstance !== instance) {
+        return false;
+      }
+
+      const hasAlreadyStarted = audioStarted.current.get(instance) === visitId;
+
+      if (hasAlreadyStarted) {
+        return false;
+      }
+
+      audioStarted.current.set(instance, visitId);
+
+      return true;
+    };
+
+    startToPlayAllAudiosWithPlayOnLoad(audioInstances, { page, allowStart });
   }, [
     appMode,
     audioInstances,

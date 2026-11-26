@@ -39,8 +39,10 @@ const DotLottiePlayer = ({
 }: DotLottieReactProps) => {
   const canStart = useCanStartPageEffects();
   const presented = usePagePresented();
+
   const [dotLottie, setDotLottie] = useState<DotLottie | null>(null);
   const [enabled, setEnabled] = useState(false);
+
   const failed = useRef(new WeakSet<DotLottie>());
   const started = useRef<DotLottie | null>(null);
 
@@ -56,7 +58,10 @@ const DotLottiePlayer = ({
     }
 
     if (dotLottie.isLoaded || failed.current.has(dotLottie)) {
-      settle(failed.current.has(dotLottie) ? 'failed' : 'ready');
+      const hasDotLottie = failed.current.has(dotLottie);
+      const status = hasDotLottie ? 'failed' : 'ready';
+
+      settle(status);
 
       return;
     }
@@ -80,19 +85,26 @@ const DotLottiePlayer = ({
       return;
     }
 
-    for (const { event, handler } of eventListeners) {
+    for (const listenerCur of eventListeners) {
+      const { event, handler } = listenerCur;
+
       dotLottie.addEventListener(event, handler);
     }
 
     return () => {
-      for (const { event, handler } of eventListeners) {
+      for (const listenerCur of eventListeners) {
+        const { event, handler } = listenerCur;
+
         dotLottie.removeEventListener(event, handler);
       }
     };
   }, [dotLottie, eventListeners]);
 
   useEffect(() => {
-    if (!presented || !autoplay || !dotLottie || started.current === dotLottie) {
+    const shouldPlay = presented && autoplay;
+    const notStarted = dotLottie && started.current !== dotLottie;
+
+    if (!shouldPlay || !notStarted) {
       return;
     }
 
@@ -102,6 +114,7 @@ const DotLottiePlayer = ({
       }
 
       started.current = dotLottie;
+
       dotLottie.play();
     };
 
@@ -125,6 +138,7 @@ const DotLottiePlayer = ({
 
   const attach = (instance: DotLottie | null) => {
     setDotLottie(instance);
+
     const cleanup = dotLottieRefCallback?.(instance);
 
     if (instance) {
@@ -153,6 +167,7 @@ const DotLottiePlayer = ({
 
 export const DotLottieReact = (props: DotLottieReactProps) => {
   const { src, data } = props;
+
   const [source, setSource] = useState({
     src,
     data,
@@ -168,5 +183,7 @@ export const DotLottieReact = (props: DotLottieReactProps) => {
     });
   }
 
-  return <DotLottiePlayer key={source.revision} {...props} />;
+  return (
+    <DotLottiePlayer key={source.revision} {...props} />
+  );
 };

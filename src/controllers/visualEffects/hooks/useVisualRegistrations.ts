@@ -50,7 +50,9 @@ export const useVisualRegistrations = ({
       availableRegistrations.map((cur) => cur.effect.id),
     );
 
-    for (const [id, previous] of owned) {
+    for (const ownedItemCur of owned) {
+      const [id, previous] = ownedItemCur;
+
       if (!ids.has(id)) {
         previous.remove();
 

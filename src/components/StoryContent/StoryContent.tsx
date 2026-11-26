@@ -7,14 +7,13 @@ import {
 
 import classNames from 'classnames';
 
-
-import { mainActions, mainSelectors } from '@store/main';
-
 import {
   useDispatch,
   useSelector,
   useStore,
 } from '@store';
+
+import { mainActions, mainSelectors } from '@store/main';
 import { segmentsActions } from '@store/segments';
 
 import { BookPresentationContext, usePageVisit } from '@hooks/pagePresentation/context';
@@ -23,9 +22,11 @@ import { useAppMode } from '@components/App/AppModeContext';
 
 import * as styles from './StoryContent.module.scss';
 
-const PrimaryContent = ({ visitId, children }: PropsWithChildren<{
-  visitId: number
-}>) => {
+export type PrimaryContentProps = PropsWithChildren & {
+  visitId: number;
+};
+
+const PrimaryContent = ({ visitId, children }: PrimaryContentProps) => {
   const dispatch = useDispatch();
 
   useLayoutEffect(() => {
@@ -41,18 +42,21 @@ const PrimaryContent = ({ visitId, children }: PropsWithChildren<{
 
 /** Only the selected content and its resources belong to a page. */
 export const StoryContent = ({ children }: PropsWithChildren) => {
+  const store = useStore();
   const dispatch = useDispatch();
 
-  const store = useStore();
-  const appMode = useAppMode();
   const bookSession = useContext(BookPresentationContext);
+
+  const appMode = useAppMode();
   const visit = usePageVisit();
+
   const pending = useSelector(mainSelectors.isPending);
   const showLoader = useSelector(mainSelectors.showLoader);
 
   const visitId = visit?.id;
   const reveal = visit?.reveal ?? false;
-  const isLoading = !!bookSession && (!reveal || showLoader);
+  const pageNotReady = !reveal || showLoader;
+  const isLoading = !!bookSession && pageNotReady;
   const hideContent = appMode === 'reader' && isLoading;
 
   useLayoutEffect(() => {
@@ -98,11 +102,13 @@ export const StoryContent = ({ children }: PropsWithChildren) => {
     };
   }, [dispatch, visitId]);
 
+  const dataStoryPreparing = isLoading || undefined;
+
   return (
     <div
       className={className}
       data-story-content
-      data-story-preparing={isLoading || undefined}
+      data-story-preparing={dataStoryPreparing}
       aria-busy={isLoading}
       inert={hideContent}
     >

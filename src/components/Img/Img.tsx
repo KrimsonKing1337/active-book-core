@@ -26,7 +26,9 @@ export const Img = ({
 
   const slideActive = useCarouselSlideActive();
 
-  useMediaReadiness(ref, slideActive && loading !== 'lazy' ? src : undefined);
+  const source = (slideActive && loading !== 'lazy') ? src : undefined;
+
+  useMediaReadiness(ref, source);
 
   return (
     <img

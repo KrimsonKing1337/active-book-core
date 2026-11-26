@@ -1,4 +1,5 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
+
 import { createSlice } from '@reduxjs/toolkit';
 
 import type {
@@ -26,7 +27,22 @@ export const initialState: State = {
 };
 
 export const visitIsPreparing = (visit: PageVisit) => {
-  return !visit.primaryCommitted || Object.keys(visit.pendingResources).length > 0;
+  if (!visit.primaryCommitted) {
+    return true;
+  }
+
+  return Object.keys(visit.pendingResources).length > 0;
+};
+
+const resolvePageId = (
+  pageIds: string[],
+  target: string | number | null,
+) => {
+  if (typeof target === 'number') {
+    return pageIds[target - 1];
+  }
+
+  return target;
 };
 
 const startVisit = (state: State) => {
@@ -35,6 +51,7 @@ const startVisit = (state: State) => {
   }
 
   state.visitSequence += 1;
+
   state.visit = {
     id: state.visitSequence,
     pageId: state.pageId,
@@ -44,6 +61,26 @@ const startVisit = (state: State) => {
     reveal: false,
     presentedAt: null,
   };
+};
+
+type OpenBookSessionPayload = {
+  sessionId: string;
+  pageIds: string[];
+  initialPage: string | number | null;
+};
+
+type SetPrimaryCommittedPayload = {
+  visitId: number;
+  committed: boolean;
+};
+
+type SettlePageResourcePayload = PageResource & {
+  outcome: PageResourceOutcome;
+};
+
+type PresentPagePayload = {
+  visitId: number;
+  time: number;
 };
 
 const slice = createSlice({
@@ -56,11 +93,7 @@ const slice = createSlice({
     setId(state, action: PayloadAction<State['id']>) {
       state.id = action.payload;
     },
-    openBookSession(state, action: PayloadAction<{
-      sessionId: string;
-      pageIds: string[];
-      initialPage: string | number | null;
-    }>) {
+    openBookSession(state, action: PayloadAction<OpenBookSessionPayload>) {
       const {
         sessionId,
         pageIds,
@@ -70,83 +103,120 @@ const slice = createSlice({
       state.bookSessionId = sessionId;
       state.pageIds = pageIds;
       state.showLoader = false;
+      state.pageId = null;
 
-      const pageId = typeof initialPage === 'number' ? pageIds[initialPage - 1] : initialPage;
+      const pageId = resolvePageId(pageIds, initialPage);
 
-      state.pageId = pageId && pageIds.includes(pageId) ? pageId : null;
+      if (pageId && pageIds.includes(pageId)) {
+        state.pageId = pageId;
+      }
+
       startVisit(state);
     },
     closeBookSession(state, action: PayloadAction<string>) {
-      if (state.bookSessionId === action.payload) {
-        state.bookSessionId = null;
-        state.visit = null;
-        state.showLoader = false;
+      if (state.bookSessionId !== action.payload) {
+        return;
       }
-    },
-    setPrimaryCommitted(state, action: PayloadAction<{
-      visitId: number;
-      committed: boolean
-    }>) {
-      const { visitId, committed } = action.payload;
-      const visit = state.visit;
 
-      if (visit?.id === visitId && visit.presentedAt === null) {
-        visit.primaryCommitted = committed;
-        if (!committed) {
-          visit.reveal = false;
-        }
+      state.bookSessionId = null;
+      state.visit = null;
+      state.showLoader = false;
+    },
+    setPrimaryCommitted(state, action: PayloadAction<SetPrimaryCommittedPayload>) {
+      const { visitId, committed } = action.payload;
+      const { visit } = state;
+
+      if (!visit || visit.id !== visitId) {
+        return;
+      }
+
+      if (visit.presentedAt !== null) {
+        return;
+      }
+
+      visit.primaryCommitted = committed;
+
+      if (!committed) {
+        visit.reveal = false;
       }
     },
     registerPageResource(state, action: PayloadAction<PageResource>) {
       const { visitId, resourceId } = action.payload;
-      const visit = state.visit;
+      const { visit } = state;
 
-      if (visit?.id === visitId && visit.presentedAt === null) {
-        visit.pendingResources[resourceId] = true;
-        visit.reveal = false;
+      if (!visit || visit.id !== visitId) {
+        return;
       }
+
+      if (visit.presentedAt !== null) {
+        return;
+      }
+
+      visit.pendingResources[resourceId] = true;
+      visit.reveal = false;
     },
-    settlePageResource(state, action: PayloadAction<PageResource & {
-      outcome: PageResourceOutcome
-    }>) {
+    settlePageResource(state, action: PayloadAction<SettlePageResourcePayload>) {
       const {
         visitId,
         resourceId,
         outcome,
       } = action.payload;
-      const visit = state.visit;
 
-      if (visit?.id === visitId && visit.pendingResources[resourceId] === true) {
-        if (outcome === 'failed') {
-          visit.failedResources += 1;
-        }
+      const { visit } = state;
 
-        delete visit.pendingResources[resourceId];
+      if (!visit || visit.id !== visitId) {
+        return;
       }
+
+      if (!visit.pendingResources[resourceId]) {
+        return;
+      }
+
+      if (outcome === 'failed') {
+        visit.failedResources += 1;
+      }
+
+      delete visit.pendingResources[resourceId];
     },
     allowPageReveal(state, action: PayloadAction<number>) {
-      const visit = state.visit;
+      const { visit, showLoader } = state;
 
-      if (visit?.id === action.payload && !state.showLoader && !visitIsPreparing(visit)) {
-        visit.reveal = true;
+      if (!visit || visit.id !== action.payload) {
+        return;
       }
+
+      if (showLoader) {
+        return;
+      }
+
+      if (visitIsPreparing(visit)) {
+        return;
+      }
+
+      visit.reveal = true;
     },
-    presentPage(state, action: PayloadAction<{
-      visitId: number;
-      time: number
-    }>) {
+    presentPage(state, action: PayloadAction<PresentPagePayload>) {
       const { visitId, time } = action.payload;
-      const visit = state.visit;
+      const { visit, showLoader } = state;
 
-      if (visit?.id === visitId && visit.reveal && !state.showLoader && visit.presentedAt === null) {
-        visit.presentedAt = time;
+      if (!visit || visit.id !== visitId) {
+        return;
       }
+
+      if (!visit.reveal || showLoader) {
+        return;
+      }
+
+      if (visit.presentedAt !== null) {
+        return;
+      }
+
+      visit.presentedAt = time;
     },
     setPage(state, action: PayloadAction<number | string | null>) {
       const target = action.payload;
-      const pageId = typeof target === 'number' ? state.pageIds[target - 1] : target;
-
-      const previous = state.pageId;
+      const previousPageId = state.pageId;
+      const pageId = resolvePageId(state.pageIds, target);
 
       if (target === 0 || target === null) {
         state.pageId = null;
@@ -154,17 +224,24 @@ const slice = createSlice({
         state.pageId = pageId;
       }
 
-      if (previous !== state.pageId) {
+      if (previousPageId !== state.pageId) {
         startVisit(state);
       }
     },
     setStoryPages(state, action: PayloadAction<string[]>) {
       state.pageIds = action.payload;
 
-      if (state.pageId && !state.pageIds.includes(state.pageId)) {
-        state.pageId = state.pageIds[0] ?? null;
-        startVisit(state);
+      if (!state.pageId) {
+        return;
       }
+
+      if (state.pageIds.includes(state.pageId)) {
+        return;
+      }
+
+      state.pageId = state.pageIds[0] ?? null;
+
+      startVisit(state);
     },
     setAuthorComments(state, action: PayloadAction<State['authorComments']>) {
       state.authorComments = action.payload;

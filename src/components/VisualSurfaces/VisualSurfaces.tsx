@@ -30,6 +30,7 @@ export const VisualSurfaces = ({ items, stride }: VisualSurfacesProps) => {
 
   return sorted.map((itemCur, index) => {
     const region = itemCur.placement.region;
+
     let target;
 
     if (region !== 'application') {

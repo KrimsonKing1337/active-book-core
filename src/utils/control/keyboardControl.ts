@@ -9,21 +9,36 @@ export const addKeyboardControl = (goPrevPage: Fn, goNextPage: Fn) => {
   const narrativeElement = document.querySelector('#narrative');
 
   const listener = (e: KeyboardEvent) => {
-    if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) {
+    const isModifier = e.ctrlKey || e.metaKey || e.altKey;
+
+    if (e.defaultPrevented || isModifier) {
       return;
     }
 
-    if (!mainSelectors.isPagePresented(store.getState()) || document.querySelector('[data-book-window-open="true"]')) {
+    const state = store.getState();
+    const isPagePresented = mainSelectors.isPagePresented(state);
+    const windowIsOpen = document.querySelector('[data-book-window-open="true"]');
+
+    if (!isPagePresented || windowIsOpen) {
       return;
     }
 
-    const target = e.target;
+    const { target } = e;
 
-    const isTextInput = target instanceof HTMLElement
-      && (target.isContentEditable || target.matches('input, textarea, select'));
+    let isTextInput = false;
+    let isInsideCarousel = false;
 
-    const isInsideCarousel = target instanceof Element
-      && target.closest('[data-book-carousel]');
+    if (target instanceof HTMLElement) {
+      const isFormControl = target.matches('input, textarea, select');
+
+      isTextInput = target.isContentEditable || isFormControl;
+    }
+
+    if (target instanceof Element) {
+      const carousel = target.closest('[data-book-carousel]');
+
+      isInsideCarousel = carousel !== null;
+    }
 
     if (isTextInput || isInsideCarousel) {
       return;

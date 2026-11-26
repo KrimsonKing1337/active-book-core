@@ -10,7 +10,6 @@ import {
 import { setWasmUrl } from '@lottiefiles/dotlottie-react';
 import { nanoid } from '@reduxjs/toolkit';
 
-
 import { useDispatch } from '@store';
 import { mainActions } from '@store/main';
 
@@ -34,14 +33,24 @@ export const BookSession = (props: BookSessionProps) => {
   const windowSessionId = useStoryWindowSession();
 
   const [sessionId] = useState(nanoid);
-  const [initialNavigation] = useState(() => ({
-    sessionId,
-    pageIds: props.storyPages.map((pageCur) => pageCur.id),
-    initialPage: props.initialPageId ?? null,
-  }));
+
+  const [initialNavigation] = useState(() => {
+    const pageIds = props.storyPages.map((pageCur) => {
+      return pageCur.id;
+    });
+
+    const initialPage = props.initialPageId ?? null;
+
+    return {
+      sessionId,
+      pageIds,
+      initialPage,
+    };
+  });
 
   useLayoutEffect(() => {
     setWasmUrl('/vendors/dotlottie-player.wasm');
+
     dispatch(mainActions.openBookSession(initialNavigation));
 
     return () => {

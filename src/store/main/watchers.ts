@@ -40,6 +40,7 @@ export function* watchLoaderGate() {
     if (showTask && !showTask.isRunning()) {
       showTask = null;
     }
+
     if (hideTask && !hideTask.isRunning()) {
       hideTask = null;
     }
@@ -61,6 +62,7 @@ export function* watchLoaderGate() {
       // если pending снова true — отменяем скрытие
       if (hideTask) {
         yield cancel(hideTask);
+
         hideTask = null;
       }
 
@@ -68,10 +70,12 @@ export function* watchLoaderGate() {
       if (!showLoader && !showTask) {
         showTask = yield fork(showAfterDelay, 250);
       }
+
     } else {
       // pending false — отменяем показ, если он ещё не случился
       if (showTask) {
         yield cancel(showTask);
+
         showTask = null;
       }
 
