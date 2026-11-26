@@ -1,8 +1,10 @@
 import type { Howl } from 'howler';
 
-import { FadeRamp, clampGain, RampOptions } from './FadeRamp';
+import type { RampOptions } from './FadeRamp';
 
-type VoiceGainAbsolute = {
+import { FadeRamp, clampGain } from './FadeRamp';
+
+type AbsoluteVoiceGain = {
   referenceVolume: number;
   multiplier: number;
 };
@@ -11,7 +13,7 @@ type VoiceGain = {
   soundId: number;
   level: number;
   ramp?: FadeRamp;
-  absolute?: VoiceGainAbsolute;
+  absolute?: AbsoluteVoiceGain;
 };
 
 type FadeOptions = {
@@ -28,9 +30,9 @@ export class AudioFades {
   constructor(private readonly howl: Howl) {}
 
   get isFading() {
-    const voicesCopy = [...this.voices.values()];
+    const voices = [...this.voices.values()];
 
-    return voicesCopy.some((cur) => Boolean(cur.ramp));
+    return voices.some((voiceCur) => Boolean(voiceCur.ramp));
   }
 
   addVoice(soundId: number, level: number) {
@@ -231,21 +233,16 @@ export class AudioFades {
     const voice = this.voices.get(soundId);
     const ramp = voice?.ramp;
 
-    if (!ramp || ramp.to === 0) {
+    if (!voice || !ramp || ramp.to !== 0 || voice.absolute || !Number.isFinite(duration)) {
       return;
     }
 
-    const durationIsValid = Number.isFinite(duration);
+    const now = performance.now();
+    const requestedDuration = Math.max(0, duration);
+    const deadline = now + requestedDuration;
 
-    if (!voice.absolute && durationIsValid) {
-      const now = performance.now();
-
-      const maxDuration = Math.max(0, duration);
-      const deadline = now + maxDuration;
-
-      if (ramp.shorten(deadline, now)) {
-        this.render(voice, now);
-      }
+    if (ramp.shorten(deadline, now)) {
+      this.render(voice, now);
     }
   }
 }

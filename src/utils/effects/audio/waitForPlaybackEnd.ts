@@ -5,6 +5,10 @@ type Playback = {
   soundIds: ReadonlySet<number>;
 };
 
+const MIN_CHECK_DELAY_MS = 50;
+// setTimeout uses a signed 32-bit delay in browsers.
+const MAX_TIMEOUT_DELAY_MS = 2 ** 31 - 1;
+
 const events = [
   'end',
   'stop',
@@ -16,8 +20,8 @@ const events = [
 
 /** Observe completion without imposing a wall-clock limit on a playing or buffering clip. */
 export const waitForPlaybackEnd = ({ howl, soundIds }: Playback) => {
-  const soundsIdsCopy = [...soundIds];
-  const playingIds = soundsIdsCopy.filter((id) => howl.playing(id));
+  const allSoundIds = [...soundIds];
+  const playingIds = allSoundIds.filter((soundIdCur) => howl.playing(soundIdCur));
 
   let resolve = () => {};
 
@@ -53,7 +57,7 @@ export const waitForPlaybackEnd = ({ howl, soundIds }: Playback) => {
 
     clearTimeout(timer);
 
-    let remaining = 0;
+    let maxRemainingMs = 0;
     let isPlaying = false;
 
     for (const idCur of playingIds) {
@@ -77,18 +81,18 @@ export const waitForPlaybackEnd = ({ howl, soundIds }: Playback) => {
       const rateIsValid = Number.isFinite(rate) && rate > 0;
 
       if (rateIsValid && Number.isFinite(position) && Number.isFinite(duration)) {
-        const delta = (duration - position) * 1000;
-        const max = delta / rate;
+        const remainingMs = (duration - position) * 1000 / rate;
 
-        remaining = Math.max(remaining, max);
+        maxRemainingMs = Math.max(maxRemainingMs, remainingMs);
       }
     }
 
     if (isPlaying) {
       // The watchdog only rechecks playback. A stalled browser may legitimately take longer.
-      const interval = Math.max(50, Math.min(remaining, 2_147_483_647));
+      const cappedDelay = Math.min(maxRemainingMs, MAX_TIMEOUT_DELAY_MS);
+      const checkDelay = Math.max(MIN_CHECK_DELAY_MS, cappedDelay);
 
-      timer = setTimeout(check, interval);
+      timer = setTimeout(check, checkDelay);
     } else {
       finish();
     }

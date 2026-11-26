@@ -6,9 +6,9 @@ export type RampOptions = {
 };
 
 export const clampGain = (level: number) => {
-  const min = Math.min(1, level);
+  const cappedLevel = Math.min(1, level);
 
-  return Math.max(0, min);
+  return Math.max(0, cappedLevel);
 };
 
 export class FadeRamp {
@@ -34,22 +34,20 @@ export class FadeRamp {
   }
 
   levelAt(now: number) {
-    const start = now - this.startedAt;
-    const end = this.deadline - this.startedAt;
-    const delta = this.to - this.from;
+    const elapsed = now - this.startedAt;
+    const duration = this.deadline - this.startedAt;
+    const gainDelta = this.to - this.from;
 
-    const level = start / end;
+    const progress = clampGain(elapsed / duration);
 
-    const progress = clampGain(level);
-
-    return this.from + delta * progress;
+    return this.from + gainDelta * progress;
   }
 
   private schedule() {
     const deadline = this.deadline;
 
-    const delta = Math.ceil(deadline - performance.now());
-    const delay = Math.max(0, delta);
+    const remainingMs = Math.ceil(deadline - performance.now());
+    const delay = Math.max(0, remainingMs);
 
     const timer = setTimeout(() => {
       if (this.timer === timer) {

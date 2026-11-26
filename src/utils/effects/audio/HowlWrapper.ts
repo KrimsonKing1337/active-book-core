@@ -561,9 +561,8 @@ export class HowlWrapper {
   private async finishUnload(immediate: boolean) {
     try {
       const shouldFadeOut = !immediate && this.fadeOutWhenUnload;
-      const isPlaying = this.state() === 'loaded' && this.playing();
 
-      if (shouldFadeOut && isPlaying) {
+      if (shouldFadeOut && this.state() === 'loaded' && this.playing()) {
         await this.fadeOutVoices();
       }
     } finally {
@@ -596,7 +595,12 @@ export class HowlWrapper {
   private fadeVoices(options: VoiceFadeOptions, absolute = false) {
     const { soundId } = options;
 
-    const soundIds = soundId === undefined ? this.soundIds : [soundId];
+    let soundIds: Iterable<number> = this.soundIds;
+
+    if (soundId !== undefined) {
+      soundIds = [soundId];
+    }
+
     const fades: Promise<boolean>[] = [];
 
     for (const idCur of soundIds) {
@@ -617,9 +621,9 @@ export class HowlWrapper {
 
     const fades = this.fadeVoices(options, true);
     const results = await Promise.all(fades);
-    const allResultsAreFulfilled = results.every(Boolean);
+    const allFadesCompleted = results.every(Boolean);
 
-    return results.length > 0 && allResultsAreFulfilled;
+    return results.length > 0 && allFadesCompleted;
   }
 
   async fadeIn(soundId?: number) {
@@ -635,9 +639,9 @@ export class HowlWrapper {
     });
 
     const results = await Promise.all(fades);
-    const allResultsAreFulfilled = results.every(Boolean);
+    const allFadesCompleted = results.every(Boolean);
 
-    return results.length > 0 && allResultsAreFulfilled;
+    return results.length > 0 && allFadesCompleted;
   }
 
   private fadeOutVoices(duration = HowlWrapper.fadeDurationDefault) {
@@ -686,9 +690,9 @@ export class HowlWrapper {
     this.haltOperation = null;
 
     const results = await Promise.all(this.fadeVoices({ to: 1, duration }));
-    const allResultsAreFulfilled = results.every(Boolean);
+    const allFadesCompleted = results.every(Boolean);
 
-    return results.length > 0 && allResultsAreFulfilled;
+    return results.length > 0 && allFadesCompleted;
   }
 
   playing() {
