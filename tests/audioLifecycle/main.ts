@@ -57,7 +57,7 @@ const fixture = {
   store,
   volumeActions,
   audioEffectsActions,
-  cleanup: (id = 'audio') => unloadAudio(get(id)),
+  cleanup: (id = 'audio', options?: Parameters<typeof unloadAudio>[1]) => unloadAudio(get(id), options),
 };
 
 declare global {
