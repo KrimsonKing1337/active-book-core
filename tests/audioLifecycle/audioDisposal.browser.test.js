@@ -28,11 +28,12 @@ test('short real loop releases every Howl after its lifetime, preserving the exi
   assert.equal(events.filter((event) => event === 'unload:loop').length, 1);
 });
 
-test('short real one-shot reaches its natural end before lifetime cleanup releases it', async (context) => {
+test('explicit cleanup lets a short real loop finish only its current iteration', async (context) => {
   const page = await openAudio(context);
   await page.evaluate(() => window.audioLifecycle.create({
     id: 'finite',
     src: '/tests/audioLifecycle/short.wav',
+    loop: true,
   }));
   await page.waitForFunction(() => window.audioLifecycle.get('finite').state() === 'loaded');
   const wasPlaying = await page.evaluate(async () => {
@@ -40,7 +41,7 @@ test('short real one-shot reaches its natural end before lifetime cleanup releas
     const audio = fixture.get('finite');
     const wasPlaying = await new Promise((resolve, reject) => {
       audio.howlInst.once('play', () => {
-        const cleanup = fixture.cleanup('finite');
+        const cleanup = fixture.cleanup('finite', { waitTillTheEnd: true });
         const wasPlaying = audio.playing();
         // Howler dispatches listeners in reverse registration order: record end before cleanup reacts to it.
         audio.howlInst.once('end', () => fixture.events.push('end:finite'));
@@ -54,7 +55,8 @@ test('short real one-shot reaches its natural end before lifetime cleanup releas
   });
   assert.equal(wasPlaying, true);
   const events = await page.evaluate(() => window.audioLifecycle.events);
-  assert(events.includes('end:finite'));
+  assert.equal(events.filter((event) => event === 'play:finite').length, 1);
+  assert.equal(events.filter((event) => event === 'end:finite').length, 1);
   assert(events.indexOf('end:finite') < events.indexOf('unload:finite'));
   assert.equal(await page.evaluate(() => window.audioLifecycle.resourceCount()), 0);
 });

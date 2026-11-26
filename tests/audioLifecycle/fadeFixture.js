@@ -12,8 +12,11 @@ export const readVoices = (audio) => {
 export const meter = () => {
   const { howler } = window.audioLifecycle;
   const analyser = howler.ctx.createAnalyser();
+  const silentOutput = howler.ctx.createGain();
   analyser.fftSize = 1024;
+  silentOutput.gain.value = 0;
   howler.masterGain.connect(analyser);
+  analyser.connect(silentOutput).connect(howler.ctx.destination);
   const samples = new Float32Array(analyser.fftSize);
   const rms = () => {
     analyser.getFloatTimeDomainData(samples);
@@ -28,9 +31,10 @@ export const meter = () => {
   const close = () => {
     howler.masterGain.disconnect(analyser);
     analyser.disconnect();
+    silentOutput.disconnect();
   };
 
-  return { rms, close };
+  return { rms, close, windowDuration: analyser.fftSize / howler.ctx.sampleRate };
 };
 
 export const until = async (predicate) => {

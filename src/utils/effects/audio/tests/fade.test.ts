@@ -97,22 +97,29 @@ test('fade-out decreases from the actual partial gain before stop and restores i
   expect(instance.howlInst.volume()).toBe(1);
 });
 
-test('a volume edit cancels a pending faded stop without cancelling a delayed play', async () => {
+test.each(['stop', 'pause'] as const)('mixer edits preserve a faded %s and its deadline', async (command) => {
   const instance = fixture.create();
   await instance.play();
-  const stop = instance.stop(true);
+  const halt = instance[command](true);
   await jest.advanceTimersByTimeAsync(200);
   store.dispatch(volumeActions.setGlobal(50));
   instance.volume(1);
-  await jest.advanceTimersByTimeAsync(1500);
-  await stop;
+  await jest.advanceTimersByTimeAsync(300);
   expect(instance.playing()).toBe(true);
-  expect(instance.howlInst.volume(1001)).toBe(0.5);
+  expect(instance.howlInst.volume(1001)).toBeCloseTo(0.25, 4);
+  await jest.advanceTimersByTimeAsync(500);
+  await halt;
+  expect(instance.playing()).toBe(false);
+  expect(instance.howlInst.volume()).toBe(0.5);
+});
+
+test('a volume edit applies to a delayed play without cancelling it', async () => {
+  const instance = fixture.create();
   instance.delay = 200;
   const play = instance.play(true);
   instance.volume(0.5);
   await jest.advanceTimersByTimeAsync(1210);
   await play;
-  expect(instance.howlInst.playing(1002)).toBe(true);
-  expect(instance.howlInst.volume(1002)).toBe(0.25);
+  expect(instance.howlInst.playing(1001)).toBe(true);
+  expect(instance.howlInst.volume(1001)).toBe(0.5);
 });

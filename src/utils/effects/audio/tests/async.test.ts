@@ -96,6 +96,7 @@ test('callbacks already queued by Howler cannot fire after cancellation', async 
 
 test('repeated pause and stop without native events do not accumulate listeners', async () => {
   const instance = fixture.create();
+  const pauseListeners = listenerCount(instance.howlInst, 'pause');
   const ownerListeners = listenerCount(instance.howlInst, 'stop');
 
   for (let index = 0; index < 5; index += 1) {
@@ -103,7 +104,7 @@ test('repeated pause and stop without native events do not accumulate listeners'
     await instance.stop();
   }
 
-  expect(listenerCount(instance.howlInst, 'pause')).toBe(0);
+  expect(listenerCount(instance.howlInst, 'pause')).toBe(pauseListeners);
   expect(listenerCount(instance.howlInst, 'stop')).toBeLessThanOrEqual(ownerListeners + 1);
   await instance.unload();
   expect(listenerCount(instance.howlInst, 'stop')).toBe(0);

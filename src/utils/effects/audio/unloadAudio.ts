@@ -1,16 +1,15 @@
 import type { HowlWrapper } from './HowlWrapper';
 
-/*
-  Короткому конечному звуку (до 1.2 секунды) даём доиграть перед unload.
-  waitTillTheEnd пропускает loop и ограничивает ожидание, если событие завершения потеряно.
-*/
-export const unloadAudio = async (audioInstance: HowlWrapper) => {
-  const fixedDur = audioInstance.howlInst.duration().toFixed(1);
-  const floatDur = parseFloat(fixedDur);
+type UnloadAudioOptions = {
+  waitTillTheEnd?: boolean;
+};
 
-  if (floatDur < 1.2) {
-    await audioInstance.waitTillTheEnd();
+export const unloadAudio = async (instance: HowlWrapper, {
+  waitTillTheEnd = false,
+}: UnloadAudioOptions = {}) => {
+  if (waitTillTheEnd) {
+    await instance.waitTillTheEnd();
   }
 
-  await audioInstance.unload();
+  await instance.unload({ immediate: waitTillTheEnd });
 };
