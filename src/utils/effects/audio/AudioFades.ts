@@ -1,22 +1,24 @@
 import type { Howl } from 'howler';
 
-import { clampGain, FadeRamp } from './FadeRamp';
+import { FadeRamp, clampGain, RampOptions } from './FadeRamp';
+
+type VoiceGainAbsolute = {
+  referenceVolume: number;
+  multiplier: number;
+};
 
 type VoiceGain = {
   soundId: number;
   level: number;
   ramp?: FadeRamp;
-  absolute?: {
-    referenceVolume: number;
-    multiplier: number;
-  };
+  absolute?: VoiceGainAbsolute;
 };
 
 type FadeOptions = {
   soundId: number;
+  from?: number;
   to: number;
   duration: number;
-  from?: number;
 };
 
 /** Tracks the intended gain independently of Howler's rounded, timer-driven volume getter. */
@@ -26,12 +28,16 @@ export class AudioFades {
   constructor(private readonly howl: Howl) {}
 
   get isFading() {
-    return [...this.voices.values()].some((voice) => Boolean(voice.ramp));
+    const voicesCopy = [...this.voices.values()];
+
+    return voicesCopy.some((cur) => Boolean(cur.ramp));
   }
 
   addVoice(soundId: number, level: number) {
     this.removeVoice(soundId);
+
     const voice = { soundId, level };
+
     this.voices.set(soundId, voice);
     this.howl.volume(this.outputLevel(voice, level), soundId);
 
@@ -48,14 +54,19 @@ export class AudioFades {
         this.howl.volume(0, soundId);
       }
 
-      ramp.finish(naturallyEnded && !voice.absolute && ramp.to === 0);
+      const completed = naturallyEnded && !voice.absolute && ramp.to === 0;
+
+      ramp.finish(completed);
     }
 
     this.voices.delete(soundId);
   }
 
   private outputLevel(voice: VoiceGain, level: number) {
-    return clampGain(level * (voice.absolute?.multiplier ?? this.howl.volume()));
+    const volume = voice.absolute?.multiplier ?? this.howl.volume();
+    const gain = level * volume;
+
+    return clampGain(gain);
   }
 
   private render(voice: VoiceGain, now: number) {
@@ -68,7 +79,9 @@ export class AudioFades {
     }
 
     if (!ramp) {
-      this.howl.volume(this.outputLevel(voice, voice.level), soundId);
+      const outputLevel = this.outputLevel(voice, voice.level);
+
+      this.howl.volume(outputLevel, soundId);
 
       return;
     }
@@ -86,27 +99,33 @@ export class AudioFades {
 
   setVolume(volume: number) {
     const now = performance.now();
+
     this.howl.volume(volume);
 
-    for (const voice of this.voices.values()) {
-      if (voice.absolute && voice.ramp) {
-        voice.absolute.multiplier = volume / voice.absolute.referenceVolume;
-      } else if (voice.absolute) {
-        voice.absolute = undefined;
-        voice.level = 1;
+    for (const voiceCur of this.voices.values()) {
+      if (voiceCur.absolute && voiceCur.ramp) {
+        voiceCur.absolute.multiplier = volume / voiceCur.absolute.referenceVolume;
+      } else if (voiceCur.absolute) {
+        voiceCur.absolute = undefined;
+        voiceCur.level = 1;
       }
 
-      this.render(voice, now);
+      this.render(voiceCur, now);
     }
   }
 
   reset() {
+    const volume = this.howl.volume();
+
     this.clear();
-    this.howl.volume(this.howl.volume());
+    this.howl.volume(volume);
   }
 
   clear() {
-    this.voices.forEach((voice) => voice.ramp?.finish(false));
+    this.voices.forEach((voiceCur) => {
+      voiceCur.ramp?.finish(false);
+    });
+
     this.voices.clear();
   }
 
@@ -115,23 +134,27 @@ export class AudioFades {
 
     if (voice?.ramp) {
       const { ramp } = voice;
+
       voice.ramp = undefined;
       const now = performance.now();
+
       voice.level = ramp.to;
 
       if (!completed) {
         voice.level = ramp.levelAt(now);
       }
 
-      this.howl.volume(this.outputLevel(voice, voice.level), soundId);
+      const outputLevel = this.outputLevel(voice, voice.level);
+
+      this.howl.volume(outputLevel, soundId);
       ramp.finish(completed);
     }
   }
 
   cancel(soundId?: number) {
-    for (const voiceId of this.voices.keys()) {
-      if (soundId === undefined || voiceId === soundId) {
-        this.finish(voiceId, false);
+    for (const voiceIdCur of this.voices.keys()) {
+      if (soundId === undefined || voiceIdCur === soundId) {
+        this.finish(voiceIdCur, false);
       }
     }
   }
@@ -143,8 +166,11 @@ export class AudioFades {
       to,
       duration,
     } = options;
+
     const now = performance.now();
+
     const previous = this.voices.get(soundId);
+
     let level = clampGain(from ?? 1);
 
     if (previous) {
@@ -152,8 +178,11 @@ export class AudioFades {
         level = previous.ramp?.levelAt(now) ?? previous.level;
 
         if (previous.absolute) {
-          const base = this.howl.volume();
-          level = clampGain(this.outputLevel(previous, level) / (base || 1));
+          const base = this.howl.volume() || 1;
+          const outputLevel = this.outputLevel(previous, level);
+          const gain = outputLevel / base;
+
+          level = clampGain(gain);
         }
       }
 
@@ -161,28 +190,38 @@ export class AudioFades {
     }
 
     const voice: VoiceGain = { soundId, level };
+
     this.voices.set(soundId, voice);
 
     if (absolute) {
-      voice.absolute = { referenceVolume: this.howl.volume() || 1, multiplier: 1 };
+      const volume = this.howl.volume() || 1;
+
+      voice.absolute = { referenceVolume: volume, multiplier: 1 };
     }
 
     const target = clampGain(to);
 
     if (!Number.isFinite(duration) || duration <= 0 || level === target) {
       voice.level = target;
+
       this.render(voice, now);
 
       return Promise.resolve(true);
     }
 
-    const ramp = new FadeRamp({
+    const rampOptions: RampOptions = {
       from: level,
       to: target,
       startedAt: now,
       duration,
-    }, () => this.finish(soundId, true));
+    };
+
+    const handleDeadline = () => this.finish(soundId, true);
+
+    const ramp = new FadeRamp(rampOptions, handleDeadline);
+
     voice.ramp = ramp;
+
     this.render(voice, now);
 
     return ramp.completion;
@@ -192,10 +231,19 @@ export class AudioFades {
     const voice = this.voices.get(soundId);
     const ramp = voice?.ramp;
 
-    if (ramp && !voice.absolute && ramp.to === 0 && Number.isFinite(duration)) {
+    if (!ramp || ramp.to === 0) {
+      return;
+    }
+
+    const durationIsValid = Number.isFinite(duration);
+
+    if (!voice.absolute && durationIsValid) {
       const now = performance.now();
 
-      if (ramp.shorten(now + Math.max(0, duration), now)) {
+      const maxDuration = Math.max(0, duration);
+      const deadline = now + maxDuration;
+
+      if (ramp.shorten(deadline, now)) {
         this.render(voice, now);
       }
     }

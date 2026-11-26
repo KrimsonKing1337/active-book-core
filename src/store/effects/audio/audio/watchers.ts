@@ -13,16 +13,18 @@ import { selectors } from './selectors';
 import type { RemoveAudioInstancePayload } from './@types';
 
 const unloadRemovedAudio = async (instance: RemoveAudioInstancePayload['instance']) => {
-  let previous = store.getState().volume;
+  let previousVolume = store.getState().volume;
+
   const unsubscribe = store.subscribe(() => {
-    const current = store.getState().volume;
     const { type } = instance;
 
-    if (previous.global !== current.global || previous[type] !== current[type]) {
-      instance.volume(current[type] / 100);
+    const currentVolume = store.getState().volume;
+
+    if (previousVolume.global !== currentVolume.global || previousVolume[type] !== currentVolume[type]) {
+      instance.volume(currentVolume[type] / 100);
     }
 
-    previous = current;
+    previousVolume = currentVolume;
   });
 
   try {
@@ -34,6 +36,7 @@ const unloadRemovedAudio = async (instance: RemoveAudioInstancePayload['instance
 
 export function* watchRemoveAudioInstance(action: PayloadAction<RemoveAudioInstancePayload>) {
   const { id, instance } = action.payload;
+
   const audioInstances: HowlInstances = yield select(selectors.audioInstances);
 
   // Если тот же экземпляр снова зарегистрировали, выгружать его нельзя.

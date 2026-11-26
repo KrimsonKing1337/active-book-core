@@ -396,8 +396,10 @@ export class HowlWrapper {
       id: soundId,
       callback: () => {
         cancelPlay();
+
         this.fades.removeVoice(soundId);
         this.soundIds.delete(soundId);
+
         options.fail();
       },
     });
@@ -411,6 +413,7 @@ export class HowlWrapper {
     if (this.fadingOut || this.haltOperation) {
       this.fadingOut = null;
       this.haltOperation = null;
+
       this.cancelPendingOperations();
 
       if (this.state() === 'loaded') {
@@ -421,6 +424,7 @@ export class HowlWrapper {
     return new Promise<void>((resolve) => {
       const complete = () => {
         this.pendingOperations.delete(request);
+
         resolve();
       };
 
@@ -485,6 +489,7 @@ export class HowlWrapper {
     const operation = {};
 
     this.haltOperation = operation;
+
     const revision = this.revision;
 
     const loaded = !this.unloadPromise && this.state() === 'loaded';
@@ -541,8 +546,10 @@ export class HowlWrapper {
   unload({ immediate = false }: UnloadOptions = {}) {
     if (!this.unloadPromise && !this.isDisposed) {
       this.isUnloading = true;
+
       this.completion?.cancel();
       this.cancelPendingOperations();
+
       this.unloadPromise = this.finishUnload(immediate);
     } else if (immediate) {
       this.dispose();
@@ -553,7 +560,10 @@ export class HowlWrapper {
 
   private async finishUnload(immediate: boolean) {
     try {
-      if (!immediate && this.fadeOutWhenUnload && this.state() === 'loaded' && this.playing()) {
+      const shouldFadeOut = !immediate && this.fadeOutWhenUnload;
+      const isPlaying = this.state() === 'loaded' && this.playing();
+
+      if (shouldFadeOut && isPlaying) {
         await this.fadeOutVoices();
       }
     } finally {
@@ -567,6 +577,7 @@ export class HowlWrapper {
     }
 
     this.isDisposed = true;
+
     this.completion?.cancel();
     this.fades.clear();
     this.cancelPendingOperations();
@@ -584,12 +595,15 @@ export class HowlWrapper {
 
   private fadeVoices(options: VoiceFadeOptions, absolute = false) {
     const { soundId } = options;
+
     const soundIds = soundId === undefined ? this.soundIds : [soundId];
     const fades: Promise<boolean>[] = [];
 
-    for (const id of soundIds) {
-      if (this.howlInst.playing(id)) {
-        fades.push(this.fades.fade({ ...options, soundId: id }, absolute));
+    for (const idCur of soundIds) {
+      if (this.howlInst.playing(idCur)) {
+        const newFade = this.fades.fade({ ...options, soundId: idCur }, absolute);
+
+        fades.push(newFade);
       }
     }
 
@@ -603,8 +617,9 @@ export class HowlWrapper {
 
     const fades = this.fadeVoices(options, true);
     const results = await Promise.all(fades);
+    const allResultsAreFulfilled = results.every(Boolean);
 
-    return results.length > 0 && results.every(Boolean);
+    return results.length > 0 && allResultsAreFulfilled;
   }
 
   async fadeIn(soundId?: number) {
@@ -618,13 +633,16 @@ export class HowlWrapper {
       duration: HowlWrapper.fadeDurationDefault,
       soundId,
     });
-    const results = await Promise.all(fades);
 
-    return results.length > 0 && results.every(Boolean);
+    const results = await Promise.all(fades);
+    const allResultsAreFulfilled = results.every(Boolean);
+
+    return results.length > 0 && allResultsAreFulfilled;
   }
 
   private fadeOutVoices(duration = HowlWrapper.fadeDurationDefault) {
     const fades = this.fadeVoices({ to: 0, duration });
+
     const operation = Promise.all(fades).then((results) => {
       if (this.fadingOut === operation) {
         this.fadingOut = null;
@@ -653,8 +671,8 @@ export class HowlWrapper {
       return Promise.resolve(false);
     }
 
-    for (const soundId of this.soundIds) {
-      this.fades.shortenFadeOut(soundId, duration);
+    for (const soundIdCur of this.soundIds) {
+      this.fades.shortenFadeOut(soundIdCur, duration);
     }
 
     return this.fadingOut;
@@ -666,9 +684,11 @@ export class HowlWrapper {
     }
 
     this.haltOperation = null;
-    const results = await Promise.all(this.fadeVoices({ to: 1, duration }));
 
-    return results.length > 0 && results.every(Boolean);
+    const results = await Promise.all(this.fadeVoices({ to: 1, duration }));
+    const allResultsAreFulfilled = results.every(Boolean);
+
+    return results.length > 0 && allResultsAreFulfilled;
   }
 
   playing() {

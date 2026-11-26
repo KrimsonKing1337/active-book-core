@@ -16,11 +16,15 @@ const events = [
 
 /** Observe completion without imposing a wall-clock limit on a playing or buffering clip. */
 export const waitForPlaybackEnd = ({ howl, soundIds }: Playback) => {
-  const playingIds = [...soundIds].filter((id) => howl.playing(id));
+  const soundsIdsCopy = [...soundIds];
+  const playingIds = soundsIdsCopy.filter((id) => howl.playing(id));
+
   let resolve = () => {};
+
   const promise = new Promise<void>((complete) => {
     resolve = complete;
   });
+
   let timer: ReturnType<typeof setTimeout> | undefined;
   let finished = false;
 
@@ -30,11 +34,13 @@ export const waitForPlaybackEnd = ({ howl, soundIds }: Playback) => {
     }
 
     finished = true;
+
     clearTimeout(timer);
+
     howl.off('loaderror', finish);
 
-    for (const event of events) {
-      howl.off(event, check);
+    for (const eventCur of events) {
+      howl.off(eventCur, check);
     }
 
     resolve();
@@ -46,49 +52,60 @@ export const waitForPlaybackEnd = ({ howl, soundIds }: Playback) => {
     }
 
     clearTimeout(timer);
+
     let remaining = 0;
     let isPlaying = false;
 
-    for (const id of playingIds) {
-      if (!howl.playing(id)) {
+    for (const idCur of playingIds) {
+      if (!howl.playing(idCur)) {
         continue;
       }
 
-      const rate = howl.rate(id);
-      const position = howl.seek(id);
-      const duration = howl.duration(id);
+      const rate = howl.rate(idCur);
+      const position = howl.seek(idCur);
+      const duration = howl.duration(idCur);
 
-      if (Number.isFinite(position) && Number.isFinite(duration) && duration > 0 && position >= duration) {
+      const positionIsValid = Number.isFinite(position);
+      const durationIsValid = Number.isFinite(duration) && duration > 0;
+
+      if (positionIsValid && durationIsValid && position >= duration) {
         continue;
       }
 
       isPlaying = true;
 
-      if (Number.isFinite(rate) && rate > 0 && Number.isFinite(position) && Number.isFinite(duration)) {
-        remaining = Math.max(remaining, (duration - position) * 1000 / rate);
+      const rateIsValid = Number.isFinite(rate) && rate > 0;
+
+      if (rateIsValid && Number.isFinite(position) && Number.isFinite(duration)) {
+        const delta = (duration - position) * 1000;
+        const max = delta / rate;
+
+        remaining = Math.max(remaining, max);
       }
     }
 
     if (isPlaying) {
       // The watchdog only rechecks playback. A stalled browser may legitimately take longer.
       const interval = Math.max(50, Math.min(remaining, 2_147_483_647));
+
       timer = setTimeout(check, interval);
     } else {
       finish();
     }
   };
 
-  for (const id of playingIds) {
-    if (howl.loop(id)) {
-      howl.loop(false, id);
+  for (const idCur of playingIds) {
+    if (howl.loop(idCur)) {
+      howl.loop(false, idCur);
     }
   }
 
-  for (const event of events) {
-    howl.on(event, check);
+  for (const eventCur of events) {
+    howl.on(eventCur, check);
   }
 
   howl.on('loaderror', finish);
+
   check();
 
   return { promise, cancel: finish };

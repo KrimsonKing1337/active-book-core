@@ -1,11 +1,15 @@
-type RampOptions = {
+export type RampOptions = {
   from: number;
   to: number;
   startedAt: number;
   duration: number;
 };
 
-export const clampGain = (level: number) => Math.max(0, Math.min(1, level));
+export const clampGain = (level: number) => {
+  const min = Math.min(1, level);
+
+  return Math.max(0, min);
+};
 
 export class FadeRamp {
   readonly to: number;
@@ -21,25 +25,37 @@ export class FadeRamp {
     this.to = options.to;
     this.startedAt = options.startedAt;
     this.deadline = options.startedAt + options.duration;
+
     this.completion = new Promise((resolve) => {
       this.resolve = resolve;
     });
+
     this.schedule();
   }
 
   levelAt(now: number) {
-    const progress = clampGain((now - this.startedAt) / (this.deadline - this.startedAt));
+    const start = now - this.startedAt;
+    const end = this.deadline - this.startedAt;
+    const delta = this.to - this.from;
 
-    return this.from + (this.to - this.from) * progress;
+    const level = start / end;
+
+    const progress = clampGain(level);
+
+    return this.from + delta * progress;
   }
 
   private schedule() {
     const deadline = this.deadline;
+
+    const delta = Math.ceil(deadline - performance.now());
+    const delay = Math.max(0, delta);
+
     const timer = setTimeout(() => {
       if (this.timer === timer) {
         this.onDeadline();
       }
-    }, Math.max(0, Math.ceil(deadline - performance.now())));
+    }, delay);
 
     this.timer = timer;
   }
@@ -50,9 +66,11 @@ export class FadeRamp {
     }
 
     clearTimeout(this.timer);
+
     this.from = this.levelAt(now);
     this.startedAt = now;
     this.deadline = deadline;
+
     this.schedule();
 
     return true;
@@ -60,7 +78,9 @@ export class FadeRamp {
 
   finish(completed: boolean) {
     clearTimeout(this.timer);
+
     this.timer = undefined;
+
     this.resolve(completed);
   }
 }
