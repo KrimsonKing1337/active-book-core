@@ -9,8 +9,6 @@ import { Img } from '@components/Img';
 
 import { Shadow } from '../Shadow';
 
-import { useMediaReadiness } from './useMediaReadiness';
-
 import * as styles from '../../BackgroundEffects.module.scss';
 
 type BackgroundParams = JsonObject & Omit<BackgroundEffect, 'id'>;
@@ -23,12 +21,6 @@ export const BackgroundRenderer = ({
   children,
 }: BackgroundRendererProps) => {
   const options = params as BackgroundParams;
-
-  const imageSrc = options.kind === 'image' ? options.image?.src : undefined;
-  const imageLoad = useMediaReadiness<HTMLImageElement>('images', imageSrc);
-
-  const videoSrc = options.kind === 'video' ? options.video?.src : undefined;
-  const videoLoad = useMediaReadiness<HTMLVideoElement>('videos', videoSrc);
 
   const {
     kind,
@@ -60,19 +52,15 @@ export const BackgroundRenderer = ({
 
       {showImage && (
         <Img
-          passedRef={imageLoad.elementRef}
           src={image.src}
           className={styles.Media}
           style={image.style}
-          onLoad={imageLoad.markReady}
-          onError={imageLoad.markReady}
         />
       )}
 
       {showVideo && (
         <Video
           preserveTime={false}
-          elementRef={videoLoad.elementRef}
           id={video.id}
           src={video.src}
           className={styles.Media}
@@ -81,8 +69,6 @@ export const BackgroundRenderer = ({
           loop={video.loop ?? true}
           muted={video.muted ?? true}
           relativeVolume={videoRelativeVolume}
-          onCanPlay={videoLoad.markReady}
-          onError={videoLoad.markReady}
         />
       )}
 

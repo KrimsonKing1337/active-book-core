@@ -9,12 +9,9 @@ import {
 } from './videoPlaybackFixture.js';
 
 test('switching during media loading does not revive the inactive video', async (context) => {
-  let held;
-  const page = await openVideos(context, {
-    setup: async (page) => {
-      held = await holdVideo(page, '**/movie.webm?id=page-a&source=first');
-    },
-  });
+  const page = await openVideos(context);
+  const held = await holdVideo(page, '**/movie.webm?id=page-a&source=second');
+  await page.evaluate(() => window.videoFixture.changeSource());
   const request = await held.request;
   const gallery = page.getByTestId('page-gallery');
   await gallery.getByRole('button', { name: 'Следующий слайд' }).click();
@@ -45,6 +42,7 @@ test('closing a dialog during media loading cancels its playback cycle', async (
 test('source replacement during loading ignores the retired response', async (context) => {
   let held;
   const page = await openVideos(context, {
+    preparing: true,
     setup: async (page) => {
       held = await holdVideo(page, '**/movie.webm?id=page-a&source=first');
     },

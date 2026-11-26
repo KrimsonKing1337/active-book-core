@@ -9,7 +9,7 @@ import { configSelectors } from '@store/config';
 import { useDispatch, useSelector } from '@store';
 import { mainActions, mainSelectors } from '@store/main';
 
-import { useGoToPage } from '@hooks/control/useGoToPage';
+import { useReaderNavigation } from '@hooks/control/useReaderNavigation';
 
 import { useReaderWindow } from '@components/StoryWindowHost/hooks';
 import { activateOnKey } from '@components/ColoredTextTrigger/utils';
@@ -49,7 +49,7 @@ export const Page0 = ({
 }: Page0Props) => {
   const dispatch = useDispatch();
 
-  const { goToPage } = useGoToPage();
+  const { goToPage } = useReaderNavigation();
 
   const id = useSelector(mainSelectors.id);
   const isWelcomeTourActiveFromConfig = useSelector(configSelectors.welcomeTour);

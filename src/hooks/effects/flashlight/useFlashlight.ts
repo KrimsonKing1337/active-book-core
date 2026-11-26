@@ -12,6 +12,8 @@ import { useSelector } from '@store';
 import { configSelectors } from '@store/config';
 import { mainSelectors } from '@store/main';
 
+import { useCanStartPageEffects, usePagePresented } from '@hooks/pagePresentation/context';
+
 import type {
   FrameAnimation,
   FrameEffect,
@@ -24,6 +26,8 @@ import { useFrameEffects } from '@hooks/effects/frame/useFrameEffects';
 import { flashlightInst } from '@utils/effects/flashlight';
 
 export const useFlashlight = (options: Partial<FlashlightEffectOptions> = {}) => {
+  const canStart = useCanStartPageEffects();
+  const presented = usePagePresented();
   const currentPage = useSelector(mainSelectors.page);
   const flashlightEnabled = useSelector(configSelectors.flashlight);
   const theme = useSelector(configSelectors.theme);
@@ -104,7 +108,7 @@ export const useFlashlight = (options: Partial<FlashlightEffectOptions> = {}) =>
     shadowEffectId,
   ]);
 
-  const on = useCallback(async (pulseDuration?: number) => {
+  const on = useCallback(async (pulseDuration?: number, isCurrent: () => boolean = () => true) => {
     // Invalidate pending camera initialization and any previous auto-off timer.
     off();
 
@@ -124,7 +128,7 @@ export const useFlashlight = (options: Partial<FlashlightEffectOptions> = {}) =>
 
     // Leaving the page or turning the effect off during the permission prompt
     // must not turn the flashlight on after the async initialization finishes.
-    if (run !== runRef.current || document.hidden) {
+    if (run !== runRef.current || document.hidden || !isCurrent()) {
       return;
     }
 
@@ -158,7 +162,7 @@ export const useFlashlight = (options: Partial<FlashlightEffectOptions> = {}) =>
   }, [off]);
 
   useEffect(() => {
-    if (!id || page !== currentPage || !playOnLoad || duration <= 0) {
+    if (!presented || !canStart() || !id || page !== currentPage || !playOnLoad || duration <= 0) {
       return;
     }
 
@@ -168,7 +172,9 @@ export const useFlashlight = (options: Partial<FlashlightEffectOptions> = {}) =>
     }
 
     const timer = setTimeout(() => {
-      void on(duration);
+      if (canStart()) {
+        void on(duration, canStart);
+      }
     }, delay);
 
     return () => {
@@ -177,6 +183,8 @@ export const useFlashlight = (options: Partial<FlashlightEffectOptions> = {}) =>
     };
   }, [
     currentPage,
+    presented,
+    canStart,
     flashlightEnabled,
     id,
     page,

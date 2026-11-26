@@ -110,6 +110,7 @@ export const useVisualEffectSurfaces = ({
         depth,
         content,
         hidden: isHidden,
+        generation,
       };
     });
   }, [

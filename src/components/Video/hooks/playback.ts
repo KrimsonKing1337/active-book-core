@@ -6,8 +6,11 @@ import {
   useRef,
 } from 'react';
 
-import { useSelector } from '@store';
-import { mainSelectors } from '@store/main';
+import {
+  BookPresentationContext,
+  useCanStartPageEffects,
+  usePagePresented,
+} from '@hooks/pagePresentation/context';
 
 import { CarouselSlideActiveContext, useCarouselSlideActive } from '@components/Carousel/context';
 
@@ -37,8 +40,10 @@ export const useVideoPlayback = (ref: RefObject<HTMLVideoElement | null>, option
   } = options;
   const dialog = useContext(VideoPlaybackContext);
   const isInCarousel = useContext(CarouselSlideActiveContext) !== undefined;
+  const bookSession = useContext(BookPresentationContext);
   const isSlideActive = useCarouselSlideActive();
-  const isPending = useSelector(mainSelectors.isPending);
+  const canStart = useCanStartPageEffects();
+  const presented = usePagePresented();
   const managed = isInCarousel || dialog !== null;
   const playbackRef = useRef<VideoPlayback | null>(null);
   const sourceRef = useRef({ id, src });
@@ -93,9 +98,9 @@ export const useVideoPlayback = (ref: RefObject<HTMLVideoElement | null>, option
 
     if (playback) {
       updateVideoPlayback(playback, {
-        active: isSlideActive && !isPending,
+        active: isSlideActive && (playback.initialized || (presented && canStart())),
         managed,
-        autoPlay,
+        autoPlay: autoPlay && (managed || bookSession !== null),
         resetOnDispose: dialog !== null || !preserveTime,
         isCurrentWindow: dialog?.isCurrentWindow,
       });
@@ -105,7 +110,9 @@ export const useVideoPlayback = (ref: RefObject<HTMLVideoElement | null>, option
     id,
     src,
     isSlideActive,
-    isPending,
+    bookSession,
+    presented,
+    canStart,
     managed,
     autoPlay,
     preserveTime,

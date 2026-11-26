@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
-import { useGoToPage } from '@hooks/control/useGoToPage';
+import { useReaderNavigation } from '@hooks/control/useReaderNavigation';
 
 import * as styles from './Item.module.scss';
 
@@ -11,7 +11,7 @@ export type ItemProps = {
 };
 
 export const Item = ({ pageNumber, onDelete }: ItemProps) => {
-  const { goToPage } = useGoToPage();
+  const { goToPage } = useReaderNavigation();
 
   const clickHandler = () => {
     goToPage(pageNumber);

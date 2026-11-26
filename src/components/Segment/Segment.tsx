@@ -12,10 +12,11 @@ import classNames from 'classnames';
 
 import { nanoid } from 'nanoid';
 
-import { mainSelectors } from '@store/main';
 import { segmentsActions, segmentsSelectors } from '@store/segments';
 
 import { useDispatch, useSelector } from '@store';
+
+import { usePagePresented } from '@hooks/pagePresentation/context';
 
 import * as styles from './Segment.module.scss';
 
@@ -39,7 +40,7 @@ export const Segment = ({
 
   const [id, setId] = useState('');
 
-  const isLoading = useSelector(mainSelectors.isPending);
+  const presented = usePagePresented();
 
   const segments = useSelector(segmentsSelectors.segments);
   const activeId = useSelector(segmentsSelectors.activeId);
@@ -47,7 +48,7 @@ export const Segment = ({
   const segmentsLength = Object.keys(segments).length;
 
   useEffect(() => {
-    if (isLoading) {
+    if (!presented) {
       return;
     }
 
@@ -65,7 +66,7 @@ export const Segment = ({
       onExit();
     }
   }, [
-    isLoading,
+    presented,
     id,
     activeId,
     onEnter,

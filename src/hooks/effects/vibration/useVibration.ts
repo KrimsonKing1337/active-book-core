@@ -7,6 +7,8 @@ import { useSelector } from '@store';
 import { configSelectors } from '@store/config';
 import { mainSelectors } from '@store/main';
 
+import { useCanStartPageEffects, usePagePresented } from '@hooks/pagePresentation/context';
+
 import { useAppMode } from '@components/App/AppModeContext';
 
 import { off as vibrationOff, on as vibrationOn } from '@utils/effects/vibration';
@@ -18,6 +20,8 @@ export const useVibration = (options?: VibrationEffectOptions) => {
   const appMode = useAppMode();
   const { start: startPreview, stop: stopPreview } = useVibrationPreview();
 
+  const canStart = useCanStartPageEffects();
+  const presented = usePagePresented();
   const currentPage = useSelector(mainSelectors.page);
   const isVibrationAvailable = useSelector(mainSelectors.isVibrationAvailable);
   const vibrationEnabled = useSelector(configSelectors.vibration);
@@ -69,7 +73,7 @@ export const useVibration = (options?: VibrationEffectOptions) => {
     const isSamePage = currentPage === page;
     const canVibrate = isVibrationAvailable && vibrationEnabled;
 
-    if (!id
+    if (!presented || !canStart() || !id
       || !isSamePage
       || !playOnLoad
       || !canVibrate) {
@@ -89,7 +93,9 @@ export const useVibration = (options?: VibrationEffectOptions) => {
     }
 
     const timer = window.setTimeout(() => {
-      on(duration);
+      if (canStart()) {
+        on(duration);
+      }
     }, delay);
 
     return () => {
@@ -99,6 +105,8 @@ export const useVibration = (options?: VibrationEffectOptions) => {
     };
   }, [
     currentPage,
+    presented,
+    canStart,
     isVibrationAvailable,
     vibrationEnabled,
     id,

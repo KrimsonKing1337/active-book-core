@@ -14,7 +14,7 @@ import { useSelector } from '@store';
 
 import { mainSelectors } from '@store/main';
 
-import { useGoToPage } from '@hooks/control/useGoToPage';
+import { useReaderNavigation } from '@hooks/control/useReaderNavigation';
 
 import { useStoryRegions } from '@components/StoryRegionsProvider';
 import { VisualHost } from '@components/VisualHost';
@@ -26,10 +26,13 @@ import * as styles from './Narrative.module.scss';
 export const Narrative = ({ children }: PropsWithChildren) => {
   const appMode = useAppMode();
   const { refs } = useStoryRegions();
-  const { goNextPage, goPrevPage } = useGoToPage();
+  const { goNextPage, goPrevPage } = useReaderNavigation();
 
   const currentPage = useSelector(mainSelectors.page);
   const pageId = useSelector(mainSelectors.pageId);
+  const visit = useSelector(mainSelectors.visit);
+  const showLoader = useSelector(mainSelectors.showLoader);
+  const locked = appMode === 'reader' && (showLoader || (visit !== null && !visit.reveal));
   const contentHadFocusRef = useRef(false);
 
   // const fontSize = useSelector(configSelectors.fontSize);
@@ -49,7 +52,6 @@ export const Narrative = ({ children }: PropsWithChildren) => {
   };
 
   const ref = useRef<HTMLDivElement>(null);
-  const currentPageRef = useRef(0);
 
   useLayoutEffect(() => {
     const element = ref.current;
@@ -66,20 +68,13 @@ export const Narrative = ({ children }: PropsWithChildren) => {
   }, [pageId, appMode]);
 
   useEffect(() => {
-    currentPageRef.current = currentPage;
-  }, [currentPage]);
-
-  useEffect(() => {
-    if (appMode !== 'reader') {
-      return;
+    if (appMode === 'reader' && !locked && document.activeElement === document.body) {
+      ref.current?.focus({ preventScroll: true });
     }
-
-    // Переводим фокус для прокрутки только в режиме чтения.
-    ref.current?.focus();
-  }, [appMode]);
+  }, [appMode, locked]);
 
   useEffect(() => {
-    if (appMode !== 'reader' || !ref.current || currentPageRef.current === 0) {
+    if (appMode !== 'reader' || !ref.current || currentPage === 0) {
       return;
     }
 
@@ -112,6 +107,7 @@ export const Narrative = ({ children }: PropsWithChildren) => {
     };
   }, [
     appMode,
+    currentPage,
     goNextPage,
     goPrevPage,
   ]);
@@ -124,6 +120,7 @@ export const Narrative = ({ children }: PropsWithChildren) => {
         className={styles.Narrative}
         style={narrativeStyle}
         tabIndex={0}
+        inert={locked}
         onFocusCapture={() => {
           contentHadFocusRef.current = true;
         }}

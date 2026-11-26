@@ -1,4 +1,13 @@
-import type { CSSProperties } from 'react';
+import {
+  type CSSProperties,
+  Suspense,
+  useLayoutEffect,
+  useState,
+} from 'react';
+
+
+import { usePagePresented } from '@hooks/pagePresentation/context';
+import { usePageResource } from '@hooks/pagePresentation/usePageResource';
 
 import type { VisualSurfaceItem } from '@components/VisualSurfaces';
 
@@ -13,7 +22,25 @@ type VisualSurfaceProps = {
   zIndex: number;
 };
 
+const holdForVisualContent = () => {};
+
+const PendingVisualContent = () => {
+  usePageResource(holdForVisualContent);
+
+  return null;
+};
+
 export const VisualSurface = ({ item, zIndex }: VisualSurfaceProps) => {
+  const presented = usePagePresented();
+  const [started, setStarted] = useState(false);
+
+  useLayoutEffect(() => {
+    if (presented) {
+      setStarted(true);
+    }
+  }, [presented]);
+
+  const preparing = !presented && !started;
   const frameSides = item.visibility?.sides;
   const frameWidth = item.visibility?.frameWidth;
   const widthStyle = frameWidth && 'value' in frameWidth
@@ -27,7 +54,7 @@ export const VisualSurface = ({ item, zIndex }: VisualSurfaceProps) => {
   const style = {
     ...widthStyle,
     zIndex,
-    visibility: item.hidden ? 'hidden' as const : undefined,
+    visibility: item.hidden || preparing ? 'hidden' as const : undefined,
     maskImage: frameSides ? getFrameMaskImage([...frameSides]) : undefined,
     maskComposite: frameSides ? 'add' : undefined,
     clipPath: localClipPath(item.visibility?.mask),
@@ -37,12 +64,16 @@ export const VisualSurface = ({ item, zIndex }: VisualSurfaceProps) => {
     <div
       className={styles.Surface}
       style={style}
+      inert={preparing}
+      data-visual-preparing={preparing || undefined}
       data-visual-surface={item.id}
       data-surface-layout="local"
       data-visual-plane={item.depth.plane}
     >
       <div className={styles.Content} style={localPlacementStyle(item.placement)} data-visual-content={item.id}>
-        {item.content}
+        <Suspense fallback={<PendingVisualContent />}>
+          {item.content}
+        </Suspense>
       </div>
     </div>
   );

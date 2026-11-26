@@ -49,7 +49,7 @@ export const VisualSurfaces = ({ items, stride }: VisualSurfacesProps) => {
     const zIndex = layers[itemCur.depth.plane] * stride + index;
 
     return createPortal(
-      <VisualSurface item={itemCur} zIndex={zIndex} />,
+      <VisualSurface key={itemCur.generation} item={itemCur} zIndex={zIndex} />,
       target,
       itemCur.id,
     );

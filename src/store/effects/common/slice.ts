@@ -5,18 +5,7 @@ import type { State, VideoCurrentTime } from './@types';
 export const initialState: State = {
   inverseColorIsActive: false,
 
-  dotLottieAmount: 0,
-  dotLottieReadyAmount: 0,
-
-  imagesAmount: 0,
-  imagesReadyAmount: 0,
-
-  videosAmount: 0,
-  videosReadyAmount: 0,
   videosCurrentTime: {},
-
-  audiosAmount: 0,
-  audiosReadyAmount: 0,
 };
 
 const slice = createSlice({
@@ -25,42 +14,6 @@ const slice = createSlice({
   reducers: {
     setInverseColorActiveState(state, action: PayloadAction<State['inverseColorIsActive']>) {
       state.inverseColorIsActive = action.payload;
-    },
-
-    setDotLottieAmount(state, action: PayloadAction<State['dotLottieAmount']>) {
-      state.dotLottieAmount = action.payload;
-    },
-    setDotLottieReadyAmount(state, action: PayloadAction<State['dotLottieReadyAmount']>) {
-      state.dotLottieReadyAmount = action.payload;
-    },
-    setDotLottieReady() {},
-
-    setVideosAmount(state, action: PayloadAction<State['videosAmount']>) {
-      state.videosAmount = action.payload;
-    },
-    setVideosReadyAmount(state, action: PayloadAction<State['videosReadyAmount']>) {
-      state.videosReadyAmount = action.payload;
-    },
-    setVideoReady() {},
-
-    setImagesAmount(state, action: PayloadAction<State['imagesAmount']>) {
-      state.imagesAmount = action.payload;
-    },
-    setImagesReadyAmount(state, action: PayloadAction<State['imagesReadyAmount']>) {
-      state.imagesReadyAmount = action.payload;
-    },
-    setImageReady() {},
-
-    setAudiosAmount(state, action: PayloadAction<State['audiosAmount']>) {
-      state.audiosAmount = action.payload;
-    },
-    setAudiosReadyAmount(state, action: PayloadAction<State['audiosReadyAmount']>) {
-      state.audiosReadyAmount = action.payload;
-    },
-    setAudioReady() {},
-
-    setAudiosAmountInc(state) {
-      state.audiosAmount += 1;
     },
 
     setVideoCurrentTime(state, action: PayloadAction<VideoCurrentTime>) {

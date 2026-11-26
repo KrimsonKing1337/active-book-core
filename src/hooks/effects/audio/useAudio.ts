@@ -1,4 +1,8 @@
-import { useEffect } from 'react';
+import {
+  useCallback,
+  useContext,
+  useLayoutEffect,
+} from 'react';
 
 import type { AudioEffectOptions } from '@types';
 
@@ -11,9 +15,18 @@ import {
 import { mainSelectors } from '@store/main';
 import { audioEffectsActions, audioEffectsSelectors } from '@store/effects/audio/audio';
 
-import { effectsActions } from '@store/effects/common';
+import { BookPresentationContext } from '@hooks/pagePresentation/context';
+import { type SettlePageResource, usePageResource } from '@hooks/pagePresentation/usePageResource';
 
 import { HowlWrapper, type HowlWrapperOptions } from '@utils/effects/audio/HowlWrapper';
+
+const failedLoads = new WeakSet<HowlWrapper>();
+const unloadListeners = new WeakMap<HowlWrapper, Set<() => void>>();
+const audioSessions = new WeakMap<HowlWrapper, string | null>();
+
+export const canAutoplayAudio = (instance: HowlWrapper, session: string | null) => {
+  return audioSessions.get(instance) === session && !failedLoads.has(instance);
+};
 
 export const useAudio = ({
   id,
@@ -37,16 +50,18 @@ export const useAudio = ({
   const dispatch = useDispatch();
 
   const currentPage = useSelector(mainSelectors.page);
+  const bookSession = useContext(BookPresentationContext);
   const isAudioUnlocked = useSelector(mainSelectors.isAudioUnlocked);
   const audioInstances = useSelector(audioEffectsSelectors.audioInstances);
 
+  const canPrepare = !!bookSession || isAudioUnlocked;
   const formatKey = format?.join(',');
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const isSamePage = currentPage === page;
 
     if (!isSamePage
-      || !isAudioUnlocked
+      || !canPrepare
       || !id
       || !src) {
       return;
@@ -56,20 +71,12 @@ export const useAudio = ({
     const existing = store.getState().audioEffects.audioInstances[id];
 
     if (lifecycle === 'manual' && existing && !existing.isUnloading) {
-      return;
-    }
-
-    let isReady = false;
-
-    const markReady = () => {
-      if (isReady) {
+      if (audioSessions.get(existing) === bookSession) {
         return;
       }
 
-      isReady = true;
-
-      dispatch(effectsActions.setAudioReady());
-    };
+      dispatch(audioEffectsActions.removeAudioInstance({ id, instance: existing }));
+    }
 
     const options: HowlWrapperOptions = {
       id,
@@ -88,22 +95,22 @@ export const useAudio = ({
       onPause,
       onStop,
       onUnload: () => {
-        // В manual звук могут удалить до завершения загрузки
-        markReady();
+        unloadListeners.get(instance)?.forEach((cancel) => cancel());
         onUnload();
       },
     };
 
     const instance = new HowlWrapper(options);
 
-    dispatch(effectsActions.setAudiosAmountInc());
-
-    if (instance.howlInst.state() === 'loaded') {
-      markReady();
-    } else {
-      instance.howlInst.once('load', markReady);
-      instance.howlInst.once('loaderror', markReady);
+    audioSessions.set(instance, bookSession);
+    // Howler can reject the format synchronously before event listeners attach.
+    if (instance.howlInst.state() === 'unloaded') {
+      failedLoads.add(instance);
     }
+
+    instance.howlInst.once('loaderror', () => {
+      failedLoads.add(instance);
+    });
 
     dispatch(audioEffectsActions.setAudioInstance(instance));
 
@@ -112,12 +119,6 @@ export const useAudio = ({
     }
 
     return () => {
-      instance.howlInst.off('load', markReady);
-      instance.howlInst.off('loaderror', markReady);
-
-      // Незаконченная загрузка не должна навсегда удерживать isAudiosLoading
-      markReady();
-
       dispatch(audioEffectsActions.removeAudioInstance({
         id,
         instance,
@@ -125,7 +126,8 @@ export const useAudio = ({
     };
   }, [
     currentPage,
-    isAudioUnlocked,
+    canPrepare,
+    bookSession,
     id,
     page,
     src,
@@ -133,5 +135,40 @@ export const useAudio = ({
     lifecycle,
   ]);
 
-  return audioInstances[id];
+  const instance = audioInstances[id];
+
+  const prepare = useCallback((settle: SettlePageResource) => {
+    if (!instance || instance.isUnloading) {
+      settle('cancelled');
+
+      return;
+    }
+
+    if (instance.howlInst.state() === 'loaded' || failedLoads.has(instance)) {
+      settle(failedLoads.has(instance) ? 'failed' : 'ready');
+
+      return;
+    }
+
+    const loaded = () => settle();
+    const failed = () => settle('failed');
+    const cancel = () => settle('cancelled');
+    const listeners = unloadListeners.get(instance) ?? new Set();
+
+    unloadListeners.set(instance, listeners);
+    listeners.add(cancel);
+
+    instance.howlInst.on('load', loaded);
+    instance.howlInst.on('loaderror', failed);
+
+    return () => {
+      listeners.delete(cancel);
+      instance.howlInst.off('load', loaded);
+      instance.howlInst.off('loaderror', failed);
+    };
+  }, [instance]);
+
+  usePageResource(currentPage === page && instance ? prepare : null);
+
+  return instance;
 };

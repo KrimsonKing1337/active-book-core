@@ -3,21 +3,5 @@ import type { RootState } from '@store';
 export const selectors = {
   inverseColorIsActive: (state: RootState) => state.effects.inverseColorIsActive,
 
-  dotLottieAmount: (state: RootState) => state.effects.dotLottieAmount,
-  dotLottieReadyAmount: (state: RootState) => state.effects.dotLottieReadyAmount,
-  isDotLottieLoading: (state: RootState) => state.effects.dotLottieAmount !== state.effects.dotLottieReadyAmount,
-
-  imagesAmount: (state: RootState) => state.effects.imagesAmount,
-  imagesReadyAmount: (state: RootState) => state.effects.imagesReadyAmount,
-  isImagesLoading: (state: RootState) => state.effects.imagesAmount !== state.effects.imagesReadyAmount,
-
-  videosAmount: (state: RootState) => state.effects.videosAmount,
-  videosReadyAmount: (state: RootState) => state.effects.videosReadyAmount,
-  isVideosLoading: (state: RootState) => state.effects.videosAmount !== state.effects.videosReadyAmount,
-
-  audiosAmount: (state: RootState) => state.effects.audiosAmount,
-  audiosReadyAmount: (state: RootState) => state.effects.audiosReadyAmount,
-  isAudiosLoading: (state: RootState) => state.effects.audiosAmount !== state.effects.audiosReadyAmount,
-
   videosCurrentTime: (state: RootState) => state.effects.videosCurrentTime,
 };

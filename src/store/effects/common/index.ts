@@ -1,3 +1,2 @@
 export { reducer as effectsReducer, actions as effectsActions } from './slice';
-export { watchActions as watchEffectsActions } from './watchers';
 export { selectors as effectsSelectors } from './selectors';

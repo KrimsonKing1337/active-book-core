@@ -1,0 +1,13 @@
+.presentation-animation {
+  animation: progress-test 10s linear infinite;
+}
+
+@keyframes progress-test {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}

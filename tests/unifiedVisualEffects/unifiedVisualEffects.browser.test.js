@@ -159,6 +159,8 @@ test('real Background and Frame renderers use the book session in Chromium', asy
     await effect(page, 'page-mask-1').waitFor();
     await page.evaluate(() => document.fonts.ready);
     await page.waitForTimeout(150);
+    // Keep the fixture's unlock diagnostic fixed in the visual reference.
+    await page.getByTestId('audio-unlocked').evaluate((output) => { output.textContent = 'false'; });
     const actual = await page.screenshot();
     const path = new URL('./screenshots/static-chromium-linux.png', import.meta.url);
     if (process.env.CAPTURE_VISUAL_BASELINE === '1') {

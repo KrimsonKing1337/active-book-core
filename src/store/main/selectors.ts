@@ -1,16 +1,23 @@
 import type { RootState } from '@store';
 
-import { effectsSelectors } from '@store/effects/common';
+import { visitIsPreparing } from './slice';
 
 const isPending = (state: RootState) => {
-  return effectsSelectors.isDotLottieLoading(state)
-    || effectsSelectors.isImagesLoading(state)
-    || effectsSelectors.isVideosLoading(state)
-    || effectsSelectors.isAudiosLoading(state);
+  const { visit } = state.main;
+
+  return visit !== null && visit.presentedAt === null && visitIsPreparing(visit);
 };
 
 export const selectors = {
   isPending,
+  bookSessionId: (state: RootState) => state.main.bookSessionId,
+  visit: (state: RootState) => state.main.visit,
+  visitId: (state: RootState) => state.main.visit?.id ?? null,
+  presentedAt: (state: RootState) => state.main.visit?.presentedAt ?? null,
+  isPagePresented: ({ main }: RootState) => {
+    return !main.showLoader && (!main.visit || main.visit.presentedAt !== null);
+  },
+
   showLoader: (state: RootState) => state.main.showLoader,
 
   id: (state: RootState) => state.main.id,

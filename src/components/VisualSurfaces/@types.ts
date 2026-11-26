@@ -14,4 +14,5 @@ export type VisualSurfaceItem = Pick<VisualEffectInstance, 'id' | 'placement' | 
   depth: VisualSurfaceDepth;
   content: ReactNode;
   hidden?: boolean;
+  generation?: number;
 };

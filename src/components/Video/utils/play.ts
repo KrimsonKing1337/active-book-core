@@ -78,15 +78,14 @@ export const updateVideoPlayback = (playback: VideoPlayback, policy: VideoPolicy
 
   Object.assign(playback, policy);
 
-  // Ordinary page videos belong to AppWrapper, not the slide activity controller.
-  if (!playback.managed) {
+  if (!playback.managed && playback.initialized) {
     return;
   }
 
   const videoIsActive = isVideoActive(playback);
 
   if (!videoIsActive) {
-    if (wasActive || !playback.element.paused || playback.pending) {
+    if (playback.managed && (wasActive || !playback.element.paused || playback.pending)) {
       pauseVideo(playback);
     }
 

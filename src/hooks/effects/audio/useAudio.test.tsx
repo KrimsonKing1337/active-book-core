@@ -114,7 +114,7 @@ test('autoplay respects page, playing state, unloading and opt-in for simultaneo
   ];
   const play = instances.map((instance) => jest.spyOn(instance, 'play').mockResolvedValue());
   const audioInstances = Object.fromEntries(instances.map((instance) => [instance.id, instance]));
-  startToPlayAllAudiosWithPlayOnLoad(audioInstances, 1);
+  startToPlayAllAudiosWithPlayOnLoad(audioInstances, { page: 1 });
   expect(play.map((mock) => mock.mock.calls.length)).toEqual([
     1,
     1,
@@ -123,7 +123,7 @@ test('autoplay respects page, playing state, unloading and opt-in for simultaneo
   ]);
   instances[0].isUnloading = true;
   jest.spyOn(instances[1], 'playing').mockReturnValue(true);
-  startToPlayAllAudiosWithPlayOnLoad(audioInstances, 1);
+  startToPlayAllAudiosWithPlayOnLoad(audioInstances, { page: 1 });
   expect(play.map((mock) => mock.mock.calls.length)).toEqual([
     1,
     1,

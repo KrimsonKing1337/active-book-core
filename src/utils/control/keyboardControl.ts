@@ -1,3 +1,6 @@
+import { store } from '@store';
+import { mainSelectors } from '@store/main';
+
 import { scrollDown, scrollUp } from '@utils/control/scroll';
 
 type Fn = () => void;
@@ -10,7 +13,7 @@ export const addKeyboardControl = (goPrevPage: Fn, goNextPage: Fn) => {
       return;
     }
 
-    if (document.querySelector('[data-book-window-open="true"]')) {
+    if (!mainSelectors.isPagePresented(store.getState()) || document.querySelector('[data-book-window-open="true"]')) {
       return;
     }
 

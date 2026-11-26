@@ -9,6 +9,10 @@ import {
 import { useSelector } from '@store';
 import { volumeSelectors } from '@store/volume';
 
+import { useMediaReadiness } from '@hooks/pagePresentation/useMediaReadiness';
+
+import { useCarouselSlideActive } from '@components/Carousel/context';
+
 import { getMediaVolume } from '@utils/volume/getMediaVolume';
 
 import { VideoPlaybackContext } from './context';
@@ -34,18 +38,24 @@ export const Video = ({
   muted = true,
   autoPlay = true,
   preserveTime = true,
+  preload = 'auto',
   elementRef,
 
   onCanPlay,
   onError,
   ...etc
 }: VideoProps) => {
+  const slideActive = useCarouselSlideActive();
   const playbackOwner = useContext(VideoPlaybackContext);
 
   const { videos: videosVolume, global: globalVolume } = useSelector(volumeSelectors.all);
 
   const ownRef = useRef<HTMLVideoElement>(null);
   const ref = elementRef ?? ownRef;
+
+  const required = slideActive && !playbackOwner && preload === 'auto';
+
+  useMediaReadiness(ref, required ? src : undefined);
 
   useLayoutEffect(() => {
     const element = ref.current;
@@ -101,7 +111,7 @@ export const Video = ({
       data-video-managed={isManaged}
       className={className}
       src={src}
-      preload="auto"
+      preload={preload}
       poster="./assets/img/poster-default.png"
       muted={muted}
       onCanPlay={onCanPlay}

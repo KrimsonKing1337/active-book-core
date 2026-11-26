@@ -2,16 +2,8 @@ import type { HowlInstances } from '@types';
 
 import { store } from '@store';
 
-import {
-  getVideoStats,
-  handleVideoPlayError,
-  reportUnexpectedVideoError,
-} from '@components/Video/utils';
-
 import { setVideosVolume } from '@utils/volume/setVideosVolume';
 
-
-const locallyManagedVideoSelector = '[data-book-carousel], [data-video-scope="dialog"]';
 
 export const setMuteToAllVideos = (muted: boolean) => {
   const { videos: videosVolume } = store.getState().volume;
@@ -19,7 +11,15 @@ export const setMuteToAllVideos = (muted: boolean) => {
   setVideosVolume(videosVolume, muted);
 };
 
-export const startToPlayAllAudiosWithPlayOnLoad = (audioInstances: HowlInstances, page: number) => {
+type PageAudioAutoplay = {
+  page: number;
+  allowStart?: (instance: NonNullable<HowlInstances[string]>) => boolean;
+};
+
+export const startToPlayAllAudiosWithPlayOnLoad = (
+  audioInstances: HowlInstances,
+  { page, allowStart = () => true }: PageAudioAutoplay,
+) => {
   Object.values(audioInstances).forEach((audioCur) => {
     if (!audioCur) {
       return;
@@ -33,50 +33,10 @@ export const startToPlayAllAudiosWithPlayOnLoad = (audioInstances: HowlInstances
       return;
     }
 
-    if (audioCur.playing()) {
-      return;
-    }
-
-    if (!audioCur.playOnLoad) {
+    if (!audioCur.playOnLoad || !allowStart(audioCur) || audioCur.playing()) {
       return;
     }
 
     audioCur.play();
-  });
-};
-
-export const startToPlayAllVideosWithPlayOnLoad = () => {
-  const videos = Array.from(document.querySelectorAll('video'));
-
-  videos.forEach((videoCur) => {
-    const videoIsManaged = videoCur.dataset.videoManaged === 'true';
-
-    const hasLocalOwner = videoIsManaged || videoCur.closest(locallyManagedVideoSelector);
-
-    if (hasLocalOwner) {
-      return;
-    }
-
-    const autoPlay = videoCur.getAttribute('data-autoPlay');
-
-    if (autoPlay === 'true') {
-      const source = videoCur.getAttribute('src');
-
-      videoCur.play().then(() => {
-        const { isConnected, sourceIsEqual } = getVideoStats(videoCur, source);
-
-        if (!isConnected && sourceIsEqual) {
-          videoCur.pause();
-        }
-      }).catch((error: unknown) => {
-        const { isConnected, sourceIsEqual } = getVideoStats(videoCur, source);
-
-        if (isConnected && sourceIsEqual) {
-          handleVideoPlayError(videoCur, error);
-        } else {
-          reportUnexpectedVideoError(source, error);
-        }
-      });
-    }
   });
 };

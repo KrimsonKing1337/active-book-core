@@ -1,0 +1,40 @@
+import { useCallback } from 'react';
+
+import { useStore } from '@store';
+import { mainActions, mainSelectors } from '@store/main';
+
+import { useAppMode } from '@components/App/AppModeContext';
+
+export const useReaderNavigation = () => {
+  const store = useStore();
+  const appMode = useAppMode();
+
+  const goToPage = useCallback((page: string | number | null) => {
+    if (appMode === 'editor' || mainSelectors.isPagePresented(store.getState())) {
+      store.dispatch(mainActions.setPage(page));
+    }
+  }, [appMode, store]);
+
+  const goPrevPage = useCallback(() => {
+    const page = mainSelectors.page(store.getState());
+
+    if (page > 0) {
+      goToPage(page - 1);
+    }
+  }, [goToPage, store]);
+
+  const goNextPage = useCallback(() => {
+    const state = store.getState();
+    const page = mainSelectors.page(state);
+
+    if (page < mainSelectors.pages(state)) {
+      goToPage(page + 1);
+    }
+  }, [goToPage, store]);
+
+  return {
+    goToPage,
+    goPrevPage,
+    goNextPage,
+  };
+};
