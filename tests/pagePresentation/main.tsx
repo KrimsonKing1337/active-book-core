@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 
 import type { VisualEffectRegistration } from '@active-book/types';
 
-import { AppWrapper, Audio, DotLottieReact, Img, Video } from '@components';
+import { AppWrapper, DotLottieReact, Img, Video } from '@components';
 import { StoreProvider, store } from '@store';
 import { mainActions } from '@store/main';
 import { initialState as defaultConfig } from '@store/config/slice';
@@ -45,6 +45,17 @@ const mark = (event: string) => {
   timeline.push({ event, time: performance.now() });
 };
 
+let observedAudio: object | undefined;
+
+store.subscribe(() => {
+  const audio = store.getState().audioEffects.audioInstances['page-audio'];
+
+  if (audio && audio !== observedAudio) {
+    observedAudio = audio;
+    audio.howlInst.on('play', () => mark('audio'));
+  }
+});
+
 const AsyncPrimary = () => {
   use(primary);
 
@@ -61,15 +72,6 @@ const AsyncPrimary = () => {
         src="/tests/unifiedVisualEffects/movie.webm?presentation"
         loop
         onPlay={() => mark('video')}
-      />
-      <Audio
-        id="page-audio"
-        page={1}
-        src="/tests/audioLifecycle/tone.wav?presentation"
-        playOnLoad
-        loop
-        fadeOutWhenUnload={false}
-        onPlay={() => mark('audio')}
       />
     </>
   );
@@ -105,6 +107,13 @@ createRoot(document.getElementById('root')!).render(
         config={{ id: 'presentation-test', pages: 2, defaultTheme: 'dark' }}
         tableOfContents={[]}
         registrations={registrations}
+        audioDescriptions={[{
+          id: 'page-audio',
+          src: '/tests/audioLifecycle/tone.wav?presentation',
+          lifetime: { type: 'page', page: 1 },
+          playOnLoad: true,
+          loop: true,
+        }]}
         definitions={[{ id: 'test.animation', defaultParams: {}, Renderer: RenderEffect }]}
         editorTools={<button type="button" onClick={() => mark('global')}>Global action</button>}
       />

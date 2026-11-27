@@ -147,3 +147,54 @@ test('restoration retains the first presentation deadline and never submits anot
   expect(stop).toHaveBeenCalledWith(true);
   expect(request).toHaveBeenCalledTimes(1);
 });
+
+test.each(['pause', 'stop'] as const)('%s cancels the delayed start while preserving stopBy', async (command) => {
+  store.dispatch(mainActions.setIsAudioUnlocked(false));
+  owner.configure([
+    range('effect', {
+      playOnLoad: true,
+      delay: 100,
+      stopBy: 300,
+    }),
+  ], true);
+  const audio = get('effect');
+  const request = jest.spyOn(audio, 'requestPlayback');
+  present();
+  await audio[command]();
+  await advance(150);
+  store.dispatch(mainActions.setIsAudioUnlocked(true));
+  expect(request).not.toHaveBeenCalled();
+
+  await audio.play();
+  await advance(150);
+  expect(audio.playing()).toBe(false);
+  await audio.play();
+  await advance(300);
+  expect(audio.playing()).toBe(true);
+});
+
+test('a manual play before delay consumes the pending automatic start', async () => {
+  owner.configure([range('effect', { playOnLoad: true, delay: 100 })], true);
+  const audio = get('effect');
+  const request = jest.spyOn(audio, 'requestPlayback');
+  present();
+  await audio.play();
+  await advance(200);
+  expect(request).not.toHaveBeenCalled();
+});
+
+test('an interrupted transport request cannot revive on a queued unlock or play event', async () => {
+  const play = jest.spyOn(Howl.prototype, 'play').mockReturnValueOnce(42);
+  owner.configure([range('effect', { playOnLoad: true })], true);
+  const audio = get('effect');
+  const completed = jest.fn();
+  audio.onPlay = completed;
+  present();
+  emit(audio.howlInst, { name: 'play', id: 42 });
+  await audio.pause();
+  await trigger(audio.howlInst, 'unlock');
+  expect(completed).not.toHaveBeenCalled();
+  expect(play).toHaveBeenCalledTimes(1);
+  await audio.play();
+  expect(play).toHaveBeenCalledTimes(2);
+});

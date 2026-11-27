@@ -43,15 +43,10 @@ export class AudioActivation {
       screamer,
     } = description;
 
-    const onUnload = () => {
-      options.remove(this);
-      this.description.onUnload?.();
-    };
-
     this.audio = new HowlWrapper({
       id,
       src: [src],
-      format,
+      format: [...format],
       loop,
       type,
       relativeVolume,
@@ -59,10 +54,8 @@ export class AudioActivation {
 
       beforePlay: () => this.timeline.beforeManualPlay(),
       canPlay: () => options.isActive(this),
-      onPlay: () => this.description.onPlay?.(),
-      onPause: () => this.description.onPause?.(),
-      onStop: () => this.description.onStop?.(),
-      onUnload,
+      beforeHalt: () => this.timeline.cancelAutoplay(),
+      onUnload: () => options.remove(this),
     });
 
     this.resource = new AudioResource(this.audio, () => this.timeline.update());

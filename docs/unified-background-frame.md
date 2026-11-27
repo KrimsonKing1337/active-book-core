@@ -36,7 +36,7 @@ Background, Frame, useBackground and useFrameEffect are small declaration
 adapters over the common session. They are the temporary connection for the
 current editor and compiled reader, not a second lifetime system. With no explicit
 lifetime, a mounted declaration follows the current author page; an explicit
-VisualEffectLifetime is available for fixed page and persistent range declarations.
+EffectLifetime is available for fixed page and persistent range declarations.
 
 ```tsx
 <Frame
@@ -89,7 +89,7 @@ media source may replace that implementation/resource as needed.
 
 ## Lifetime and resources
 
-VisualEffectLifetime is the sole activation rule. React keys use registration
+EffectLifetime is the sole activation rule. React keys use registration
 identity/generation, never the current page. A direct jump between any two active
 pages, including disjoint intervals, retains the component, its state, image/video
 DOM and CSS Animation object. Geometry gaps hide the surface without deleting

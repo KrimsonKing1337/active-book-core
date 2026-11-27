@@ -30,6 +30,13 @@ const slice = createSlice({
         return;
       }
 
+      const hasPrevious = Object.prototype.hasOwnProperty.call(state.audioInstances, instance.id);
+      const previous = hasPrevious && state.audioInstances[instance.id];
+
+      if (previous && previous !== instance) {
+        throw new Error(`Audio ID "${instance.id}" is already registered`);
+      }
+
       state.audioInstances[instance.id] = instance;
     },
 

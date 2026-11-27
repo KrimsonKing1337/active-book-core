@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 
-import type { VisualEffectLifetime } from '@active-book/types';
+import type { EffectLifetime } from '@active-book/types';
 
 import {
   type BuiltinDeclaration,
@@ -12,7 +12,7 @@ import {
 
 import type { FrameEffect } from './@types';
 
-export const useFrameEffect = (effect: FrameEffect | null, lifetime?: VisualEffectLifetime) => {
+export const useFrameEffect = (effect: FrameEffect | null, lifetime?: EffectLifetime) => {
   const session = useContext(VisualEffectsContext);
   const pageLifetime = usePageLifetime(session);
 

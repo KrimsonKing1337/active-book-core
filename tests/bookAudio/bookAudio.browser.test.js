@@ -167,3 +167,26 @@ test('waitTillTheEnd restores the loop on re-entry and finishes the current iter
     playing: false,
   });
 });
+
+test('manual pause cancels the delayed automatic start and reentry preserves a manual stop fade', async (context) => {
+  const page = await openBook(context, 'commands');
+  const result = await page.evaluate(async () => {
+    const { until, wait } = await import('/tests/audioLifecycle/fadeFixture.js');
+    const book = window.bookAudio;
+    const audio = book.get('range');
+    await audio.pause();
+    await wait(1100);
+    const automaticStarts = book.plays.length;
+    await audio.play();
+    await until(() => book.plays.length === 1 && audio.playing());
+
+    const stopping = audio.stop(true);
+    book.navigate(4);
+    book.navigate(1);
+    const preserved = book.get('range') === audio;
+    await stopping;
+
+    return { automaticStarts, preserved, stopped: !audio.playing(), starts: book.plays.length };
+  });
+  assert.deepEqual(result, { automaticStarts: 0, preserved: true, stopped: true, starts: 1 });
+});

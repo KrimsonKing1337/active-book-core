@@ -17,6 +17,10 @@ export class RetiringAudio {
     return this.retiring.keys();
   }
 
+  track(activation: AudioActivation) {
+    this.retiring.set(activation, {});
+  }
+
   waitForEnd(activation: AudioActivation) {
     const waiting = activation.audio.finishCurrentPlayback();
 
@@ -29,11 +33,14 @@ export class RetiringAudio {
   }
 
   fadeOut(activations: readonly AudioActivation[]) {
-    if (!activations.length) {
+    const pending = activations.filter((activation) => this.has(activation));
+
+    if (!pending.length) {
       return;
     }
 
     this.generation += 1;
+    const nextGeneration = this.generation;
 
     for (const [activationCur, retirementCur] of this.retiring) {
       const { generation } = retirementCur;
@@ -42,17 +49,21 @@ export class RetiringAudio {
         continue;
       }
 
-      if (generation < this.generation - 1) {
+      if (generation < nextGeneration - 1) {
         this.dispose(activationCur);
-      } else {
+      } else if (!activationCur.audio.isHalting) {
         void activationCur.audio.shortenFadeOut(SHORT_FADE_MS);
       }
     }
 
-    for (const activationCur of activations) {
+    for (const activationCur of pending) {
+      if (!this.has(activationCur)) {
+        continue;
+      }
+
       this.remove(activationCur);
 
-      const retirement = { generation: this.generation };
+      const retirement = { generation: nextGeneration };
       this.retiring.set(activationCur, retirement);
 
       const { audio } = activationCur;
@@ -96,7 +107,7 @@ export class RetiringAudio {
 
         return false;
       }
-    } else {
+    } else if (!audio.isHalting) {
       void audio.restoreFadeIn();
     }
 

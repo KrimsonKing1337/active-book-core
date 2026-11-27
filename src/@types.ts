@@ -1,3 +1,5 @@
+import type { AudioCategory } from '@active-book/types';
+
 import type { ItemProps as TableOfContentsItem } from '@components/TableOfContents/Item';
 
 import type { HowlWrapper } from '@utils/effects/audio/HowlWrapper';
@@ -10,7 +12,7 @@ export type Interval = ReturnType<typeof setInterval> | null;
 export type HowlInst = HowlWrapper | null;
 export type HowlInstances = Record<string, HowlInst>;
 
-export type AudioType = 'bg' | 'music' | 'sfx';
+export type AudioType = AudioCategory;
 export type AudioLifecycle = 'auto' | 'manual';
 
 export type AudioEffectOptions = {
@@ -22,7 +24,6 @@ export type AudioEffectOptions = {
   fadeOutWhenUnload?: boolean;
   type?: AudioType;
   loop?: boolean;
-  playOnLoad?: boolean;
   stopBy?: number;
   delay?: number;
   relativeVolume?: number;

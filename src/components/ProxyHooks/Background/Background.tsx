@@ -1,10 +1,10 @@
-import type { VisualEffectLifetime } from '@active-book/types';
+import type { EffectLifetime } from '@active-book/types';
 
 import type { BackgroundEffect } from '@hooks/effects/background/@types';
 import { useBackground } from '@hooks/effects/background';
 
 export type BackgroundProps = BackgroundEffect & {
-  lifetime?: VisualEffectLifetime;
+  lifetime?: EffectLifetime;
 };
 
 export const Background = ({

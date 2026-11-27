@@ -1,6 +1,6 @@
-import type { VisualEffectLifetime } from '@active-book/types';
+import type { EffectLifetime } from '@active-book/types';
 
-export const isEffectActive = (lifetime: VisualEffectLifetime, page: number): boolean => {
+export const isEffectActive = (lifetime: EffectLifetime, page: number): boolean => {
   if (lifetime.type === 'page') {
     return lifetime.page === page;
   }

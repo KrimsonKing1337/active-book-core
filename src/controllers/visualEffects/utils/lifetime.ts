@@ -1,8 +1,8 @@
-import type { VisualEffectLifetime } from '@active-book/types';
+import type { EffectLifetime } from '@active-book/types';
 
 export { isEffectActive as isVisualEffectActive } from '@utils/effects/lifetime';
 
-export const validateVisualLifetime = (lifetime: VisualEffectLifetime, pages: number): void => {
+export const validateVisualLifetime = (lifetime: EffectLifetime, pages: number): void => {
   const validatePage = (page: number) => {
     if (!Number.isInteger(page) || page < 1 || page > pages) {
       throw new Error(`Visual effect page must be an integer between 1 and ${pages}: ${page}`);

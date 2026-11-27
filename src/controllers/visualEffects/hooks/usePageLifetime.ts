@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from 'react';
 
-import type { VisualEffectLifetime } from '@active-book/types';
+import type { EffectLifetime } from '@active-book/types';
 
 import { useSelector } from '@store';
 import { mainSelectors } from '@store/main';
@@ -11,7 +11,7 @@ const subscribeEmpty = () => () => {};
 const readNoPages = () => 0;
 
 /** Navigation and editor structure can commit separately; never declare a transient invalid page. */
-export const usePageLifetime = (session: VisualEffects | null): VisualEffectLifetime | null => {
+export const usePageLifetime = (session: VisualEffects | null): EffectLifetime | null => {
   const pageSubscribe = session?.subscribe ?? subscribeEmpty;
   const pageCount = session?.getPageCount ?? readNoPages;
 

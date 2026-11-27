@@ -138,3 +138,43 @@ test('closes active loading, fading and waiting voices together and releases the
   }
   expect(jest.getTimerCount()).toBe(0);
 });
+
+test.each(['pause', 'stop'] as const)('quick reentry preserves an author %s fade', async (command) => {
+  owner.configure([onPage('effect', 1)], true);
+  const audio = get('effect');
+  const restore = jest.spyOn(audio, 'restoreFadeIn');
+  await audio.play();
+  const halted = audio[command](true);
+  navigate(2);
+  navigate(1);
+  expect(get('effect')).toBe(audio);
+  expect(restore).not.toHaveBeenCalled();
+  await advance(1001);
+  await halted;
+  expect(audio.playing()).toBe(false);
+  expect(audio.isUnloading).toBe(false);
+  await audio.play();
+  expect(audio.playing()).toBe(true);
+});
+
+test('close from onUnload also releases staged fades and prevents entering the destination', async () => {
+  owner.configure([
+    onPage('fading', 1),
+    onPage('silent', 1),
+    onPage('incoming', 2),
+  ], true);
+  const fading = get('fading');
+  const silent = get('silent');
+  const handleUnload = silent.onUnload;
+  silent.onUnload = () => {
+    handleUnload();
+    owner.close();
+  };
+  await fading.play();
+  navigate(2);
+  expect(fading.isUnloading).toBe(true);
+  expect(silent.isUnloading).toBe(true);
+  expect(store.getState().audioEffects.audioInstances).toEqual({});
+  await advance(2000);
+  expect(fading.playing()).toBe(false);
+});

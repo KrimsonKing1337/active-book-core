@@ -1,45 +1,74 @@
-import type { VisualEffectLifetime } from '@active-book/types';
+import type {
+  AudioEffect,
+  EffectLifetime,
+  PageRange,
+} from '@active-book/types';
 
-import type { AudioEffectOptions } from '@types';
+type RuntimeAudio = AudioEffect<number>;
 
-type AudioDescriptionExcludedKeys = 'page' | 'lifecycle' | 'fadeOutWhenUnload';
+export type AudioDescription = Required<RuntimeAudio>;
 
-export type AudioDescription = Omit<AudioEffectOptions, AudioDescriptionExcludedKeys> & {
-  lifetime: VisualEffectLifetime;
-  fadeIn?: boolean;
-  fadeOut?: boolean;
-  waitTillTheEnd?: boolean;
-};
-
-export type PageAudioDescription = AudioDescription & {
-  pageId?: string | null;
-};
-
-export const describeAudio = (description: PageAudioDescription) => {
-  const { lifetime } = description;
-
-  let pages: number | number[][];
-
+const normalizeLifetime = (lifetime: EffectLifetime): EffectLifetime => {
   if (lifetime.type === 'page') {
-    pages = lifetime.page;
-  } else {
-    pages = lifetime.range.map(({ from, to }) => [from, to]);
+    return lifetime;
   }
 
-  return JSON.stringify([
-    description.id,
-    description.pageId,
-    pages,
-    description.src,
-    description.format,
-    description.type ?? 'sfx',
-    description.loop ?? false,
-    description.screamer ?? false,
-    description.playOnLoad ?? false,
-    description.delay ?? 0,
-    description.stopBy ?? 0,
-    description.fadeIn ?? false,
-    description.fadeOut ?? false,
-    description.waitTillTheEnd ?? false,
-  ]);
+  const sorted = [...lifetime.range].sort((first, second) => first.from - second.from);
+  const merged: PageRange[] = [];
+
+  for (const current of sorted) {
+    const previous = merged.at(-1);
+
+    if (previous && current.from <= previous.to + 1) {
+      previous.to = Math.max(previous.to, current.to);
+    } else {
+      merged.push({ ...current });
+    }
+  }
+
+  const [onlyRange] = merged;
+
+  if (merged.length === 1 && onlyRange.from === onlyRange.to) {
+    return { type: 'page', page: onlyRange.from };
+  }
+
+  return { type: 'range', range: merged };
+};
+
+export const normalizeAudioDescription = ({
+  id,
+  src,
+  lifetime,
+  format = [],
+  type = 'sfx',
+  relativeVolume = 100,
+  loop = false,
+  screamer = false,
+  playOnLoad = false,
+  delay = 0,
+  stopBy = 0,
+  fadeIn = false,
+  fadeOut = false,
+  waitTillTheEnd = false,
+}: RuntimeAudio): AudioDescription => {
+  return {
+    id,
+    src,
+    lifetime: normalizeLifetime(lifetime),
+    format,
+    type,
+    relativeVolume,
+    loop,
+    screamer,
+    playOnLoad,
+    delay,
+    stopBy,
+    fadeIn,
+    fadeOut,
+    waitTillTheEnd,
+  };
+};
+
+export const describeAudio = ({ relativeVolume: _relativeVolume, ...identity }: AudioDescription) => {
+  return JSON.stringify(identity);
 };
