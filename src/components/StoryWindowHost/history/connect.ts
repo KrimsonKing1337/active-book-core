@@ -21,7 +21,8 @@ export const connectWindowHistory = ({ store, sessionId }: HistoryConnection) =>
   let isHandlingPop = false;
 
   const getActiveWindow = () => {
-    const { main, windows } = store.getState();
+    const state = store.getState();
+    const { main, windows } = state;
 
     if (windows.sessionId !== sessionId || windows.pageId !== main.pageId) {
       return null;

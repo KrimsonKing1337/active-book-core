@@ -17,7 +17,9 @@ export const useAudioController = (id: string) => {
   const audio = audioInstances[id] ?? null;
 
   const getAudio = useCallback(() => {
-    return store.getState().audioEffects.audioInstances[id];
+    const state = store.getState();
+
+    return state.audioEffects.audioInstances[id];
   }, [id]);
 
   const play = useCallback((withFadeIn = false) => {

@@ -20,7 +20,8 @@ import { selectors } from './selectors';
 
 
 const setAudioVolumeByType = (type: AudioType, volume: number) => {
-  const { audioInstances } = store.getState().audioEffects;
+  const state = store.getState();
+  const { audioInstances } = state.audioEffects;
 
   Object.values(audioInstances).forEach((audioInstanceCur) => {
     if (!audioInstanceCur) {

@@ -49,7 +49,8 @@ export class BookAudio {
     }
 
     const ids = new Set<string>();
-    const { audioInstances } = store.getState().audioEffects;
+    const state = store.getState();
+    const { audioInstances } = state.audioEffects;
 
     for (const descriptionCur of descriptions) {
       const { id, src } = descriptionCur;
@@ -175,7 +176,8 @@ export class BookAudio {
   }
 
   private isCurrentVisit(visitId: number) {
-    const { bookSessionId, visit } = store.getState().main;
+    const state = store.getState();
+    const { bookSessionId, visit } = state.main;
 
     return !!this.unsubscribe && bookSessionId === this.sessionId && visit?.id === visitId;
   }
@@ -263,7 +265,8 @@ export class BookAudio {
   private enter(entry: DesiredAudio, visitId: number) {
     const { description, identity } = entry;
 
-    const existing = store.getState().audioEffects.audioInstances[description.id];
+    const state = store.getState();
+    const existing = state.audioEffects.audioInstances[description.id];
 
     if (existing) {
       throw new Error(`Audio ID "${description.id}" is already registered`);
@@ -325,7 +328,8 @@ export class BookAudio {
 
   private canAutoplay = (activation: AudioActivation) => {
     const isActive = this.isActive(activation);
-    const { isAudioUnlocked } = store.getState().main;
+    const state = store.getState();
+    const { isAudioUnlocked } = state.main;
 
     return isActive && this.isAutoplayEnabled && isAudioUnlocked;
   };
@@ -399,7 +403,10 @@ export class BookAudio {
     const { id } = activation.audio;
 
     if (this.active.get(id) === activation) {
-      this.resetRemovals(store.getState().main.visit?.id);
+      const state = store.getState();
+      const visitId = state.main.visit?.id;
+
+      this.resetRemovals(visitId);
       this.removed.set(id, activation.identity);
       this.dispose(activation);
     }

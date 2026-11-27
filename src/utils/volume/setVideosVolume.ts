@@ -4,7 +4,8 @@ import { getMediaVolume } from '@utils/volume/getMediaVolume';
 
 export const setVideosVolume = (volume: number, muted = document.hidden) => {
   const videos = document.querySelectorAll('video');
-  const globalVolume = store.getState().volume.global / 100;
+  const state = store.getState();
+  const globalVolume = state.volume.global / 100;
   let categoryVolume = volume / 100;
 
   if (muted) {

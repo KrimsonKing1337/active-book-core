@@ -79,7 +79,10 @@ export const StoryContent = ({ children }: PropsWithChildren) => {
       };
     }
 
-    if (mainSelectors.presentedAt(store.getState()) === null) {
+    const state = store.getState();
+    const presentedAt = mainSelectors.presentedAt(state);
+
+    if (presentedAt === null) {
       dispatch(mainActions.presentPage({ visitId, time: performance.now() }));
     }
   }, [

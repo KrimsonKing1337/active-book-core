@@ -17,7 +17,8 @@ export const usePageVisit = () => {
   const store = useContext(storeContext)?.store;
 
   const getSnapshot = useCallback(() => {
-    const main = store?.getState().main;
+    const state = store?.getState();
+    const main = state?.main;
 
     if (!bookSessionId || !main) {
       return null;
@@ -64,7 +65,8 @@ export const useCanStartPageEffects = () => {
       return false;
     }
 
-    const { bookSessionId, visit } = store.getState().main;
+    const state = store.getState();
+    const { bookSessionId, visit } = state.main;
 
     if (!visit) {
       return false;

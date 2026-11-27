@@ -17,12 +17,14 @@ import type { RemoveAudioInstancePayload } from './@types';
 type AudioInstance = RemoveAudioInstancePayload['instance'];
 
 const unloadRemovedAudio = async (instance: AudioInstance) => {
-  let previousVolume = store.getState().volume;
+  const initialState = store.getState();
+  let previousVolume = initialState.volume;
 
   const unsubscribe = store.subscribe(() => {
     const { type } = instance;
 
-    const currentVolume = store.getState().volume;
+    const state = store.getState();
+    const currentVolume = state.volume;
 
     if (previousVolume.global !== currentVolume.global || previousVolume[type] !== currentVolume[type]) {
       instance.volume(currentVolume[type] / 100);

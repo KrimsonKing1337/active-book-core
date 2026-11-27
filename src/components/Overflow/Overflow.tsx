@@ -67,7 +67,8 @@ export const Overflow = ({
     overflowRef.current?.focus();
 
     return () => {
-      const { windows } = store.getState();
+      const state = store.getState();
+      const { windows } = state;
 
       if (windows.sessionId !== sessionId || windows.activeWindow) {
         return;

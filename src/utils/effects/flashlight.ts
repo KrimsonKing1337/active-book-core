@@ -6,7 +6,9 @@ export class Flashlight {
   public isInited: boolean;
 
   static getIsFlashlightAvailable() {
-    return store.getState().main.isFlashlightAvailable;
+    const state = store.getState();
+
+    return state.main.isFlashlightAvailable;
   }
 
   static getIsTorchSupported(capabilities: any) {

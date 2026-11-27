@@ -20,7 +20,8 @@ export const registerPageResource = (
   registration: ResourceRegistration,
 ) => {
   const { visitId, prepare } = registration;
-  const { visit } = store.getState().main;
+  const state = store.getState();
+  const { visit } = state.main;
 
   if (!visit || visit.id !== visitId) {
     return;

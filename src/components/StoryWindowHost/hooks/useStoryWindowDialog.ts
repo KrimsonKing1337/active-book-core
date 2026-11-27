@@ -64,7 +64,9 @@ export const useStoryWindowDialog = (target: WindowTarget | undefined) => {
       return false;
     }
 
-    return matchesWindowTarget(store.getState(), { sessionId: targetSessionId, instanceId });
+    const state = store.getState();
+
+    return matchesWindowTarget(state, { sessionId: targetSessionId, instanceId });
   }, [
     targetSessionId,
     instanceId,
@@ -78,7 +80,8 @@ export const useStoryWindowDialog = (target: WindowTarget | undefined) => {
   };
 
   const handleCloseAutoFocus = (e: Event) => {
-    const { windows } = store.getState();
+    const state = store.getState();
+    const { windows } = state;
 
     if (windows.sessionId !== sessionId || windows.activeWindow) {
       e.preventDefault();

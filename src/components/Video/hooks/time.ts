@@ -47,7 +47,9 @@ export const useVideoTime = (ref: VideoRef, options: VideoTimeOptions) => {
       let savedTime = 0;
 
       if (!previous && preserveTime) {
-        savedTime = store.getState().effects.videosCurrentTime[id] ?? 0;
+        const state = store.getState();
+
+        savedTime = state.effects.videosCurrentTime[id] ?? 0;
       }
 
       if (previous) {
