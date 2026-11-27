@@ -1,8 +1,6 @@
-import {
-  type HowlOptions,
-  Howl,
-  Howler,
-} from 'howler';
+import type { HowlOptions } from 'howler';
+
+import { Howl, Howler } from 'howler';
 
 import type { AudioType } from '@types';
 
@@ -393,9 +391,9 @@ export class HowlWrapper {
     const handlePlay = () => {
       cancelError();
 
-      const accepted = options.acceptStart?.() ?? true;
+      const isStartAccepted = options.acceptStart?.() ?? true;
 
-      if (!accepted) {
+      if (!isStartAccepted) {
         this.howlInst.stop(soundId);
         options.complete();
 
@@ -421,7 +419,7 @@ export class HowlWrapper {
       callback: handlePlay,
     });
 
-    const cancelErrorCallback = () => {
+    const handlePlayError = () => {
       cancelPlay();
 
       this.fades.removeVoice(soundId);
@@ -433,7 +431,7 @@ export class HowlWrapper {
     const cancelError = this.listenOnce({
       event: 'playerror',
       id: soundId,
-      callback: cancelErrorCallback,
+      callback: handlePlayError,
     });
 
     return () => {

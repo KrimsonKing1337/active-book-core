@@ -14,9 +14,9 @@ import { selectors } from './selectors';
 
 import type { RemoveAudioInstancePayload } from './@types';
 
-type Instance = RemoveAudioInstancePayload['instance'];
+type AudioInstance = RemoveAudioInstancePayload['instance'];
 
-const unloadRemovedAudio = async (instance: Instance) => {
+const unloadRemovedAudio = async (instance: AudioInstance) => {
   let previousVolume = store.getState().volume;
 
   const unsubscribe = store.subscribe(() => {

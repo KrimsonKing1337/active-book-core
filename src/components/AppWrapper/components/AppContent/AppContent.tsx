@@ -1,5 +1,6 @@
+import type { PropsWithChildren } from 'react';
+
 import {
-  type PropsWithChildren,
   useEffect,
   useLayoutEffect,
   useRef,

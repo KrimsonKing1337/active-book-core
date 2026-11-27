@@ -22,7 +22,7 @@ export class AudioTimeline {
   private isAutoplayPending: boolean;
   private hasStoppedAutomatically = false;
   private unlockCount = 0;
-  private attemptedAtUnlock = -1;
+  private lastAttemptUnlockCount = -1;
 
   constructor(private readonly options: TimelineOptions) {
     this.isAutoplayPending = options.description.playOnLoad ?? false;
@@ -116,7 +116,7 @@ export class AudioTimeline {
   }
 
   private tryAutoplay() {
-    if (this.attempt || this.attemptedAtUnlock === this.unlockCount) {
+    if (this.attempt || this.lastAttemptUnlockCount === this.unlockCount) {
       return;
     }
 
@@ -135,7 +135,7 @@ export class AudioTimeline {
     const attempt: PlaybackAttempt = {};
 
     this.attempt = attempt;
-    this.attemptedAtUnlock = this.unlockCount;
+    this.lastAttemptUnlockCount = this.unlockCount;
 
     attempt.cancel = audio.requestPlayback({
       withFadeIn: description.fadeIn ?? false,
@@ -157,7 +157,7 @@ export class AudioTimeline {
 
         this.attempt = null;
 
-        if (this.attemptedAtUnlock !== this.unlockCount) {
+        if (this.lastAttemptUnlockCount !== this.unlockCount) {
           this.update();
         }
       },
@@ -178,10 +178,11 @@ export class AudioTimeline {
   }
 
   destroy() {
-    clearTimeout(this.timer);
-
     this.cancelAutoplay();
     this.startedAt = null;
+
+    clearTimeout(this.timer);
+
     this.options.audio.howlInst.off('unlock', this.handleUnlock);
   }
 }

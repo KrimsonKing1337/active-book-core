@@ -3,9 +3,8 @@ import type { VisualEffectLifetime } from '@active-book/types';
 import type { AudioEffectOptions } from '@types';
 
 type AudioDescriptionExcludedKeys = 'page' | 'lifecycle' | 'fadeOutWhenUnload';
-type AudioDescriptionOmitted = Omit<AudioEffectOptions, AudioDescriptionExcludedKeys>;
 
-export type AudioDescription = AudioDescriptionOmitted & {
+export type AudioDescription = Omit<AudioEffectOptions, AudioDescriptionExcludedKeys> & {
   lifetime: VisualEffectLifetime;
   fadeIn?: boolean;
   fadeOut?: boolean;

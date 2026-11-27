@@ -8,7 +8,7 @@ import { mainActions } from '@store/main';
 export type SettlePageResource = (outcome?: PageResourceOutcome) => void;
 export type PreparePageResource = (settle: SettlePageResource) => void | (() => void);
 
-type PageResourceStore  = Pick<typeof appStore, 'getState' | 'dispatch'>;
+type PageResourceStore = Pick<typeof appStore, 'getState' | 'dispatch'>;
 
 type ResourceRegistration = {
   visitId: number | undefined;
@@ -17,7 +17,8 @@ type ResourceRegistration = {
 
 export const registerPageResource = (
   store: PageResourceStore,
-  registration: ResourceRegistration) => {
+  registration: ResourceRegistration,
+) => {
   const { visitId, prepare } = registration;
   const { visit } = store.getState().main;
 

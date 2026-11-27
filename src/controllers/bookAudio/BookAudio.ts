@@ -1,5 +1,7 @@
+import type { RootState } from '@store';
 import type { PageVisit, State as MainState } from '@store/main/@types';
-import { type RootState, store } from '@store';
+
+import { store } from '@store';
 
 import { mainSelectors } from '@store/main';
 import { audioEffectsActions } from '@store/effects/audio/audio';
@@ -31,7 +33,7 @@ export class BookAudio {
   private readonly retiring = new RetiringAudio((activation) => this.dispose(activation));
   private readonly removed = new Map<string, string>();
   private unsubscribe?: () => void;
-  private main?: MainState;
+  private lastSyncedMain?: MainState;
   private isAutoplayEnabled = false;
   private isSyncing = false;
   private needsSync = false;
@@ -90,16 +92,28 @@ export class BookAudio {
     this.updateRetiringVolume(state.volume);
 
     const { main } = state;
-    const previous = this.main;
+    const previousMain = this.lastSyncedMain;
 
-    const changed =
-      main.bookSessionId !== previous?.bookSessionId
-      || main.pageIds !== previous.pageIds
-      || main.visit?.id !== previous.visit?.id
-      || main.visit?.presentedAt !== previous.visit?.presentedAt
-      || main.isAudioUnlocked !== previous.isAudioUnlocked;
+    if (!previousMain) {
+      this.sync();
 
-    if (changed) {
+      return;
+    }
+
+    const hasSessionChanged = main.bookSessionId !== previousMain.bookSessionId;
+    const hasPagesChanged = main.pageIds !== previousMain.pageIds;
+    const hasVisitChanged = main.visit?.id !== previousMain.visit?.id;
+    const hasPresentationChanged = main.visit?.presentedAt !== previousMain.visit?.presentedAt;
+    const hasUnlockChanged = main.isAudioUnlocked !== previousMain.isAudioUnlocked;
+
+    const needsReconciliation =
+      hasSessionChanged
+      || hasPagesChanged
+      || hasVisitChanged
+      || hasPresentationChanged
+      || hasUnlockChanged;
+
+    if (needsReconciliation) {
       this.sync();
     }
   };
@@ -146,11 +160,11 @@ export class BookAudio {
           return;
         }
 
-        if (this.main?.visit?.id !== main.visit.id) {
+        if (this.lastSyncedMain?.visit?.id !== main.visit.id) {
           this.removed.clear();
         }
 
-        this.main = main;
+        this.lastSyncedMain = main;
 
         this.reconcile(main.visit, mainSelectors.page(state));
       }
@@ -160,11 +174,11 @@ export class BookAudio {
   }
 
   private reconcile(visit: PageVisit, page: number) {
-    const fading: AudioActivation[] = [];
-    const wanted = this.getDescriptions(visit, page);
+    const activationsToFade: AudioActivation[] = [];
+    const desiredDescriptions = this.getDescriptions(visit, page);
 
     for (const [idCur, activationCur] of this.active) {
-      const description = wanted.get(idCur);
+      const description = desiredDescriptions.get(idCur);
       const identity = description && describeAudio(description);
 
       if (description && identity === activationCur.identity) {
@@ -175,10 +189,10 @@ export class BookAudio {
 
       this.active.delete(idCur);
       this.unpublish(activationCur);
-      this.leave(activationCur, fading);
+      this.leave(activationCur, activationsToFade);
     }
 
-    for (const [idCur, descriptionCur] of wanted) {
+    for (const [idCur, descriptionCur] of desiredDescriptions) {
       const identity = describeAudio(descriptionCur);
       const wasRemoved = this.removed.get(idCur) === identity;
 
@@ -199,15 +213,15 @@ export class BookAudio {
       activation.timeline.update();
     }
 
-    this.retiring.fadeOut(fading);
+    this.retiring.fadeOut(activationsToFade);
   }
 
   private getDescriptions(visit: PageVisit, page: number) {
-    const wanted = new Map<string, AudioDescription>();
+    const desiredDescriptions = new Map<string, AudioDescription>();
 
     for (const descriptionCur of this.descriptions) {
       if (isEffectActive(descriptionCur.lifetime, page)) {
-        wanted.set(descriptionCur.id, descriptionCur);
+        desiredDescriptions.set(descriptionCur.id, descriptionCur);
       }
     }
 
@@ -215,12 +229,12 @@ export class BookAudio {
       const isCurrentVisit = visitId === visit.id;
       const isOnPage = isEffectActive(description.lifetime, page);
 
-      if (isCurrentVisit && isOnPage && !wanted.has(description.id)) {
-        wanted.set(description.id, description);
+      if (isCurrentVisit && isOnPage && !desiredDescriptions.has(description.id)) {
+        desiredDescriptions.set(description.id, description);
       }
     }
 
-    return wanted;
+    return desiredDescriptions;
   }
 
   private enter(description: AudioDescription, identity: string) {
@@ -288,7 +302,7 @@ export class BookAudio {
     store.dispatch(audioEffectsActions.unregisterAudioInstance({ id: audio.id, instance: audio }));
   }
 
-  private leave(activation: AudioActivation, fading: AudioActivation[]) {
+  private leave(activation: AudioActivation, activationsToFade: AudioActivation[]) {
     activation.leave();
 
     const {
@@ -302,7 +316,7 @@ export class BookAudio {
     } else if (description.waitTillTheEnd && !timeline.hasReachedStop) {
       this.retiring.waitForEnd(activation);
     } else if (description.fadeOut) {
-      fading.push(activation);
+      activationsToFade.push(activation);
     } else {
       this.dispose(activation);
     }
@@ -360,7 +374,7 @@ export class BookAudio {
     this.unsubscribe?.();
     this.unsubscribe = undefined;
 
-    this.main = undefined;
+    this.lastSyncedMain = undefined;
     this.removed.clear();
 
     for (const activationCur of this.active.values()) {

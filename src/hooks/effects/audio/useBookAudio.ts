@@ -27,9 +27,9 @@ export const useBookAudio = (options: AudioEffectOptions) => {
     fadeOutWhenUnload = true,
   } = options;
 
-  const latest = useRef(options);
+  const latestOptions = useRef(options);
 
-  const descriptionLifetime: PageAudioDescription['lifetime'] = {
+  const lifetime: PageAudioDescription['lifetime'] = {
     type: 'page',
     page,
   };
@@ -37,13 +37,13 @@ export const useBookAudio = (options: AudioEffectOptions) => {
   const description: PageAudioDescription = {
     ...options,
     pageId: visit?.pageId ?? null,
-    lifetime: descriptionLifetime,
+    lifetime,
     fadeOut: fadeOutWhenUnload,
 
-    onPlay: () => latest.current.onPlay?.(),
-    onPause: () => latest.current.onPause?.(),
-    onStop: () => latest.current.onStop?.(),
-    onUnload: () => latest.current.onUnload?.(),
+    onPlay: () => latestOptions.current.onPlay?.(),
+    onPause: () => latestOptions.current.onPause?.(),
+    onStop: () => latestOptions.current.onStop?.(),
+    onUnload: () => latestOptions.current.onUnload?.(),
   };
 
   const identity = describeAudio(description);
@@ -51,7 +51,7 @@ export const useBookAudio = (options: AudioEffectOptions) => {
   const latestDescription = useRef(description);
 
   useLayoutEffect(() => {
-    latest.current = options;
+    latestOptions.current = options;
     latestDescription.current = description;
   });
 
