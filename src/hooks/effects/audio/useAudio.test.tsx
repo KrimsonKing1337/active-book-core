@@ -16,8 +16,6 @@ import { mainActions } from '@store/main';
 import { audioEffectsActions } from '@store/effects/audio/audio';
 import { volumeActions } from '@store/volume';
 
-import { startToPlayAllAudiosWithPlayOnLoad } from '@components/AppWrapper/utils';
-
 import { HowlWrapper } from '@utils/effects/audio/HowlWrapper';
 
 import { useAudio } from './useAudio';
@@ -82,61 +80,6 @@ test.each<AudioType>([
   act(() => store.dispatch(mainActions.setPage(2)));
   expect(store.getState().audioEffects.audioInstances[current.id]).toBeUndefined();
   expect(current.isUnloading).toBe(true);
-});
-
-test('autoplay respects page, playing state, unloading and opt-in for simultaneous audio', () => {
-  const instances = [
-    new HowlWrapper({
-      id: 'background',
-      page: 1,
-      src: 'bg.wav',
-      type: 'bg',
-      playOnLoad: true,
-    }),
-    new HowlWrapper({
-      id: 'music',
-      page: 1,
-      src: 'music.wav',
-      type: 'music',
-      playOnLoad: true,
-    }),
-    new HowlWrapper({
-      id: 'manual',
-      page: 1,
-      src: 'manual.wav',
-    }),
-    new HowlWrapper({
-      id: 'other-page',
-      page: 2,
-      src: 'other.wav',
-      playOnLoad: true,
-    }),
-  ];
-  const play = instances.map((instance) => jest.spyOn(instance, 'play').mockResolvedValue());
-  const audioInstances = Object.fromEntries(instances.map((instance) => [instance.id, instance]));
-  const allowStart = jest.fn(() => true);
-
-  startToPlayAllAudiosWithPlayOnLoad(audioInstances, { page: 1, allowStart });
-  expect(allowStart.mock.calls).toEqual([
-    [instances[0]],
-    [instances[1]],
-  ]);
-  expect(play.map((mock) => mock.mock.calls.length)).toEqual([
-    1,
-    1,
-    0,
-    0,
-  ]);
-  instances[0].isUnloading = true;
-  jest.spyOn(instances[1], 'playing').mockReturnValue(true);
-  startToPlayAllAudiosWithPlayOnLoad(audioInstances, { page: 1 });
-  expect(play.map((mock) => mock.mock.calls.length)).toEqual([
-    1,
-    1,
-    0,
-    0,
-  ]);
-  instances.forEach((instance) => instance.howlInst.unload());
 });
 
 test('BookRuntime controller keeps manual ownership and controls the current instance after unmount', () => {

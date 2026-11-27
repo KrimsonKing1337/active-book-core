@@ -36,6 +36,7 @@ export const browserTests = [
   'visualPlacement/storyRegions.browser.test.js',
   'mediaContinuity/mediaContinuity.browser.test.js',
   'pagePresentation/pagePresentation.browser.test.js',
+  'bookAudio/bookAudio.browser.test.js',
   'visualPlayground/finalDemos.browser.test.js',
 ];
 

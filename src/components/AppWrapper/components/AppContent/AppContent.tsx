@@ -1,7 +1,6 @@
 import type { PropsWithChildren } from 'react';
 
 import {
-  useContext,
   useEffect,
   useLayoutEffect,
   useRef,
@@ -10,23 +9,16 @@ import {
 import classNames from 'classnames';
 import { ToastContainer } from 'react-toastify';
 
-import {
-  useDispatch,
-  useSelector,
-  useStore,
-} from '@store';
+import { useDispatch, useSelector } from '@store';
 
 import { mainActions, mainSelectors } from '@store/main';
-import { audioEffectsSelectors } from '@store/effects/audio/audio';
 import { effectsSelectors } from '@store/effects/common';
 
 import type { VisualEffects } from '@controllers/visualEffects';
 
 import { useVisualRegistrations } from '@controllers/visualEffects';
 
-import { canAutoplayAudio } from '@hooks/effects/audio/useAudio';
 import { useReaderNavigation } from '@hooks/control/useReaderNavigation';
-import { BookPresentationContext, usePageVisit } from '@hooks/pagePresentation/context';
 
 import { BookApplicationSurface, useBookApplicationSurface } from '@components/BookApplicationSurface';
 
@@ -39,8 +31,6 @@ import { removeCssHover } from '@utils/touch/removeCssHover';
 import { addKeyboardControl } from '@utils/control/keyboardControl';
 import { hideAddressBarInMobileDevices } from '@utils/mobile/hideAddressBarInMobileDevices';
 
-import type { HowlWrapper } from '@utils/effects/audio/HowlWrapper';
-
 import type { AppWrapperProps } from '../../@types';
 
 import {
@@ -50,8 +40,6 @@ import {
   useSetUpConfig,
   useVisibilityChangeHandler,
 } from '../../hooks';
-
-import { startToPlayAllAudiosWithPlayOnLoad } from '../../utils';
 
 import * as styles from '../../AppWrapper.module.scss';
 
@@ -76,11 +64,6 @@ export const AppContent = ({
 }: AppContentProps) => {
   const dispatch = useDispatch();
 
-  const store = useStore();
-
-  const bookSession = useContext(BookPresentationContext);
-
-  const visit = usePageVisit();
   const application = useBookApplicationSurface();
 
   const pageId = useSelector(mainSelectors.pageId);
@@ -136,13 +119,6 @@ export const AppContent = ({
   const showLoader = useSelector(mainSelectors.showLoader);
   const page = useSelector(mainSelectors.page);
   const inverseColors = useSelector(effectsSelectors.inverseColorIsActive);
-  const audioInstances = useSelector(audioEffectsSelectors.audioInstances);
-
-  const audioStarted = useRef(new WeakMap<object, number>());
-
-  const visitId = visit?.id;
-  const presentedAt = visit?.presentedAt;
-
   // применяю конфиг
   useSetUpConfig(config);
 
@@ -195,62 +171,6 @@ export const AppContent = ({
     appMode,
     canPlayAudio,
     dispatch,
-  ]);
-
-  useEffect(() => {
-    if (appMode !== 'reader' || !canPlayAudio) {
-      return;
-    }
-
-    if (visitId === undefined || presentedAt == null) {
-      return;
-    }
-
-    const currentVisitId = mainSelectors.visitId(store.getState());
-
-    if (currentVisitId !== visitId) {
-      return;
-    }
-
-    const allowStart = (instance: HowlWrapper) => {
-      if (!canAutoplayAudio(instance, bookSession)) {
-        return false;
-      }
-
-      const state = store.getState();
-      const isCurrentVisit = mainSelectors.visitId(state) === visitId;
-
-      if (!isCurrentVisit) {
-        return false;
-      }
-
-      const registeredInstance = state.audioEffects.audioInstances[instance.id];
-
-      if (registeredInstance !== instance) {
-        return false;
-      }
-
-      const hasAlreadyStarted = audioStarted.current.get(instance) === visitId;
-
-      if (hasAlreadyStarted) {
-        return false;
-      }
-
-      audioStarted.current.set(instance, visitId);
-
-      return true;
-    };
-
-    startToPlayAllAudiosWithPlayOnLoad(audioInstances, { page, allowStart });
-  }, [
-    appMode,
-    audioInstances,
-    bookSession,
-    canPlayAudio,
-    page,
-    presentedAt,
-    store,
-    visitId,
   ]);
 
   // Удаляю id видео из списка currentTime, если видео с data-id на странице нет

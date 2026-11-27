@@ -5,6 +5,8 @@ import type { HowlInstances } from '@types';
 
 import { store } from '@store/store';
 
+import { removeOwnedAudio } from '@controllers/bookAudio/ownedAudio';
+
 import { unloadAudio } from '@utils/effects/audio/unloadAudio';
 
 import { actions } from './slice';
@@ -12,7 +14,9 @@ import { selectors } from './selectors';
 
 import type { RemoveAudioInstancePayload } from './@types';
 
-const unloadRemovedAudio = async (instance: RemoveAudioInstancePayload['instance']) => {
+type AudioInstance = RemoveAudioInstancePayload['instance'];
+
+const unloadRemovedAudio = async (instance: AudioInstance) => {
   let previousVolume = store.getState().volume;
 
   const unsubscribe = store.subscribe(() => {
@@ -41,6 +45,14 @@ export function* watchRemoveAudioInstance(action: PayloadAction<RemoveAudioInsta
 
   // Если тот же экземпляр снова зарегистрировали, выгружать его нельзя.
   if (audioInstances[id] === instance) {
+    return;
+  }
+
+  const removeOwned = removeOwnedAudio.get(instance);
+
+  if (removeOwned) {
+    removeOwned();
+
     return;
   }
 

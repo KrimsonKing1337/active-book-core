@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { fileURLToPath } from 'node:url';
 
 import { openAudio } from './audioLifecycleFixture.js';
 
@@ -83,7 +84,10 @@ test('real Howler cancels stop and lifetime cleanup while resources are still lo
   });
   await page.route('**/delayed.wav', async (route) => {
     await gate;
-    await route.fulfill({ path: new URL('./tone.wav', import.meta.url).pathname, contentType: 'audio/wav' });
+    await route.fulfill({
+      path: fileURLToPath(new URL('./tone.wav', import.meta.url)),
+      contentType: 'audio/wav',
+    });
   });
   context.after(() => release());
   await page.evaluate(async () => {

@@ -26,7 +26,7 @@ export const Img = ({
 
   const slideActive = useCarouselSlideActive();
 
-  let source: typeof src;
+  let source: string | undefined;
 
   if (slideActive && loading !== 'lazy') {
     source = src;

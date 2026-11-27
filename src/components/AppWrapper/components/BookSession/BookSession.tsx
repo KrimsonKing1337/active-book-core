@@ -14,10 +14,15 @@ import { useDispatch } from '@store';
 import { mainActions } from '@store/main';
 
 import { createVisualEffects, VisualEffectsContext } from '@controllers/visualEffects';
+import { BookAudio } from '@controllers/bookAudio/BookAudio';
+import { BookAudioContext } from '@controllers/bookAudio/context';
+
+import type { AudioDescription } from '@controllers/bookAudio/descriptions';
 
 import { BookPresentationContext } from '@hooks/pagePresentation/context';
 
 import { StoryRegionsProvider } from '@components/StoryRegionsProvider';
+import { useAppMode } from '@components/App/AppModeContext';
 import { StoryWindowSessionContext } from '@components/StoryWindowHost/context';
 import { useStoryWindowSession } from '@components/StoryWindowHost/hooks';
 
@@ -27,12 +32,18 @@ import { AppContent } from '../AppContent';
 
 export type BookSessionProps = PropsWithChildren<AppWrapperProps>;
 
+const noAudio: readonly AudioDescription[] = [];
+
 export const BookSession = (props: BookSessionProps) => {
   const dispatch = useDispatch();
 
   const windowSessionId = useStoryWindowSession();
 
   const [sessionId] = useState(nanoid);
+  const [audio] = useState(() => new BookAudio(sessionId));
+
+  const isReader = useAppMode() === 'reader';
+  const audioDescriptions = props.audioDescriptions ?? noAudio;
 
   const [initialNavigation] = useState(() => {
     const pageIds = props.storyPages.map((pageCur) => {
@@ -53,13 +64,26 @@ export const BookSession = (props: BookSessionProps) => {
 
     dispatch(mainActions.openBookSession(initialNavigation));
 
+    audio.start();
+
     return () => {
+      audio.close();
+
       dispatch(mainActions.closeBookSession(sessionId));
     };
   }, [
     dispatch,
     sessionId,
     initialNavigation,
+    audio,
+  ]);
+
+  useLayoutEffect(() => {
+    audio.configure(audioDescriptions, isReader);
+  }, [
+    audioDescriptions,
+    isReader,
+    audio,
   ]);
 
   const [ownedSession] = useState(() => {
@@ -100,7 +124,9 @@ export const BookSession = (props: BookSessionProps) => {
       <StoryWindowSessionContext value={windowSessionId}>
         <StoryRegionsProvider>
           <BookPresentationContext value={sessionId}>
-            <AppContent {...props} visualEffects={session} />
+            <BookAudioContext value={audio}>
+              <AppContent {...props} visualEffects={session} />
+            </BookAudioContext>
           </BookPresentationContext>
         </StoryRegionsProvider>
       </StoryWindowSessionContext>

@@ -21,7 +21,9 @@ const events = [
 /** Observe completion without imposing a wall-clock limit on a playing or buffering clip. */
 export const waitForPlaybackEnd = ({ howl, soundIds }: Playback) => {
   const allSoundIds = [...soundIds];
+
   const playingIds = allSoundIds.filter((soundIdCur) => howl.playing(soundIdCur));
+  const loopingIds = playingIds.filter((soundIdCur) => howl.loop(soundIdCur));
 
   let resolve = () => {};
 
@@ -98,10 +100,8 @@ export const waitForPlaybackEnd = ({ howl, soundIds }: Playback) => {
     }
   };
 
-  for (const idCur of playingIds) {
-    if (howl.loop(idCur)) {
-      howl.loop(false, idCur);
-    }
+  for (const idCur of loopingIds) {
+    howl.loop(false, idCur);
   }
 
   for (const eventCur of events) {
@@ -112,5 +112,25 @@ export const waitForPlaybackEnd = ({ howl, soundIds }: Playback) => {
 
   check();
 
-  return { promise, cancel: finish };
+  const restore = () => {
+    if (finished) {
+      return false;
+    }
+
+    for (const idCur of loopingIds) {
+      if (howl.playing(idCur)) {
+        howl.loop(true, idCur);
+      }
+    }
+
+    finish();
+
+    return true;
+  };
+
+  return {
+    promise,
+    cancel: finish,
+    restore,
+  };
 };
