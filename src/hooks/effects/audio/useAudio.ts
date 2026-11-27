@@ -26,9 +26,9 @@ const audioSessions = new WeakMap<HowlWrapper, string | null>();
 
 export const canAutoplayAudio = (instance: HowlWrapper, session: string | null) => {
   const audioSession = audioSessions.get(instance);
-  const theSameSession = audioSession === session;
+  const isSameSession = audioSession === session;
 
-  return theSameSession && !failedLoads.has(instance);
+  return isSameSession && !failedLoads.has(instance);
 };
 
 export const useAudio = ({
@@ -62,10 +62,10 @@ export const useAudio = ({
   const formatKey = format?.join(',');
 
   useLayoutEffect(() => {
-    const theSamePage = currentPage === page;
-    const attrsAreInValid = !id || !src;
+    const isSamePage = currentPage === page;
+    const hasMissingSourceOrId = !id || !src;
 
-    if (!canPrepare || !theSamePage || attrsAreInValid) {
+    if (!canPrepare || !isSamePage || hasMissingSourceOrId) {
       return;
     }
 
@@ -157,11 +157,14 @@ export const useAudio = ({
       return;
     }
 
-    if (instance.howlInst.state() === 'loaded' || failedLoads.has(instance)) {
-      const failed = failedLoads.has(instance);
-      const status = failed ? 'failed' : 'ready';
+    if (failedLoads.has(instance)) {
+      settle('failed');
 
-      settle(status);
+      return;
+    }
+
+    if (instance.howlInst.state() === 'loaded') {
+      settle('ready');
 
       return;
     }
@@ -186,11 +189,13 @@ export const useAudio = ({
     };
   }, [instance]);
 
-  const theSamePage = currentPage === page;
-  const instanceIsValid = theSamePage && instance;
-  const resource = instanceIsValid ? prepare : null;
+  let prepareResource: typeof prepare | null = null;
 
-  usePageResource(resource);
+  if (currentPage === page && instance) {
+    prepareResource = prepare;
+  }
+
+  usePageResource(prepareResource);
 
   return instance;
 };

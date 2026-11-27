@@ -43,8 +43,8 @@ const DotLottiePlayer = ({
   const [dotLottie, setDotLottie] = useState<DotLottie | null>(null);
   const [enabled, setEnabled] = useState(false);
 
-  const failed = useRef(new WeakSet<DotLottie>());
-  const started = useRef<DotLottie | null>(null);
+  const failedLoads = useRef(new WeakSet<DotLottie>());
+  const startedPlayer = useRef<DotLottie | null>(null);
 
   useLayoutEffect(() => {
     if (presented && canStart()) {
@@ -57,11 +57,16 @@ const DotLottiePlayer = ({
       return;
     }
 
-    if (dotLottie.isLoaded || failed.current.has(dotLottie)) {
-      const hasDotLottie = failed.current.has(dotLottie);
-      const status = hasDotLottie ? 'failed' : 'ready';
+    const hasLoadFailed = failedLoads.current.has(dotLottie);
 
-      settle(status);
+    if (hasLoadFailed) {
+      settle('failed');
+
+      return;
+    }
+
+    if (dotLottie.isLoaded) {
+      settle('ready');
 
       return;
     }
@@ -101,10 +106,11 @@ const DotLottiePlayer = ({
   }, [dotLottie, eventListeners]);
 
   useEffect(() => {
-    const shouldPlay = presented && autoplay;
-    const notStarted = dotLottie && started.current !== dotLottie;
+    if (!presented || !autoplay || !dotLottie) {
+      return;
+    }
 
-    if (!shouldPlay || !notStarted) {
+    if (startedPlayer.current === dotLottie) {
       return;
     }
 
@@ -113,7 +119,7 @@ const DotLottiePlayer = ({
         return;
       }
 
-      started.current = dotLottie;
+      startedPlayer.current = dotLottie;
 
       dotLottie.play();
     };
@@ -143,7 +149,7 @@ const DotLottiePlayer = ({
 
     if (instance) {
       instance.addEventListener('loadError', () => {
-        failed.current.add(instance);
+        failedLoads.current.add(instance);
       });
 
       refCallback?.(instance);

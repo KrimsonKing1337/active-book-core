@@ -1,6 +1,10 @@
-import { type RefObject, useMemo } from 'react';
+import type { RefObject } from 'react';
 
-import { type SettlePageResource, usePageResource } from './usePageResource';
+import { useMemo } from 'react';
+
+import type { SettlePageResource } from './usePageResource';
+
+import { usePageResource } from './usePageResource';
 
 type MediaElement = HTMLImageElement | HTMLVideoElement;
 type MediaReadinessOutcome = 'ready' | 'failed';
@@ -10,9 +14,7 @@ type MediaReadinessResult = {
   outcome: MediaReadinessOutcome;
 };
 
-type GetMediaOutcomeReturns = MediaReadinessOutcome | undefined;
-
-const getMediaOutcome = (element: MediaElement): GetMediaOutcomeReturns => {
+const getMediaOutcome = (element: MediaElement): MediaReadinessOutcome | undefined => {
   const { currentSrc, src } = element;
 
   if (currentSrc && currentSrc !== src) {
@@ -38,6 +40,8 @@ const getMediaOutcome = (element: MediaElement): GetMediaOutcomeReturns => {
   if (element.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
     return 'ready';
   }
+
+  return;
 };
 
 export const useMediaReadiness = (

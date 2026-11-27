@@ -9,17 +9,17 @@ export const addKeyboardControl = (goPrevPage: Fn, goNextPage: Fn) => {
   const narrativeElement = document.querySelector('#narrative');
 
   const listener = (e: KeyboardEvent) => {
-    const isModifier = e.ctrlKey || e.metaKey || e.altKey;
+    const hasModifierKey = e.ctrlKey || e.metaKey || e.altKey;
 
-    if (e.defaultPrevented || isModifier) {
+    if (e.defaultPrevented || hasModifierKey) {
       return;
     }
 
     const state = store.getState();
     const isPagePresented = mainSelectors.isPagePresented(state);
-    const windowIsOpen = document.querySelector('[data-book-window-open="true"]');
+    const isWindowOpen = document.querySelector('[data-book-window-open="true"]') !== null;
 
-    if (!isPagePresented || windowIsOpen) {
+    if (!isPagePresented || isWindowOpen) {
       return;
     }
 

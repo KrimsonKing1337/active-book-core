@@ -168,7 +168,7 @@ const slice = createSlice({
         return;
       }
 
-      if (!visit.pendingResources[resourceId]) {
+      if (visit.pendingResources[resourceId] !== true) {
         return;
       }
 

@@ -16,8 +16,9 @@ import { CarouselSlideActiveContext, useCarouselSlideActive } from '@components/
 
 import { VideoPlaybackContext } from '../context';
 
+import type { VideoPlayback } from '../utils';
+
 import {
-  type VideoPlayback,
   createVideoPlayback,
   disposeVideo,
   listenVideoPlayback,
@@ -62,9 +63,9 @@ export const useVideoPlayback = (ref: RefObject<HTMLVideoElement | null>, option
     const previous = playbackRef.current;
     const sourceChanged = sourceRef.current.id !== id || sourceRef.current.src !== src;
 
-    const elementsAreDifferent = previous?.element !== element;
+    const hasElementChanged = previous?.element !== element;
 
-    if (elementsAreDifferent || sourceChanged) {
+    if (hasElementChanged || sourceChanged) {
       if (previous) {
         previous.disposed = true;
         previous.element.pause();
@@ -90,9 +91,9 @@ export const useVideoPlayback = (ref: RefObject<HTMLVideoElement | null>, option
       removeListeners();
 
       queueMicrotask(() => {
-        const isPlayback = playbackRef.current === playback;
+        const isCurrentPlayback = playbackRef.current === playback;
 
-        if (!playback.connected && isPlayback) {
+        if (!playback.connected && isCurrentPlayback) {
           disposeVideo(playback);
         }
       });

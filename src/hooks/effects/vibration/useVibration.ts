@@ -69,16 +69,19 @@ export const useVibration = (options?: VibrationEffectOptions) => {
 
   // Declarative behavior is available through both useVibration(options) and <Vibration />
   useEffect(() => {
-    const canStartPlayback = canStart();
+    if (!presented) {
+      return;
+    }
 
-    const cantStart = !presented || !canStartPlayback || !id;
-    const isSamePage = currentPage === page;
-    const canVibrate = isVibrationAvailable && vibrationEnabled;
+    if (!canStart() || !id) {
+      return;
+    }
 
-    if (cantStart
-      || !isSamePage
-      || !playOnLoad
-      || !canVibrate) {
+    if (currentPage !== page || !playOnLoad) {
+      return;
+    }
+
+    if (!isVibrationAvailable || !vibrationEnabled) {
       return;
     }
 
@@ -95,7 +98,7 @@ export const useVibration = (options?: VibrationEffectOptions) => {
     }
 
     const timer = window.setTimeout(() => {
-      if (canStartPlayback) {
+      if (canStart()) {
         on(duration);
       }
     }, delay);

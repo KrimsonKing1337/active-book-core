@@ -107,17 +107,16 @@ export const useFlashlight = (options: Partial<FlashlightEffectOptions> = {}) =>
     shadowEffectId,
   ]);
 
-  const isCurrentDefault: () => boolean = () => true;
-
   const on = useCallback(async (
     pulseDuration?: number,
-    isCurrent = isCurrentDefault) => {
+    isCurrent: () => boolean = () => true,
+  ) => {
     // Invalidate pending camera initialization and any previous auto-off timer.
     off();
 
-    const noFlashlightOrFrameShadow = !flashlightEnabled && !withFrameShadow;
+    const isEffectDisabled = !flashlightEnabled && !withFrameShadow;
 
-    if (document.hidden || noFlashlightOrFrameShadow) {
+    if (document.hidden || isEffectDisabled) {
       return;
     }
 
@@ -191,7 +190,7 @@ export const useFlashlight = (options: Partial<FlashlightEffectOptions> = {}) =>
     }
 
     const timer = setTimeout(() => {
-      if (canStartPlayback) {
+      if (canStart()) {
         void on(duration, canStart);
       }
     }, delay);

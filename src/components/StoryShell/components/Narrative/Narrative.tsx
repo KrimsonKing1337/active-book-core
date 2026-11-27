@@ -1,5 +1,6 @@
+import type { PropsWithChildren, FocusEvent } from 'react';
+
 import {
-  type PropsWithChildren,
   useEffect,
   useLayoutEffect,
   useRef,
@@ -33,8 +34,8 @@ export const Narrative = ({ children }: PropsWithChildren) => {
   const visit = useSelector(mainSelectors.visit);
   const showLoader = useSelector(mainSelectors.showLoader);
 
-  const reveal = visit !== null && !visit.reveal;
-  const isLoading = showLoader || reveal;
+  const isAwaitingReveal = visit !== null && !visit.reveal;
+  const isLoading = showLoader || isAwaitingReveal;
   const locked = appMode === 'reader' && isLoading;
 
   const contentHadFocusRef = useRef(false);
@@ -63,9 +64,9 @@ export const Narrative = ({ children }: PropsWithChildren) => {
     if (element) {
       element.scrollTop = 0;
 
-      const bodyIsActive = document.activeElement === document.body;
+      const isBodyFocused = document.activeElement === document.body;
 
-      if (appMode === 'reader' && contentHadFocusRef.current && bodyIsActive) {
+      if (appMode === 'reader' && contentHadFocusRef.current && isBodyFocused) {
         element.focus({ preventScroll: true });
       }
     }
@@ -74,9 +75,9 @@ export const Narrative = ({ children }: PropsWithChildren) => {
   }, [pageId, appMode]);
 
   useEffect(() => {
-    const bodyIsActive = document.activeElement === document.body;
+    const isBodyFocused = document.activeElement === document.body;
 
-    if (appMode === 'reader' && !locked && bodyIsActive) {
+    if (appMode === 'reader' && !locked && isBodyFocused) {
       ref.current?.focus({ preventScroll: true });
     }
   }, [appMode, locked]);
@@ -124,7 +125,7 @@ export const Narrative = ({ children }: PropsWithChildren) => {
     contentHadFocusRef.current = true;
   };
 
-  const handleBlurCapture = (e: React.FocusEvent) => {
+  const handleBlurCapture = (e: FocusEvent) => {
     if (e.relatedTarget instanceof Node && !e.currentTarget.contains(e.relatedTarget)) {
       contentHadFocusRef.current = false;
     }
@@ -148,6 +149,7 @@ export const Narrative = ({ children }: PropsWithChildren) => {
       >
         <div
           ref={refs.narrativeContent}
+          className="Narrative__Text"
           style={textStyle}
           data-story-region="narrativeContent"
         >

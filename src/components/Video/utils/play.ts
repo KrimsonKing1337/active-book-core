@@ -10,10 +10,10 @@ import {
 const requestVideoPlay = (playback: VideoPlayback) => {
   const { element } = playback;
 
-  const playbackIsNotReady = !playback.wantsPlay || playback.pending;
-  const elementCantPlay = !element.paused || element.ended;
+  const isPlaybackBlocked = !playback.wantsPlay || playback.pending;
+  const isPlayingOrEnded = !element.paused || element.ended;
 
-  if (playbackIsNotReady || elementCantPlay) {
+  if (isPlaybackBlocked || isPlayingOrEnded) {
     return;
   }
 

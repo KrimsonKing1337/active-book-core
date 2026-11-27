@@ -19,9 +19,15 @@ const isPending = ({ main }: RootState) => {
 const isPagePresented = ({ main }: RootState) => {
   const { showLoader, visit } = main;
 
-  const isVisitPresented = !visit || visit.presentedAt !== null;
+  if (showLoader) {
+    return false;
+  }
 
-  return !showLoader && isVisitPresented;
+  if (!visit) {
+    return true;
+  }
+
+  return visit.presentedAt !== null;
 };
 
 const page = ({ main }: RootState) => {

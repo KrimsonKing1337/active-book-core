@@ -33,10 +33,18 @@ export const startToPlayAllAudiosWithPlayOnLoad = (
       return;
     }
 
-    const canStart = allowStart(audioCur);
-    const isPlaying = audioCur.playing();
+    if (!audioCur.playOnLoad) {
+      return;
+    }
 
-    if (!audioCur.playOnLoad || !canStart || isPlaying) {
+    // The callback can record the autoplay attempt for this visit.
+    const isStartAllowed = allowStart(audioCur);
+
+    if (!isStartAllowed) {
+      return;
+    }
+
+    if (audioCur.playing()) {
       return;
     }
 
