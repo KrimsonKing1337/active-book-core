@@ -1,6 +1,6 @@
 import type { HowlOptions } from 'howler';
 
-import { Howl } from 'howler';
+import { Howl, Howler } from 'howler';
 
 import type { AudioType } from '@types';
 
@@ -25,6 +25,8 @@ export type HowlWrapperOptions = {
   delay?: number;
   stopBy?: number;
 
+  beforePlay?: () => void;
+  canPlay?: () => boolean;
   onPlay?: () => void;
   onPause?: () => void;
   onStop?: () => void;
@@ -71,6 +73,12 @@ type PlaybackOptions = {
   withFadeIn: boolean;
   complete: () => void;
   fail: () => void;
+  acceptStart?: () => boolean;
+  holdUntilStarted?: boolean;
+};
+
+type PlaybackRequest = Pick<PlaybackOptions, 'withFadeIn' | 'fail' | 'acceptStart'> & {
+  canStart: () => boolean;
 };
 
 export class HowlWrapper {
@@ -100,6 +108,8 @@ export class HowlWrapper {
   private pendingOperations = new Set<PendingOperation>();
   private unloadPromise: Promise<void> | null = null;
   private completion: ReturnType<typeof waitForPlaybackEnd> | null = null;
+  private readonly beforePlay: () => void;
+  private readonly canPlay?: () => boolean;
 
   public onPlay: () => void;
   public onPause: () => void;
@@ -119,6 +129,8 @@ export class HowlWrapper {
     fadeOutWhenUnload = true,
     delay = 0,
     stopBy = 0,
+    beforePlay = () => {},
+    canPlay,
     onPlay = () => {},
     onUnload = () => {},
     onPause = () => {},
@@ -170,6 +182,8 @@ export class HowlWrapper {
     this.stopBy = stopBy;
     this.playOnLoad = playOnLoad;
 
+    this.beforePlay = beforePlay;
+    this.canPlay = canPlay;
     this.onPlay = onPlay;
     this.onPause = onPause;
     this.onStop = onStop;
@@ -365,7 +379,7 @@ export class HowlWrapper {
     // Initialize this voice in the same turn as play, leaving other voices untouched.
     let level = 1;
 
-    if (options.withFadeIn) {
+    if (options.withFadeIn || options.holdUntilStarted) {
       level = 0;
     }
 
@@ -373,12 +387,24 @@ export class HowlWrapper {
 
     const onPlay = this.onPlay;
 
-    const cancelPlayCallback = () => {
+    const handlePlay = () => {
       cancelError();
+      const accepted = options.acceptStart?.() ?? true;
+
+      if (!accepted) {
+        this.howlInst.stop(soundId);
+        options.complete();
+
+        return;
+      }
 
       if (options.withFadeIn && hasInitialGain()) {
         this.fadeIn(soundId).then(options.complete);
       } else {
+        if (options.holdUntilStarted && hasInitialGain()) {
+          this.fades.addVoice(soundId, 1);
+        }
+
         options.complete();
       }
 
@@ -388,7 +414,7 @@ export class HowlWrapper {
     const cancelPlay = this.listenOnce({
       event: 'play',
       id: soundId,
-      callback: cancelPlayCallback,
+      callback: handlePlay,
     });
 
     const cancelError = this.listenOnce({
@@ -403,9 +429,69 @@ export class HowlWrapper {
         options.fail();
       },
     });
+
+    return () => {
+      cancelPlay();
+      cancelError();
+      this.howlInst.stop(soundId);
+      this.soundIds.delete(soundId);
+      this.fades.removeVoice(soundId);
+    };
+  }
+
+  /** Requests one loaded voice. The caller owns the timing and any retry. */
+  requestPlayback(options: PlaybackRequest) {
+    const revision = this.revision;
+    let cancelPlayback: (() => void) | undefined;
+    let isPending = true;
+
+    const start = () => {
+      if (!isPending || revision !== this.revision) {
+        return;
+      }
+
+      const canStart = options.canStart();
+      const isLoaded = this.state() === 'loaded';
+
+      if (!canStart || !isLoaded || this.isUnloading) {
+        options.fail();
+
+        return;
+      }
+
+      cancelPlayback = this.startPlayback({
+        ...options,
+        complete: () => {},
+        holdUntilStarted: true,
+      });
+    };
+
+    const context = Howler.ctx;
+
+    // Resuming separately keeps this request out of Howler's playback queue while autoplay is blocked.
+    if (context && context.state !== 'running' && context.state !== 'closed') {
+      void context.resume().then(start, () => {
+        if (isPending && revision === this.revision) {
+          options.fail();
+        }
+      });
+    } else {
+      start();
+    }
+
+    return () => {
+      isPending = false;
+      cancelPlayback?.();
+    };
   }
 
   async play(withFadeIn = false) {
+    if (this.canPlay && !this.canPlay()) {
+      return;
+    }
+
+    this.beforePlay();
+
     if (this.isUnloading) {
       return;
     }
@@ -443,14 +529,25 @@ export class HowlWrapper {
         complete();
       };
 
-      const options = {
+      const options: PlaybackOptions = {
         withFadeIn,
         complete,
         fail,
+        acceptStart: this.canPlay,
       };
 
       const start = () => {
-        this.afterLoad(() => this.startPlayback(options), fail);
+        const handleLoad = () => {
+          if (this.canPlay && !this.canPlay()) {
+            fail();
+
+            return;
+          }
+
+          this.startPlayback(options);
+        };
+
+        this.afterLoad(handleLoad, fail);
       };
 
       if (this.delay > 0) {
@@ -660,6 +757,10 @@ export class HowlWrapper {
     return operation;
   }
 
+  get pendingFadeOut() {
+    return this.fadingOut;
+  }
+
   /** A reversible fade. A successful result is independent of terminal unload. */
   fadeOut(duration = HowlWrapper.fadeDurationDefault) {
     if (this.isUnloading || this.state() !== 'loaded') {
@@ -689,6 +790,7 @@ export class HowlWrapper {
 
     this.haltOperation = null;
 
+    this.fadingOut = null;
     const results = await Promise.all(this.fadeVoices({ to: 1, duration }));
     const allFadesCompleted = results.every(Boolean);
 
@@ -697,6 +799,16 @@ export class HowlWrapper {
 
   playing() {
     return this.howlInst.playing();
+  }
+
+  hasCurrentPlayback() {
+    for (const soundId of this.soundIds) {
+      if (this.howlInst.playing(soundId)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   state() {
@@ -711,9 +823,14 @@ export class HowlWrapper {
     this.isUnloading = true;
 
     if (!this.completion) {
-      this.completion = waitForPlaybackEnd({ howl: this.howlInst, soundIds: this.soundIds });
+      this.completion = this.finishCurrentPlayback();
     }
 
     return this.completion.promise;
+  }
+
+  /** Finish the current iteration while retaining the option to restore its loop. */
+  finishCurrentPlayback() {
+    return waitForPlaybackEnd({ howl: this.howlInst, soundIds: this.soundIds });
   }
 }

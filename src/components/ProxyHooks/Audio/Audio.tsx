@@ -10,7 +10,7 @@ export const Audio = ({
 }: AudioEffectOptions) => {
   const appMode = useAppMode();
 
-  const playOnLoadAppMode = appMode === 'reader' ? playOnLoad : false;
+  const playOnLoadAppMode = appMode === 'reader' && playOnLoad;
 
   useAudio({
     ...options,

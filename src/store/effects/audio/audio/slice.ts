@@ -1,4 +1,4 @@
-import type { PayloadAction } from '@reduxjs/toolkit';
+import type { Draft, PayloadAction } from '@reduxjs/toolkit';
 
 import { createSlice } from '@reduxjs/toolkit';
 
@@ -25,17 +25,20 @@ const slice = createSlice({
     },
 
     removeAudioInstance(state, action: PayloadAction<RemoveAudioInstancePayload>) {
-      const { id, instance } = action.payload;
-
-      // Асинхронное удаление старого звука не должно удалить его замену.
-      if (state.audioInstances[id] !== instance) {
-        return;
-      }
-
-      delete state.audioInstances[id];
+      unregisterAudioInstance(state, action.payload);
     },
 
+    unregisterAudioInstance(state, action: PayloadAction<RemoveAudioInstancePayload>) {
+      unregisterAudioInstance(state, action.payload);
+    },
   },
 });
+
+// Асинхронное удаление старого звука не должно удалить его замену.
+function unregisterAudioInstance(state: Draft<State>, { id, instance }: RemoveAudioInstancePayload) {
+  if (state.audioInstances[id] === instance) {
+    delete state.audioInstances[id];
+  }
+}
 
 export const { actions, reducer } = slice;

@@ -1,12 +1,6 @@
 import type { VisualEffectLifetime } from '@active-book/types';
 
-export const isVisualEffectActive = (lifetime: VisualEffectLifetime, page: number): boolean => {
-  if (lifetime.type === 'page') {
-    return lifetime.page === page;
-  }
-
-  return lifetime.range.some((rangeCur) => page >= rangeCur.from && page <= rangeCur.to);
-};
+export { isEffectActive as isVisualEffectActive } from '@utils/effects/lifetime';
 
 export const validateVisualLifetime = (lifetime: VisualEffectLifetime, pages: number): void => {
   const validatePage = (page: number) => {

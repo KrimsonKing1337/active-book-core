@@ -20,37 +20,34 @@ import { type SettlePageResource, usePageResource } from '@hooks/pagePresentatio
 
 import { HowlWrapper, type HowlWrapperOptions } from '@utils/effects/audio/HowlWrapper';
 
+import { useBookAudio } from './useBookAudio';
+
 const failedLoads = new WeakSet<HowlWrapper>();
 const unloadListeners = new WeakMap<HowlWrapper, Set<() => void>>();
 const audioSessions = new WeakMap<HowlWrapper, string | null>();
 
-export const canAutoplayAudio = (instance: HowlWrapper, session: string | null) => {
-  const audioSession = audioSessions.get(instance);
-  const isSameSession = audioSession === session;
+export const useAudio = (passedOptions: AudioEffectOptions) => {
+  const {
+    id,
+    page,
+    src,
+    format,
+    lifecycle = 'auto',
+    type = 'sfx',
+    loop = false,
+    playOnLoad = false,
+    stopBy = 0,
+    delay = 0,
+    relativeVolume = 100,
+    screamer = false,
+    fadeOutWhenUnload = true,
 
-  return isSameSession && !failedLoads.has(instance);
-};
-
-export const useAudio = ({
-  id,
-  page,
-  src,
-  format,
-  lifecycle = 'auto',
-  type = 'sfx',
-  loop = false,
-  playOnLoad = false,
-  stopBy = 0,
-  delay = 0,
-  relativeVolume = 100,
-  screamer = false,
-  fadeOutWhenUnload = true,
-
-  onPlay = () => {},
-  onPause = () => {},
-  onStop = () => {},
-  onUnload = () => {},
-}: AudioEffectOptions) => {
+    onPlay = () => {},
+    onPause = () => {},
+    onStop = () => {},
+    onUnload = () => {},
+  } = passedOptions;
+  const isSessionOwned = useBookAudio(passedOptions);
   const dispatch = useDispatch();
 
   const currentPage = useSelector(mainSelectors.page);
@@ -58,7 +55,8 @@ export const useAudio = ({
   const isAudioUnlocked = useSelector(mainSelectors.isAudioUnlocked);
   const audioInstances = useSelector(audioEffectsSelectors.audioInstances);
 
-  const canPrepare = !!bookSession || isAudioUnlocked;
+  const hasPermissionToPrepare = !!bookSession || isAudioUnlocked;
+  const canPrepare = !isSessionOwned && hasPermissionToPrepare;
   const formatKey = format?.join(',');
 
   useLayoutEffect(() => {
@@ -191,7 +189,7 @@ export const useAudio = ({
 
   let prepareResource: typeof prepare | null = null;
 
-  if (currentPage === page && instance) {
+  if (canPrepare && currentPage === page && instance) {
     prepareResource = prepare;
   }
 

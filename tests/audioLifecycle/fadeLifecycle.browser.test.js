@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { fileURLToPath } from 'node:url';
 
 import { openAudio } from './audioLifecycleFixture.js';
 
@@ -57,7 +58,10 @@ test('cancelling faded play while loading settles its promise before the resourc
   });
   await page.route('**/fade-loading.wav', async (route) => {
     await gate;
-    await route.fulfill({ path: new URL('./tone.wav', import.meta.url).pathname, contentType: 'audio/wav' });
+    await route.fulfill({
+      path: fileURLToPath(new URL('./tone.wav', import.meta.url)),
+      contentType: 'audio/wav',
+    });
   });
   context.after(() => release());
   const cancelled = await page.evaluate(async () => {
