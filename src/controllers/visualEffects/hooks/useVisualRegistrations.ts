@@ -1,6 +1,6 @@
 import {
   useCallback,
-  useEffect,
+  useLayoutEffect,
   useRef,
 } from 'react';
 
@@ -31,7 +31,7 @@ export const useVisualRegistrations = ({
 }: VisualRegistrationsOptions) => {
   const ownedRef = useRef(new Map<string, OwnedRegistration>());
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!session) {
       return;
     }
@@ -50,7 +50,9 @@ export const useVisualRegistrations = ({
       availableRegistrations.map((cur) => cur.effect.id),
     );
 
-    for (const [id, previous] of owned) {
+    for (const ownedItemCur of owned) {
+      const [id, previous] = ownedItemCur;
+
       if (!ids.has(id)) {
         previous.remove();
 
@@ -99,7 +101,7 @@ export const useVisualRegistrations = ({
     ownedRef.current.clear();
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     return clear;
   }, [session, clear]);
 

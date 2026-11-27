@@ -31,7 +31,7 @@ for (const mode of ['reader', 'editor']) {
       return old.node.isConnected && old.node.getAnimations().includes(old.animation)
         && old.animation.currentTime > old.time + 300 && old.canvas.getContext('2d') === old.context;
     }));
-    assert.equal(await page.getByTestId('new-content').isVisible(), false, 'pending page is not presented as ready');
+    assert.equal(await page.getByTestId('new-content').isVisible(), mode === 'editor');
     release();
     await page.locator('[data-story-content][aria-busy="false"]').waitFor();
     await page.getByTestId('new-content').waitFor();

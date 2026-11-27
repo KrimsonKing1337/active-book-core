@@ -10,10 +10,10 @@ import {
 const requestVideoPlay = (playback: VideoPlayback) => {
   const { element } = playback;
 
-  if (!playback.wantsPlay
-    || playback.pending
-    || !element.paused
-    || element.ended) {
+  const isPlaybackBlocked = !playback.wantsPlay || playback.pending;
+  const isPlayingOrEnded = !element.paused || element.ended;
+
+  if (isPlaybackBlocked || isPlayingOrEnded) {
     return;
   }
 
@@ -78,15 +78,17 @@ export const updateVideoPlayback = (playback: VideoPlayback, policy: VideoPolicy
 
   Object.assign(playback, policy);
 
-  // Ordinary page videos belong to AppWrapper, not the slide activity controller.
-  if (!playback.managed) {
+  if (!playback.managed && playback.initialized) {
     return;
   }
 
   const videoIsActive = isVideoActive(playback);
 
   if (!videoIsActive) {
-    if (wasActive || !playback.element.paused || playback.pending) {
+    const isPlaying = !playback.element.paused;
+    const shouldPause = wasActive || isPlaying || playback.pending;
+
+    if (playback.managed && shouldPause) {
       pauseVideo(playback);
     }
 

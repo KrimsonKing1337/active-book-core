@@ -7,10 +7,15 @@ import {
   useState,
 } from 'react';
 
+import { setWasmUrl } from '@lottiefiles/dotlottie-react';
+import { nanoid } from '@reduxjs/toolkit';
+
 import { useDispatch } from '@store';
 import { mainActions } from '@store/main';
 
 import { createVisualEffects, VisualEffectsContext } from '@controllers/visualEffects';
+
+import { BookPresentationContext } from '@hooks/pagePresentation/context';
 
 import { StoryRegionsProvider } from '@components/StoryRegionsProvider';
 import { StoryWindowSessionContext } from '@components/StoryWindowHost/context';
@@ -27,11 +32,35 @@ export const BookSession = (props: BookSessionProps) => {
 
   const windowSessionId = useStoryWindowSession();
 
-  const initialPageIdRef = useRef(props.initialPageId ?? null);
+  const [sessionId] = useState(nanoid);
+
+  const [initialNavigation] = useState(() => {
+    const pageIds = props.storyPages.map((pageCur) => {
+      return pageCur.id;
+    });
+
+    const initialPage = props.initialPageId ?? null;
+
+    return {
+      sessionId,
+      pageIds,
+      initialPage,
+    };
+  });
 
   useLayoutEffect(() => {
-    dispatch(mainActions.setPage(initialPageIdRef.current));
-  }, [dispatch]);
+    setWasmUrl('/vendors/dotlottie-player.wasm');
+
+    dispatch(mainActions.openBookSession(initialNavigation));
+
+    return () => {
+      dispatch(mainActions.closeBookSession(sessionId));
+    };
+  }, [
+    dispatch,
+    sessionId,
+    initialNavigation,
+  ]);
 
   const [ownedSession] = useState(() => {
     if (props.visualEffects) {
@@ -70,7 +99,9 @@ export const BookSession = (props: BookSessionProps) => {
     <VisualEffectsContext value={session}>
       <StoryWindowSessionContext value={windowSessionId}>
         <StoryRegionsProvider>
-          <AppContent {...props} visualEffects={session} />
+          <BookPresentationContext value={sessionId}>
+            <AppContent {...props} visualEffects={session} />
+          </BookPresentationContext>
         </StoryRegionsProvider>
       </StoryWindowSessionContext>
     </VisualEffectsContext>

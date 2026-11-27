@@ -2,6 +2,11 @@
   min-width: 0;
 }
 
-.Pending {
-  visibility: hidden;
+.Pending,
+.Pending * {
+  visibility: hidden !important;
+}
+
+.Content[data-story-preparing] * {
+  animation-play-state: paused !important;
 }

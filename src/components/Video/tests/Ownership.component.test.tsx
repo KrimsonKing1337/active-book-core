@@ -7,16 +7,22 @@ import {
 } from '@testing-library/react';
 
 import { StoreProvider, store } from '@store';
-import { effectsActions } from '@store/effects/common';
+import { mainActions } from '@store/main';
+
+import { BookPresentationContext } from '@hooks/pagePresentation/context';
 
 import { CarouselSlideActiveContext } from '@components/Carousel/context';
-import { startToPlayAllVideosWithPlayOnLoad } from '@components/AppWrapper/utils';
 import { DialogMedia } from '@components/DialogMedia';
 
 import { Video } from '../Video';
 
 import { installMedia } from './media';
-import { resetReadiness } from './view';
+import {
+  preparePage,
+  presentPage,
+  resetReadiness,
+  videoSession,
+} from './view';
 
 let media: ReturnType<typeof installMedia>;
 
@@ -28,25 +34,6 @@ beforeEach(() => {
 afterEach(async () => {
   await act(async () => cleanup());
   jest.restoreAllMocks();
-});
-
-test('the global autoplay pass starts only ordinary page videos', async () => {
-  const { container } = render(
-    <div>
-      <video data-autoplay="true" data-testid="ordinary" />
-      <video data-autoplay="true" data-video-managed="true" />
-
-      <div data-book-carousel>
-        <video data-autoplay="true" />
-      </div>
-
-      <div data-video-scope="dialog">
-        <video data-autoplay="true" />
-      </div>
-    </div>,
-  );
-  await act(async () => startToPlayAllVideosWithPlayOnLoad());
-  expect(media.play.mock.instances).toEqual([container.querySelector('[data-testid="ordinary"]')]);
 });
 
 test('DialogMedia starts native video once and leaves managed playback to Video', async () => {
@@ -82,11 +69,14 @@ test('DialogMedia starts native video once and leaves managed playback to Video'
   });
 });
 
-test('ordinary page video keeps manual playback during unrelated reader loading', async () => {
+test('ordinary video keeps manual playback when it outlives a page visit', async () => {
+  preparePage();
   const { container } = render(
     <StrictMode>
       <StoreProvider>
-        <Video id="ordinary-page" src="ordinary.webm" autoPlay={false} />
+        <BookPresentationContext value={videoSession}>
+          <Video id="ordinary-page" src="ordinary.webm" autoPlay={false} />
+        </BookPresentationContext>
       </StoreProvider>
     </StrictMode>,
   );
@@ -97,6 +87,7 @@ test('ordinary page video keeps manual playback during unrelated reader loading'
     throw new Error('Missing ordinary page video');
   }
 
+  await act(async () => presentPage());
   await act(async () => {
     await video.play();
   });
@@ -106,7 +97,7 @@ test('ordinary page video keeps manual playback during unrelated reader loading'
   const pauseCountBeforeLoading = media.pause.mock.calls.length;
 
   await act(async () => {
-    store.dispatch(effectsActions.setVideosAmount(1));
+    store.dispatch(mainActions.setPage(2));
   });
 
   expect(video.paused).toBe(false);
@@ -124,7 +115,7 @@ test('ordinary page video keeps manual playback during unrelated reader loading'
   expect(media.pause).toHaveBeenCalledTimes(pauseCountBeforeLoading + 1);
 
   await act(async () => {
-    store.dispatch(effectsActions.setVideosReadyAmount(1));
+    presentPage();
   });
 
   expect(video.paused).toBe(false);

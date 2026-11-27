@@ -5,11 +5,13 @@ import {
 } from '@testing-library/react';
 
 import { store } from '@store';
-import { effectsActions } from '@store/effects/common';
 
 import { finishMedia, installMedia } from './media';
 import {
+  preparePage,
+  presentPage,
   resetReadiness,
+  videoSession,
   videoElement,
   videoView,
 } from './view';
@@ -27,12 +29,12 @@ afterEach(async () => {
 });
 
 test('autoplay waits for reader readiness and StrictMode starts once', async () => {
-  store.dispatch(effectsActions.setVideosAmount(1));
-  const { rerender } = render(videoView());
+  preparePage();
+  const { rerender } = render(videoView({ session: videoSession }));
   expect(media.play).not.toHaveBeenCalled();
-  await act(async () => store.dispatch(effectsActions.setVideosReadyAmount(1)));
+  await act(async () => presentPage());
   expect(media.play).toHaveBeenCalledTimes(1);
-  rerender(videoView());
+  rerender(videoView({ session: videoSession }));
   expect(media.play).toHaveBeenCalledTimes(1);
 });
 

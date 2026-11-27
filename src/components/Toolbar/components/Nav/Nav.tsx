@@ -12,7 +12,7 @@ import ArrowRight from '@assets/img/toolbar/i-arrow-right.svg';
 import { useSelector } from '@store';
 import { mainSelectors } from '@store/main';
 
-import { useGoToPage } from '@hooks/control/useGoToPage';
+import { useReaderNavigation } from '@hooks/control/useReaderNavigation';
 
 import { useReaderWindow } from '@components/StoryWindowHost/hooks';
 import { useAppMode } from '@components/App/AppModeContext';
@@ -32,16 +32,19 @@ export const Nav = () => {
     goToPage,
     goPrevPage,
     goNextPage,
-  } = useGoToPage();
+  } = useReaderNavigation();
 
+  const presented = useSelector(mainSelectors.isPagePresented);
   const id = useSelector(mainSelectors.id);
   const page = useSelector(mainSelectors.page);
   const pages = useSelector(mainSelectors.pages);
 
-  const inputRef = useRef<HTMLInputElement>(null);
-
   const [goToWithInputIsHide, setGoToWithInputIsHide] = useState(true);
   const [inputValue, setInputValue] = useState('');
+
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const locked = appMode === 'reader' && !presented;
 
   const modalWindow = useReaderWindow({
     kind: 'dialog',
@@ -68,6 +71,10 @@ export const Nav = () => {
   };
 
   const nextClickHandler = () => {
+    if (locked) {
+      return;
+    }
+
     if (modalsWereShowed.get(id, Flags.swipes)) {
       goNextPage();
     } else {
@@ -140,7 +147,7 @@ export const Nav = () => {
         onCancel={modalWindow.close}
       />
 
-      <div className={goToWithArrowsClassNames}>
+      <div className={goToWithArrowsClassNames} inert={locked}>
         <Item aria-label="Предыдущая страница" onClick={prevClickHandler}>
           <ArrowLeft />
         </Item>
@@ -154,7 +161,7 @@ export const Nav = () => {
         </Item>
       </div>
 
-      <div className={goToWithInputClassNames}>
+      <div className={goToWithInputClassNames} inert={locked}>
         <div className={styles.WrapperInput}>
           <input
             ref={inputRef}

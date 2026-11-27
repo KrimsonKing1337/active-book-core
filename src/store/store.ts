@@ -15,7 +15,7 @@ import createSagaMiddleware from 'redux-saga';
 import { mainReducer, watchMainActions } from './main';
 import { configReducer, watchConfigActions } from './config';
 import { volumeReducer, watchVolumeActions } from './volume';
-import { effectsReducer, watchEffectsActions } from './effects/common';
+import { effectsReducer } from './effects/common';
 import { fontEffectsReducer } from './effects/font';
 import { audioEffectsReducer, watchAudioEffectsActions } from './effects/audio/audio';
 import { bookmarksReducer, watchBookmarksActions } from './bookmarks';
@@ -58,7 +58,6 @@ export const store = configureStore({
 
 sagaMiddleware.run(watchConfigActions);
 sagaMiddleware.run(watchMainActions);
-sagaMiddleware.run(watchEffectsActions);
 sagaMiddleware.run(watchAudioEffectsActions);
 sagaMiddleware.run(watchBookmarksActions);
 sagaMiddleware.run(watchVolumeActions);

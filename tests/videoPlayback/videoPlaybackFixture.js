@@ -16,7 +16,7 @@ export const openVideos = async (context, options = {}) => {
   }
 
   await page.goto(`${origin}/tests/videoPlayback/?${options.search ?? ''}`, { waitUntil: 'domcontentloaded' });
-  await page.getByTestId('page-a').waitFor();
+  await page.getByTestId('page-a').waitFor({ state: options.preparing ? 'attached' : 'visible' });
 
   return page;
 };

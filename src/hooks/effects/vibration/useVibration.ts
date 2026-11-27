@@ -7,16 +7,19 @@ import { useSelector } from '@store';
 import { configSelectors } from '@store/config';
 import { mainSelectors } from '@store/main';
 
+import { useCanStartPageEffects, usePagePresented } from '@hooks/pagePresentation/context';
+
 import { useAppMode } from '@components/App/AppModeContext';
 
 import { off as vibrationOff, on as vibrationOn } from '@utils/effects/vibration';
 
 import { useVibrationPreview } from './useVibrationPreview';
 
-
 export const useVibration = (options?: VibrationEffectOptions) => {
   const appMode = useAppMode();
   const { start: startPreview, stop: stopPreview } = useVibrationPreview();
+  const canStart = useCanStartPageEffects();
+  const presented = usePagePresented();
 
   const currentPage = useSelector(mainSelectors.page);
   const isVibrationAvailable = useSelector(mainSelectors.isVibrationAvailable);
@@ -66,13 +69,19 @@ export const useVibration = (options?: VibrationEffectOptions) => {
 
   // Declarative behavior is available through both useVibration(options) and <Vibration />
   useEffect(() => {
-    const isSamePage = currentPage === page;
-    const canVibrate = isVibrationAvailable && vibrationEnabled;
+    if (!presented) {
+      return;
+    }
 
-    if (!id
-      || !isSamePage
-      || !playOnLoad
-      || !canVibrate) {
+    if (!canStart() || !id) {
+      return;
+    }
+
+    if (currentPage !== page || !playOnLoad) {
+      return;
+    }
+
+    if (!isVibrationAvailable || !vibrationEnabled) {
       return;
     }
 
@@ -89,7 +98,9 @@ export const useVibration = (options?: VibrationEffectOptions) => {
     }
 
     const timer = window.setTimeout(() => {
-      on(duration);
+      if (canStart()) {
+        on(duration);
+      }
     }, delay);
 
     return () => {
@@ -99,6 +110,7 @@ export const useVibration = (options?: VibrationEffectOptions) => {
     };
   }, [
     currentPage,
+    presented,
     isVibrationAvailable,
     vibrationEnabled,
     id,
@@ -106,6 +118,7 @@ export const useVibration = (options?: VibrationEffectOptions) => {
     duration,
     delay,
     playOnLoad,
+    canStart,
     on,
     off,
   ]);

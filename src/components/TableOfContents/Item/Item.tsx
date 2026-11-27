@@ -1,7 +1,7 @@
 import { useSelector } from '@store';
 import { mainSelectors } from '@store/main';
 
-import { useGoToPage } from '@hooks/control/useGoToPage';
+import { useReaderNavigation } from '@hooks/control/useReaderNavigation';
 
 import * as styles from './Item.module.scss';
 
@@ -16,7 +16,7 @@ export const Item = ({
   subtitle = '',
   pageNumber,
 }: ItemProps) => {
-  const { goToPage } = useGoToPage();
+  const { goToPage } = useReaderNavigation();
 
   const pages = useSelector(mainSelectors.pages);
 

@@ -1,30 +1,17 @@
-import { type PropsWithChildren, useEffect } from 'react';
-
-import { useDispatch } from '@store';
-import { effectsActions } from '@store/effects/common';
+import type { PropsWithChildren } from 'react';
 
 export type DotLottieReactWrapperProps = PropsWithChildren & React.HTMLAttributes<HTMLDivElement> & {
   className?: string;
+  /** Each mounted player participates in page preparation directly. */
   amount?: number;
 };
 
 export const DotLottieReactWrapper = ({
   children,
-  amount = 1,
+  amount: _amount,
   className = '',
   ...etc
 }: DotLottieReactWrapperProps) => {
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(effectsActions.setDotLottieAmount(amount));
-
-    return () => {
-      dispatch(effectsActions.setDotLottieAmount(0));
-      dispatch(effectsActions.setDotLottieReadyAmount(0));
-    };
-  }, []);
-
   return (
     <div className={className} {...etc}>
       {children}

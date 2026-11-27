@@ -15,3 +15,8 @@
 
   pointer-events: none;
 }
+
+.Surface[data-visual-preparing],
+.Surface[data-visual-preparing] * {
+  animation-play-state: paused !important;
+}

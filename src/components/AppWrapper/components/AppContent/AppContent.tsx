@@ -1,16 +1,20 @@
 import type { PropsWithChildren } from 'react';
 
 import {
+  useContext,
   useEffect,
   useLayoutEffect,
   useRef,
 } from 'react';
 
 import classNames from 'classnames';
-import { setWasmUrl } from '@lottiefiles/dotlottie-react';
 import { ToastContainer } from 'react-toastify';
 
-import { useDispatch, useSelector } from '@store';
+import {
+  useDispatch,
+  useSelector,
+  useStore,
+} from '@store';
 
 import { mainActions, mainSelectors } from '@store/main';
 import { audioEffectsSelectors } from '@store/effects/audio/audio';
@@ -20,7 +24,9 @@ import type { VisualEffects } from '@controllers/visualEffects';
 
 import { useVisualRegistrations } from '@controllers/visualEffects';
 
-import { useGoToPage } from '@hooks/control/useGoToPage';
+import { canAutoplayAudio } from '@hooks/effects/audio/useAudio';
+import { useReaderNavigation } from '@hooks/control/useReaderNavigation';
+import { BookPresentationContext, usePageVisit } from '@hooks/pagePresentation/context';
 
 import { BookApplicationSurface, useBookApplicationSurface } from '@components/BookApplicationSurface';
 
@@ -33,6 +39,8 @@ import { removeCssHover } from '@utils/touch/removeCssHover';
 import { addKeyboardControl } from '@utils/control/keyboardControl';
 import { hideAddressBarInMobileDevices } from '@utils/mobile/hideAddressBarInMobileDevices';
 
+import type { HowlWrapper } from '@utils/effects/audio/HowlWrapper';
+
 import type { AppWrapperProps } from '../../@types';
 
 import {
@@ -43,10 +51,7 @@ import {
   useVisibilityChangeHandler,
 } from '../../hooks';
 
-import {
-  startToPlayAllAudiosWithPlayOnLoad,
-  startToPlayAllVideosWithPlayOnLoad,
-} from '../../utils';
+import { startToPlayAllAudiosWithPlayOnLoad } from '../../utils';
 
 import * as styles from '../../AppWrapper.module.scss';
 
@@ -70,6 +75,12 @@ export const AppContent = ({
   selectedVisualEffectId,
 }: AppContentProps) => {
   const dispatch = useDispatch();
+
+  const store = useStore();
+
+  const bookSession = useContext(BookPresentationContext);
+
+  const visit = usePageVisit();
   const application = useBookApplicationSurface();
 
   const pageId = useSelector(mainSelectors.pageId);
@@ -95,7 +106,10 @@ export const AppContent = ({
       return;
     }
 
-    if (new Set(ids).size !== ids.length || ids.some((cur) => !cur)) {
+    const idsAreUnique = new Set(ids).size === ids.length;
+    const idsAreNonEmpty = ids.every((cur) => !!cur);
+
+    if (!idsAreUnique || !idsAreNonEmpty) {
       throw new Error('Story pages require unique non-empty IDs');
     }
 
@@ -116,13 +130,18 @@ export const AppContent = ({
 
   const appMode = useAppMode();
 
-  const { goPrevPage, goNextPage } = useGoToPage();
+  const { goPrevPage, goNextPage } = useReaderNavigation();
 
-  const isLoading = useSelector(mainSelectors.isPending);
+  const canPlayAudio = useSelector(mainSelectors.isAudioUnlocked);
   const showLoader = useSelector(mainSelectors.showLoader);
   const page = useSelector(mainSelectors.page);
   const inverseColors = useSelector(effectsSelectors.inverseColorIsActive);
   const audioInstances = useSelector(audioEffectsSelectors.audioInstances);
+
+  const audioStarted = useRef(new WeakMap<object, number>());
+
+  const visitId = visit?.id;
+  const presentedAt = visit?.presentedAt;
 
   // применяю конфиг
   useSetUpConfig(config);
@@ -147,24 +166,91 @@ export const AppContent = ({
   }, []);
 
   useEffect(() => {
-    /*
-      в эту директорию в dist-е клиента с помощью webpack нужно копировать этот файлик,
-      иначе он будет загружаться с cdn
-    */
-    setWasmUrl('/vendors/dotlottie-player.wasm');
-  }, []);
-
-  // после полной загрузки страницы воспроизвожу все аудио, у которых playOnLoad = true
-  useEffect(() => {
-    if (isLoading) {
+    if (appMode !== 'reader' || canPlayAudio) {
       return;
     }
 
-    startToPlayAllAudiosWithPlayOnLoad(audioInstances, page);
+    const unlock = (event: Event) => {
+      if (event.isTrusted) {
+        dispatch(mainActions.setIsAudioUnlocked(true));
+      }
+    };
+    const events = [
+      'click',
+      'pointerup',
+      'touchend',
+      'keydown',
+    ];
+
+    events.forEach((eventCur) => {
+      window.addEventListener(eventCur, unlock);
+    });
+
+    return () => {
+      events.forEach((eventCur) => {
+        window.removeEventListener(eventCur, unlock);
+      });
+    };
   }, [
-    page,
-    isLoading,
+    appMode,
+    canPlayAudio,
+    dispatch,
+  ]);
+
+  useEffect(() => {
+    if (appMode !== 'reader' || !canPlayAudio) {
+      return;
+    }
+
+    if (visitId === undefined || presentedAt == null) {
+      return;
+    }
+
+    const currentVisitId = mainSelectors.visitId(store.getState());
+
+    if (currentVisitId !== visitId) {
+      return;
+    }
+
+    const allowStart = (instance: HowlWrapper) => {
+      if (!canAutoplayAudio(instance, bookSession)) {
+        return false;
+      }
+
+      const state = store.getState();
+      const isCurrentVisit = mainSelectors.visitId(state) === visitId;
+
+      if (!isCurrentVisit) {
+        return false;
+      }
+
+      const registeredInstance = state.audioEffects.audioInstances[instance.id];
+
+      if (registeredInstance !== instance) {
+        return false;
+      }
+
+      const hasAlreadyStarted = audioStarted.current.get(instance) === visitId;
+
+      if (hasAlreadyStarted) {
+        return false;
+      }
+
+      audioStarted.current.set(instance, visitId);
+
+      return true;
+    };
+
+    startToPlayAllAudiosWithPlayOnLoad(audioInstances, { page, allowStart });
+  }, [
+    appMode,
     audioInstances,
+    bookSession,
+    canPlayAudio,
+    page,
+    presentedAt,
+    store,
+    visitId,
   ]);
 
   // Удаляю id видео из списка currentTime, если видео с data-id на странице нет
@@ -187,18 +273,6 @@ export const AppContent = ({
     // addTouchSupportForCssHover(); // вместо этого просто "удаляю" :hover везде, возможно так и оставлю
     hideAddressBarInMobileDevices();
   }, []);
-
-  /*
-    начинаю воспроизведение video, у которых autoPlay.
-    делаю это здесь, чтобы воспроизведение начиналось только после полной загрузки страницы
-  */
-  useEffect(() => {
-    if (isLoading) {
-      return;
-    }
-
-    startToPlayAllVideosWithPlayOnLoad();
-  }, [page, isLoading]);
 
   useAllPagesSeen();
   useBeforeUnloadHandler();

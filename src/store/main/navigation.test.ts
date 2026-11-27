@@ -29,3 +29,24 @@ test('one stable page ID survives reorder; numeric positions are only a navigati
   expect(state.pageId).toBe('beta');
   expect(reducer(state, actions.setPage(0)).pageId).toBeNull();
 });
+
+test('settling an unregistered inherited resource does not count as a failure', () => {
+  const state = reducer(initialState, actions.openBookSession({
+    sessionId: 'book',
+    pageIds: ['first'],
+    initialPage: 'first',
+  }));
+
+  if (!state.visit) {
+    throw new Error('Page visit was not created');
+  }
+
+  const nextState = reducer(state, actions.settlePageResource({
+    visitId: state.visit.id,
+    resourceId: 'toString',
+    outcome: 'failed',
+  }));
+
+  expect(nextState.visit?.failedResources).toBe(0);
+  expect(nextState.visit?.pendingResources).toEqual({});
+});

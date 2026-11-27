@@ -2,15 +2,12 @@ import type { Task } from 'redux-saga';
 
 import {
   put,
-  takeLatest,
   delay,
   fork,
   select,
   take,
   cancel,
 } from 'redux-saga/effects';
-
-import { effectsActions } from '@store/effects/common';
 
 import { actions } from './slice';
 import { selectors } from './selectors';
@@ -43,24 +40,19 @@ export function* watchLoaderGate() {
     if (showTask && !showTask.isRunning()) {
       showTask = null;
     }
+
     if (hideTask && !hideTask.isRunning()) {
       hideTask = null;
     }
 
     yield take([
-      // список actions, влияющих на pending
-      effectsActions.setImagesAmount.type,
-      effectsActions.setImagesReadyAmount.type,
-      effectsActions.setImageReady.type,
-      effectsActions.setVideosAmount.type,
-      effectsActions.setVideosReadyAmount.type,
-      effectsActions.setVideoReady.type,
-      effectsActions.setDotLottieAmount.type,
-      effectsActions.setDotLottieReadyAmount.type,
-      effectsActions.setDotLottieReady.type,
-      effectsActions.setAudiosAmount.type,
-      effectsActions.setAudiosReadyAmount.type,
-      effectsActions.setAudioReady.type,
+      actions.openBookSession.type,
+      actions.closeBookSession.type,
+      actions.setPage.type,
+      actions.setStoryPages.type,
+      actions.setPrimaryCommitted.type,
+      actions.registerPageResource.type,
+      actions.settlePageResource.type,
     ]);
 
     const isPending: boolean = yield select(selectors.isPending);
@@ -70,6 +62,7 @@ export function* watchLoaderGate() {
       // если pending снова true — отменяем скрытие
       if (hideTask) {
         yield cancel(hideTask);
+
         hideTask = null;
       }
 
@@ -77,10 +70,12 @@ export function* watchLoaderGate() {
       if (!showLoader && !showTask) {
         showTask = yield fork(showAfterDelay, 250);
       }
+
     } else {
       // pending false — отменяем показ, если он ещё не случился
       if (showTask) {
         yield cancel(showTask);
+
         showTask = null;
       }
 
@@ -92,13 +87,6 @@ export function* watchLoaderGate() {
   }
 }
 
-function* watchSetPage() {
-  yield put(effectsActions.setAudiosAmount(0));
-  yield put(effectsActions.setAudiosReadyAmount(0));
-}
-
 export function* watchActions() {
-  yield takeLatest(actions.setPage, watchSetPage);
-
   yield fork(watchLoaderGate);
 }

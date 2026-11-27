@@ -6,14 +6,18 @@ import {
   useRef,
 } from 'react';
 
-import { useSelector } from '@store';
-import { mainSelectors } from '@store/main';
+import {
+  BookPresentationContext,
+  useCanStartPageEffects,
+  usePagePresented,
+} from '@hooks/pagePresentation/context';
 
 import { CarouselSlideActiveContext, useCarouselSlideActive } from '@components/Carousel/context';
 
+import { VideoPlaybackContext } from '../context';
+
 import type { VideoPlayback } from '../utils';
 
-import { VideoPlaybackContext } from '../context';
 import {
   createVideoPlayback,
   disposeVideo,
@@ -35,13 +39,19 @@ export const useVideoPlayback = (ref: RefObject<HTMLVideoElement | null>, option
     autoPlay,
     preserveTime,
   } = options;
+
   const dialog = useContext(VideoPlaybackContext);
   const isInCarousel = useContext(CarouselSlideActiveContext) !== undefined;
+  const bookSession = useContext(BookPresentationContext);
+
   const isSlideActive = useCarouselSlideActive();
-  const isPending = useSelector(mainSelectors.isPending);
-  const managed = isInCarousel || dialog !== null;
+  const canStart = useCanStartPageEffects();
+  const presented = usePagePresented();
+
   const playbackRef = useRef<VideoPlayback | null>(null);
   const sourceRef = useRef({ id, src });
+
+  const managed = isInCarousel || dialog !== null;
 
   useLayoutEffect(() => {
     const element = ref.current;
@@ -53,7 +63,9 @@ export const useVideoPlayback = (ref: RefObject<HTMLVideoElement | null>, option
     const previous = playbackRef.current;
     const sourceChanged = sourceRef.current.id !== id || sourceRef.current.src !== src;
 
-    if (!previous || previous.element !== element || sourceChanged) {
+    const hasElementChanged = previous?.element !== element;
+
+    if (hasElementChanged || sourceChanged) {
       if (previous) {
         previous.disposed = true;
         previous.element.pause();
@@ -70,14 +82,18 @@ export const useVideoPlayback = (ref: RefObject<HTMLVideoElement | null>, option
     }
 
     playback.connected = true;
+
     const removeListeners = listenVideoPlayback(playback);
 
     return () => {
       playback.connected = false;
+
       removeListeners();
 
       queueMicrotask(() => {
-        if (!playback.connected && playbackRef.current === playback) {
+        const isCurrentPlayback = playbackRef.current === playback;
+
+        if (!playback.connected && isCurrentPlayback) {
           disposeVideo(playback);
         }
       });
@@ -92,11 +108,19 @@ export const useVideoPlayback = (ref: RefObject<HTMLVideoElement | null>, option
     const playback = playbackRef.current;
 
     if (playback) {
+      const canStartPlayback = canStart();
+      const isReadyToStart = presented && canStartPlayback;
+      const canActivatePlayback = playback.initialized || isReadyToStart;
+      const isPlaybackActive = isSlideActive && canActivatePlayback;
+      const canAutoPlay = managed || bookSession !== null;
+      const shouldAutoPlay = autoPlay && canAutoPlay;
+      const shouldResetOnDispose = dialog !== null || !preserveTime;
+
       updateVideoPlayback(playback, {
-        active: isSlideActive && !isPending,
+        active: isPlaybackActive,
         managed,
-        autoPlay,
-        resetOnDispose: dialog !== null || !preserveTime,
+        autoPlay: shouldAutoPlay,
+        resetOnDispose: shouldResetOnDispose,
         isCurrentWindow: dialog?.isCurrentWindow,
       });
     }
@@ -105,11 +129,13 @@ export const useVideoPlayback = (ref: RefObject<HTMLVideoElement | null>, option
     id,
     src,
     isSlideActive,
-    isPending,
+    bookSession,
+    presented,
     managed,
     autoPlay,
     preserveTime,
     dialog,
+    canStart,
   ]);
 
   return managed;
