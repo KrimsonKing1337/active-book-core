@@ -23,8 +23,8 @@ export class RetiringAudio {
 
   waitForEnd(activation: AudioActivation) {
     const waiting = activation.audio.finishCurrentPlayback();
-
     const retirement = { waiting };
+
     this.retiring.set(activation, retirement);
 
     void waiting.promise.then(() => {
@@ -33,7 +33,9 @@ export class RetiringAudio {
   }
 
   fadeOut(activations: readonly AudioActivation[]) {
-    const pending = activations.filter((activation) => this.has(activation));
+    const pending = activations.filter((activationCur) => {
+      return this.has(activationCur);
+    });
 
     if (!pending.length) {
       return;

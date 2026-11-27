@@ -451,6 +451,7 @@ export class HowlWrapper {
 
     const finish = () => {
       isPending = false;
+
       this.pendingOperations.delete(operation);
     };
 
@@ -493,13 +494,15 @@ export class HowlWrapper {
         return;
       }
 
+      const acceptStart = () => {
+        finish();
+
+        return options.acceptStart?.() ?? true;
+      };
+
       cancelVoice = this.startPlayback({
         ...options,
-        acceptStart: () => {
-          finish();
-
-          return options.acceptStart?.() ?? true;
-        },
+        acceptStart,
         fail,
         complete: () => {},
         holdUntilStarted: true,

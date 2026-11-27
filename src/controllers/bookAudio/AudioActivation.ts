@@ -43,10 +43,12 @@ export class AudioActivation {
       screamer,
     } = description;
 
+    const formatCopy = [...format];
+
     this.audio = new HowlWrapper({
       id,
       src: [src],
-      format: [...format],
+      format: formatCopy,
       loop,
       type,
       relativeVolume,

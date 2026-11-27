@@ -5,7 +5,6 @@ import type {
 } from '@active-book/types';
 
 type RuntimeAudio = AudioEffect<number>;
-
 export type AudioDescription = Required<RuntimeAudio>;
 
 const normalizeLifetime = (lifetime: EffectLifetime): EffectLifetime => {
@@ -13,7 +12,10 @@ const normalizeLifetime = (lifetime: EffectLifetime): EffectLifetime => {
     return lifetime;
   }
 
-  const sorted = [...lifetime.range].sort((first, second) => first.from - second.from);
+  const sorted = [...lifetime.range].sort((first, second) => {
+    return first.from - second.from;
+  });
+
   const merged: PageRange[] = [];
 
   for (const current of sorted) {
@@ -51,10 +53,12 @@ export const normalizeAudioDescription = ({
   fadeOut = false,
   waitTillTheEnd = false,
 }: RuntimeAudio): AudioDescription => {
+  const lifetimeNormalized = normalizeLifetime(lifetime);
+
   return {
     id,
     src,
-    lifetime: normalizeLifetime(lifetime),
+    lifetime: lifetimeNormalized,
     format,
     type,
     relativeVolume,
@@ -69,6 +73,8 @@ export const normalizeAudioDescription = ({
   };
 };
 
-export const describeAudio = ({ relativeVolume: _relativeVolume, ...identity }: AudioDescription) => {
+export const describeAudio = ({
+  relativeVolume: _relativeVolume,
+  ...identity }: AudioDescription) => {
   return JSON.stringify(identity);
 };

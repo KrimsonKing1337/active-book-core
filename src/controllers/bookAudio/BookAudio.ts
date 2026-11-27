@@ -10,19 +10,27 @@ import { audioEffectsActions } from '@store/effects/audio/audio';
 
 import { isEffectActive } from '@utils/effects/lifetime';
 
-import type { AudioDescription } from './descriptions';
-
 import { AudioActivation } from './AudioActivation';
-import { describeAudio, normalizeAudioDescription } from './descriptions';
-import { removeOwnedAudio } from './ownedAudio';
 import { RetiringAudio } from './RetiringAudio';
+import { removeOwnedAudio } from './ownedAudio';
+
+import {
+  type AudioDescription,
+  describeAudio,
+  normalizeAudioDescription,
+} from './descriptions';
+
+type EnterEntry = {
+  description: AudioDescription;
+  identity: string
+};
 
 export class BookAudio {
   private descriptions: readonly AudioDescription[] = [];
   private configuredDescriptions?: readonly AudioEffect<number>[];
   private readonly active = new Map<string, AudioActivation>();
-  private readonly retiring = new RetiringAudio((activation) => this.dispose(activation));
   private readonly removed = new Map<string, string>();
+  private readonly retiring = new RetiringAudio(this.dispose.bind(this));
   private removalVisitId?: number;
   private unsubscribe?: () => void;
   private lastSyncedMain?: MainState;
@@ -45,8 +53,8 @@ export class BookAudio {
     const ids = new Set<string>();
     const { audioInstances } = store.getState().audioEffects;
 
-    for (const description of descriptions) {
-      const { id, src } = description;
+    for (const descriptionCur of descriptions) {
+      const { id, src } = descriptionCur;
 
       const hasId = typeof id === 'string' && !!id.trim();
       const hasSource = typeof src === 'string' && !!src.trim();
@@ -75,19 +83,20 @@ export class BookAudio {
     this.descriptions = descriptions.map(normalizeAudioDescription);
     this.configuredDescriptions = descriptions;
     this.isAutoplayEnabled = isAutoplayEnabled;
+
     this.sync();
   }
 
   hasDescription(id: string) {
-    return this.descriptions.some((description) => description.id === id);
+    return this.descriptions.some((cur) => cur.id === id);
   }
 
   private handleStoreChange = () => {
     const state = store.getState();
+    const { main } = state;
 
     this.updateRetiringVolume(state.volume);
 
-    const { main } = state;
     const previousMain = this.lastSyncedMain;
 
     if (!previousMain) {
@@ -201,19 +210,19 @@ export class BookAudio {
         }
       }
 
-      for (const entry of desired.values()) {
+      for (const entryCur of desired.values()) {
         if (!this.isCurrentVisit(visit.id) || this.needsSync) {
           return;
         }
 
-        const { description, identity } = entry;
+        const { description, identity } = entryCur;
         const { id } = description;
 
         if (this.removed.get(id) === identity) {
           continue;
         }
 
-        const activation = this.active.get(id) ?? this.enter(entry, visit.id);
+        const activation = this.active.get(id) ?? this.enter(entryCur, visit.id);
 
         if (!activation || !this.isActive(activation)) {
           continue;
@@ -237,27 +246,30 @@ export class BookAudio {
   }
 
   private getDescriptions(page: number) {
-    const desired = new Map<string, {
+    type Desire = {
       description: AudioDescription;
       identity: string
-    }>();
+    };
 
-    for (const description of this.descriptions) {
-      if (isEffectActive(description.lifetime, page)) {
-        const identity = describeAudio(description);
+    const desired = new Map<string, Desire>();
 
-        desired.set(description.id, { description, identity });
+    for (const descriptionCur of this.descriptions) {
+      if (isEffectActive(descriptionCur.lifetime, page)) {
+        const identity = describeAudio(descriptionCur);
+
+        desired.set(descriptionCur.id, {
+          description: descriptionCur,
+          identity,
+        });
       }
     }
 
     return desired;
   }
 
-  private enter(entry: {
-    description: AudioDescription;
-    identity: string
-  }, visitId: number) {
+  private enter(entry: EnterEntry, visitId: number) {
     const { description, identity } = entry;
+
     const existing = store.getState().audioEffects.audioInstances[description.id];
 
     if (existing) {
@@ -281,6 +293,7 @@ export class BookAudio {
 
       if (restored) {
         activationCur.updateDescription(description);
+
         this.publish(activationCur);
 
         return activationCur;
@@ -409,6 +422,7 @@ export class BookAudio {
 
   private dispose(activation: AudioActivation) {
     const { audio } = activation;
+
     this.retiring.remove(activation);
 
     if (this.active.get(audio.id) === activation) {

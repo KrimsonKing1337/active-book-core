@@ -1,6 +1,5 @@
-import type { PropsWithChildren } from 'react';
-
 import {
+  type PropsWithChildren,
   useEffect,
   useLayoutEffect,
   useRef,
@@ -8,7 +7,7 @@ import {
 } from 'react';
 
 import { setWasmUrl } from '@lottiefiles/dotlottie-react';
-import { nanoid } from '@reduxjs/toolkit';
+import { nanoid } from 'nanoid';
 
 import type { AudioEffect } from '@active-book/types';
 
@@ -19,12 +18,11 @@ import { createVisualEffects, VisualEffectsContext } from '@controllers/visualEf
 import { BookAudio } from '@controllers/bookAudio/BookAudio';
 import { BookAudioContext } from '@controllers/bookAudio/context';
 
-
 import { BookPresentationContext } from '@hooks/pagePresentation/context';
 
 import { StoryRegionsProvider } from '@components/StoryRegionsProvider';
-import { useAppMode } from '@components/App/AppModeContext';
 import { StoryWindowSessionContext } from '@components/StoryWindowHost/context';
+import { useAppMode } from '@components/App/AppModeContext';
 import { useStoryWindowSession } from '@components/StoryWindowHost/hooks';
 
 import type { AppWrapperProps } from '../../@types';

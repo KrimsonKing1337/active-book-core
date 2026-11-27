@@ -13,9 +13,9 @@ import { StoreProvider } from '@store';
 import type { VisualEffects } from '@controllers/visualEffects';
 
 import type { VisualSurfaceItem } from '@components/VisualSurfaces';
-import { AppWrapper } from '@components/AppWrapper';
 import type { StoryPage } from '@components/AppWrapper/@types';
 
+import { AppWrapper } from '@components/AppWrapper';
 
 import { AppModeContext } from './AppModeContext';
 

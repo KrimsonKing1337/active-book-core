@@ -1,11 +1,7 @@
 import type { JsonValue } from '@active-book/types';
 
 const validateJson = (value: unknown, ancestors: Set<object>): void => {
-  if (
-    value === null
-    || typeof value === 'string'
-    || typeof value === 'boolean'
-  ) {
+  if (value === null || typeof value === 'string' || typeof value === 'boolean') {
     return;
   }
 

@@ -23,7 +23,6 @@ import { type SettlePageResource, usePageResource } from '@hooks/pagePresentatio
 
 import { HowlWrapper, type HowlWrapperOptions } from '@utils/effects/audio/HowlWrapper';
 
-
 const failedLoads = new WeakSet<HowlWrapper>();
 const unloadListeners = new WeakMap<HowlWrapper, Set<() => void>>();
 const audioSessions = new WeakMap<HowlWrapper, string | null>();
@@ -59,7 +58,6 @@ export const useAudio = (passedOptions: AudioEffectOptions) => {
   const audioInstances = useSelector(audioEffectsSelectors.audioInstances);
 
   const canPrepare = !!bookSession || isAudioUnlocked;
-
   const formatKey = format?.join(',');
 
   useLayoutEffect(() => {
