@@ -38,7 +38,12 @@ type HowlerOptions = {
   format?: HowlOptions['format'];
   loop?: HowlOptions['loop'];
   volume?: HowlOptions['volume'];
+  onload: () => void;
+  onloaderror: () => void;
 };
+
+type AudioLoadOutcome = 'ready' | 'failed' | 'cancelled';
+type AudioLoadListener = (outcome: AudioLoadOutcome) => void;
 
 type ScheduleCallbacks = {
   complete: () => void;
@@ -97,6 +102,8 @@ export class HowlWrapper {
 
   public isUnloading = false;
   private readonly fades: AudioFades;
+  private loadResult?: AudioLoadOutcome;
+  private readonly loadListeners = new Set<AudioLoadListener>();
   private fadingOut: Promise<boolean> | null = null;
   private haltOperation: object | null = null;
   // Only this Howl's voice IDs are retained; Howler continues to own the sound resources.
@@ -163,6 +170,8 @@ export class HowlWrapper {
       format,
       loop,
       volume,
+      onload: this.handleLoad,
+      onloaderror: this.handleLoadError,
     };
 
     // todo: через вебапи делать громкость более 100%
@@ -172,6 +181,14 @@ export class HowlWrapper {
 
     this.howlInst = new Howl(options);
     this.fades = new AudioFades(this.howlInst);
+
+    const state = this.howlInst.state();
+
+    if (state === 'loaded') {
+      this.handleLoad();
+    } else if (state === 'unloaded') {
+      this.handleLoadError();
+    }
 
     this.id = id;
     this.page = page;
@@ -209,6 +226,48 @@ export class HowlWrapper {
         this.fades.cancel(soundId);
       }
     });
+  }
+
+  get loadOutcome() {
+    return this.loadResult;
+  }
+
+  observeLoad = (listener: AudioLoadListener) => {
+    if (this.isDisposed) {
+      listener('cancelled');
+
+      return;
+    }
+
+    if (this.loadResult) {
+      listener(this.loadResult);
+
+      return;
+    }
+
+    this.loadListeners.add(listener);
+
+    return () => {
+      this.loadListeners.delete(listener);
+    };
+  };
+
+  private handleLoad = () => this.finishLoad('ready');
+  private handleLoadError = () => this.finishLoad('failed');
+
+  private finishLoad(outcome: AudioLoadOutcome) {
+    if (this.loadResult) {
+      return;
+    }
+
+    this.loadResult = outcome;
+    this.howlInst.off('load', this.handleLoad);
+    this.howlInst.off('loaderror', this.handleLoadError);
+
+    for (const listener of this.loadListeners) {
+      this.loadListeners.delete(listener);
+      listener(outcome);
+    }
   }
 
   get isFading() {
@@ -281,7 +340,7 @@ export class HowlWrapper {
   }
 
   private afterLoad(ready: () => void, cancelled: () => void = () => {}) {
-    if (this.isDisposed || this.state() === 'unloaded') {
+    if (this.isDisposed || this.loadResult === 'failed' || this.state() === 'unloaded') {
       cancelled();
 
       return;
@@ -721,6 +780,7 @@ export class HowlWrapper {
     }
 
     this.howlInst.unload();
+    this.finishLoad('cancelled');
     this.onUnload();
   }
 

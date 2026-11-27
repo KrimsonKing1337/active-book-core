@@ -153,6 +153,22 @@ test('equivalent ranges and explicit defaults preserve the active instance', () 
   expect(get('effect')).toBe(previous);
 });
 
+test('retains page and range audio when the properties of their lifetimes are reordered', () => {
+  const pageEffect = onPage('page', 1);
+  const rangeEffect = range('range');
+  owner.configure([pageEffect, rangeEffect], true);
+  const pageAudio = get('page');
+  const rangeAudio = get('range');
+
+  owner.configure([
+    { ...pageEffect, lifetime: { page: 1, type: 'page' } },
+    { ...rangeEffect, lifetime: { range: [{ to: 3, from: 1 }], type: 'range' } },
+  ], true);
+
+  expect(get('page')).toBe(pageAudio);
+  expect(get('range')).toBe(rangeAudio);
+});
+
 test('duplicates and imperative conflicts fail before an instance can be replaced', () => {
   owner.configure([range('effect')], true);
   const audio = get('effect');

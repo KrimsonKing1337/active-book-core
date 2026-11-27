@@ -51,10 +51,16 @@ export class RetiringAudio {
         continue;
       }
 
-      if (generation < nextGeneration - 1) {
+      const { audio } = activationCur;
+      const isOldest = generation < nextGeneration - 1;
+
+      if (!isOldest) {
+        void audio.shortenFadeOut(SHORT_FADE_MS);
+      } else if (audio.isHalting) {
+        // Finish the existing ramp now so its pending pause or stop runs before disposal.
+        void audio.shortenFadeOut(0);
+      } else {
         this.dispose(activationCur);
-      } else if (!activationCur.audio.isHalting) {
-        void activationCur.audio.shortenFadeOut(SHORT_FADE_MS);
       }
     }
 

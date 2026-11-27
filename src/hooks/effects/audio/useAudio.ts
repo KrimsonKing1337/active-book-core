@@ -1,5 +1,4 @@
 import {
-  useCallback,
   useContext,
   useLayoutEffect,
 } from 'react';
@@ -19,12 +18,10 @@ import { BookAudioContext } from '@controllers/bookAudio/context';
 import { removeOwnedAudio } from '@controllers/bookAudio/ownedAudio';
 
 import { BookPresentationContext } from '@hooks/pagePresentation/context';
-import { type SettlePageResource, usePageResource } from '@hooks/pagePresentation/usePageResource';
+import { usePageResource } from '@hooks/pagePresentation/usePageResource';
 
 import { HowlWrapper, type HowlWrapperOptions } from '@utils/effects/audio/HowlWrapper';
 
-const failedLoads = new WeakSet<HowlWrapper>();
-const unloadListeners = new WeakMap<HowlWrapper, Set<() => void>>();
 const audioSessions = new WeakMap<HowlWrapper, string | null>();
 
 export const useAudio = (passedOptions: AudioEffectOptions) => {
@@ -93,16 +90,6 @@ export const useAudio = (passedOptions: AudioEffectOptions) => {
       throw new Error(`Audio ID "${id}" is already registered`);
     }
 
-    const handleUnload = () => {
-      const instanceUnloadListeners = unloadListeners.get(instance);
-
-      if (instanceUnloadListeners) {
-        instanceUnloadListeners.forEach((cancel) => cancel());
-      }
-
-      onUnload();
-    };
-
     const options: HowlWrapperOptions = {
       id,
       page,
@@ -119,21 +106,12 @@ export const useAudio = (passedOptions: AudioEffectOptions) => {
       onPlay,
       onPause,
       onStop,
-      onUnload: handleUnload,
+      onUnload,
     };
 
     const instance = new HowlWrapper(options);
 
     audioSessions.set(instance, bookSession);
-
-    // Howler can reject the format synchronously before event listeners attach.
-    if (instance.howlInst.state() === 'unloaded') {
-      failedLoads.add(instance);
-    }
-
-    instance.howlInst.once('loaderror', () => {
-      failedLoads.add(instance);
-    });
 
     dispatch(audioEffectsActions.setAudioInstance(instance));
 
@@ -161,49 +139,10 @@ export const useAudio = (passedOptions: AudioEffectOptions) => {
 
   const instance = audioInstances[id];
 
-  const prepare = useCallback((settle: SettlePageResource) => {
-    if (!instance || instance.isUnloading) {
-      settle('cancelled');
-
-      return;
-    }
-
-    if (failedLoads.has(instance)) {
-      settle('failed');
-
-      return;
-    }
-
-    if (instance.howlInst.state() === 'loaded') {
-      settle('ready');
-
-      return;
-    }
-
-    const loaded = () => settle();
-    const failed = () => settle('failed');
-    const cancel = () => settle('cancelled');
-
-    const listeners = unloadListeners.get(instance) ?? new Set();
-
-    unloadListeners.set(instance, listeners);
-    listeners.add(cancel);
-
-    instance.howlInst.on('load', loaded);
-    instance.howlInst.on('loaderror', failed);
-
-    return () => {
-      listeners.delete(cancel);
-
-      instance.howlInst.off('load', loaded);
-      instance.howlInst.off('loaderror', failed);
-    };
-  }, [instance]);
-
-  let prepareResource: typeof prepare | null = null;
+  let prepareResource = null;
 
   if (canPrepare && currentPage === page && instance) {
-    prepareResource = prepare;
+    prepareResource = instance.observeLoad;
   }
 
   usePageResource(prepareResource);

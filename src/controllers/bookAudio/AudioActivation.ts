@@ -6,7 +6,6 @@ import { HowlWrapper } from '@utils/effects/audio/HowlWrapper';
 
 import type { AudioDescription } from './descriptions';
 
-import { AudioResource } from './AudioResource';
 import { AudioTimeline } from './AudioTimeline';
 
 type ActivationOptions = {
@@ -23,7 +22,6 @@ export class AudioActivation {
   readonly timeline: AudioTimeline;
   readonly identity: string;
   description: AudioDescription;
-  private readonly resource: AudioResource;
   private visitId: number | undefined;
   private cancelPreparation?: () => void;
 
@@ -60,10 +58,8 @@ export class AudioActivation {
       onUnload: () => options.remove(this),
     });
 
-    this.resource = new AudioResource(this.audio, () => this.timeline.update());
-
     const canPlay = () => {
-      const isReady = this.resource.isReady;
+      const isReady = this.audio.loadOutcome === 'ready';
       const canAutoplay = options.canAutoplay(this);
 
       return isReady && canAutoplay;
@@ -102,14 +98,24 @@ export class AudioActivation {
     }
 
     this.cancelPreparation?.();
-
+    this.cancelPreparation = undefined;
     this.visitId = visitId;
 
-    if (!this.resource.isReady) {
-      const prepare = this.resource.prepare;
-
-      this.cancelPreparation = registerPageResource(store, { visitId, prepare });
+    if (this.audio.loadOutcome === 'ready') {
+      return;
     }
+
+    const cancelResource = registerPageResource(store, { visitId, prepare: this.audio.observeLoad });
+    const stopObservingLoad = this.audio.observeLoad((outcome) => {
+      if (outcome === 'ready') {
+        this.timeline.update();
+      }
+    });
+
+    this.cancelPreparation = () => {
+      stopObservingLoad?.();
+      cancelResource?.();
+    };
   }
 
   leave() {
@@ -121,7 +127,6 @@ export class AudioActivation {
 
   dispose() {
     this.timeline.destroy();
-    this.resource.destroy();
     this.leave();
     void this.audio.unload({ immediate: true });
   }

@@ -178,3 +178,87 @@ test('close from onUnload also releases staged fades and prevents entering the d
   await advance(2000);
   expect(fading.playing()).toBe(false);
 });
+
+test.each([
+  {
+    command: 'pause',
+    elapsed: 0,
+    remaining: 100,
+  },
+  {
+    command: 'stop',
+    elapsed: 950,
+    remaining: 50,
+  },
+] as const)('shortens a retired $command to at most 100 ms and keeps its promise on reentry', async ({
+  command,
+  elapsed,
+  remaining,
+}) => {
+  owner.configure([onPage('first', 1), onPage('second', 2)], true);
+  const first = get('first');
+  const nativeHalt = jest.spyOn(first.howlInst, command);
+  const shorten = jest.spyOn(first, 'shortenFadeOut');
+  const restore = jest.spyOn(first, 'restoreFadeIn');
+  await first.play();
+  const halted = first[command](true);
+  const completed = jest.fn();
+  void halted.then(completed);
+
+  navigate(2);
+  await get('second').play();
+  await advance(elapsed);
+  navigate(3);
+  expect(shorten).toHaveBeenCalledWith(100);
+  navigate(1);
+  expect(get('first')).toBe(first);
+  expect(restore).not.toHaveBeenCalled();
+  await advance(remaining - 1);
+  expect(nativeHalt).not.toHaveBeenCalled();
+  expect(completed).not.toHaveBeenCalled();
+  await advance(1);
+  await halted;
+  expect(nativeHalt).toHaveBeenCalledTimes(1);
+  expect(completed).toHaveBeenCalledTimes(1);
+  expect(first.playing()).toBe(false);
+  expect(first.isUnloading).toBe(false);
+});
+
+test.each(['pause', 'stop'] as const)('completes author %s before releasing the oldest fade', async (command) => {
+  owner.configure([
+    onPage('first', 1),
+    { ...onPage('waiting', 1), waitTillTheEnd: true },
+    onPage('second', 2),
+    onPage('third', 3),
+  ], true);
+  const first = get('first');
+  const waiting = get('waiting');
+  const waitingShorten = jest.spyOn(waiting, 'shortenFadeOut');
+  const nativeHalt = jest.spyOn(first.howlInst, command);
+  const nativeUnload = jest.spyOn(first.howlInst, 'unload');
+  await first.play();
+  await waiting.play();
+  const halted = first[command](true);
+
+  navigate(2);
+  const second = get('second');
+  await second.play();
+  navigate(3);
+  const third = get('third');
+  await third.play();
+  navigate(4);
+
+  expect(first.isFading).toBe(false);
+  expect(second.isFading).toBe(true);
+  expect(third.isFading).toBe(true);
+  await advance(0);
+  await halted;
+  expect(nativeHalt.mock.invocationCallOrder[0]).toBeLessThan(nativeUnload.mock.invocationCallOrder[0]);
+  expect(first.isUnloading).toBe(true);
+  expect(waitingShorten).not.toHaveBeenCalled();
+  expect(waiting.isUnloading).toBe(false);
+  expect(waiting.playing()).toBe(true);
+  await advance(100);
+  expect(second.isUnloading).toBe(true);
+  expect(third.isUnloading).toBe(false);
+});

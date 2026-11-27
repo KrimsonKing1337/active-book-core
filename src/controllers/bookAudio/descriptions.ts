@@ -9,7 +9,7 @@ export type AudioDescription = Required<RuntimeAudio>;
 
 const normalizeLifetime = (lifetime: EffectLifetime): EffectLifetime => {
   if (lifetime.type === 'page') {
-    return lifetime;
+    return { type: 'page', page: lifetime.page };
   }
 
   const sortedRanges = [...lifetime.range].sort((first, second) => {
@@ -24,7 +24,9 @@ const normalizeLifetime = (lifetime: EffectLifetime): EffectLifetime => {
     if (previousRange && rangeCur.from <= previousRange.to + 1) {
       previousRange.to = Math.max(previousRange.to, rangeCur.to);
     } else {
-      mergedRanges.push({ ...rangeCur });
+      const { from, to } = rangeCur;
+
+      mergedRanges.push({ from, to });
     }
   }
 
