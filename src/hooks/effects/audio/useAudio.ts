@@ -47,16 +47,19 @@ export const useAudio = (passedOptions: AudioEffectOptions) => {
     onStop = () => {},
     onUnload = () => {},
   } = passedOptions;
+
+  const bookSession = useContext(BookPresentationContext);
   const isSessionOwned = useBookAudio(passedOptions);
+
   const dispatch = useDispatch();
 
   const currentPage = useSelector(mainSelectors.page);
-  const bookSession = useContext(BookPresentationContext);
   const isAudioUnlocked = useSelector(mainSelectors.isAudioUnlocked);
   const audioInstances = useSelector(audioEffectsSelectors.audioInstances);
 
   const hasPermissionToPrepare = !!bookSession || isAudioUnlocked;
   const canPrepare = !isSessionOwned && hasPermissionToPrepare;
+
   const formatKey = format?.join(',');
 
   useLayoutEffect(() => {

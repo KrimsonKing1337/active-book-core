@@ -1,6 +1,5 @@
-import type { PropsWithChildren } from 'react';
-
 import {
+  type PropsWithChildren,
   useEffect,
   useLayoutEffect,
   useRef,
@@ -9,10 +8,7 @@ import {
 import classNames from 'classnames';
 import { ToastContainer } from 'react-toastify';
 
-import {
-  useDispatch,
-  useSelector,
-} from '@store';
+import { useDispatch, useSelector } from '@store';
 
 import { mainActions, mainSelectors } from '@store/main';
 import { effectsSelectors } from '@store/effects/common';

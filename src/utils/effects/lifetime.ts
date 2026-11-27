@@ -5,5 +5,7 @@ export const isEffectActive = (lifetime: VisualEffectLifetime, page: number): bo
     return lifetime.page === page;
   }
 
-  return lifetime.range.some((rangeCur) => page >= rangeCur.from && page <= rangeCur.to);
+  return lifetime.range.some((rangeCur) => {
+    return page >= rangeCur.from && page <= rangeCur.to;
+  });
 };

@@ -4,15 +4,11 @@ import type { PreparePageResource, SettlePageResource } from '@hooks/pagePresent
 
 import type { HowlWrapper } from '@utils/effects/audio/HowlWrapper';
 
-
 export class AudioResource {
   private outcome: PageResourceOutcome | null = null;
   private settleVisit: SettlePageResource | null = null;
 
-  constructor(
-    private readonly audio: HowlWrapper,
-    private readonly onLoad: () => void,
-  ) {
+  constructor(private readonly audio: HowlWrapper, private readonly onLoad: () => void) {
     const state = audio.state();
 
     if (state === 'loaded') {
@@ -42,6 +38,7 @@ export class AudioResource {
     this.audio.howlInst.off('loaderror', this.handleError);
 
     const settle = this.settleVisit;
+
     this.settleVisit = null;
     settle?.(outcome);
 

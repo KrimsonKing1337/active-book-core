@@ -29,8 +29,10 @@ export class AudioActivation {
 
   constructor(options: ActivationOptions) {
     const { description } = options;
+
     this.description = description;
     this.identity = options.identity;
+
     const {
       id,
       src,
@@ -40,6 +42,11 @@ export class AudioActivation {
       relativeVolume,
       screamer,
     } = description;
+
+    const onUnload = () => {
+      options.remove(this);
+      this.description.onUnload?.();
+    };
 
     this.audio = new HowlWrapper({
       id,
@@ -55,22 +62,22 @@ export class AudioActivation {
       onPlay: () => this.description.onPlay?.(),
       onPause: () => this.description.onPause?.(),
       onStop: () => this.description.onStop?.(),
-      onUnload: () => {
-        options.remove(this);
-        this.description.onUnload?.();
-      },
+      onUnload,
     });
 
     this.resource = new AudioResource(this.audio, () => this.timeline.update());
+
+    const canPlay = () => {
+      const isReady = this.resource.isReady;
+      const canAutoplay = options.canAutoplay(this);
+
+      return isReady && canAutoplay;
+    };
+
     this.timeline = new AudioTimeline({
       audio: this.audio,
       description,
-      canPlay: () => {
-        const isReady = this.resource.isReady;
-        const canAutoplay = options.canAutoplay(this);
-
-        return isReady && canAutoplay;
-      },
+      canPlay,
       stop: () => options.stop(this),
     });
   }
@@ -87,7 +94,9 @@ export class AudioActivation {
   setRelativeVolume(volume: number) {
     if (volume !== this.audio.relativeVolume) {
       this.audio.relativeVolume = volume;
+
       const categoryVolume = this.audio.getVolumeByType();
+
       this.audio.volume(categoryVolume / 100);
     }
   }
@@ -98,10 +107,12 @@ export class AudioActivation {
     }
 
     this.cancelPreparation?.();
+
     this.visitId = visitId;
 
     if (!this.resource.isReady) {
       const prepare = this.resource.prepare;
+
       this.cancelPreparation = registerPageResource(store, { visitId, prepare });
     }
   }

@@ -1,6 +1,5 @@
-import type { PropsWithChildren } from 'react';
-
 import {
+  type PropsWithChildren,
   useEffect,
   useLayoutEffect,
   useRef,
@@ -41,6 +40,7 @@ export const BookSession = (props: BookSessionProps) => {
 
   const [sessionId] = useState(nanoid);
   const [audio] = useState(() => new BookAudio(sessionId));
+
   const isReader = useAppMode() === 'reader';
   const audioDescriptions = props.audioDescriptions ?? noAudio;
 
@@ -62,10 +62,12 @@ export const BookSession = (props: BookSessionProps) => {
     setWasmUrl('/vendors/dotlottie-player.wasm');
 
     dispatch(mainActions.openBookSession(initialNavigation));
+
     audio.start();
 
     return () => {
       audio.close();
+
       dispatch(mainActions.closeBookSession(sessionId));
     };
   }, [

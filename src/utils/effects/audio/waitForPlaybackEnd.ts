@@ -21,8 +21,9 @@ const events = [
 /** Observe completion without imposing a wall-clock limit on a playing or buffering clip. */
 export const waitForPlaybackEnd = ({ howl, soundIds }: Playback) => {
   const allSoundIds = [...soundIds];
-  const playingIds = allSoundIds.filter((soundIdCur) => howl.playing(soundIdCur));
-  const loopingIds = playingIds.filter((soundIdCur) => howl.loop(soundIdCur));
+
+  const playingIds = allSoundIds.filter((idCur) => howl.playing(idCur));
+  const loopingIds = playingIds.filter((idCur) => howl.loop(idCur));
 
   let resolve = () => {};
 

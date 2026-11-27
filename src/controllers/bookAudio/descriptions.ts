@@ -2,7 +2,10 @@ import type { VisualEffectLifetime } from '@active-book/types';
 
 import type { AudioEffectOptions } from '@types';
 
-export type AudioDescription = Omit<AudioEffectOptions, 'page' | 'lifecycle' | 'fadeOutWhenUnload'> & {
+type AudioDescriptionExcludedKeys = 'page' | 'lifecycle' | 'fadeOutWhenUnload';
+type AudioDescriptionOmitted = Omit<AudioEffectOptions, AudioDescriptionExcludedKeys>;
+
+export type AudioDescription = AudioDescriptionOmitted & {
   lifetime: VisualEffectLifetime;
   fadeIn?: boolean;
   fadeOut?: boolean;
@@ -15,6 +18,7 @@ export type PageAudioDescription = AudioDescription & {
 
 export const describeAudio = (description: PageAudioDescription) => {
   const { lifetime } = description;
+
   let pages: number | number[][];
 
   if (lifetime.type === 'page') {

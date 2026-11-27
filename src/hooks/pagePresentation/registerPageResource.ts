@@ -1,12 +1,14 @@
-import { nanoid } from '@reduxjs/toolkit';
+import { nanoid } from 'nanoid';
 
 import type { store as appStore } from '@store';
-import type { PageResourceOutcome } from '@store/main/@types';
 
+import type { PageResourceOutcome } from '@store/main/@types';
 import { mainActions } from '@store/main';
 
 export type SettlePageResource = (outcome?: PageResourceOutcome) => void;
 export type PreparePageResource = (settle: SettlePageResource) => void | (() => void);
+
+type PageResourceStore  = Pick<typeof appStore, 'getState' | 'dispatch'>;
 
 type ResourceRegistration = {
   visitId: number | undefined;
@@ -14,26 +16,33 @@ type ResourceRegistration = {
 };
 
 export const registerPageResource = (
-  store: Pick<typeof appStore, 'getState' | 'dispatch'>,
-  { visitId, prepare }: ResourceRegistration,
-) => {
+  store: PageResourceStore,
+  registration: ResourceRegistration) => {
+  const { visitId, prepare } = registration;
   const { visit } = store.getState().main;
 
-  if (!visit || visit.id !== visitId || visit.presentedAt !== null) {
+  if (!visit || visit.id !== visitId) {
     return;
   }
 
-  const resource = { visitId, resourceId: nanoid() };
+  if (visit.presentedAt !== null) {
+    return;
+  }
+
+  const resourceId = nanoid();
+  const resource = { visitId, resourceId };
 
   store.dispatch(mainActions.registerPageResource(resource));
 
   let isPending = true;
+
   const settle: SettlePageResource = (outcome = 'ready') => {
     if (!isPending) {
       return;
     }
 
     isPending = false;
+
     store.dispatch(mainActions.settlePageResource({ ...resource, outcome }));
   };
 

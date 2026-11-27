@@ -19,10 +19,13 @@ export class RetiringAudio {
 
   waitForEnd(activation: AudioActivation) {
     const waiting = activation.audio.finishCurrentPlayback();
+
     const retirement = { waiting };
     this.retiring.set(activation, retirement);
 
-    void waiting.promise.then(() => this.finish(activation, retirement));
+    void waiting.promise.then(() => {
+      this.finish(activation, retirement);
+    });
   }
 
   fadeOut(activations: readonly AudioActivation[]) {
@@ -48,12 +51,17 @@ export class RetiringAudio {
 
     for (const activationCur of activations) {
       this.remove(activationCur);
+
       const retirement = { generation: this.generation };
       this.retiring.set(activationCur, retirement);
 
       const { audio } = activationCur;
+
       const fade = audio.pendingFadeOut ?? audio.fadeOut();
-      void fade.then(() => this.finish(activationCur, retirement));
+
+      void fade.then(() => {
+        this.finish(activationCur, retirement);
+      });
     }
   }
 
@@ -67,6 +75,7 @@ export class RetiringAudio {
 
   restore(activation: AudioActivation) {
     const retirement = this.retiring.get(activation);
+
     const { audio, timeline } = activation;
 
     if (!retirement || audio.isUnloading || timeline.hasReachedStop) {
@@ -108,6 +117,7 @@ export class RetiringAudio {
 
   remove(activation: AudioActivation) {
     const retirement = this.retiring.get(activation);
+
     this.retiring.delete(activation);
     retirement?.waiting?.cancel();
   }

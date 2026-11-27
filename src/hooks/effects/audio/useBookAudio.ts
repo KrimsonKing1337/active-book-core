@@ -16,8 +16,10 @@ import { usePageVisit } from '@hooks/pagePresentation/context';
 export const useBookAudio = (options: AudioEffectOptions) => {
   const bookAudio = useContext(BookAudioContext);
   const visit = usePageVisit();
+
   const visitId = visit?.id;
   const canRegister = !!bookAudio && options.lifecycle !== 'manual';
+
   const {
     id,
     page,
@@ -26,10 +28,16 @@ export const useBookAudio = (options: AudioEffectOptions) => {
   } = options;
 
   const latest = useRef(options);
+
+  const descriptionLifetime: PageAudioDescription['lifetime'] = {
+    type: 'page',
+    page,
+  };
+
   const description: PageAudioDescription = {
     ...options,
     pageId: visit?.pageId ?? null,
-    lifetime: { type: 'page', page },
+    lifetime: descriptionLifetime,
     fadeOut: fadeOutWhenUnload,
 
     onPlay: () => latest.current.onPlay?.(),
@@ -37,7 +45,9 @@ export const useBookAudio = (options: AudioEffectOptions) => {
     onStop: () => latest.current.onStop?.(),
     onUnload: () => latest.current.onUnload?.(),
   };
+
   const identity = describeAudio(description);
+
   const latestDescription = useRef(description);
 
   useLayoutEffect(() => {
@@ -47,7 +57,10 @@ export const useBookAudio = (options: AudioEffectOptions) => {
 
   useLayoutEffect(() => {
     if (bookAudio && canRegister && visitId !== undefined) {
-      return bookAudio.registerPageAudio({ description: latestDescription.current, visitId });
+      return bookAudio.registerPageAudio({
+        description: latestDescription.current,
+        visitId,
+      });
     }
   }, [
     bookAudio,

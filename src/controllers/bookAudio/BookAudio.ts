@@ -1,7 +1,6 @@
-import type { RootState } from '@store';
 import type { PageVisit, State as MainState } from '@store/main/@types';
+import { type RootState, store } from '@store';
 
-import { store } from '@store';
 import { mainSelectors } from '@store/main';
 import { audioEffectsActions } from '@store/effects/audio/audio';
 
@@ -51,6 +50,7 @@ export class BookAudio {
 
     this.descriptions = descriptions;
     this.isAutoplayEnabled = isAutoplayEnabled;
+
     this.sync();
   }
 
@@ -62,10 +62,12 @@ export class BookAudio {
     }
 
     this.pageRegistrations.add(registration);
+
     this.sync();
 
     return () => {
       this.pageRegistrations.delete(registration);
+
       this.sync();
     };
   }
@@ -84,11 +86,14 @@ export class BookAudio {
 
   private handleStoreChange = () => {
     const state = store.getState();
+
     this.updateRetiringVolume(state.volume);
 
     const { main } = state;
     const previous = this.main;
-    const changed = main.bookSessionId !== previous?.bookSessionId
+
+    const changed =
+      main.bookSessionId !== previous?.bookSessionId
       || main.pageIds !== previous.pageIds
       || main.visit?.id !== previous.visit?.id
       || main.visit?.presentedAt !== previous.visit?.presentedAt
@@ -146,6 +151,7 @@ export class BookAudio {
         }
 
         this.main = main;
+
         this.reconcile(main.visit, mainSelectors.page(state));
       }
     } finally {
@@ -154,8 +160,8 @@ export class BookAudio {
   }
 
   private reconcile(visit: PageVisit, page: number) {
-    const wanted = this.getDescriptions(visit, page);
     const fading: AudioActivation[] = [];
+    const wanted = this.getDescriptions(visit, page);
 
     for (const [idCur, activationCur] of this.active) {
       const description = wanted.get(idCur);
@@ -181,6 +187,7 @@ export class BookAudio {
       }
 
       const activation = this.active.get(idCur) ?? this.enter(descriptionCur, identity);
+
       activation.prepare(visit.id);
 
       const isActive = this.isActive(activation);
@@ -247,6 +254,7 @@ export class BookAudio {
   private isActive = (activation: AudioActivation) => {
     const { id, lifetime } = activation.description;
     const state = store.getState();
+
     const isCurrentSession = state.main.bookSessionId === this.sessionId;
     const isCurrentActivation = this.active.get(id) === activation;
 
@@ -268,8 +276,11 @@ export class BookAudio {
 
   private publish(activation: AudioActivation) {
     const { audio } = activation;
+
     this.active.set(audio.id, activation);
+
     removeOwnedAudio.set(audio, () => this.remove(activation));
+
     store.dispatch(audioEffectsActions.setAudioInstance(audio));
   }
 
@@ -348,6 +359,7 @@ export class BookAudio {
   close() {
     this.unsubscribe?.();
     this.unsubscribe = undefined;
+
     this.main = undefined;
     this.removed.clear();
 

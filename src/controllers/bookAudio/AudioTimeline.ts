@@ -26,6 +26,7 @@ export class AudioTimeline {
 
   constructor(private readonly options: TimelineOptions) {
     this.isAutoplayPending = options.description.playOnLoad ?? false;
+
     options.audio.howlInst.on('unlock', this.handleUnlock);
   }
 
@@ -51,6 +52,7 @@ export class AudioTimeline {
   cancelAutoplay() {
     this.isAutoplayPending = false;
     const attempt = this.attempt;
+
     this.attempt = null;
     attempt?.cancel?.();
   }
@@ -75,6 +77,7 @@ export class AudioTimeline {
 
   update() {
     clearTimeout(this.timer);
+
     this.stopIfDue();
 
     const startedAt = this.startedAt;
@@ -84,6 +87,7 @@ export class AudioTimeline {
     }
 
     const { delay = 0, stopBy = 0 } = this.options.description;
+
     let nextDeadline = Infinity;
 
     if (!this.hasStoppedAutomatically && stopBy > 0) {
@@ -104,7 +108,10 @@ export class AudioTimeline {
     if (Number.isFinite(nextDeadline)) {
       const remaining = nextDeadline - performance.now();
       const timerDelay = Math.min(MAX_TIMER_DELAY, Math.max(0, remaining));
-      this.timer = setTimeout(() => this.update(), timerDelay);
+
+      this.timer = setTimeout(() => {
+        this.update();
+      }, timerDelay);
     }
   }
 
@@ -126,10 +133,13 @@ export class AudioTimeline {
     }
 
     const attempt: PlaybackAttempt = {};
+
     this.attempt = attempt;
     this.attemptedAtUnlock = this.unlockCount;
+
     attempt.cancel = audio.requestPlayback({
       withFadeIn: description.fadeIn ?? false,
+
       canStart: () => {
         if (this.attempt !== attempt) {
           return false;
@@ -139,6 +149,7 @@ export class AudioTimeline {
 
         return canStillPlay && !this.hasReachedStop;
       },
+
       fail: () => {
         if (this.attempt !== attempt) {
           return;
@@ -150,6 +161,7 @@ export class AudioTimeline {
           this.update();
         }
       },
+
       acceptStart: () => {
         if (this.attempt !== attempt) {
           return false;
@@ -157,6 +169,7 @@ export class AudioTimeline {
 
         this.attempt = null;
         this.isAutoplayPending = false;
+
         const canStillPlay = this.options.canPlay();
 
         return canStillPlay && !this.hasReachedStop;
@@ -165,9 +178,10 @@ export class AudioTimeline {
   }
 
   destroy() {
+    clearTimeout(this.timer);
+
     this.cancelAutoplay();
     this.startedAt = null;
-    clearTimeout(this.timer);
     this.options.audio.howlInst.off('unlock', this.handleUnlock);
   }
 }

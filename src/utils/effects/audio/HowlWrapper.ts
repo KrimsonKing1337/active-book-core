@@ -1,6 +1,8 @@
-import type { HowlOptions } from 'howler';
-
-import { Howl, Howler } from 'howler';
+import {
+  type HowlOptions,
+  Howl,
+  Howler,
+} from 'howler';
 
 import type { AudioType } from '@types';
 
@@ -108,6 +110,7 @@ export class HowlWrapper {
   private pendingOperations = new Set<PendingOperation>();
   private unloadPromise: Promise<void> | null = null;
   private completion: ReturnType<typeof waitForPlaybackEnd> | null = null;
+
   private readonly beforePlay: () => void;
   private readonly canPlay?: () => boolean;
 
@@ -164,7 +167,7 @@ export class HowlWrapper {
       volume,
     };
 
-    // todo: через вебапи делать громкость в 200%
+    // todo: через вебапи делать громкость более 100%
     if (screamer) {
       options.volume = 1;
     }
@@ -389,6 +392,7 @@ export class HowlWrapper {
 
     const handlePlay = () => {
       cancelError();
+
       const accepted = options.acceptStart?.() ?? true;
 
       if (!accepted) {
@@ -417,22 +421,25 @@ export class HowlWrapper {
       callback: handlePlay,
     });
 
+    const cancelErrorCallback = () => {
+      cancelPlay();
+
+      this.fades.removeVoice(soundId);
+      this.soundIds.delete(soundId);
+
+      options.fail();
+    };
+
     const cancelError = this.listenOnce({
       event: 'playerror',
       id: soundId,
-      callback: () => {
-        cancelPlay();
-
-        this.fades.removeVoice(soundId);
-        this.soundIds.delete(soundId);
-
-        options.fail();
-      },
+      callback: cancelErrorCallback,
     });
 
     return () => {
       cancelPlay();
       cancelError();
+
       this.howlInst.stop(soundId);
       this.soundIds.delete(soundId);
       this.fades.removeVoice(soundId);
@@ -442,8 +449,9 @@ export class HowlWrapper {
   /** Requests one loaded voice. The caller owns the timing and any retry. */
   requestPlayback(options: PlaybackRequest) {
     const revision = this.revision;
-    let cancelPlayback: (() => void) | undefined;
+
     let isPending = true;
+    let cancelPlayback: (() => void) | undefined;
 
     const start = () => {
       if (!isPending || revision !== this.revision) {
@@ -584,11 +592,9 @@ export class HowlWrapper {
     }
 
     const operation = {};
-
     this.haltOperation = operation;
 
     const revision = this.revision;
-
     const loaded = !this.unloadPromise && this.state() === 'loaded';
 
     if (withFadeOut && loaded && this.playing()) {
@@ -702,7 +708,12 @@ export class HowlWrapper {
 
     for (const idCur of soundIds) {
       if (this.howlInst.playing(idCur)) {
-        const newFade = this.fades.fade({ ...options, soundId: idCur }, absolute);
+        const fadeOptions = {
+          ...options,
+          soundId: idCur,
+        };
+
+        const newFade = this.fades.fade(fadeOptions, absolute);
 
         fades.push(newFade);
       }
@@ -717,6 +728,7 @@ export class HowlWrapper {
     }
 
     const fades = this.fadeVoices(options, true);
+
     const results = await Promise.all(fades);
     const allFadesCompleted = results.every(Boolean);
 
@@ -789,8 +801,8 @@ export class HowlWrapper {
     }
 
     this.haltOperation = null;
-
     this.fadingOut = null;
+
     const results = await Promise.all(this.fadeVoices({ to: 1, duration }));
     const allFadesCompleted = results.every(Boolean);
 

@@ -10,6 +10,15 @@ export const initialState: State = {
   audioInstances: {},
 };
 
+// Асинхронное удаление старого звука не должно удалить его замену.
+const unregisterAudioInstance = (state: Draft<State>, payload: RemoveAudioInstancePayload) => {
+  const { id, instance } = payload;
+
+  if (state.audioInstances[id] === instance) {
+    delete state.audioInstances[id];
+  }
+};
+
 const slice = createSlice({
   name: '@effects/audio',
   initialState,
@@ -33,12 +42,5 @@ const slice = createSlice({
     },
   },
 });
-
-// Асинхронное удаление старого звука не должно удалить его замену.
-function unregisterAudioInstance(state: Draft<State>, { id, instance }: RemoveAudioInstancePayload) {
-  if (state.audioInstances[id] === instance) {
-    delete state.audioInstances[id];
-  }
-}
 
 export const { actions, reducer } = slice;
