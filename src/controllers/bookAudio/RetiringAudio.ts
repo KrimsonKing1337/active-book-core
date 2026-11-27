@@ -33,11 +33,11 @@ export class RetiringAudio {
   }
 
   fadeOut(activations: readonly AudioActivation[]) {
-    const pending = activations.filter((activationCur) => {
+    const activationsToFade = activations.filter((activationCur) => {
       return this.has(activationCur);
     });
 
-    if (!pending.length) {
+    if (!activationsToFade.length) {
       return;
     }
 
@@ -58,7 +58,7 @@ export class RetiringAudio {
       }
     }
 
-    for (const activationCur of pending) {
+    for (const activationCur of activationsToFade) {
       if (!this.has(activationCur)) {
         continue;
       }

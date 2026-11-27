@@ -68,7 +68,7 @@ export const useAudio = (passedOptions: AudioEffectOptions) => {
       return;
     }
 
-    if (Object.prototype.hasOwnProperty.call(Object.prototype, id)) {
+    if (Object.hasOwn(Object.prototype, id)) {
       throw new Error(`Audio ID "${id}" is reserved`);
     }
 

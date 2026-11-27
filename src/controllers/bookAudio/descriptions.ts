@@ -12,29 +12,29 @@ const normalizeLifetime = (lifetime: EffectLifetime): EffectLifetime => {
     return lifetime;
   }
 
-  const sorted = [...lifetime.range].sort((first, second) => {
+  const sortedRanges = [...lifetime.range].sort((first, second) => {
     return first.from - second.from;
   });
 
-  const merged: PageRange[] = [];
+  const mergedRanges: PageRange[] = [];
 
-  for (const current of sorted) {
-    const previous = merged.at(-1);
+  for (const rangeCur of sortedRanges) {
+    const previousRange = mergedRanges.at(-1);
 
-    if (previous && current.from <= previous.to + 1) {
-      previous.to = Math.max(previous.to, current.to);
+    if (previousRange && rangeCur.from <= previousRange.to + 1) {
+      previousRange.to = Math.max(previousRange.to, rangeCur.to);
     } else {
-      merged.push({ ...current });
+      mergedRanges.push({ ...rangeCur });
     }
   }
 
-  const [onlyRange] = merged;
+  const [onlyRange] = mergedRanges;
 
-  if (merged.length === 1 && onlyRange.from === onlyRange.to) {
+  if (mergedRanges.length === 1 && onlyRange.from === onlyRange.to) {
     return { type: 'page', page: onlyRange.from };
   }
 
-  return { type: 'range', range: merged };
+  return { type: 'range', range: mergedRanges };
 };
 
 export const normalizeAudioDescription = ({
@@ -53,12 +53,12 @@ export const normalizeAudioDescription = ({
   fadeOut = false,
   waitTillTheEnd = false,
 }: RuntimeAudio): AudioDescription => {
-  const lifetimeNormalized = normalizeLifetime(lifetime);
+  const normalizedLifetime = normalizeLifetime(lifetime);
 
   return {
     id,
     src,
-    lifetime: lifetimeNormalized,
+    lifetime: normalizedLifetime,
     format,
     type,
     relativeVolume,
@@ -75,6 +75,7 @@ export const normalizeAudioDescription = ({
 
 export const describeAudio = ({
   relativeVolume: _relativeVolume,
-  ...identity }: AudioDescription) => {
+  ...identity
+}: AudioDescription) => {
   return JSON.stringify(identity);
 };

@@ -14,15 +14,13 @@ import { AudioActivation } from './AudioActivation';
 import { RetiringAudio } from './RetiringAudio';
 import { removeOwnedAudio } from './ownedAudio';
 
-import {
-  type AudioDescription,
-  describeAudio,
-  normalizeAudioDescription,
-} from './descriptions';
+import type { AudioDescription } from './descriptions';
 
-type EnterEntry = {
+import { describeAudio, normalizeAudioDescription } from './descriptions';
+
+type DesiredAudio = {
   description: AudioDescription;
-  identity: string
+  identity: string;
 };
 
 export class BookAudio {
@@ -63,7 +61,7 @@ export class BookAudio {
         throw new Error('Each book audio effect needs a nonempty ID and source');
       }
 
-      if (Object.prototype.hasOwnProperty.call(Object.prototype, id)) {
+      if (Object.hasOwn(Object.prototype, id)) {
         throw new Error(`Audio ID "${id}" is reserved`);
       }
 
@@ -88,7 +86,7 @@ export class BookAudio {
   }
 
   hasDescription(id: string) {
-    return this.descriptions.some((cur) => cur.id === id);
+    return this.descriptions.some((descriptionCur) => descriptionCur.id === id);
   }
 
   private handleStoreChange = () => {
@@ -184,7 +182,7 @@ export class BookAudio {
 
   private reconcile(visit: PageVisit, page: number) {
     const activationsToFade: AudioActivation[] = [];
-    const desired = this.getDescriptions(page);
+    const desiredAudio = this.getDesiredAudio(page);
 
     try {
       for (const [idCur, activationCur] of this.active) {
@@ -192,10 +190,10 @@ export class BookAudio {
           return;
         }
 
-        const entry = desired.get(idCur);
+        const desiredEntry = desiredAudio.get(idCur);
 
-        if (entry?.identity === activationCur.identity) {
-          activationCur.updateDescription(entry.description);
+        if (desiredEntry?.identity === activationCur.identity) {
+          activationCur.updateDescription(desiredEntry.description);
 
           continue;
         }
@@ -210,7 +208,7 @@ export class BookAudio {
         }
       }
 
-      for (const entryCur of desired.values()) {
+      for (const entryCur of desiredAudio.values()) {
         if (!this.isCurrentVisit(visit.id) || this.needsSync) {
           return;
         }
@@ -245,29 +243,24 @@ export class BookAudio {
     }
   }
 
-  private getDescriptions(page: number) {
-    type Desire = {
-      description: AudioDescription;
-      identity: string
-    };
-
-    const desired = new Map<string, Desire>();
+  private getDesiredAudio(page: number) {
+    const desiredAudio = new Map<string, DesiredAudio>();
 
     for (const descriptionCur of this.descriptions) {
       if (isEffectActive(descriptionCur.lifetime, page)) {
         const identity = describeAudio(descriptionCur);
 
-        desired.set(descriptionCur.id, {
+        desiredAudio.set(descriptionCur.id, {
           description: descriptionCur,
           identity,
         });
       }
     }
 
-    return desired;
+    return desiredAudio;
   }
 
-  private enter(entry: EnterEntry, visitId: number) {
+  private enter(entry: DesiredAudio, visitId: number) {
     const { description, identity } = entry;
 
     const existing = store.getState().audioEffects.audioInstances[description.id];

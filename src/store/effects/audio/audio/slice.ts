@@ -31,10 +31,13 @@ const slice = createSlice({
       }
 
       const hasPrevious = Object.hasOwn(state.audioInstances, instance.id);
-      const previous = hasPrevious && state.audioInstances[instance.id];
 
-      if (previous && previous !== instance) {
-        throw new Error(`Audio ID "${instance.id}" is already registered`);
+      if (hasPrevious) {
+        const previousInstance = state.audioInstances[instance.id];
+
+        if (previousInstance && previousInstance !== instance) {
+          throw new Error(`Audio ID "${instance.id}" is already registered`);
+        }
       }
 
       state.audioInstances[instance.id] = instance;
