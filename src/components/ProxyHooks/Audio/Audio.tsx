@@ -2,20 +2,8 @@ import type { AudioEffectOptions } from '@types';
 
 import { useAudio } from '@hooks/effects/audio';
 
-import { useAppMode } from '@components/App/AppModeContext';
-
-export const Audio = ({
-  playOnLoad,
-  ...options
-}: AudioEffectOptions) => {
-  const appMode = useAppMode();
-
-  const playOnLoadAppMode = appMode === 'reader' && playOnLoad;
-
-  useAudio({
-    ...options,
-    playOnLoad: playOnLoadAppMode,
-  });
+export const Audio = (options: AudioEffectOptions) => {
+  useAudio(options);
 
   return null;
 };

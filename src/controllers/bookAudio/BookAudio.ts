@@ -1,3 +1,5 @@
+import type { AudioEffect } from '@active-book/types';
+
 import type { RootState } from '@store';
 import type { PageVisit, State as MainState } from '@store/main/@types';
 
@@ -8,30 +10,26 @@ import { audioEffectsActions } from '@store/effects/audio/audio';
 
 import { isEffectActive } from '@utils/effects/lifetime';
 
-import type { AudioDescription, PageAudioDescription } from './descriptions';
-
 import { AudioActivation } from './AudioActivation';
-import { describeAudio } from './descriptions';
-import { removeOwnedAudio } from './ownedAudio';
 import { RetiringAudio } from './RetiringAudio';
+import { removeOwnedAudio } from './ownedAudio';
 
-type PageRegistration = {
-  description: PageAudioDescription;
-  visitId: number;
-};
+import type { AudioDescription } from './descriptions';
 
-type RelativeVolumeChange = {
-  id: string;
+import { describeAudio, normalizeAudioDescription } from './descriptions';
+
+type DesiredAudio = {
+  description: AudioDescription;
   identity: string;
-  relativeVolume: number;
 };
 
 export class BookAudio {
   private descriptions: readonly AudioDescription[] = [];
-  private readonly pageRegistrations = new Set<PageRegistration>();
+  private configuredDescriptions?: readonly AudioEffect<number>[];
   private readonly active = new Map<string, AudioActivation>();
-  private readonly retiring = new RetiringAudio((activation) => this.dispose(activation));
   private readonly removed = new Map<string, string>();
+  private readonly retiring = new RetiringAudio(this.dispose.bind(this));
+  private removalVisitId?: number;
   private unsubscribe?: () => void;
   private lastSyncedMain?: MainState;
   private isAutoplayEnabled = false;
@@ -45,53 +43,58 @@ export class BookAudio {
     this.sync();
   }
 
-  configure(descriptions: readonly AudioDescription[], isAutoplayEnabled: boolean) {
-    if (this.descriptions === descriptions && this.isAutoplayEnabled === isAutoplayEnabled) {
+  configure(descriptions: readonly AudioEffect<number>[], isAutoplayEnabled: boolean) {
+    if (this.configuredDescriptions === descriptions && this.isAutoplayEnabled === isAutoplayEnabled) {
       return;
     }
 
-    this.descriptions = descriptions;
+    const ids = new Set<string>();
+    const { audioInstances } = store.getState().audioEffects;
+
+    for (const descriptionCur of descriptions) {
+      const { id, src } = descriptionCur;
+
+      const hasId = typeof id === 'string' && !!id.trim();
+      const hasSource = typeof src === 'string' && !!src.trim();
+
+      if (!hasId || !hasSource) {
+        throw new Error('Each book audio effect needs a nonempty ID and source');
+      }
+
+      if (Object.hasOwn(Object.prototype, id)) {
+        throw new Error(`Audio ID "${id}" is reserved`);
+      }
+
+      if (ids.has(id)) {
+        throw new Error(`Duplicate book audio ID "${id}"`);
+      }
+
+      const existing = audioInstances[id];
+
+      if (existing && this.active.get(id)?.audio !== existing) {
+        throw new Error(`Audio ID "${id}" is already registered`);
+      }
+
+      ids.add(id);
+    }
+
+    this.descriptions = descriptions.map(normalizeAudioDescription);
+    this.configuredDescriptions = descriptions;
     this.isAutoplayEnabled = isAutoplayEnabled;
 
     this.sync();
   }
 
-  registerPageAudio(registration: PageRegistration) {
-    const { id, src } = registration.description;
-
-    if (!id || !src) {
-      return;
-    }
-
-    this.pageRegistrations.add(registration);
-
-    this.sync();
-
-    return () => {
-      this.pageRegistrations.delete(registration);
-
-      this.sync();
-    };
-  }
-
-  setRelativeVolume({
-    id,
-    identity,
-    relativeVolume,
-  }: RelativeVolumeChange) {
-    const activation = this.active.get(id);
-
-    if (activation?.identity === identity) {
-      activation.setRelativeVolume(relativeVolume);
-    }
+  hasDescription(id: string) {
+    return this.descriptions.some((descriptionCur) => descriptionCur.id === id);
   }
 
   private handleStoreChange = () => {
     const state = store.getState();
+    const { main } = state;
 
     this.updateRetiringVolume(state.volume);
 
-    const { main } = state;
     const previousMain = this.lastSyncedMain;
 
     if (!previousMain) {
@@ -160,9 +163,7 @@ export class BookAudio {
           return;
         }
 
-        if (this.lastSyncedMain?.visit?.id !== main.visit.id) {
-          this.removed.clear();
-        }
+        this.resetRemovals(main.visit.id);
 
         this.lastSyncedMain = main;
 
@@ -173,78 +174,119 @@ export class BookAudio {
     }
   }
 
-  private reconcile(visit: PageVisit, page: number) {
-    const activationsToFade: AudioActivation[] = [];
-    const desiredDescriptions = this.getDescriptions(visit, page);
+  private isCurrentVisit(visitId: number) {
+    const { bookSessionId, visit } = store.getState().main;
 
-    for (const [idCur, activationCur] of this.active) {
-      const description = desiredDescriptions.get(idCur);
-      const identity = description && describeAudio(description);
-
-      if (description && identity === activationCur.identity) {
-        activationCur.updateDescription(description);
-
-        continue;
-      }
-
-      this.active.delete(idCur);
-      this.unpublish(activationCur);
-      this.leave(activationCur, activationsToFade);
-    }
-
-    for (const [idCur, descriptionCur] of desiredDescriptions) {
-      const identity = describeAudio(descriptionCur);
-      const wasRemoved = this.removed.get(idCur) === identity;
-
-      if (wasRemoved) {
-        continue;
-      }
-
-      const activation = this.active.get(idCur) ?? this.enter(descriptionCur, identity);
-
-      activation.prepare(visit.id);
-
-      const isActive = this.isActive(activation);
-
-      if (visit.presentedAt !== null && isActive) {
-        activation.timeline.present(visit.presentedAt);
-      }
-
-      activation.timeline.update();
-    }
-
-    this.retiring.fadeOut(activationsToFade);
+    return !!this.unsubscribe && bookSessionId === this.sessionId && visit?.id === visitId;
   }
 
-  private getDescriptions(visit: PageVisit, page: number) {
-    const desiredDescriptions = new Map<string, AudioDescription>();
+  private reconcile(visit: PageVisit, page: number) {
+    const activationsToFade: AudioActivation[] = [];
+    const desiredAudio = this.getDesiredAudio(page);
+
+    try {
+      for (const [idCur, activationCur] of this.active) {
+        if (!this.isCurrentVisit(visit.id) || this.needsSync) {
+          return;
+        }
+
+        const desiredEntry = desiredAudio.get(idCur);
+
+        if (desiredEntry?.identity === activationCur.identity) {
+          activationCur.updateDescription(desiredEntry.description);
+
+          continue;
+        }
+
+        // From this point close() must be able to find the activation even during unpublish.
+        this.retiring.track(activationCur);
+        this.active.delete(idCur);
+        this.unpublish(activationCur);
+
+        if (this.retiring.has(activationCur)) {
+          this.leave(activationCur, activationsToFade);
+        }
+      }
+
+      for (const entryCur of desiredAudio.values()) {
+        if (!this.isCurrentVisit(visit.id) || this.needsSync) {
+          return;
+        }
+
+        const { description, identity } = entryCur;
+        const { id } = description;
+
+        if (this.removed.get(id) === identity) {
+          continue;
+        }
+
+        const activation = this.active.get(id) ?? this.enter(entryCur, visit.id);
+
+        if (!activation || !this.isActive(activation)) {
+          continue;
+        }
+
+        activation.prepare(visit.id);
+
+        if (!this.isCurrentVisit(visit.id) || this.needsSync) {
+          return;
+        }
+
+        if (visit.presentedAt !== null && this.isActive(activation)) {
+          activation.timeline.present(visit.presentedAt);
+        }
+
+        activation.timeline.update();
+      }
+    } finally {
+      this.retiring.fadeOut(activationsToFade);
+    }
+  }
+
+  private getDesiredAudio(page: number) {
+    const desiredAudio = new Map<string, DesiredAudio>();
 
     for (const descriptionCur of this.descriptions) {
       if (isEffectActive(descriptionCur.lifetime, page)) {
-        desiredDescriptions.set(descriptionCur.id, descriptionCur);
+        const identity = describeAudio(descriptionCur);
+
+        desiredAudio.set(descriptionCur.id, {
+          description: descriptionCur,
+          identity,
+        });
       }
     }
 
-    for (const { description, visitId } of this.pageRegistrations) {
-      const isCurrentVisit = visitId === visit.id;
-      const isOnPage = isEffectActive(description.lifetime, page);
-
-      if (isCurrentVisit && isOnPage && !desiredDescriptions.has(description.id)) {
-        desiredDescriptions.set(description.id, description);
-      }
-    }
-
-    return desiredDescriptions;
+    return desiredAudio;
   }
 
-  private enter(description: AudioDescription, identity: string) {
+  private enter(entry: DesiredAudio, visitId: number) {
+    const { description, identity } = entry;
+
+    const existing = store.getState().audioEffects.audioInstances[description.id];
+
+    if (existing) {
+      throw new Error(`Audio ID "${description.id}" is already registered`);
+    }
+
     for (const activationCur of this.retiring.activations) {
       if (activationCur.identity !== identity) {
         continue;
       }
 
-      if (this.retiring.restore(activationCur)) {
+      const restored = this.retiring.restore(activationCur);
+
+      if (!this.isCurrentVisit(visitId) || this.needsSync) {
+        if (restored) {
+          this.dispose(activationCur);
+        }
+
+        return;
+      }
+
+      if (restored) {
         activationCur.updateDescription(description);
+
         this.publish(activationCur);
 
         return activationCur;
@@ -305,6 +347,10 @@ export class BookAudio {
   private leave(activation: AudioActivation, activationsToFade: AudioActivation[]) {
     activation.leave();
 
+    if (!this.retiring.has(activation)) {
+      return;
+    }
+
     const {
       audio,
       description,
@@ -313,6 +359,8 @@ export class BookAudio {
 
     if (!audio.hasCurrentPlayback()) {
       this.dispose(activation);
+    } else if (audio.isHalting) {
+      activationsToFade.push(activation);
     } else if (description.waitTillTheEnd && !timeline.hasReachedStop) {
       this.retiring.waitForEnd(activation);
     } else if (description.fadeOut) {
@@ -340,10 +388,18 @@ export class BookAudio {
     }
   };
 
+  private resetRemovals(visitId?: number) {
+    if (this.removalVisitId !== visitId) {
+      this.removed.clear();
+      this.removalVisitId = visitId;
+    }
+  }
+
   private remove(activation: AudioActivation) {
     const { id } = activation.audio;
 
     if (this.active.get(id) === activation) {
+      this.resetRemovals(store.getState().main.visit?.id);
       this.removed.set(id, activation.identity);
       this.dispose(activation);
     }
@@ -359,6 +415,7 @@ export class BookAudio {
 
   private dispose(activation: AudioActivation) {
     const { audio } = activation;
+
     this.retiring.remove(activation);
 
     if (this.active.get(audio.id) === activation) {
@@ -375,7 +432,7 @@ export class BookAudio {
     this.unsubscribe = undefined;
 
     this.lastSyncedMain = undefined;
-    this.removed.clear();
+    this.resetRemovals();
 
     for (const activationCur of this.active.values()) {
       this.dispose(activationCur);

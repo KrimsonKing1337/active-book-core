@@ -18,7 +18,6 @@ export type HowlWrapperOptions = {
   format?: HowlOptions['format'];
   loop?: HowlOptions['loop'];
   type?: AudioType;
-  playOnLoad?: boolean;
   relativeVolume?: number;
   screamer?: boolean;
   fadeOutWhenUnload?: boolean;
@@ -26,6 +25,7 @@ export type HowlWrapperOptions = {
   stopBy?: number;
 
   beforePlay?: () => void;
+  beforeHalt?: () => void;
   canPlay?: () => boolean;
   onPlay?: () => void;
   onPause?: () => void;
@@ -89,7 +89,6 @@ export class HowlWrapper {
   public page: HowlWrapperOptions['page'];
   public src: HowlOptions['src'] = '';
   public type: AudioType = 'sfx';
-  public playOnLoad = false;
   public relativeVolume: number;
   public fadeOutWhenUnload = true;
 
@@ -110,6 +109,7 @@ export class HowlWrapper {
   private completion: ReturnType<typeof waitForPlaybackEnd> | null = null;
 
   private readonly beforePlay: () => void;
+  private readonly beforeHalt: () => void;
   private readonly canPlay?: () => boolean;
 
   public onPlay: () => void;
@@ -124,13 +124,13 @@ export class HowlWrapper {
     format,
     loop,
     type = 'sfx',
-    playOnLoad = false,
     relativeVolume = 100,
     screamer = false,
     fadeOutWhenUnload = true,
     delay = 0,
     stopBy = 0,
     beforePlay = () => {},
+    beforeHalt = () => {},
     canPlay,
     onPlay = () => {},
     onUnload = () => {},
@@ -181,9 +181,9 @@ export class HowlWrapper {
     this.fadeOutWhenUnload = fadeOutWhenUnload;
     this.delay = delay;
     this.stopBy = stopBy;
-    this.playOnLoad = playOnLoad;
 
     this.beforePlay = beforePlay;
+    this.beforeHalt = beforeHalt;
     this.canPlay = canPlay;
     this.onPlay = onPlay;
     this.onPause = onPause;
@@ -446,13 +446,42 @@ export class HowlWrapper {
 
   /** Requests one loaded voice. The caller owns the timing and any retry. */
   requestPlayback(options: PlaybackRequest) {
-    const revision = this.revision;
-
     let isPending = true;
-    let cancelPlayback: (() => void) | undefined;
+    let cancelVoice: (() => void) | undefined;
+
+    const finish = () => {
+      isPending = false;
+
+      this.pendingOperations.delete(operation);
+    };
+
+    const fail = () => {
+      if (isPending) {
+        finish();
+        options.fail();
+      }
+    };
+
+    const cancel = () => {
+      if (isPending) {
+        finish();
+        cancelVoice?.();
+      }
+    };
+
+    const operation = {
+      cancel: () => {
+        if (isPending) {
+          cancel();
+          options.fail();
+        }
+      },
+    };
+
+    this.pendingOperations.add(operation);
 
     const start = () => {
-      if (!isPending || revision !== this.revision) {
+      if (!isPending) {
         return;
       }
 
@@ -460,13 +489,21 @@ export class HowlWrapper {
       const isLoaded = this.state() === 'loaded';
 
       if (!canStart || !isLoaded || this.isUnloading) {
-        options.fail();
+        fail();
 
         return;
       }
 
-      cancelPlayback = this.startPlayback({
+      const acceptStart = () => {
+        finish();
+
+        return options.acceptStart?.() ?? true;
+      };
+
+      cancelVoice = this.startPlayback({
         ...options,
+        acceptStart,
+        fail,
         complete: () => {},
         holdUntilStarted: true,
       });
@@ -476,19 +513,12 @@ export class HowlWrapper {
 
     // Resuming separately keeps this request out of Howler's playback queue while autoplay is blocked.
     if (context && context.state !== 'running' && context.state !== 'closed') {
-      void context.resume().then(start, () => {
-        if (isPending && revision === this.revision) {
-          options.fail();
-        }
-      });
+      void context.resume().then(start, fail);
     } else {
       start();
     }
 
-    return () => {
-      isPending = false;
-      cancelPlayback?.();
-    };
+    return cancel;
   }
 
   async play(withFadeIn = false) {
@@ -583,6 +613,7 @@ export class HowlWrapper {
   }
 
   private async halt(event: 'pause' | 'stop', withFadeOut: boolean) {
+    this.beforeHalt();
     this.cancelPendingOperations();
 
     if (this.isDisposed) {
@@ -765,6 +796,10 @@ export class HowlWrapper {
     this.fadingOut = operation;
 
     return operation;
+  }
+
+  get isHalting() {
+    return this.haltOperation !== null;
   }
 
   get pendingFadeOut() {

@@ -59,10 +59,7 @@ export class AudioTimeline {
 
   beforeManualPlay() {
     this.stopIfDue();
-
-    if (this.attempt) {
-      this.cancelAutoplay();
-    }
+    this.cancelAutoplay();
   }
 
   private stopIfDue() {

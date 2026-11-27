@@ -1,11 +1,12 @@
 import type { Howl } from 'howler';
 
+import type { AudioEffect } from '@active-book/types';
+
 import { store } from '@store';
 import { mainActions } from '@store/main';
 
 import { emit, installHowlerFixture } from '@utils/effects/audio/tests/howlerFixture';
 
-import type { AudioDescription } from '../descriptions';
 
 import { BookAudio } from '../BookAudio';
 
@@ -13,14 +14,14 @@ export const bookKey = 'audio-test';
 export let owner: BookAudio;
 let fixture: ReturnType<typeof installHowlerFixture>;
 
-export const range = (id: string, options: Partial<AudioDescription> = {}): AudioDescription => ({
+export const range = (id: string, options: Partial<AudioEffect<number>> = {}): AudioEffect<number> => ({
   id,
   src: `${id}.wav`,
   lifetime: { type: 'range', range: [{ from: 1, to: 3 }] },
   ...options,
 });
 
-export const onPage = (id: string, page: number): AudioDescription => ({
+export const onPage = (id: string, page: number): AudioEffect<number> => ({
   ...range(id),
   lifetime: { type: 'page', page },
   fadeOut: true,

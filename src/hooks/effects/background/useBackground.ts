@@ -1,4 +1,4 @@
-import type { VisualEffectLifetime } from '@active-book/types';
+import type { EffectLifetime } from '@active-book/types';
 
 import {
   type BuiltinDeclaration,
@@ -10,7 +10,7 @@ import {
 
 import type { BackgroundEffect } from './@types';
 
-export const useBackground = (effect: BackgroundEffect, lifetime?: VisualEffectLifetime) => {
+export const useBackground = (effect: BackgroundEffect, lifetime?: EffectLifetime) => {
   const session = useVisualEffects();
   const pageLifetime = usePageLifetime(session);
 

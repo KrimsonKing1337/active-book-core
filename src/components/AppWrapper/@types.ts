@@ -1,11 +1,14 @@
 import type { ReactNode, Ref } from 'react';
 
-import type { VisualEffectDefinition, VisualEffectRegistration } from '@active-book/types';
+import type {
+  AudioEffect,
+  VisualEffectDefinition,
+  VisualEffectRegistration,
+} from '@active-book/types';
 
 import type { Config, TableOfContents } from '@types';
 
 import type { VisualEffects } from '@controllers/visualEffects';
-import type { AudioDescription } from '@controllers/bookAudio/descriptions';
 
 import type { VisualSurfaceItem } from '@components/VisualSurfaces';
 
@@ -26,7 +29,7 @@ export type AppWrapperProps = {
   registrations?: readonly VisualEffectRegistration[];
   definitions?: readonly VisualEffectDefinition[];
   /** Internal input for the book audio owner. */
-  audioDescriptions?: readonly AudioDescription[];
+  audioDescriptions?: readonly AudioEffect<number>[];
   tableOfContents: TableOfContents;
   editorTools?: ReactNode;
   ref?: Ref<HTMLDivElement>;

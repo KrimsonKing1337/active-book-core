@@ -8,7 +8,9 @@ import {
 } from 'react';
 
 import { setWasmUrl } from '@lottiefiles/dotlottie-react';
-import { nanoid } from '@reduxjs/toolkit';
+import { nanoid } from 'nanoid';
+
+import type { AudioEffect } from '@active-book/types';
 
 import { useDispatch } from '@store';
 import { mainActions } from '@store/main';
@@ -17,13 +19,11 @@ import { createVisualEffects, VisualEffectsContext } from '@controllers/visualEf
 import { BookAudio } from '@controllers/bookAudio/BookAudio';
 import { BookAudioContext } from '@controllers/bookAudio/context';
 
-import type { AudioDescription } from '@controllers/bookAudio/descriptions';
-
 import { BookPresentationContext } from '@hooks/pagePresentation/context';
 
 import { StoryRegionsProvider } from '@components/StoryRegionsProvider';
-import { useAppMode } from '@components/App/AppModeContext';
 import { StoryWindowSessionContext } from '@components/StoryWindowHost/context';
+import { useAppMode } from '@components/App/AppModeContext';
 import { useStoryWindowSession } from '@components/StoryWindowHost/hooks';
 
 import type { AppWrapperProps } from '../../@types';
@@ -32,7 +32,7 @@ import { AppContent } from '../AppContent';
 
 export type BookSessionProps = PropsWithChildren<AppWrapperProps>;
 
-const noAudio: readonly AudioDescription[] = [];
+const noAudio: readonly AudioEffect<number>[] = [];
 
 export const BookSession = (props: BookSessionProps) => {
   const dispatch = useDispatch();

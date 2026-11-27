@@ -1,45 +1,81 @@
-import type { VisualEffectLifetime } from '@active-book/types';
+import type {
+  AudioEffect,
+  EffectLifetime,
+  PageRange,
+} from '@active-book/types';
 
-import type { AudioEffectOptions } from '@types';
+type RuntimeAudio = AudioEffect<number>;
+export type AudioDescription = Required<RuntimeAudio>;
 
-type AudioDescriptionExcludedKeys = 'page' | 'lifecycle' | 'fadeOutWhenUnload';
-
-export type AudioDescription = Omit<AudioEffectOptions, AudioDescriptionExcludedKeys> & {
-  lifetime: VisualEffectLifetime;
-  fadeIn?: boolean;
-  fadeOut?: boolean;
-  waitTillTheEnd?: boolean;
-};
-
-export type PageAudioDescription = AudioDescription & {
-  pageId?: string | null;
-};
-
-export const describeAudio = (description: PageAudioDescription) => {
-  const { lifetime } = description;
-
-  let pages: number | number[][];
-
+const normalizeLifetime = (lifetime: EffectLifetime): EffectLifetime => {
   if (lifetime.type === 'page') {
-    pages = lifetime.page;
-  } else {
-    pages = lifetime.range.map(({ from, to }) => [from, to]);
+    return lifetime;
   }
 
-  return JSON.stringify([
-    description.id,
-    description.pageId,
-    pages,
-    description.src,
-    description.format,
-    description.type ?? 'sfx',
-    description.loop ?? false,
-    description.screamer ?? false,
-    description.playOnLoad ?? false,
-    description.delay ?? 0,
-    description.stopBy ?? 0,
-    description.fadeIn ?? false,
-    description.fadeOut ?? false,
-    description.waitTillTheEnd ?? false,
-  ]);
+  const sortedRanges = [...lifetime.range].sort((first, second) => {
+    return first.from - second.from;
+  });
+
+  const mergedRanges: PageRange[] = [];
+
+  for (const rangeCur of sortedRanges) {
+    const previousRange = mergedRanges.at(-1);
+
+    if (previousRange && rangeCur.from <= previousRange.to + 1) {
+      previousRange.to = Math.max(previousRange.to, rangeCur.to);
+    } else {
+      mergedRanges.push({ ...rangeCur });
+    }
+  }
+
+  const [onlyRange] = mergedRanges;
+
+  if (mergedRanges.length === 1 && onlyRange.from === onlyRange.to) {
+    return { type: 'page', page: onlyRange.from };
+  }
+
+  return { type: 'range', range: mergedRanges };
+};
+
+export const normalizeAudioDescription = ({
+  id,
+  src,
+  lifetime,
+  format = [],
+  type = 'sfx',
+  relativeVolume = 100,
+  loop = false,
+  screamer = false,
+  playOnLoad = false,
+  delay = 0,
+  stopBy = 0,
+  fadeIn = false,
+  fadeOut = false,
+  waitTillTheEnd = false,
+}: RuntimeAudio): AudioDescription => {
+  const normalizedLifetime = normalizeLifetime(lifetime);
+
+  return {
+    id,
+    src,
+    lifetime: normalizedLifetime,
+    format,
+    type,
+    relativeVolume,
+    loop,
+    screamer,
+    playOnLoad,
+    delay,
+    stopBy,
+    fadeIn,
+    fadeOut,
+    waitTillTheEnd,
+  };
+};
+
+export const describeAudio = ({
+  relativeVolume: _relativeVolume,
+  ...identity
+}: AudioDescription) => {
+  return JSON.stringify(identity);
 };

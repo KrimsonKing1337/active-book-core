@@ -1,6 +1,6 @@
 import type {
   JsonObject,
-  VisualEffectLifetime,
+  EffectLifetime,
   VisualEffectRegistration,
   VisualPlacement,
 } from '@active-book/types';
@@ -17,7 +17,7 @@ import {
 export type BuiltinDeclaration = {
   type: 'background' | 'frame';
   options: BackgroundEffect | FrameEffect;
-  lifetime: VisualEffectLifetime;
+  lifetime: EffectLifetime;
 };
 
 export const fillRegion = (region: VisualPlacement['region']): VisualPlacement => {

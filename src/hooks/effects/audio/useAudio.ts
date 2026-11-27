@@ -15,12 +15,13 @@ import {
 import { mainSelectors } from '@store/main';
 import { audioEffectsActions, audioEffectsSelectors } from '@store/effects/audio/audio';
 
+import { BookAudioContext } from '@controllers/bookAudio/context';
+import { removeOwnedAudio } from '@controllers/bookAudio/ownedAudio';
+
 import { BookPresentationContext } from '@hooks/pagePresentation/context';
 import { type SettlePageResource, usePageResource } from '@hooks/pagePresentation/usePageResource';
 
 import { HowlWrapper, type HowlWrapperOptions } from '@utils/effects/audio/HowlWrapper';
-
-import { useBookAudio } from './useBookAudio';
 
 const failedLoads = new WeakSet<HowlWrapper>();
 const unloadListeners = new WeakMap<HowlWrapper, Set<() => void>>();
@@ -35,7 +36,6 @@ export const useAudio = (passedOptions: AudioEffectOptions) => {
     lifecycle = 'auto',
     type = 'sfx',
     loop = false,
-    playOnLoad = false,
     stopBy = 0,
     delay = 0,
     relativeVolume = 100,
@@ -49,7 +49,7 @@ export const useAudio = (passedOptions: AudioEffectOptions) => {
   } = passedOptions;
 
   const bookSession = useContext(BookPresentationContext);
-  const isSessionOwned = useBookAudio(passedOptions);
+  const bookAudio = useContext(BookAudioContext);
 
   const dispatch = useDispatch();
 
@@ -57,9 +57,7 @@ export const useAudio = (passedOptions: AudioEffectOptions) => {
   const isAudioUnlocked = useSelector(mainSelectors.isAudioUnlocked);
   const audioInstances = useSelector(audioEffectsSelectors.audioInstances);
 
-  const hasPermissionToPrepare = !!bookSession || isAudioUnlocked;
-  const canPrepare = !isSessionOwned && hasPermissionToPrepare;
-
+  const canPrepare = !!bookSession || isAudioUnlocked;
   const formatKey = format?.join(',');
 
   useLayoutEffect(() => {
@@ -70,10 +68,18 @@ export const useAudio = (passedOptions: AudioEffectOptions) => {
       return;
     }
 
+    if (Object.hasOwn(Object.prototype, id)) {
+      throw new Error(`Audio ID "${id}" is reserved`);
+    }
+
     const state = store.getState();
 
     // В manual экземпляр принадлежит приложению: React лишь обеспечивает его создание
     const existing = state.audioEffects.audioInstances[id];
+
+    if (bookAudio?.hasDescription(id) || (existing && removeOwnedAudio.has(existing))) {
+      throw new Error(`Audio ID "${id}" is already declared in the book`);
+    }
 
     if (lifecycle === 'manual' && existing && !existing.isUnloading) {
       if (audioSessions.get(existing) === bookSession) {
@@ -81,6 +87,10 @@ export const useAudio = (passedOptions: AudioEffectOptions) => {
       }
 
       dispatch(audioEffectsActions.removeAudioInstance({ id, instance: existing }));
+    }
+
+    if (existing && lifecycle !== 'manual') {
+      throw new Error(`Audio ID "${id}" is already registered`);
     }
 
     const handleUnload = () => {
@@ -100,7 +110,6 @@ export const useAudio = (passedOptions: AudioEffectOptions) => {
       format,
       type,
       loop,
-      playOnLoad,
       relativeVolume,
       screamer,
       fadeOutWhenUnload,
@@ -142,6 +151,7 @@ export const useAudio = (passedOptions: AudioEffectOptions) => {
     currentPage,
     canPrepare,
     bookSession,
+    bookAudio,
     id,
     page,
     src,

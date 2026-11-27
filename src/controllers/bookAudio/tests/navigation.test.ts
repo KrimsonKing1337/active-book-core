@@ -4,6 +4,8 @@ import { store } from '@store';
 import { mainActions } from '@store/main';
 import { audioEffectsActions } from '@store/effects/audio/audio';
 
+import { HowlWrapper } from '@utils/effects/audio/HowlWrapper';
+
 import { BookAudio } from '../BookAudio';
 
 import {
@@ -103,5 +105,64 @@ test('switching books clears a pending request without touching the next book’
   } finally {
     next.close();
     store.dispatch(mainActions.closeBookSession(nextBookKey));
+  }
+});
+
+test('onUnload can navigate and remove another effect while reconciliation is in progress', async () => {
+  owner.configure([
+    onPage('trigger', 1),
+    range('keep'),
+    onPage('skipped', 2),
+    onPage('destination', 3),
+  ], true);
+  const triggerAudio = get('trigger');
+  const keep = get('keep');
+  const handleUnload = triggerAudio.onUnload;
+  triggerAudio.onUnload = () => {
+    handleUnload();
+    navigate(3);
+    store.dispatch(audioEffectsActions.removeAudioInstance({ id: keep.id, instance: keep }));
+  };
+  const load = jest.spyOn(Howl.prototype, 'load');
+  load.mockClear();
+  navigate(2);
+  expect(keep.isUnloading).toBe(true);
+  expect(get('destination').id).toBe('destination');
+  expect(store.getState().audioEffects.audioInstances.skipped).toBeUndefined();
+  expect(load).toHaveBeenCalledTimes(1);
+});
+
+test('equivalent ranges and explicit defaults preserve the active instance', () => {
+  owner.configure([range('effect')], true);
+  const previous = get('effect');
+  owner.configure([
+    range('effect', {
+      type: 'sfx',
+      delay: 0,
+      format: [],
+      lifetime: {
+        type: 'range',
+        range: [
+          { from: 3, to: 3 },
+          { from: 1, to: 2 },
+          { from: 2, to: 3 },
+        ],
+      },
+    }),
+  ], true);
+  expect(get('effect')).toBe(previous);
+});
+
+test('duplicates and imperative conflicts fail before an instance can be replaced', () => {
+  owner.configure([range('effect')], true);
+  const audio = get('effect');
+  expect(() => owner.configure([range('effect'), onPage('effect', 5)], true)).toThrow(/Duplicate book audio ID/);
+  const { id, src } = audio;
+  const other = new HowlWrapper({ id, src });
+  try {
+    expect(() => store.dispatch(audioEffectsActions.setAudioInstance(other))).toThrow(/already registered/);
+    expect(get('effect')).toBe(audio);
+  } finally {
+    void other.unload({ immediate: true });
   }
 });

@@ -1,5 +1,7 @@
 import type { PropsWithChildren, ReactNode } from 'react';
 
+import type { AudioEffect } from '@active-book/types';
+
 import type {
   AppMode,
   Config,
@@ -11,9 +13,9 @@ import { StoreProvider } from '@store';
 import type { VisualEffects } from '@controllers/visualEffects';
 
 import type { VisualSurfaceItem } from '@components/VisualSurfaces';
-import { AppWrapper } from '@components/AppWrapper';
 import type { StoryPage } from '@components/AppWrapper/@types';
 
+import { AppWrapper } from '@components/AppWrapper';
 
 import { AppModeContext } from './AppModeContext';
 
@@ -25,6 +27,7 @@ export type AppProps = {
   editorTools?: ReactNode;
   visualSurfaces?: readonly VisualSurfaceItem[];
   visualEffects?: VisualEffects;
+  audioDescriptions?: readonly AudioEffect<number>[];
 };
 
 export const App = ({
@@ -36,6 +39,7 @@ export const App = ({
   editorTools,
   visualSurfaces,
   visualEffects,
+  audioDescriptions,
 }: PropsWithChildren<AppProps>) => {
   return (
     <AppModeContext.Provider value={appMode}>
@@ -47,6 +51,7 @@ export const App = ({
           editorTools={editorTools}
           visualSurfaces={visualSurfaces}
           visualEffects={visualEffects}
+          audioDescriptions={audioDescriptions}
         >
           {children}
         </AppWrapper>

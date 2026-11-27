@@ -2,7 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Howler } from 'howler';
 
-import type { AudioDescription } from '@controllers/bookAudio/descriptions';
+import type { AudioEffect } from '@active-book/types';
 
 import { AppWrapper } from '@components';
 import { StoreProvider, store } from '@store';
@@ -16,8 +16,8 @@ localStorage.setItem('book-audio', JSON.stringify({ config: { ...defaultConfig, 
 
 const plays: string[] = [];
 const tone = '/tests/audioLifecycle/tone.wav';
-const observe = (id: string) => () => plays.push(id);
-const pageSound = (number: number): AudioDescription => {
+
+const pageSound = (number: number): AudioEffect<number> => {
   const id = `sound-${number}`;
 
   return {
@@ -29,12 +29,11 @@ const pageSound = (number: number): AudioDescription => {
     fadeOut: true,
     relativeVolume: number === 1 ? 100 : 0,
 
-    onPlay: observe(id),
   };
 };
 
 const mode = new URLSearchParams(location.search).get('mode');
-let audioDescriptions: AudioDescription[] = [
+let audioDescriptions: AudioEffect<number>[] = [
   {
     id: 'range',
     src: tone,
@@ -44,7 +43,6 @@ let audioDescriptions: AudioDescription[] = [
     fadeIn: true,
     fadeOut: true,
 
-    onPlay: observe('range'),
   },
   {
     id: 'preparing',
@@ -55,12 +53,29 @@ let audioDescriptions: AudioDescription[] = [
 
 if (mode === 'generations') {
   audioDescriptions = [pageSound(1), pageSound(2), pageSound(3)];
+} else if (mode === 'commands') {
+  audioDescriptions = [{
+    ...audioDescriptions[0],
+    delay: 1000,
+  }];
 } else if (mode === 'wait') {
   audioDescriptions = [{
     ...pageSound(1),
     waitTillTheEnd: true,
   }];
 }
+
+const observed = new WeakSet<object>();
+store.subscribe(() => {
+  const { audioInstances } = store.getState().audioEffects;
+
+  for (const audio of Object.values(audioInstances)) {
+    if (audio && !observed.has(audio)) {
+      observed.add(audio);
+      audio.howlInst.on('play', () => plays.push(audio.id));
+    }
+  }
+});
 
 const root = createRoot(document.getElementById('root')!);
 Object.assign(window, {
