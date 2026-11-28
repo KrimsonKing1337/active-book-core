@@ -76,25 +76,25 @@ test('range playback and position continue while the destination visit loads ano
 test('retiring audio restores the same voice and shortens a fade from its current output', async (context) => {
   const page = await openBook(context, 'generations');
   const result = await page.evaluate(async () => {
-    const { meter, readVoices, until, wait } = await import('/tests/audioLifecycle/fadeFixture.js');
+    const { readVoices, timedMeter, until, wait } = await import('/tests/audioLifecycle/fadeFixture.js');
     const book = window.bookAudio;
-    const signal = meter();
+    const signal = await timedMeter();
     await until(() => book.plays.includes('sound-1'));
     const first = book.get('sound-1');
     const voiceId = readVoices(first)[0].id;
-    await until(() => signal.rms() > 0.01);
     const clock = window.audioLifecycle.howler.ctx;
-    const fullWindowAt = clock.currentTime + signal.windowDuration;
-    await until(() => clock.currentTime >= fullWindowAt);
-    const baseline = signal.rms();
+    const baselineAt = clock.currentTime;
+    await signal.waitFor(baselineAt + 0.06);
+    const baseline = signal.rms(baselineAt + 0.02, baselineAt + 0.06);
 
     book.navigate(4);
     await wait(250);
-    const beforeRestore = signal.rms();
     const position = first.howlInst.seek(voiceId);
     book.navigate(1);
-    await wait(45);
-    const afterRestore = signal.rms();
+    const restoreAt = clock.currentTime;
+    await signal.waitFor(restoreAt + 0.06);
+    const beforeRestore = signal.rms(restoreAt - 0.04, restoreAt - 0.01);
+    const afterRestore = signal.rms(restoreAt + 0.02, restoreAt + 0.06);
     const restored = {
       sameAudio: book.get('sound-1') === first,
       sameVoice: readVoices(first)[0].id === voiceId,
@@ -105,17 +105,24 @@ test('retiring audio restores the same voice and shortens a fade from its curren
     await until(() => book.plays.includes('sound-2'));
     const second = book.get('sound-2');
     await wait(120);
-    const beforeShorten = signal.rms();
     book.navigate(3);
-    const start = performance.now();
-    await wait(35);
-    const afterShorten = signal.rms();
+    const shortenAt = clock.currentTime;
+    const stallUntil = performance.now() + 145;
+    while (performance.now() < stallUntil) {
+      // Reproduce a missed main-thread timer without changing the audio clock.
+    }
+
+    await signal.waitFor(shortenAt + 0.17);
+    const beforeShorten = signal.rms(shortenAt - 0.04, shortenAt - 0.01);
+    const afterShorten = signal.rms(shortenAt + 0.035, shortenAt + 0.065);
+    const afterDeadline = signal.rms(shortenAt + 0.12, shortenAt + 0.17);
     await until(() => first.isUnloading);
-    const shortenMs = performance.now() - start;
     await until(() => book.plays.includes('sound-3'));
     const third = book.get('sound-3');
     book.close();
-    await until(() => signal.rms() < 0.00001);
+    const closedAt = clock.currentTime;
+    await signal.waitFor(closedAt + 0.06);
+    const afterClose = signal.rms(closedAt + 0.02, closedAt + 0.06);
     signal.close();
 
     return {
@@ -123,7 +130,8 @@ test('retiring audio restores the same voice and shortens a fade from its curren
       beforeRestore: beforeRestore / baseline,
       afterRestore: afterRestore / baseline,
       afterShorten: afterShorten / beforeShorten,
-      shortenMs,
+      afterDeadline,
+      afterClose,
       firstPlayCount: book.plays.filter((id) => id === 'sound-1').length,
       disposed: [first, second, third].every((audio) => audio.isUnloading && !audio.playing()),
     };
@@ -135,7 +143,8 @@ test('retiring audio restores the same voice and shortens a fade from its curren
   assert(result.beforeRestore > 0.4 && result.beforeRestore < 0.95);
   assert(Math.abs(result.afterRestore - result.beforeRestore) < 0.18);
   assert(result.afterShorten > 0.2 && result.afterShorten < 0.9);
-  assert(result.shortenMs >= 80 && result.shortenMs < 180);
+  assert(result.afterDeadline < 0.00001);
+  assert(result.afterClose < 0.00001);
   assert.equal(result.disposed, true);
 });
 
