@@ -1,5 +1,7 @@
 import { type Howl, Howler } from 'howler';
 
+// Как и в howlerVolume, Reflect используется для доступа к внутренним
+// свойствам Howler, отсутствующим в публичных типах.
 export const prepareHowlerPlayback = () => {
   // Howler 2.2.4 can copy WebKit's initial interrupted state and then wait
   // forever for resume. Its normal resume path already handles suspended.

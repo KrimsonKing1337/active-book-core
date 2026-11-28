@@ -126,6 +126,7 @@
   ],
   "exports": {
     "./*": "./lib/src/*.js",
+    "./audioVolume": "./lib/src/utils/effects/audio/audioVolume.js",
     "./components": "./lib/src/components/index.js",
     "./components/*": "./lib/src/components/*/index.js",
     "./controllers/*": "./lib/src/controllers/*/index.js",

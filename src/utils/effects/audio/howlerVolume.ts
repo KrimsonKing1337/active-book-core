@@ -2,6 +2,9 @@ import { type Howl, Howler } from 'howler';
 
 import type { FadeTime } from './FadeRamp';
 
+// Внутренние свойства Howler 2.2.4 не описаны публичными типами библиотеки.
+// Reflect позволяет обращаться к ним без приведения Howl к вымышленному типу.
+// Результаты чтения проверяются во время выполнения; Reflect сам по себе их не валидирует.
 export const usesHowlerWebAudio = (howl: Howl) => {
   return Reflect.get(howl, '_webAudio') === true;
 };

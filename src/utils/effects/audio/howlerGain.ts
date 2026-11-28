@@ -55,6 +55,8 @@ export class HowlerGain {
 
     const original = Object.getOwnPropertyDescriptor(howl, '_refreshBuffer');
 
+    // Reflect.set возвращает false, если свойство нельзя записать, вместо ошибки
+    // обычного присваивания в strict mode. В этом случае усиление недоступно.
     if (Reflect.set(howl, '_refreshBuffer', renewBuffer)) {
       this.restoreRefresh = () => {
         if (original) {

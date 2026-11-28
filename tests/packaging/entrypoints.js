@@ -65,6 +65,9 @@ export const getModuleEntries = (files) => {
     modules.set(modulePath, modulePath);
   }
 
+  // The public audio volume contract lives with the audio utilities.
+  modules.set('audioVolume', 'utils/effects/audio/audioVolume');
+
   return modules;
 };
 
