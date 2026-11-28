@@ -6,7 +6,7 @@ import { PNG } from 'pngjs';
 import { createServer } from 'vite';
 import svgr from 'vite-plugin-svgr';
 
-export const openBrowserFixture = async (context) => {
+export const openBrowserFixture = async (context, browserType = chromium) => {
   const root = fileURLToPath(new URL('../', import.meta.url));
   const sourcePath = (name) => fileURLToPath(new URL(`../src/${name}`, import.meta.url));
   const aliases = ['assets', 'components', 'controllers', 'pages', 'hooks', 'utils', 'store', 'styles'];
@@ -30,7 +30,13 @@ export const openBrowserFixture = async (context) => {
   const address = server.httpServer.address();
   assert(address && typeof address === 'object');
 
-  const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH });
+  let executablePath;
+
+  if (browserType === chromium) {
+    executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
+  }
+
+  const browser = await browserType.launch({ executablePath });
   context.after(() => browser.close());
   return { browser, origin: `http://127.0.0.1:${address.port}` };
 };

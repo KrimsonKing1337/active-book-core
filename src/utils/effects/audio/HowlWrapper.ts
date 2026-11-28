@@ -12,6 +12,7 @@ import { getMediaVolume } from '@utils/volume/getMediaVolume';
 
 import { AudioFades } from './AudioFades';
 import { waitForPlaybackEnd } from './waitForPlaybackEnd';
+import { prepareHowlerPlayback, waitForPlayUnlock } from './howlerPlayback';
 
 export type HowlWrapperOptions = {
   id: string;
@@ -429,6 +430,7 @@ export class HowlWrapper {
       return;
     }
 
+    prepareHowlerPlayback();
     const soundId = this.howlInst.play();
 
     if (typeof soundId !== 'number') {
@@ -657,13 +659,7 @@ export class HowlWrapper {
       if (this.stopBy > 0 && !hasFailed) {
         cancelDeadline = this.schedule(this.stopBy, {
           complete: () => {
-            this.cancelPendingOperations();
-            this.fadingOut = null;
-
-            if (this.state() === 'loaded') {
-              this.howlInst.stop();
-              this.completion?.cancel();
-            }
+            void this.stop();
           },
         });
       }
@@ -701,11 +697,27 @@ export class HowlWrapper {
       }
     }
 
-    const revisionsAreNotSame = revision !== this.revision;
-    const operationsAreNotSame = this.haltOperation !== operation;
-
-    if (revisionsAreNotSame || this.isDisposed || operationsAreNotSame) {
+    if (revision !== this.revision || this.isDisposed || this.haltOperation !== operation) {
       return;
+    }
+
+    const pendingStart = waitForPlayUnlock(this.howlInst);
+
+    if (pendingStart) {
+      this.pendingOperations.add(pendingStart);
+      const unlocked = await pendingStart.promise;
+
+      this.pendingOperations.delete(pendingStart);
+
+      if (this.haltOperation !== operation) {
+        return;
+      }
+
+      if (!unlocked || revision !== this.revision || this.isDisposed) {
+        this.haltOperation = null;
+
+        return;
+      }
     }
 
     this.haltOperation = null;
@@ -720,13 +732,14 @@ export class HowlWrapper {
       callback = this.onStop;
     }
 
-    this.listenOnce({ event, callback });
-
     this.howlInst[event]();
     this.completion?.cancel();
 
     // A paused voice resumes at its base volume unless the next play requests a fade.
     this.fades.reset();
+
+    // Native events are per voice and asynchronous. The logical command has now completed.
+    callback();
   }
 
   async pause(withFadeOut = false) {
@@ -741,11 +754,16 @@ export class HowlWrapper {
   unload({ immediate = false }: UnloadOptions = {}) {
     if (!this.unloadPromise && !this.isDisposed) {
       this.isUnloading = true;
+      let followUnload = (_completion: Promise<void>) => {};
+
+      this.unloadPromise = new Promise<void>((resolve) => {
+        followUnload = resolve;
+      });
 
       this.completion?.cancel();
       this.cancelPendingOperations();
 
-      this.unloadPromise = this.finishUnload(immediate);
+      followUnload(this.finishUnload(immediate));
     } else if (immediate) {
       this.dispose();
     }

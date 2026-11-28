@@ -73,6 +73,8 @@ test('waitTillTheEnd restores the existing loop and yields to stopBy after exiti
   ], true);
   const audio = get('effect');
   const fade = jest.spyOn(audio, 'fadeOut');
+  const stop = jest.spyOn(audio, 'stop');
+  audio.onStop = jest.fn();
   function setLoop(state: boolean, id?: number): Howl;
   function setLoop(id?: number): boolean;
   function setLoop(stateOrId?: boolean | number, id?: number) {
@@ -102,8 +104,10 @@ test('waitTillTheEnd restores the existing loop and yields to stopBy after exiti
   expect(loops.get(1)).toBe(true);
   navigate(2);
   await advance(200);
-  expect(fade).toHaveBeenCalledTimes(1);
+  expect(stop).toHaveBeenCalledWith(true);
+  expect(audio.onStop).not.toHaveBeenCalled();
   await advance(1000);
+  expect(audio.onStop).toHaveBeenCalledTimes(1);
   expect(audio.isUnloading).toBe(true);
 });
 
@@ -236,9 +240,27 @@ test.each(['pause', 'stop'] as const)('completes author %s before releasing the 
   const waitingShorten = jest.spyOn(waiting, 'shortenFadeOut');
   const nativeHalt = jest.spyOn(first.howlInst, command);
   const nativeUnload = jest.spyOn(first.howlInst, 'unload');
+  const events: string[] = [];
+  const onHalt = () => {
+    events.push(command);
+  };
+  const handleUnload = first.onUnload;
+
+  if (command === 'pause') {
+    first.onPause = onHalt;
+  } else {
+    first.onStop = onHalt;
+  }
+
+  first.onUnload = () => {
+    events.push('unload');
+    handleUnload();
+  };
+
   await first.play();
   await waiting.play();
   const halted = first[command](true);
+  void halted.then(() => events.push('resolved'));
 
   navigate(2);
   const second = get('second');
@@ -253,6 +275,11 @@ test.each(['pause', 'stop'] as const)('completes author %s before releasing the 
   expect(third.isFading).toBe(true);
   await advance(0);
   await halted;
+  expect(events).toEqual([
+    command,
+    'unload',
+    'resolved',
+  ]);
   expect(nativeHalt.mock.invocationCallOrder[0]).toBeLessThan(nativeUnload.mock.invocationCallOrder[0]);
   expect(first.isUnloading).toBe(true);
   expect(waitingShorten).not.toHaveBeenCalled();
@@ -261,4 +288,35 @@ test.each(['pause', 'stop'] as const)('completes author %s before releasing the 
   await advance(100);
   expect(second.isUnloading).toBe(true);
   expect(third.isUnloading).toBe(false);
+});
+
+test('a completed retired stop can unload another sound, navigate and close the book', async () => {
+  owner.configure([
+    onPage('first', 1),
+    onPage('second', 2),
+    onPage('third', 3),
+  ], true);
+  const first = get('first');
+  await first.play();
+  const halted = first.stop(true);
+  navigate(2);
+  const second = get('second');
+  await second.play();
+  navigate(3);
+  const third = get('third');
+  const onStop = jest.fn(() => {
+    expect(first.playing()).toBe(false);
+    void third.unload({ immediate: true });
+    navigate(1);
+    owner.close();
+  });
+  first.onStop = onStop;
+
+  await advance(100);
+  await halted;
+  expect(onStop).toHaveBeenCalledTimes(1);
+  expect(first.isUnloading).toBe(true);
+  expect(second.isUnloading).toBe(true);
+  expect(third.isUnloading).toBe(true);
+  expect(store.getState().audioEffects.audioInstances).toEqual({});
 });

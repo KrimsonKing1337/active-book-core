@@ -226,3 +226,28 @@
     position: static;
   }
 }
+
+.CommandEvents {
+  margin-top: 16px;
+  padding-top: 12px;
+
+  color: #b2c5c8;
+  font-size: 13px;
+
+  border-top: 1px solid #34474f;
+
+  h2 {
+    margin-bottom: 6px;
+
+    color: #edf4f2;
+    font-size: 14px;
+  }
+
+  ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+
+    list-style: none;
+  }
+}

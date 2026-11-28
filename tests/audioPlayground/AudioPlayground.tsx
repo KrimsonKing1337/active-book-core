@@ -7,6 +7,7 @@ import {
 } from '@store';
 import { mainActions, mainSelectors } from '@store/main';
 
+import { AudioCommandEvents } from './AudioCommandEvents';
 import { AudioControls } from './AudioControls';
 import { DemoBook } from './DemoBook';
 import { EffectStatus } from './EffectStatus';
@@ -141,6 +142,8 @@ const PlaygroundContent = () => {
               {scene.cue}
             </p>
           )}
+
+          <AudioCommandEvents />
         </section>
 
         <aside className={styles.Panel} aria-label="Диагностика аудио">

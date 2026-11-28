@@ -385,9 +385,18 @@ export class BookAudio {
       return;
     }
 
-    if (activation.description.fadeOut && activation.audio.hasCurrentPlayback()) {
+    const { audio, description } = activation;
+
+    if (description.fadeOut && audio.hasCurrentPlayback()) {
+      void audio.stop(true);
       this.retiring.fadeOut([activation]);
-    } else {
+
+      return;
+    }
+
+    void audio.stop();
+
+    if (this.retiring.has(activation)) {
       this.dispose(activation);
     }
   };
