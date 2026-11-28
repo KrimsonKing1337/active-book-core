@@ -29,14 +29,30 @@ alias['@types'] = sourcePath('@types.ts');
 alias['~styles'] = sourcePath('styles');
 alias['~assets'] = sourcePath('assets');
 
+let playground = '/tests/visualPlayground/';
+
+if (process.argv.includes('--audio')) {
+  playground = '/tests/audioPlayground/';
+}
+
 const server = await createServer({
   configFile: false,
   root,
   plugins: [svgr({ include: '**/*.svg' })],
   resolve: { alias },
   define: { 'process.env.mode': JSON.stringify('development') },
-  server: { host: '0.0.0.0', port: 4175, open: '/tests/visualPlayground/' },
+  server: {
+    host: '0.0.0.0',
+    port: 4175,
+    open: playground,
+  },
 });
 
 await server.listen();
 server.printUrls();
+
+const localUrl = server.resolvedUrls?.local[0];
+
+if (localUrl) {
+  console.log(new URL(playground, localUrl).href);
+}

@@ -22,6 +22,7 @@
     "lint-staged": "lint-staged",
     "pre-commit": "lint-staged",
     "dev:visual-lab": "node scripts/visualPlayground.js",
+    "dev:audio-lab": "node scripts/visualPlayground.js --audio",
     "test:visual-lab": "node --test tests/visualPlayground/visualPlayground.browser.test.js",
     "lint:ts:check": "eslint \"./src/**/*.{ts,tsx}\"",
     "lint:css:check": "stylelint \"src/**/*.scss\"",

@@ -1,0 +1,228 @@
+:global(body) {
+  overflow: auto;
+}
+
+:global(#root) {
+  height: auto;
+  min-height: 100%;
+}
+
+.Lab {
+  min-height: 100vh;
+  padding: 28px clamp(16px, 4vw, 56px) 44px;
+
+  color: #e8eeee;
+  font-family: Roboto, sans-serif;
+
+  background: #10191e;
+
+  button,
+  select {
+    padding: 8px 12px;
+
+    color: inherit;
+    font: inherit;
+    font-size: 14px;
+
+    background: #23333b;
+    border: 1px solid #42535b;
+    border-radius: 6px;
+  }
+
+  button:not(:disabled) {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    color: #9eaab0;
+
+    background: #182428;
+  }
+
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible {
+    outline: 2px solid #94dbc8;
+    outline-offset: 2px;
+  }
+
+  button[aria-current='page'],
+  .Primary {
+    color: #122723;
+
+    background: #a1ded0;
+    border-color: #a1ded0;
+  }
+}
+
+.Header,
+.BookStatus,
+.EffectHeading {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.Header {
+  margin-bottom: 28px;
+
+  h1 {
+    margin-bottom: 6px;
+
+    font-family: Georgia, serif;
+    font-size: clamp(28px, 5vw, 44px);
+    font-weight: 400;
+  }
+
+  p {
+    color: #a8b9bc;
+  }
+}
+
+.Layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 390px);
+  gap: 24px;
+  align-items: start;
+}
+
+.Workspace,
+.Panel {
+  min-width: 0;
+  padding: 16px;
+
+  background: #17262c;
+  border: 1px solid #34474f;
+  border-radius: 12px;
+}
+
+.Workspace {
+  position: sticky;
+  top: 12px;
+}
+
+.BookStatus {
+  margin-bottom: 12px;
+
+  color: #b2c5c8;
+  font-size: 14px;
+}
+
+.Stage {
+  height: clamp(285px, 52vh, 520px);
+  overflow: hidden;
+
+  background: linear-gradient(155deg, #294f54, #13252f 70%);
+  border-radius: 8px;
+}
+
+.Narrative {
+  padding: clamp(12px, 4vw, 48px);
+
+  h2 {
+    margin-bottom: 14px;
+
+    font: 400 clamp(24px, 5cqw, 54px) Georgia, serif;
+  }
+
+  p {
+    line-height: 1.65;
+  }
+}
+
+.Navigation,
+.Actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.Navigation,
+.Cue {
+  margin-top: 16px;
+}
+
+.Cue {
+  color: #bfcecf;
+  line-height: 1.5;
+}
+
+.Panel {
+  h2 {
+    margin: 2px 0 12px;
+
+    font-size: 20px;
+  }
+}
+
+.Controls {
+  display: grid;
+  gap: 10px;
+
+  font-size: 14px;
+}
+
+.Field {
+  display: grid;
+  gap: 5px;
+}
+
+.Check {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+}
+
+.Field input,
+.Check input {
+  accent-color: #a1ded0;
+}
+
+.Effects {
+  display: grid;
+  gap: 6px;
+  margin-top: 14px;
+
+  list-style: none;
+}
+
+.Effect {
+  display: grid;
+  gap: 4px;
+  padding: 9px 10px;
+
+  color: #b8c6c9;
+  font-size: 13px;
+
+  border: 1px solid #34474f;
+  border-radius: 6px;
+
+  strong {
+    color: #edf4f2;
+  }
+
+  &[data-playback='playing'] .State {
+    color: #a1ded0;
+  }
+
+  &[data-playback='failed'] .State {
+    color: #ffb6ab;
+  }
+}
+
+.State {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+@media (width <= 850px) {
+  .Layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .Workspace {
+    position: static;
+  }
+}

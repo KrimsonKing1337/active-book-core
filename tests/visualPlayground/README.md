@@ -4,6 +4,8 @@
 
 Запуск из корня ядра: `npm run dev:visual-lab`. Reader: `/tests/visualPlayground/?mode=reader`; editor: `?mode=editor`.
 
+[Звуковая история и проверка межстраничного аудио](../audioPlayground/README.md).
+
 [Финальная архитектура, проверки и замеры](../../docs/css-first-story-surfaces.ru.md). Старые отчёты описывают предыдущие эксперименты.
 
 `Controls → Playground.change → registrationsFor/definitionsFor → AppWrapper/session → StoryRoot → VisualSurfaces → RegisteredVisualEffect`.
