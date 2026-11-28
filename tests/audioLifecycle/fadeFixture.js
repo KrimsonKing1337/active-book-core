@@ -87,6 +87,11 @@ export const timedMeter = async () => {
 
       return Math.sqrt(energy / sampleCount);
     },
+    maxBlockRms: (from, to) => {
+      const window = blocks.filter(({ time }) => time >= from && time < to);
+
+      return Math.max(...window.map(({ count, energy }) => Math.sqrt(energy / count)));
+    },
     close: () => {
       masterGain.disconnect(probe);
       probe.disconnect();

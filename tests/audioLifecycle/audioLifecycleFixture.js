@@ -2,9 +2,16 @@ import assert from 'node:assert/strict';
 
 import { openBrowserFixture } from '../browserFixture.js';
 
-export const openAudio = async (context) => {
-  const { browser, origin } = await openBrowserFixture(context);
+export const openAudio = async (context, { browserType, html5 = false } = {}) => {
+  const { browser, origin } = await openBrowserFixture(context, browserType);
   const page = await browser.newPage();
+  if (html5) {
+    await page.addInitScript(() => {
+      window.AudioContext = undefined;
+      window.webkitAudioContext = undefined;
+    });
+  }
+
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   context.after(() => assert.deepEqual(errors, []));

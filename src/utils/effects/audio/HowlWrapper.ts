@@ -8,9 +8,13 @@ import type { AudioType } from '@types';
 
 import { store } from '@store';
 
+import { assertAudioRelativeVolume, DEFAULT_AUDIO_RELATIVE_VOLUME } from '@utils/effects/audio/audioVolume';
+
 import { getMediaVolume } from '@utils/volume/getMediaVolume';
 
 import { AudioFades } from './AudioFades';
+import { HowlerGain } from './howlerGain';
+
 import { waitForPlaybackEnd } from './waitForPlaybackEnd';
 import { prepareHowlerPlayback, waitForPlayUnlock } from './howlerPlayback';
 
@@ -22,14 +26,13 @@ export type HowlWrapperOptions = {
   loop?: HowlOptions['loop'];
   type?: AudioType;
   relativeVolume?: number;
-  screamer?: boolean;
   fadeOutWhenUnload?: boolean;
   delay?: number;
   stopBy?: number;
+  canPlay?: () => boolean;
 
   beforePlay?: () => void;
   beforeHalt?: () => void;
-  canPlay?: () => boolean;
   onPlay?: () => void;
   onPause?: () => void;
   onStop?: () => void;
@@ -97,7 +100,8 @@ export class HowlWrapper {
   public page: HowlWrapperOptions['page'];
   public src: HowlOptions['src'] = '';
   public type: AudioType = 'sfx';
-  public relativeVolume: number;
+  private relativePercent: number;
+  private categoryVolume: number;
   public fadeOutWhenUnload = true;
 
   public delay: number = 0;
@@ -105,6 +109,7 @@ export class HowlWrapper {
 
   public isUnloading = false;
   private readonly fades: AudioFades;
+  private readonly gain: HowlerGain;
   private loadResult?: AudioLoadOutcome;
   private readonly loadListeners = new Set<AudioLoadListener>();
   private fadingOut: Promise<boolean> | null = null;
@@ -134,8 +139,7 @@ export class HowlWrapper {
     format,
     loop,
     type = 'sfx',
-    relativeVolume = 100,
-    screamer = false,
+    relativeVolume = DEFAULT_AUDIO_RELATIVE_VOLUME,
     fadeOutWhenUnload = true,
     delay = 0,
     stopBy = 0,
@@ -147,26 +151,12 @@ export class HowlWrapper {
     onPause = () => {},
     onStop = () => {},
   }: HowlWrapperOptions) {
-    const {
-      sfx,
-      bg,
-      music,
-      global,
-    } = this.getVolume();
+    assertAudioRelativeVolume(relativeVolume);
 
-    let categoryVolume = sfx;
-
-    if (type === 'bg') {
-      categoryVolume = bg;
-    } else if (type === 'music') {
-      categoryVolume = music;
-    }
-
-    const volume = getMediaVolume({
-      global: global / 100,
-      category: categoryVolume / 100,
-      relative: relativeVolume / 100,
-    });
+    this.type = type;
+    this.relativePercent = relativeVolume;
+    this.categoryVolume = this.getVolumeByType() / 100;
+    const volume = this.getNativeVolume();
 
     const options: HowlerOptions = {
       src,
@@ -177,13 +167,11 @@ export class HowlWrapper {
       onloaderror: this.handleLoadError,
     };
 
-    // todo: через вебапи делать громкость более 100%
-    if (screamer) {
-      options.volume = 1;
-    }
-
     this.howlInst = new Howl(options);
     this.fades = new AudioFades(this.howlInst);
+    this.gain = new HowlerGain(this.howlInst);
+
+    this.gain.setMultiplier(Math.max(this.relativePercent / 100, 1));
 
     const state = this.howlInst.state();
 
@@ -196,8 +184,6 @@ export class HowlWrapper {
     this.id = id;
     this.page = page;
     this.src = src;
-    this.type = type;
-    this.relativeVolume = relativeVolume;
     this.fadeOutWhenUnload = fadeOutWhenUnload;
     this.delay = delay;
     this.stopBy = stopBy;
@@ -212,6 +198,7 @@ export class HowlWrapper {
 
     this.howlInst.on('end', (soundId) => {
       if (!this.howlInst.loop(soundId) && !this.howlInst.playing(soundId)) {
+        this.gain.cancelStart(soundId);
         this.soundIds.delete(soundId);
         this.fades.removeVoice(soundId, true);
       }
@@ -219,6 +206,7 @@ export class HowlWrapper {
 
     this.howlInst.on('stop', (soundId) => {
       if (!this.howlInst.playing(soundId)) {
+        this.gain.cancelStart(soundId);
         this.soundIds.delete(soundId);
         this.fades.removeVoice(soundId);
       }
@@ -279,21 +267,41 @@ export class HowlWrapper {
     return this.fades.isFading;
   }
 
+  get relativeVolume() {
+    return this.relativePercent;
+  }
+
+  setRelativeVolume(percent: number) {
+    assertAudioRelativeVolume(percent);
+
+    if (this.isDisposed || percent === this.relativePercent) {
+      return;
+    }
+
+    this.relativePercent = percent;
+    this.gain.setMultiplier(Math.max(percent / 100, 1));
+    this.fades.setVolume(this.getNativeVolume());
+  }
+
   // Category volume uses 0..1 here; mixer settings and relative volume remain percentages.
   volume(categoryVolume: number) {
     if (this.isDisposed) {
       return;
     }
 
-    const globalVolume = this.getVolume().global;
+    this.categoryVolume = categoryVolume;
+    this.fades.setVolume(this.getNativeVolume());
+  }
 
-    const newValue = getMediaVolume({
-      global: globalVolume / 100,
-      category: categoryVolume,
-      relative: this.relativeVolume / 100,
+  private getNativeVolume() {
+    const globalVolume = this.getVolume().global / 100;
+    const userCategoryVolume = this.getVolumeByType() / 100;
+
+    return getMediaVolume({
+      global: globalVolume,
+      category: Math.min(this.categoryVolume, userCategoryVolume),
+      relative: Math.min(this.relativePercent / 100, 1),
     });
-
-    this.fades.setVolume(newValue);
   }
 
   getVolume() {
@@ -432,7 +440,13 @@ export class HowlWrapper {
 
     prepareHowlerPlayback();
 
-    const soundId = this.howlInst.play();
+    let level = 1;
+
+    if (options.withFadeIn || options.holdUntilStarted) {
+      level = 0;
+    }
+
+    const soundId = this.gain.play(level);
 
     if (typeof soundId !== 'number') {
       options.fail();
@@ -441,13 +455,6 @@ export class HowlWrapper {
     }
 
     this.soundIds.add(soundId);
-
-    // Initialize this voice in the same turn as play, leaving other voices untouched.
-    let level = 1;
-
-    if (options.withFadeIn || options.holdUntilStarted) {
-      level = 0;
-    }
 
     const hasInitialGain = this.fades.addVoice(soundId, level);
 
@@ -487,6 +494,7 @@ export class HowlWrapper {
     const handlePlayError = () => {
       cancelPlay();
 
+      this.gain.cancelStart(soundId);
       this.fades.removeVoice(soundId);
       this.soundIds.delete(soundId);
 
@@ -503,6 +511,7 @@ export class HowlWrapper {
       cancelPlay();
       cancelError();
 
+      this.gain.cancelStart(soundId);
       this.howlInst.stop(soundId);
       this.soundIds.delete(soundId);
       this.fades.removeVoice(soundId);
@@ -810,12 +819,13 @@ export class HowlWrapper {
       this.howlInst.stop();
     }
 
+    this.gain.dispose();
     this.howlInst.unload();
     this.finishLoad('cancelled');
     this.onUnload();
   }
 
-  private fadeVoices(options: VoiceFadeOptions, absolute = false) {
+  private fadeVoices(options: VoiceFadeOptions) {
     const { soundId } = options;
 
     let soundIds: Iterable<number> = this.soundIds;
@@ -833,7 +843,7 @@ export class HowlWrapper {
           soundId: idCur,
         };
 
-        const newFade = this.fades.fade(fadeOptions, absolute);
+        const newFade = this.fades.fade(fadeOptions);
 
         fades.push(newFade);
       }
@@ -847,7 +857,7 @@ export class HowlWrapper {
       return false;
     }
 
-    const fades = this.fadeVoices(options, true);
+    const fades = this.fadeVoices(options);
 
     const results = await Promise.all(fades);
     const allFadesCompleted = results.every(Boolean);

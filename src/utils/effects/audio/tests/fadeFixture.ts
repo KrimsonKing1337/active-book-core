@@ -15,7 +15,6 @@ type Voice = {
   };
 };
 type SoundState = {
-  volume: number;
   voices: Map<number, Voice>;
 };
 
@@ -33,13 +32,7 @@ export const installFadeFixture = () => {
     let sound = sounds.get(howl);
 
     if (!sound) {
-      const volume: unknown = Reflect.get(howl, '_volume');
-
-      if (typeof volume !== 'number') {
-        throw new Error('Missing initial Howler volume');
-      }
-
-      sound = { volume, voices: new Map() };
+      sound = { voices: new Map() };
       sounds.set(howl, sound);
     }
 
@@ -68,7 +61,13 @@ export const installFadeFixture = () => {
     const sound = state(this);
 
     if (args.length === 0) {
-      return sound.volume;
+      const volume: unknown = Reflect.get(this, '_volume');
+
+      if (typeof volume !== 'number') {
+        throw new Error('Missing Howler group volume');
+      }
+
+      return volume;
     }
 
     if (args.length === 1 && sound.voices.has(args[0])) {
@@ -82,7 +81,7 @@ export const installFadeFixture = () => {
     const [volume, id] = args;
 
     if (id === undefined) {
-      sound.volume = volume;
+      Reflect.set(this, '_volume', volume);
     }
 
     for (const [voiceId, voice] of sound.voices) {
@@ -96,7 +95,7 @@ export const installFadeFixture = () => {
   });
   jest.spyOn(NativeHowl.prototype, 'play').mockImplementation(function (this: Howl) {
     nextId += 1;
-    state(this).voices.set(nextId, { volume: state(this).volume, playing: true });
+    state(this).voices.set(nextId, { volume: this.volume(), playing: true });
     events.push({
       event: 'play',
       time: Date.now(),

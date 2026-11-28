@@ -52,7 +52,11 @@ let audioDescriptions: AudioEffect<number>[] = [
 ];
 
 if (mode === 'generations') {
-  audioDescriptions = [pageSound(1), pageSound(2), pageSound(3)];
+  audioDescriptions = [
+    { ...pageSound(1), relativeVolume: 150 },
+    pageSound(2),
+    pageSound(3),
+  ];
 } else if (mode === 'commands') {
   audioDescriptions = [{
     ...audioDescriptions[0],

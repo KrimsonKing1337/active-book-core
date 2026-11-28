@@ -20,6 +20,8 @@ import { removeOwnedAudio } from '@controllers/bookAudio/ownedAudio';
 import { BookPresentationContext } from '@hooks/pagePresentation/context';
 import { usePageResource } from '@hooks/pagePresentation/usePageResource';
 
+import { DEFAULT_AUDIO_RELATIVE_VOLUME } from '@utils/effects/audio/audioVolume';
+
 import { HowlWrapper, type HowlWrapperOptions } from '@utils/effects/audio/HowlWrapper';
 
 const audioSessions = new WeakMap<HowlWrapper, string | null>();
@@ -35,8 +37,7 @@ export const useAudio = (passedOptions: AudioEffectOptions) => {
     loop = false,
     stopBy = 0,
     delay = 0,
-    relativeVolume = 100,
-    screamer = false,
+    relativeVolume = DEFAULT_AUDIO_RELATIVE_VOLUME,
     fadeOutWhenUnload = true,
 
     onPlay = () => {},
@@ -98,7 +99,6 @@ export const useAudio = (passedOptions: AudioEffectOptions) => {
       type,
       loop,
       relativeVolume,
-      screamer,
       fadeOutWhenUnload,
       stopBy,
       delay,

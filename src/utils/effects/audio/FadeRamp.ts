@@ -1,7 +1,12 @@
+export type FadeTime = {
+  wall: number;
+  playback: number;
+};
+
 export type RampOptions = {
   from: number;
   to: number;
-  startedAt: number;
+  startedAt: FadeTime;
   duration: number;
 };
 
@@ -16,15 +21,17 @@ export class FadeRamp {
   readonly completion: Promise<boolean>;
   deadline: number;
   private from: number;
-  private startedAt: number;
+  private playbackStart: number;
+  private playbackDeadline: number;
   private timer?: ReturnType<typeof setTimeout>;
   private resolve = (_completed: boolean) => {};
 
   constructor(options: RampOptions, private readonly onDeadline: () => void) {
     this.from = options.from;
     this.to = options.to;
-    this.startedAt = options.startedAt;
-    this.deadline = options.startedAt + options.duration;
+    this.playbackStart = options.startedAt.playback;
+    this.playbackDeadline = this.playbackStart + options.duration;
+    this.deadline = options.startedAt.wall + options.duration;
 
     this.completion = new Promise((resolve) => {
       this.resolve = resolve;
@@ -33,9 +40,17 @@ export class FadeRamp {
     this.schedule();
   }
 
-  levelAt(now: number) {
-    const elapsed = now - this.startedAt;
-    const duration = this.deadline - this.startedAt;
+  remainingPlaybackAt(now: FadeTime) {
+    return Math.max(0, this.playbackDeadline - now.playback);
+  }
+
+  levelAt(now: FadeTime) {
+    if (now.playback >= this.playbackDeadline) {
+      return this.to;
+    }
+
+    const elapsed = now.playback - this.playbackStart;
+    const duration = this.playbackDeadline - this.playbackStart;
     const gainDelta = this.to - this.from;
 
     const progress = clampGain(elapsed / duration);
@@ -58,7 +73,9 @@ export class FadeRamp {
     this.timer = timer;
   }
 
-  shorten(deadline: number, now: number) {
+  shorten(now: FadeTime, duration: number) {
+    const deadline = now.wall + duration;
+
     if (deadline >= this.deadline) {
       return false;
     }
@@ -66,7 +83,8 @@ export class FadeRamp {
     clearTimeout(this.timer);
 
     this.from = this.levelAt(now);
-    this.startedAt = now;
+    this.playbackStart = now.playback;
+    this.playbackDeadline = Math.min(this.playbackDeadline, now.playback + duration);
     this.deadline = deadline;
 
     this.schedule();

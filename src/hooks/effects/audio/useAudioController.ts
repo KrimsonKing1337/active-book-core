@@ -34,6 +34,10 @@ export const useAudioController = (id: string) => {
     return getAudio()?.stop(withFadeOut);
   }, [getAudio]);
 
+  const setRelativeVolume = useCallback((percent: number) => {
+    getAudio()?.setRelativeVolume(percent);
+  }, [getAudio]);
+
   const remove = useCallback(() => {
     const instance = getAudio();
 
@@ -53,6 +57,7 @@ export const useAudioController = (id: string) => {
     play,
     pause,
     stop,
+    setRelativeVolume,
     remove,
   };
 };
