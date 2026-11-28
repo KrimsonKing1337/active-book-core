@@ -70,10 +70,12 @@ export class HowlerGain {
 
   setMultiplier(multiplier: number) {
     this.multiplier = multiplier;
+
     this.updateOutput();
 
     if (this.isUnavailable && multiplier > 1 && !reportedIncompatibleRoute) {
       reportedIncompatibleRoute = true;
+
       console.warn('ActiveBook audio: incompatible Howler voice route, amplification is limited to 100%.');
     }
   }
@@ -132,17 +134,21 @@ export class HowlerGain {
 
     if (isHowlerSound(sound)) {
       node = getHowlerVoiceGain(sound);
+
       const id: unknown = Reflect.get(sound, '_id');
 
       if (typeof id === 'number') {
         const level = this.startingLevel ?? this.pendingLevels.get(id);
+
         this.startingLevel = undefined;
         this.pendingLevels.delete(id);
 
         if (level !== undefined) {
           // _refreshBuffer runs before Howler writes _volume to the voice and starts the source.
           node?.gain.cancelScheduledValues(node.context.currentTime);
-          Reflect.set(sound, '_volume', this.howl.volume() * level);
+
+          const newVolume = this.howl.volume() * level;
+          Reflect.set(sound, '_volume', newVolume);
         }
       }
     }
@@ -157,14 +163,15 @@ export class HowlerGain {
     const context = Howler.ctx;
     const master = Howler.masterGain;
 
-    const isSharedContext = context
-      && context.state !== 'closed'
-      && node
-      && master instanceof GainNode
-      && node.context === context
-      && master.context === context;
+    if (!context || context.state === 'closed') {
+      return false;
+    }
 
-    if (!isSharedContext) {
+    if (!node || !(master instanceof GainNode)) {
+      return false;
+    }
+
+    if (node.context !== context || master.context !== context) {
       return false;
     }
 
@@ -210,6 +217,7 @@ export class HowlerGain {
     try {
       output = context.createGain();
       output.gain.setValueAtTime(this.multiplier, context.currentTime);
+
       output.connect(master);
     } catch (error) {
       output?.disconnect();

@@ -4,7 +4,7 @@ import {
   DEFAULT_AUDIO_RELATIVE_VOLUME,
   MAX_AUDIO_RELATIVE_VOLUME,
   MIN_AUDIO_RELATIVE_VOLUME,
-} from '@@/audioVolume';
+} from '@utils/effects/audio/audioVolume';
 
 import { useDispatch, useSelector } from '@store';
 import { volumeActions, volumeSelectors } from '@store/volume';

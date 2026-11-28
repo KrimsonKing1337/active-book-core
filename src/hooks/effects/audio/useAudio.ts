@@ -3,8 +3,6 @@ import {
   useLayoutEffect,
 } from 'react';
 
-import { DEFAULT_AUDIO_RELATIVE_VOLUME } from '@@/audioVolume';
-
 import type { AudioEffectOptions } from '@types';
 
 import {
@@ -21,6 +19,8 @@ import { removeOwnedAudio } from '@controllers/bookAudio/ownedAudio';
 
 import { BookPresentationContext } from '@hooks/pagePresentation/context';
 import { usePageResource } from '@hooks/pagePresentation/usePageResource';
+
+import { DEFAULT_AUDIO_RELATIVE_VOLUME } from '@utils/effects/audio/audioVolume';
 
 import { HowlWrapper, type HowlWrapperOptions } from '@utils/effects/audio/HowlWrapper';
 

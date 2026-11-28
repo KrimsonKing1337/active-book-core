@@ -1,8 +1,12 @@
 import type { Howl } from 'howler';
 
-import type { FadeTime, RampOptions } from './FadeRamp';
+import {
+  type FadeTime,
+  type RampOptions,
+  FadeRamp,
+  clampGain,
+} from './FadeRamp';
 
-import { FadeRamp, clampGain } from './FadeRamp';
 import {
   cancelHowlerVoiceAutomation,
   getFadeTime,
@@ -119,11 +123,12 @@ export class AudioFades {
   reset() {
     const volume = this.howl.volume();
 
-    for (const soundId of this.voices.keys()) {
-      cancelHowlerVoiceAutomation(this.howl, soundId);
+    for (const soundIdCur of this.voices.keys()) {
+      cancelHowlerVoiceAutomation(this.howl, soundIdCur);
     }
 
     this.clear();
+
     this.howl.volume(volume);
   }
 
@@ -142,6 +147,7 @@ export class AudioFades {
       const { ramp } = voice;
 
       voice.ramp = undefined;
+
       const now = getFadeTime(this.howl);
 
       voice.level = ramp.to;
@@ -194,7 +200,9 @@ export class AudioFades {
 
     const target = clampGain(to);
 
-    if (!Number.isFinite(duration) || duration <= 0 || level === target) {
+    const durationIsValid = Number.isFinite(duration) && duration > 0;
+
+    if (!durationIsValid || level === target) {
       voice.level = target;
 
       this.render(voice, now);

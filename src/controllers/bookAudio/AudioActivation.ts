@@ -77,6 +77,7 @@ export class AudioActivation {
     }
 
     const previousVolume = this.description.relativeVolume;
+
     this.description = description;
 
     if (description.relativeVolume !== previousVolume) {

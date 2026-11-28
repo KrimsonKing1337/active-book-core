@@ -2,9 +2,13 @@ import { type Howl, Howler } from 'howler';
 
 import type { FadeTime } from './FadeRamp';
 
-export const usesHowlerWebAudio = (howl: Howl) => Reflect.get(howl, '_webAudio') === true;
+export const usesHowlerWebAudio = (howl: Howl) => {
+  return Reflect.get(howl, '_webAudio') === true;
+};
 
-export const isHowlerSound = (value: unknown): value is object => typeof value === 'object' && value !== null;
+export const isHowlerSound = (value: unknown): value is object => {
+  return typeof value === 'object' && value !== null;
+};
 
 export const getHowlerSounds = (howl: Howl): readonly object[] => {
   const sounds: unknown = Reflect.get(howl, '_sounds');
@@ -53,7 +57,9 @@ export const cancelHowlerVoiceAutomation = (howl: Howl, soundId: number) => {
     return;
   }
 
-  const sound = getHowlerSounds(howl).find((voiceCur) => Reflect.get(voiceCur, '_id') === soundId);
+  const sound = getHowlerSounds(howl).find((voiceCur) => {
+    return Reflect.get(voiceCur, '_id') === soundId;
+  });
 
   if (sound) {
     const node = getHowlerVoiceGain(sound);

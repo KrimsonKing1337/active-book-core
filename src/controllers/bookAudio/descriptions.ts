@@ -4,7 +4,7 @@ import type {
   PageRange,
 } from '@active-book/types';
 
-import { assertAudioRelativeVolume, DEFAULT_AUDIO_RELATIVE_VOLUME } from '@@/audioVolume';
+import { assertAudioRelativeVolume, DEFAULT_AUDIO_RELATIVE_VOLUME } from '@utils/effects/audio/audioVolume';
 
 type RuntimeAudio = AudioEffect<number>;
 export type AudioDescription = Required<RuntimeAudio>;

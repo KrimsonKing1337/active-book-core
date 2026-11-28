@@ -4,16 +4,17 @@ import {
   Howler,
 } from 'howler';
 
-import { assertAudioRelativeVolume, DEFAULT_AUDIO_RELATIVE_VOLUME } from '@@/audioVolume';
-
 import type { AudioType } from '@types';
 
 import { store } from '@store';
+
+import { assertAudioRelativeVolume, DEFAULT_AUDIO_RELATIVE_VOLUME } from '@utils/effects/audio/audioVolume';
 
 import { getMediaVolume } from '@utils/volume/getMediaVolume';
 
 import { AudioFades } from './AudioFades';
 import { HowlerGain } from './howlerGain';
+
 import { waitForPlaybackEnd } from './waitForPlaybackEnd';
 import { prepareHowlerPlayback, waitForPlayUnlock } from './howlerPlayback';
 
@@ -28,10 +29,10 @@ export type HowlWrapperOptions = {
   fadeOutWhenUnload?: boolean;
   delay?: number;
   stopBy?: number;
+  canPlay?: () => boolean;
 
   beforePlay?: () => void;
   beforeHalt?: () => void;
-  canPlay?: () => boolean;
   onPlay?: () => void;
   onPause?: () => void;
   onStop?: () => void;
@@ -151,6 +152,7 @@ export class HowlWrapper {
     onStop = () => {},
   }: HowlWrapperOptions) {
     assertAudioRelativeVolume(relativeVolume);
+
     this.type = type;
     this.relativePercent = relativeVolume;
     this.categoryVolume = this.getVolumeByType() / 100;
@@ -168,6 +170,7 @@ export class HowlWrapper {
     this.howlInst = new Howl(options);
     this.fades = new AudioFades(this.howlInst);
     this.gain = new HowlerGain(this.howlInst);
+
     this.gain.setMultiplier(Math.max(this.relativePercent / 100, 1));
 
     const state = this.howlInst.state();
