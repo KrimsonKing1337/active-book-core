@@ -1,6 +1,4 @@
-import type { Howl } from 'howler';
-
-import { Howler } from 'howler';
+import { type Howl, Howler } from 'howler';
 
 export const prepareHowlerPlayback = () => {
   // Howler 2.2.4 can copy WebKit's initial interrupted state and then wait
@@ -12,7 +10,9 @@ export const prepareHowlerPlayback = () => {
 
 export const waitForPlayUnlock = (howl: Howl) => {
   // Howler 2.2.4 queues halt commands while a native start has the play lock.
-  const isLocked = () => Reflect.get(howl, '_playLock') === true;
+  const isLocked = () => {
+    return Reflect.get(howl, '_playLock') === true;
+  };
 
   if (!isLocked()) {
     return;
@@ -28,6 +28,7 @@ export const waitForPlayUnlock = (howl: Howl) => {
     howl.off('play', handleUnlock);
     howl.off('playerror', handleUnlock);
     howl.off('loaderror', cancel);
+
     resolve(unlocked);
   };
 

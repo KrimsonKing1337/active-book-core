@@ -431,6 +431,7 @@ export class HowlWrapper {
     }
 
     prepareHowlerPlayback();
+
     const soundId = this.howlInst.play();
 
     if (typeof soundId !== 'number') {
@@ -697,7 +698,10 @@ export class HowlWrapper {
       }
     }
 
-    if (revision !== this.revision || this.isDisposed || this.haltOperation !== operation) {
+    const theSameRevision = revision === this.revision;
+    const operationHalted = this.haltOperation === operation;
+
+    if (!theSameRevision || this.isDisposed || !operationHalted) {
       return;
     }
 
@@ -705,7 +709,9 @@ export class HowlWrapper {
 
     if (pendingStart) {
       this.pendingOperations.add(pendingStart);
+
       const unlocked = await pendingStart.promise;
+      const theSameRevision = revision === this.revision;
 
       this.pendingOperations.delete(pendingStart);
 
@@ -713,7 +719,7 @@ export class HowlWrapper {
         return;
       }
 
-      if (!unlocked || revision !== this.revision || this.isDisposed) {
+      if (!unlocked || !theSameRevision || this.isDisposed) {
         this.haltOperation = null;
 
         return;
@@ -754,6 +760,7 @@ export class HowlWrapper {
   unload({ immediate = false }: UnloadOptions = {}) {
     if (!this.unloadPromise && !this.isDisposed) {
       this.isUnloading = true;
+
       let followUnload = (_completion: Promise<void>) => {};
 
       this.unloadPromise = new Promise<void>((resolve) => {
