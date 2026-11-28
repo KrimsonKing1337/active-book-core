@@ -256,7 +256,7 @@ export class AudioFades {
     const requestedDuration = Math.max(0, duration);
     const deadline = now + requestedDuration;
 
-    if (ramp.shorten(deadline, now)) {
+    if (now >= ramp.deadline || ramp.shorten(deadline, now)) {
       this.render(voice, now);
     }
   }

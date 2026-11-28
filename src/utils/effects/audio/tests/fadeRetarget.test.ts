@@ -50,6 +50,20 @@ test('a shorter repeated request can finish the same fade immediately', async ()
   expect(jest.getTimerCount()).toBe(0);
 });
 
+test('finishes an overdue fade even when the deadline timer has not run yet', async () => {
+  const instance = fixture.create();
+  await instance.play();
+  const fade = instance.fadeOut();
+  instance.shortenFadeOut(100);
+  const overdueTime = performance.now() + 101;
+  jest.spyOn(performance, 'now').mockReturnValue(overdueTime);
+
+  expect(instance.shortenFadeOut(0)).toBe(fade);
+  expect(instance.isFading).toBe(false);
+  expect(await fade).toBe(true);
+  expect(instance.howlInst.volume(1001)).toBe(0);
+});
+
 test('restoring an existing voice cancels the pending stop and never starts a second voice', async () => {
   const instance = fixture.create();
   await instance.play();
