@@ -27,3 +27,5 @@
 [Правила активации, микшера, команд и `observeLoad`](../../docs/book-audio.md)
 
 Для целевого прогона playground с принудительным HTML5 Audio задайте `PLAYWRIGHT_AUDIO_TRANSPORT=html5`. Для прогона на WebKit задайте `PLAYWRIGHT_AUDIO_BROWSER=webkit` и установите браузер и нужные системные библиотеки Playwright.
+
+Все пять сценариев текущего транспорта прошли в Linux Chromium с Web Audio, в Linux Chromium с принудительным HTML5 Audio и в Playwright WebKit 27.2 (WPE) с виртуальным аудиовыходом. Проверка на реальных устройствах iOS остаётся открытой.
