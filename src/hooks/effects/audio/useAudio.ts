@@ -138,10 +138,11 @@ export const useAudio = (passedOptions: AudioEffectOptions) => {
   ]);
 
   const instance = audioInstances[id];
+  const theSamePage = currentPage === page;
 
   let prepareResource = null;
 
-  if (canPrepare && currentPage === page && instance) {
+  if (canPrepare && theSamePage && instance) {
     prepareResource = instance.observeLoad;
   }
 

@@ -99,13 +99,18 @@ export class AudioActivation {
 
     this.cancelPreparation?.();
     this.cancelPreparation = undefined;
+
     this.visitId = visitId;
 
     if (this.audio.loadOutcome === 'ready') {
       return;
     }
 
-    const cancelResource = registerPageResource(store, { visitId, prepare: this.audio.observeLoad });
+    const cancelResource = registerPageResource(store, {
+      visitId,
+      prepare: this.audio.observeLoad,
+    });
+
     const stopObservingLoad = this.audio.observeLoad((outcome) => {
       if (outcome === 'ready') {
         this.timeline.update();

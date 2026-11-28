@@ -1,6 +1,8 @@
-import type { HowlOptions } from 'howler';
-
-import { Howl, Howler } from 'howler';
+import {
+  type HowlOptions,
+  Howl,
+  Howler,
+} from 'howler';
 
 import type { AudioType } from '@types';
 
@@ -261,12 +263,14 @@ export class HowlWrapper {
     }
 
     this.loadResult = outcome;
+
     this.howlInst.off('load', this.handleLoad);
     this.howlInst.off('loaderror', this.handleLoadError);
 
-    for (const listener of this.loadListeners) {
-      this.loadListeners.delete(listener);
-      listener(outcome);
+    for (const listenerCur of this.loadListeners) {
+      this.loadListeners.delete(listenerCur);
+
+      listenerCur(outcome);
     }
   }
 
@@ -292,9 +296,7 @@ export class HowlWrapper {
   }
 
   getVolume() {
-    const storeState = store.getState();
-
-    return storeState.volume;
+    return store.getState().volume;
   }
 
   getVolumeByType() {
@@ -329,6 +331,7 @@ export class HowlWrapper {
 
     const timer = setTimeout(() => {
       this.pendingOperations.delete(operation);
+
       callbacks.complete();
     }, duration);
 
@@ -684,8 +687,9 @@ export class HowlWrapper {
 
     const revision = this.revision;
     const loaded = !this.unloadPromise && this.state() === 'loaded';
+    const playing = this.playing();
 
-    if (withFadeOut && loaded && this.playing()) {
+    if (withFadeOut && loaded && playing) {
       const completed = await this.fadeOutVoices();
 
       if (!completed) {
@@ -752,8 +756,10 @@ export class HowlWrapper {
   private async finishUnload(immediate: boolean) {
     try {
       const shouldFadeOut = !immediate && this.fadeOutWhenUnload;
+      const loaded = this.state() === 'loaded';
+      const playing = this.playing();
 
-      if (shouldFadeOut && this.state() === 'loaded' && this.playing()) {
+      if (shouldFadeOut && loaded && playing) {
         await this.fadeOutVoices();
       }
     } finally {

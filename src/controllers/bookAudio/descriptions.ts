@@ -9,7 +9,10 @@ export type AudioDescription = Required<RuntimeAudio>;
 
 const normalizeLifetime = (lifetime: EffectLifetime): EffectLifetime => {
   if (lifetime.type === 'page') {
-    return { type: 'page', page: lifetime.page };
+    return {
+      type: 'page',
+      page: lifetime.page,
+    };
   }
 
   const sortedRanges = [...lifetime.range].sort((first, second) => {
