@@ -7,13 +7,14 @@ import classNames from 'classnames';
 
 const STEP = 1;
 const MIN = 0;
-const MAX = 100;
 
 import * as styles from './Slider.module.scss';
 
 type SliderProps = {
   className?: string;
   value: number;
+  max?: number;
+  label?: string;
   onChange?: (value: number) => void;
   onAfterChange?: (value: number) => void;
 };
@@ -21,6 +22,8 @@ type SliderProps = {
 export const Slider = ({
   className = '',
   value,
+  max = 100,
+  label,
   onChange,
   onAfterChange,
 }: SliderProps) => {
@@ -54,7 +57,7 @@ export const Slider = ({
       values,
       colors: ['var(--main)', '#ccc'],
       min: MIN,
-      max: MAX,
+      max,
     });
 
     const trackStyle = {
@@ -101,7 +104,8 @@ export const Slider = ({
       values={values}
       step={STEP}
       min={MIN}
-      max={MAX}
+      max={max}
+      label={label}
       renderTrack={Track}
       renderThumb={Thumb}
       onChange={changeHandler}

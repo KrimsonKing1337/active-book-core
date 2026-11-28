@@ -70,5 +70,5 @@ window.audioLifecycle = fixture;
 // Create a real AudioContext before requesting its resume from the user gesture.
 create();
 document.getElementById('unlock')?.addEventListener('click', () => {
-  void Howler.ctx.resume();
+  void Howler.ctx?.resume();
 });

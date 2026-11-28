@@ -1,9 +1,16 @@
 import { type ChangeEvent, useState } from 'react';
 
+import {
+  DEFAULT_AUDIO_RELATIVE_VOLUME,
+  MAX_AUDIO_RELATIVE_VOLUME,
+  MIN_AUDIO_RELATIVE_VOLUME,
+} from '@@/audioVolume';
+
 import { useDispatch, useSelector } from '@store';
 import { volumeActions, volumeSelectors } from '@store/volume';
 
 import { useAudioController } from '@hooks/effects';
+
 
 import { effects } from './effects';
 import { useAudioSample } from './hooks';
@@ -20,6 +27,7 @@ export const AudioControls = () => {
     play,
     pause,
     stop,
+    setRelativeVolume,
   } = useAudioController(effectId);
   const sample = useAudioSample(audio);
   const canPlay = sample?.playback === 'ready' || sample?.playback === 'playing';
@@ -48,15 +56,11 @@ export const AudioControls = () => {
     void stop(withFade);
   };
 
-  const setInstanceVolume = (multiplier: number) => {
-    if (!audio) {
-      return;
-    }
-
-    const categoryVolume = audio.getVolumeByType() / 100;
-
-    audio.volume(categoryVolume * multiplier);
+  const handleRelativeVolume = (event: ChangeEvent<HTMLInputElement>) => {
+    setRelativeVolume(event.currentTarget.valueAsNumber);
   };
+
+  const relativeVolume = sample?.relativeVolume ?? DEFAULT_AUDIO_RELATIVE_VOLUME;
 
   return (
     <div className={styles.Controls}>
@@ -90,15 +94,19 @@ export const AudioControls = () => {
         Плавные ручные команды
       </label>
 
-      <div className={styles.Actions}>
-        <button type="button" disabled={!audio} onClick={() => setInstanceVolume(0.5)}>
-          Вдвое тише
-        </button>
+      <label className={styles.Field}>
+        Относительная громкость · {relativeVolume}%
 
-        <button type="button" disabled={!audio} onClick={() => setInstanceVolume(1)}>
-          Уровень микшера
-        </button>
-      </div>
+        <input
+          type="range"
+          aria-label="Относительная громкость"
+          min={MIN_AUDIO_RELATIVE_VOLUME}
+          max={MAX_AUDIO_RELATIVE_VOLUME}
+          value={relativeVolume}
+          disabled={!audio}
+          onChange={handleRelativeVolume}
+        />
+      </label>
 
       <label className={styles.Field}>
         Громкость SFX · {volume}%

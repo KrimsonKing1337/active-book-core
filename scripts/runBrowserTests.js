@@ -6,6 +6,7 @@ export const browserTests = [
   'audioLifecycle/audioLifecycle.browser.test.js',
   'audioLifecycle/audioDisposal.browser.test.js',
   'audioLifecycle/audioVolume.browser.test.js',
+  'audioLifecycle/amplification.browser.test.js',
   'audioLifecycle/fadeIn.browser.test.js',
   'audioLifecycle/fadeOut.browser.test.js',
   'audioLifecycle/fadeLifecycle.browser.test.js',

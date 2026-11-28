@@ -8,6 +8,7 @@ export type AudioSample = {
   audio: HowlWrapper;
   instance: number;
   playback: Playback;
+  relativeVolume: number;
   position?: number;
 };
 
@@ -29,11 +30,13 @@ const getInstance = (audio: HowlWrapper) => {
 
 const readSample = (audio: HowlWrapper): AudioSample => {
   const instance = getInstance(audio);
+  const { relativeVolume } = audio;
 
   if (audio.loadOutcome === 'failed') {
     return {
       audio,
       instance,
+      relativeVolume,
       playback: 'failed',
     };
   }
@@ -42,6 +45,7 @@ const readSample = (audio: HowlWrapper): AudioSample => {
     return {
       audio,
       instance,
+      relativeVolume,
       playback: 'loading',
     };
   }
@@ -61,6 +65,7 @@ const readSample = (audio: HowlWrapper): AudioSample => {
   return {
     audio,
     instance,
+    relativeVolume,
     playback,
     position,
   };
@@ -80,6 +85,7 @@ export const useAudioSample = (audio: HowlWrapper | null) => {
       const next = readSample(audio);
       setSample((previous) => {
         const isSameSample = previous?.audio === audio
+          && previous.relativeVolume === next.relativeVolume
           && previous.playback === next.playback
           && previous.position === next.position;
 

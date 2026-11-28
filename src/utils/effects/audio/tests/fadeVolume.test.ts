@@ -40,7 +40,7 @@ test.each([
   await jest.advanceTimersByTimeAsync(200);
   store.dispatch(volumeActions.setGlobal(factors.global));
   store.dispatch(volumeActions.setSfx(factors.category));
-  instance.relativeVolume = factors.relative;
+  instance.setRelativeVolume(factors.relative);
   instance.volume(instance.getVolumeByType() / 100);
   await jest.advanceTimersByTimeAsync(300);
   const volume = factors.global * factors.category * factors.relative / 1_000_000;
@@ -73,12 +73,12 @@ test('independent wrappers keep their own fade progress and cancellation', async
   expect(jest.getTimerCount()).toBe(0);
 });
 
-test('screamer fades to its initial override until an explicit mixer update replaces it', async () => {
+test('amplification respects the user mute throughout fades and repeated playback', async () => {
   store.dispatch(volumeActions.setGlobal(0));
-  const instance = fixture.create({ screamer: true, relativeVolume: 0 });
+  const instance = fixture.create({ relativeVolume: 200 });
   const first = instance.play(true);
   await jest.advanceTimersByTimeAsync(500);
-  expect(instance.howlInst.volume(1001)).toBeCloseTo(0.5, 2);
+  expect(instance.howlInst.volume(1001)).toBe(0);
   instance.volume(instance.getVolumeByType() / 100);
   expect(instance.isFading).toBe(true);
   await jest.advanceTimersByTimeAsync(500);
@@ -116,7 +116,7 @@ test('sound gains keep advancing independently while the base volume is zero', a
   expect(instance.howlInst.volume(1002)).toBe(0.5);
 });
 
-test('an absolute scoped fade uses the supplied levels even with a non-unit base volume', async () => {
+test('a scoped fade multiplies its levels by the base volume', async () => {
   const instance = fixture.create({ relativeVolume: 50 });
   await instance.play();
   const fade = instance.fade({
@@ -125,18 +125,18 @@ test('an absolute scoped fade uses the supplied levels even with a non-unit base
     duration: 1000,
     soundId: 1001,
   });
-  expect(instance.howlInst.volume(1001)).toBe(0.8);
+  expect(instance.howlInst.volume(1001)).toBe(0.4);
   await jest.advanceTimersByTimeAsync(500);
-  expect(instance.howlInst.volume(1001)).toBeCloseTo(0.5, 4);
-  instance.volume(0.5);
   expect(instance.howlInst.volume(1001)).toBeCloseTo(0.25, 4);
+  instance.volume(0.5);
+  expect(instance.howlInst.volume(1001)).toBeCloseTo(0.125, 4);
   await jest.advanceTimersByTimeAsync(250);
-  expect(instance.howlInst.volume(1001)).toBeCloseTo(0.175, 4);
+  expect(instance.howlInst.volume(1001)).toBeCloseTo(0.0875, 4);
   instance.volume(1);
   await jest.advanceTimersByTimeAsync(250);
   expect(await fade).toBe(true);
-  expect(instance.howlInst.volume(1001)).toBe(0.2);
+  expect(instance.howlInst.volume(1001)).toBe(0.1);
   expect(instance.howlInst.volume()).toBe(0.5);
   instance.volume(0.8);
-  expect(instance.howlInst.volume(1001)).toBe(0.4);
+  expect(instance.howlInst.volume(1001)).toBeCloseTo(0.08, 4);
 });

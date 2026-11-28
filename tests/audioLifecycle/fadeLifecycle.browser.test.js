@@ -66,16 +66,25 @@ test('cancelling faded play while loading settles its promise before the resourc
   context.after(() => release());
   const cancelled = await page.evaluate(async () => {
     const fixture = window.audioLifecycle;
-    const audio = fixture.create({ id: 'loading-fade', src: '/fade-loading.wav' });
+    const audio = fixture.create({
+      id: 'loading-fade',
+      src: '/fade-loading.wav',
+      relativeVolume: 150,
+    });
     const fadeOut = audio.fadeOut();
     const play = audio.play(true);
     await audio.stop();
     await Promise.all([fadeOut, play]);
 
-    return { playing: audio.playing(), queued: Reflect.get(audio.howlInst, '_queue').length };
+    return {
+      playing: audio.playing(),
+      queued: Reflect.get(audio.howlInst, '_queue').length,
+      gainAllocated: Boolean(Reflect.get(Reflect.get(audio, 'gain'), 'output')),
+    };
   });
   assert.equal(cancelled.playing, false);
   assert.equal(cancelled.queued, 0);
+  assert.equal(cancelled.gainAllocated, false);
   release();
   await page.waitForFunction(() => window.audioLifecycle.get('loading-fade').state() === 'loaded');
   const result = await page.evaluate(async () => {

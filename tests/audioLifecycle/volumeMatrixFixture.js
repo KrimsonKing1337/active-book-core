@@ -1,3 +1,5 @@
+import { until } from './fadeFixture.js';
+
 export const readVolumeMatrix = async () => {
   const fixture = window.audioLifecycle;
   const levels = [
@@ -16,8 +18,10 @@ export const readVolumeMatrix = async () => {
   const failures = [];
   let checked = 0;
   const check = async (phase, expected) => {
-    // AudioParam values become observable after the audio rendering quantum.
-    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    // AudioParam values become observable on the audio thread, independently of animation frames.
+    const { ctx } = fixture.howler;
+    const renderedAt = ctx.currentTime + 256 / ctx.sampleRate;
+    await until(() => ctx.currentTime >= renderedAt);
     for (const id of ids) {
       const howl = fixture.get(id).howlInst;
 
@@ -25,6 +29,7 @@ export const readVolumeMatrix = async () => {
         failures.push({
           id,
           phase,
+          source: 'group',
           actual: howl.volume(),
           expected,
         });
@@ -35,6 +40,7 @@ export const readVolumeMatrix = async () => {
           failures.push({
             id,
             phase,
+            source: sound._id,
             actual: sound._node.gain.value,
             expected,
           });
@@ -62,7 +68,7 @@ export const readVolumeMatrix = async () => {
         video.setAttribute('data-relativeVolume', String(relative));
 
         for (const id of ids) {
-          fixture.get(id).relativeVolume = relative;
+          fixture.get(id).setRelativeVolume(relative);
         }
 
         fixture.store.dispatch(fixture.volumeActions.setAll({

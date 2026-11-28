@@ -154,12 +154,14 @@ test('manual volume and halt controls preserve the current on fast reentry', asy
   assert(first);
   await selectEffect(page, 'current');
   const currentAudio = await getAudio(page, 'current');
-  const volume = await currentAudio.evaluate((audio) => audio.howlInst.volume());
-  assert(volume > 0);
-  await page.getByRole('button', { name: 'Вдвое тише' }).click();
-  assert.equal(await currentAudio.evaluate((audio) => audio.howlInst.volume()), volume / 2);
-  await page.getByRole('button', { name: 'Уровень микшера' }).click();
-  assert.equal(await currentAudio.evaluate((audio) => audio.howlInst.volume()), volume);
+  const baseVolume = await currentAudio.evaluate((audio) => audio.howlInst.volume() * 100 / audio.relativeVolume);
+  assert(baseVolume > 0);
+  const relative = page.getByRole('slider', { name: 'Относительная громкость' });
+  await relative.fill('50');
+  assert.equal(await currentAudio.evaluate((audio) => audio.howlInst.volume()), baseVolume / 2);
+  await relative.fill('200');
+  assert.equal(await currentAudio.evaluate((audio) => audio.relativeVolume), 200);
+  assert.equal(await currentAudio.evaluate((audio) => audio.howlInst.volume()), baseVolume);
 
   assert.deepEqual(await returnFromTower(scene(page, '5. Вышка'), { audio: currentAudio }), {
     isUnavailable: true,

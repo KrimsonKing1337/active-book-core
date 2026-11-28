@@ -77,15 +77,17 @@ test.each(volumeCases)('audio factors $global/$category/$relative apply once in 
   }
 });
 
-test('screamer retains its initial full-volume override and later explicit mixer updates', () => {
+test('amplified audio preserves user mixer mutes on creation and updates', () => {
   store.dispatch(actions.setGlobal(0));
   store.dispatch(actions.setSfx(50));
-  const instance = fixture.create({ screamer: true, relativeVolume: 25 });
+  const instance = fixture.create({ relativeVolume: 200 });
   Reflect.set(instance.howlInst, '_state', 'loaded');
-  expect(instance.howlInst.volume()).toBe(1);
+  expect(instance.howlInst.volume()).toBe(0);
   store.dispatch(audioEffectsActions.setAudioInstance(instance));
   store.dispatch(actions.setGlobal(50));
-  expect(instance.howlInst.volume()).toBeCloseTo(0.0625, 12);
+  expect(instance.howlInst.volume()).toBe(0.25);
+  store.dispatch(actions.setSfx(0));
+  expect(instance.howlInst.volume()).toBe(0);
 });
 
 test('a stale volume callback cannot enqueue work on a disposed Howl or change its replacement', async () => {

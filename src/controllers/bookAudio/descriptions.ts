@@ -4,6 +4,8 @@ import type {
   PageRange,
 } from '@active-book/types';
 
+import { assertAudioRelativeVolume, DEFAULT_AUDIO_RELATIVE_VOLUME } from '@@/audioVolume';
+
 type RuntimeAudio = AudioEffect<number>;
 export type AudioDescription = Required<RuntimeAudio>;
 
@@ -48,9 +50,8 @@ export const normalizeAudioDescription = ({
   lifetime,
   format = [],
   type = 'sfx',
-  relativeVolume = 100,
+  relativeVolume = DEFAULT_AUDIO_RELATIVE_VOLUME,
   loop = false,
-  screamer = false,
   playOnLoad = false,
   delay = 0,
   stopBy = 0,
@@ -58,6 +59,7 @@ export const normalizeAudioDescription = ({
   fadeOut = false,
   waitTillTheEnd = false,
 }: RuntimeAudio): AudioDescription => {
+  assertAudioRelativeVolume(relativeVolume);
   const normalizedLifetime = normalizeLifetime(lifetime);
 
   return {
@@ -68,7 +70,6 @@ export const normalizeAudioDescription = ({
     type,
     relativeVolume,
     loop,
-    screamer,
     playOnLoad,
     delay,
     stopBy,

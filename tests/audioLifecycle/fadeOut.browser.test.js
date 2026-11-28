@@ -65,6 +65,59 @@ test('scoped fade honors duration, zero duration and equal endpoints without nat
   assert.equal(result.resources, 0);
 });
 
+test('replacing a fade removes scheduled Howler automation even after its interval ends early', async (context) => {
+  const page = await openAudio(context);
+  const result = await page.evaluate(async () => {
+    const {
+      readVoices,
+      timedMeter,
+      until,
+    } = await import('/tests/audioLifecycle/fadeFixture.js');
+    const fixture = window.audioLifecycle;
+    const audio = fixture.get();
+    audio.howlInst.loop(true);
+    const signal = await timedMeter();
+    await audio.play();
+    await until(() => fixture.events.includes('play:audio'));
+    const { id: soundId } = readVoices(audio)[0];
+    const start = fixture.howler.ctx.currentTime;
+    const fade = audio.fade({
+      from: 1,
+      to: 0.2,
+      duration: 400,
+      soundId,
+    });
+
+    // Howler's interval uses Date.now() while the underlying ramp uses the audio clock.
+    const wallTime = Date.now;
+
+    try {
+      Date.now = () => wallTime() + 500;
+      await until(() => !readVoices(audio)[0].fading);
+    } finally {
+      Date.now = wallTime;
+    }
+
+    const completed = await audio.fade({
+      from: 0.2,
+      to: 0,
+      duration: 0,
+      soundId,
+    });
+    const previousCompleted = await fade;
+    await signal.waitFor(start + 0.47);
+    const residual = signal.rms(start + 0.41, start + 0.47);
+    signal.close();
+    await audio.unload();
+
+    return { completed, previousCompleted, residual };
+  });
+
+  assert.equal(result.completed, true);
+  assert.equal(result.previousCompleted, false);
+  assert.equal(result.residual, 0);
+});
+
 test('mixer updates preserve the real fade signal and the pending stop deadline', async (context) => {
   const page = await openAudio(context);
   const result = await page.evaluate(async () => {
@@ -95,7 +148,7 @@ test('mixer updates preserve the real fade signal and the pending stop deadline'
     await wait(250);
     fixture.store.dispatch(fixture.volumeActions.setGlobal(50));
     fixture.store.dispatch(fixture.volumeActions.setSfx(50));
-    audio.relativeVolume = 50;
+    audio.setRelativeVolume(50);
     audio.volume(audio.getVolumeByType() / 100);
     await wait(250);
     const midpoint = signal.rms() / baseline;

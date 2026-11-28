@@ -3,6 +3,8 @@ import {
   useLayoutEffect,
 } from 'react';
 
+import { DEFAULT_AUDIO_RELATIVE_VOLUME } from '@@/audioVolume';
+
 import type { AudioEffectOptions } from '@types';
 
 import {
@@ -35,8 +37,7 @@ export const useAudio = (passedOptions: AudioEffectOptions) => {
     loop = false,
     stopBy = 0,
     delay = 0,
-    relativeVolume = 100,
-    screamer = false,
+    relativeVolume = DEFAULT_AUDIO_RELATIVE_VOLUME,
     fadeOutWhenUnload = true,
 
     onPlay = () => {},
@@ -98,7 +99,6 @@ export const useAudio = (passedOptions: AudioEffectOptions) => {
       type,
       loop,
       relativeVolume,
-      screamer,
       fadeOutWhenUnload,
       stopBy,
       delay,

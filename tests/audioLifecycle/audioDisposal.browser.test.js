@@ -8,6 +8,7 @@ test('short real loop releases every Howl after its lifetime, preserving the exi
   await page.evaluate(() => window.audioLifecycle.create({
     id: 'loop',
     src: '/tests/audioLifecycle/short.wav',
+    relativeVolume: 150,
     loop: true,
     fadeOutWhenUnload: true,
   }));
@@ -33,6 +34,7 @@ test('explicit cleanup lets a short real loop finish only its current iteration'
   await page.evaluate(() => window.audioLifecycle.create({
     id: 'finite',
     src: '/tests/audioLifecycle/short.wav',
+    relativeVolume: 200,
     loop: true,
   }));
   await page.waitForFunction(() => window.audioLifecycle.get('finite').state() === 'loaded');
@@ -59,4 +61,33 @@ test('explicit cleanup lets a short real loop finish only its current iteration'
   assert.equal(events.filter((event) => event === 'end:finite').length, 1);
   assert(events.indexOf('end:finite') < events.indexOf('unload:finite'));
   assert.equal(await page.evaluate(() => window.audioLifecycle.resourceCount()), 0);
+});
+
+test('failed amplified audio has no output node and unloads without starting a voice', async (context) => {
+  const page = await openAudio(context);
+  const result = await page.evaluate(async () => {
+    const fixture = window.audioLifecycle;
+    const audio = fixture.create({
+      id: 'failed',
+      src: '/tests/audioLifecycle/unsupported.activebook',
+      relativeVolume: 200,
+    });
+    const outcome = await new Promise((resolve) => audio.observeLoad(resolve));
+    await audio.play(true);
+    const output = Reflect.get(Reflect.get(audio, 'gain'), 'output');
+    await audio.unload();
+    await fixture.cleanup();
+
+    return {
+      outcome,
+      hasOutput: Boolean(output),
+      events: fixture.events,
+      resources: fixture.resourceCount(),
+    };
+  });
+
+  assert.equal(result.outcome, 'failed');
+  assert.equal(result.hasOutput, false);
+  assert.deepEqual(result.events, ['unload:failed', 'unload:audio']);
+  assert.equal(result.resources, 0);
 });

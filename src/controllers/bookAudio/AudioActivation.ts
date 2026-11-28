@@ -38,7 +38,6 @@ export class AudioActivation {
       loop,
       type,
       relativeVolume,
-      screamer,
     } = description;
 
     const formatCopy = [...format];
@@ -50,7 +49,6 @@ export class AudioActivation {
       loop,
       type,
       relativeVolume,
-      screamer,
 
       beforePlay: () => this.timeline.beforeManualPlay(),
       canPlay: () => options.isActive(this),
@@ -78,17 +76,11 @@ export class AudioActivation {
       return;
     }
 
+    const previousVolume = this.description.relativeVolume;
     this.description = description;
-    this.setRelativeVolume(description.relativeVolume ?? 100);
-  }
 
-  setRelativeVolume(volume: number) {
-    if (volume !== this.audio.relativeVolume) {
-      this.audio.relativeVolume = volume;
-
-      const categoryVolume = this.audio.getVolumeByType();
-
-      this.audio.volume(categoryVolume / 100);
+    if (description.relativeVolume !== previousVolume) {
+      this.audio.setRelativeVolume(description.relativeVolume);
     }
   }
 

@@ -73,7 +73,7 @@ test('range playback and position continue while the destination visit loads ano
   assert.equal(afterClose.playing, false);
 });
 
-test('retiring audio restores the same voice and shortens a fade from its current output', async (context) => {
+test('retiring amplified audio restores the same voice and shortens a fade from its current output', async (context) => {
   const page = await openBook(context, 'generations');
   const result = await page.evaluate(async () => {
     const { readVoices, timedMeter, until, wait } = await import('/tests/audioLifecycle/fadeFixture.js');
@@ -97,6 +97,7 @@ test('retiring audio restores the same voice and shortens a fade from its curren
     const afterRestore = signal.rms(restoreAt + 0.02, restoreAt + 0.06);
     const restored = {
       sameAudio: book.get('sound-1') === first,
+      relativeVolume: first.relativeVolume,
       sameVoice: readVoices(first)[0].id === voiceId,
       advanced: first.howlInst.seek(voiceId) > position,
     };
@@ -138,7 +139,7 @@ test('retiring audio restores the same voice and shortens a fade from its curren
   });
 
   context.diagnostic(JSON.stringify(result));
-  assert.deepEqual(result.restored, { sameAudio: true, sameVoice: true, advanced: true });
+  assert.deepEqual(result.restored, { sameAudio: true, relativeVolume: 150, sameVoice: true, advanced: true });
   assert.equal(result.firstPlayCount, 1);
   assert(result.beforeRestore > 0.4 && result.beforeRestore < 0.95);
   assert(Math.abs(result.afterRestore - result.beforeRestore) < 0.18);
